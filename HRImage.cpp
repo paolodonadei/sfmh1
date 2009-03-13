@@ -89,7 +89,7 @@ HRImage::HRImage(const HRImage &img)
     cv_img=cvCloneImage(img.cv_img);
  updateImageInfo();
 
-cout<<"copy constructor being called on :"<<filename<<endl;
+ if(DEBUGLVL>0) cout<<"copy constructor being called on :"<<filename<<endl;
 
 
 }
@@ -116,7 +116,7 @@ int HRImage::displayImage()
 HRImage::HRImage(string fname)
 {
     cv_img=NULL;
-
+    flag_valid=0;//object not redy yet
     openim(fname);
 
 }
@@ -124,6 +124,7 @@ HRImage::HRImage(string fname)
 
 HRImage::HRImage(char* fname)
 {
+    flag_valid=0;//object not redy yet
     filename=fname;
     string sfname=fname;
     openim(sfname);
@@ -132,6 +133,7 @@ HRImage::HRImage(char* fname)
 
 HRImage::HRImage(int pheight, int pwidth,int initial)
 {
+    flag_valid=0;//object not redy yet
     openim(pheight,pwidth,initial);
 }
 
@@ -156,6 +158,7 @@ int HRImage::writeImage(string fname)
 
 HRImage::~HRImage()
 {
+
     // cout<<"destructor is being called on "<<filename<<endl;
     close();
 
@@ -222,7 +225,7 @@ void  HRImage::setAll(int val)
 
 void HRImage::close()
 {
-    cout<<"close of HRImage called "<<filename<<endl;
+   if(DEBUGLVL>0)   cout<<"close of HRImage called "<<filename<<endl;
     //free the oneD and twoD arrays
     if (flag_valid==0 || cv_img==NULL )
     {
@@ -297,7 +300,7 @@ void HRImage::setPixel(int y,int x,int pixValue)
 
 HRImage& HRImage::operator= (const HRImage& param)
 {
-cout<<"shouldnt be here_______________________"<<endl;///zzzzz
+
     if (param.flag_valid==0)
     {
         cout<<"equating to empty image, returning\n"<<endl;
@@ -330,7 +333,7 @@ void HRImage::updateImageInfo()
     step      = cv_img->widthStep;
     channels  = cv_img->nChannels;
     data      = (uchar *)cv_img->imageData;
-    cout<<"Processing a "<< height<<"X"<< width <<"image with "<<  channels<<" channels, called: "<<filename<<endl;
+   if(DEBUGLVL>0)   cout<<"Processing a "<< height<<"X"<< width <<"image with "<<  channels<<" channels, called: "<<filename<<endl;
 
 
 }
@@ -458,7 +461,7 @@ HRCORRImage::~HRCORRImage()
 void HRCORRImage::close()
 {
 
-    cout<<"close of HRCORRImage"<<endl;
+    if(DEBUGLVL>0)  cout<<"close of HRCORRImage"<<endl;
     //free the oneD and twoD arrays
     if (flag_valid==0)
     {
@@ -485,14 +488,14 @@ HRImageSet::~HRImageSet()
 }
 void HRImageSet::showOneByOne()
 {
-    cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
-    vector<HRImage>::iterator img_iterator;
+   if(DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
+    vector<HRImagePtr>::iterator img_iterator;
 
 
     img_iterator = imageCollection.begin();
     while ( img_iterator  != imageCollection.end() )
     {
-        img_iterator->displayImage();
+        (*img_iterator)->displayImage();
         ++img_iterator;
     }
 
@@ -537,13 +540,15 @@ int  HRImageSet::open(string directoryName)
                     {
                         ++file_count;
                         cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
-                        HRImage myimage(dir_itr->path().string());
-                        imageCollection.push_back(myimage);
-                        cout<<"_____________________________________________________________________"<<endl;
+
+                        HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
+                        imageCollection.push_back( hr_iptr );
+
+
 
                     }
-                     std::cout<<"Press [Enter] to continue . . .";///zzzz
-                        std::cin.get();
+                   //  std::cout<<"Press [Enter] to continue . . .";
+                    //    std::cin.get();
 
                 }
 
@@ -562,6 +567,6 @@ int  HRImageSet::open(string directoryName)
         cout << "\nFound: " << full_path.native_file_string() << endl;
     }
     numImages=file_count;
-    cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
-cout<<"________________LOOP FINISHED______________________________"<<endl;
+   // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
+//cout<<"________________LOOP FINISHED______________________________"<<endl;
 }

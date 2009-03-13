@@ -15,8 +15,11 @@ int main(int argc, char *argv[])
     argument_processing(argc, argv, &my_parms);
 
    printf("directory is %s \n",my_parms.dirName.c_str());
-HRImageSet imSet(my_parms.dirName);
-//imSet.showOneByOne();
+
+{
+    HRImageSet imSet(my_parms.dirName);
+
+}
    return 0;
 }
 

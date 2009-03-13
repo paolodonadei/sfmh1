@@ -1,11 +1,13 @@
 #ifndef HRIMAGE_HPP_INCLUDED
 #define HRIMAGE_HPP_INCLUDED
 
+
 #include <string>
 #include <cv.h>
 #include <highgui.h>
 #include "HRprimitives.h"
 #include <vector>
+#include <boost/shared_ptr.hpp>
 using namespace std;
 
 class HRImage
@@ -70,10 +72,11 @@ public:
     int init(HRImage* p_hr_im1,HRImage* p_hr_im2);
     void close();
 };
+typedef boost::shared_ptr<HRImage> HRImagePtr;
 
 class HRImageSet
 {
-vector<HRImage> imageCollection;
+vector<HRImagePtr> imageCollection;
 string dirName;
 int numImages;
  public:
