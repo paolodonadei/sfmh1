@@ -53,26 +53,26 @@ void argument_processing(int argc, char *argv[], Parameters *params)
 
 //////////here is the error checking for the arguments////
 //1. directory is non empty
-    if(params->dirName.length()==0)
+    if (params->dirName.length()==0)
     {
         std::cout << "directory not defined, use option -D\n";
-         UsageShow();
-    exit(EXIT_FAILURE);
+        UsageShow();
+        exit(EXIT_FAILURE);
     }
 //2. directory exists
 
     if ( !boost::filesystem::exists( params->dirName ) )
     {
         std::cout << "directory: "<<params->dirName <<" does not exist, exiting\n";
-         UsageShow();
-    exit(EXIT_FAILURE);
+        UsageShow();
+        exit(EXIT_FAILURE);
     }
 //3. if its not a directory
     if ( !boost::filesystem::is_directory( params->dirName ) )
     {
         std::cout << "this: "<<params->dirName <<" is not a directory\n";
-         UsageShow();
-    exit(EXIT_FAILURE);
+        UsageShow();
+        exit(EXIT_FAILURE);
     }
 
 

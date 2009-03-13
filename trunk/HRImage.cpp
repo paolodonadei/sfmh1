@@ -47,7 +47,7 @@ int HRImage::openim(string fname)
 
     if (cv_img->nChannels!=1)
     {
-         if(DEBUGLVL>0)  cout<<" image is not grey, converting"<<endl;
+        if (DEBUGLVL>0)  cout<<" image is not grey, converting"<<endl;
         IplImage* tempImage = cvCreateImage(cvGetSize(cv_img), IPL_DEPTH_8U, 1);
         cvCvtColor(cv_img, tempImage, CV_BGR2GRAY);
         cvReleaseImage(&cv_img );
@@ -87,9 +87,9 @@ HRImage::HRImage(const HRImage &img)
     flag_valid=img.flag_valid;
     filename=img.filename+"_copy";
     cv_img=cvCloneImage(img.cv_img);
- updateImageInfo();
+    updateImageInfo();
 
- if(DEBUGLVL>0) cout<<"copy constructor being called on :"<<filename<<endl;
+    if (DEBUGLVL>0) cout<<"copy constructor being called on :"<<filename<<endl;
 
 
 }
@@ -97,7 +97,7 @@ int HRImage::displayImage()
 {
     if (flag_valid==0)
     {
-      cout<<"image not loaded\n"<<endl;
+        cout<<"image not loaded\n"<<endl;
         return 0;
     }
     cvNamedWindow(  filename.c_str(), CV_WINDOW_AUTOSIZE);
@@ -225,7 +225,7 @@ void  HRImage::setAll(int val)
 
 void HRImage::close()
 {
-   if(DEBUGLVL>0)   cout<<"close of HRImage called "<<filename<<endl;
+    if (DEBUGLVL>0)   cout<<"close of HRImage called "<<filename<<endl;
     //free the oneD and twoD arrays
     if (flag_valid==0 || cv_img==NULL )
     {
@@ -333,7 +333,7 @@ void HRImage::updateImageInfo()
     step      = cv_img->widthStep;
     channels  = cv_img->nChannels;
     data      = (uchar *)cv_img->imageData;
-   if(DEBUGLVL>0)   cout<<"Processing a "<< height<<"X"<< width <<"image with "<<  channels<<" channels, called: "<<filename<<endl;
+    if (DEBUGLVL>0)   cout<<"Processing a "<< height<<"X"<< width <<"image with "<<  channels<<" channels, called: "<<filename<<endl;
 
 
 }
@@ -461,7 +461,7 @@ HRCORRImage::~HRCORRImage()
 void HRCORRImage::close()
 {
 
-    if(DEBUGLVL>0)  cout<<"close of HRCORRImage"<<endl;
+    if (DEBUGLVL>0)  cout<<"close of HRCORRImage"<<endl;
     //free the oneD and twoD arrays
     if (flag_valid==0)
     {
@@ -488,7 +488,7 @@ HRImageSet::~HRImageSet()
 }
 void HRImageSet::showOneByOne()
 {
-   if(DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
+    if (DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
     vector<HRImagePtr>::iterator img_iterator;
 
 
@@ -547,7 +547,7 @@ int  HRImageSet::open(string directoryName)
 
 
                     }
-                   //  std::cout<<"Press [Enter] to continue . . .";
+                    //  std::cout<<"Press [Enter] to continue . . .";
                     //    std::cin.get();
 
                 }
@@ -567,6 +567,6 @@ int  HRImageSet::open(string directoryName)
         cout << "\nFound: " << full_path.native_file_string() << endl;
     }
     numImages=file_count;
-   // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
+    // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
 //cout<<"________________LOOP FINISHED______________________________"<<endl;
 }

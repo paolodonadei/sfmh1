@@ -14,13 +14,13 @@ int main(int argc, char *argv[])
     //Process command-line arguments
     argument_processing(argc, argv, &my_parms);
 
-   printf("directory is %s \n",my_parms.dirName.c_str());
+    printf("directory is %s \n",my_parms.dirName.c_str());
 
-{
-    HRImageSet imSet(my_parms.dirName);
+    {
+        HRImageSet imSet(my_parms.dirName);
 
-}
-   return 0;
+    }
+    return 0;
 }
 
 
