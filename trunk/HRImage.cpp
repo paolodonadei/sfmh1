@@ -11,6 +11,7 @@ using namespace std;
 
 HRImage::HRImage()
 {
+    hr_features=NULL;
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     cv_img=NULL;
@@ -19,6 +20,7 @@ HRImage::HRImage()
 }
 int HRImage::openim(string fname)
 {
+
     cv_img=NULL;
     if ( !boost::filesystem::exists( fname) )
     {
@@ -84,8 +86,9 @@ int HRImage::openim(int pheight, int pwidth,int initial)
 }
 HRImage::HRImage(const HRImage &img)
 {
+    hr_features=NULL;
     flag_valid=img.flag_valid;
-    filename=img.filename+"_copy";
+
     cv_img=cvCloneImage(img.cv_img);
     updateImageInfo();
 
@@ -115,6 +118,7 @@ int HRImage::displayImage()
 
 HRImage::HRImage(string fname)
 {
+    hr_features=NULL;
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     openim(fname);
@@ -124,6 +128,7 @@ HRImage::HRImage(string fname)
 
 HRImage::HRImage(char* fname)
 {
+    hr_features=NULL;
     flag_valid=0;//object not redy yet
     filename=fname;
     string sfname=fname;
@@ -569,4 +574,19 @@ int  HRImageSet::open(string directoryName)
     numImages=file_count;
     // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
 //cout<<"________________LOOP FINISHED______________________________"<<endl;
+}
+
+int HRImageSet::featureMatchSift()
+{
+
+
+
+
+
+
+
+
+
+
+ return 0;
 }
