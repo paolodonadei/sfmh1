@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="305" topLine="0" />
+	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="2698" topLine="114" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="2182" topLine="56" />
+		<Cursor position="236" topLine="0" />
 	</File>
-	<File name="HRprimitives.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="0" topLine="0" />
+	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="81" topLine="0" />
 	</File>
-	<File name="Makefile" open="1" top="1" tabpos="7">
-		<Cursor position="83" topLine="0" />
+	<File name="Makefile" open="1" top="0" tabpos="7">
+		<Cursor position="397" topLine="0" />
 	</File>
-	<File name="argproc.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1387" topLine="51" />
+	<File name="argproc.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1387" topLine="0" />
 	</File>
-	<File name="argproc.h" open="1" top="0" tabpos="2">
+	<File name="argproc.h" open="1" top="0" tabpos="3">
 		<Cursor position="373" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="392" topLine="0" />
+	<File name="main.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="399" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

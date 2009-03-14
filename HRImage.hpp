@@ -43,7 +43,7 @@ public:
     }
     void updateImageInfo();
     void incrementPixel(int y,int x);
-
+    HRFeatures* hr_features;
 private:
 
     enum {BLACK=0,WHITE=255};
@@ -76,13 +76,15 @@ typedef boost::shared_ptr<HRImage> HRImagePtr;
 
 class HRImageSet
 {
-vector<HRImagePtr> imageCollection;
-string dirName;
-int numImages;
- public:
-       HRImageSet();
+
+    vector<HRImagePtr> imageCollection;
+    string dirName;
+    int numImages;
+public:
+    int featureMatchSift();
+    HRImageSet();
     HRImageSet(string directoryName);
-        ~HRImageSet();
+    ~HRImageSet();
     int open(string directoryName);
     void showOneByOne();
 };
