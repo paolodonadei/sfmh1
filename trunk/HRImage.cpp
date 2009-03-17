@@ -4,6 +4,8 @@
 #include <iostream>
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
+#include <time.h>
+#include "general.h"
 
 #define DEBUGLVL 0
 namespace fs = boost::filesystem;
@@ -11,7 +13,7 @@ using namespace std;
 
 HRImage::HRImage()
 {
-    hr_features=NULL;
+
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     cv_img=NULL;
@@ -86,7 +88,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
 }
 HRImage::HRImage(const HRImage &img)
 {
-    hr_features=NULL;
+
     flag_valid=img.flag_valid;
 
     cv_img=cvCloneImage(img.cv_img);
@@ -118,7 +120,7 @@ int HRImage::displayImage()
 
 HRImage::HRImage(string fname)
 {
-    hr_features=NULL;
+
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     openim(fname);
@@ -128,7 +130,7 @@ HRImage::HRImage(string fname)
 
 HRImage::HRImage(char* fname)
 {
-    hr_features=NULL;
+
     flag_valid=0;//object not redy yet
     filename=fname;
     string sfname=fname;
@@ -342,6 +344,55 @@ void HRImage::updateImageInfo()
 
 
 }
+int HRImage::findSIFTfeatures()
+{
+    if (flag_valid==0)
+    {
+        cout<<"image not loaded\n"<<endl;
+        return ;
+    }
+
+    //check see if sift exists
+    if ( !fs::exists( "utils/sift" ) )
+    {
+        cout << "sift for matching is unavailable\n";
+        exit(EXIT_FAILURE  );
+    }
+
+    //  HR2DVector;
+// HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
+//zzz                        imageCollection.push_back( hr_iptr );
+
+    fs::path p( filename, fs::native );
+    string pgmfilename="";
+
+    if (!fs::extension(p)==".pgm") //create pgm version for sift binary
+    {
+        p.replace_extension(".pgm");
+        pgmfilename=p.path().string();
+        if (!cvSaveImage(pgmfilename.c_str(),cv_img))
+        {
+
+            cout<<"image "<<fname <<" not saved\n"<<endl;
+            return 0;
+        }
+        fs::path p2( pgmfilename, fs::native );
+        if ( !fs::exists( p2 ) )
+        {
+            cout << "file was not saved: "<<pgmfilename<<endl;
+            exit(EXIT_FAILURE  );
+        }
+        else
+        {
+            pgmfilename=filename;zzz
+        }
+
+    }
+
+
+}
+
+
 
 ///////////////////////////////////////////////////////////CLASS HRCORRIMAGE:
 HRCORRImage::HRCORRImage()
@@ -588,5 +639,5 @@ int HRImageSet::featureMatchSift()
 
 
 
- return 0;
+    return 0;
 }
