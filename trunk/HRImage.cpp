@@ -349,14 +349,14 @@ int HRImage::findSIFTfeatures()
     if (flag_valid==0)
     {
         cout<<"image not loaded\n"<<endl;
-        return ;
+        return 0;
     }
 
     //check see if sift exists
     if ( !fs::exists( "utils/sift" ) )
     {
         cout << "sift for matching is unavailable\n";
-        exit(EXIT_FAILURE  );
+       return 0;
     }
 
     //  HR2DVector;
@@ -369,6 +369,12 @@ int HRImage::findSIFTfeatures()
     if (!fs::extension(p)==".pgm") //create pgm version for sift binary
     {
         p.replace_extension(".pgm");
+    }
+     else
+        {
+            pgmfilename=filename;
+        }
+
         pgmfilename=p.path().string();
         if (!cvSaveImage(pgmfilename.c_str(),cv_img))
         {
@@ -382,10 +388,7 @@ int HRImage::findSIFTfeatures()
             cout << "file was not saved: "<<pgmfilename<<endl;
             exit(EXIT_FAILURE  );
         }
-        else
-        {
-            pgmfilename=filename;zzz
-        }
+
 
     }
 
