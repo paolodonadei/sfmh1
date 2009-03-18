@@ -2,7 +2,7 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="7395" topLine="360" />
+		<Cursor position="7229" topLine="359" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="0" topLine="0" />
@@ -14,7 +14,7 @@
 		<Cursor position="526" topLine="0" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="7">
-		<Cursor position="189" topLine="0" />
+		<Cursor position="83" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />
