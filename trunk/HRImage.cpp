@@ -7,15 +7,19 @@
 #include <time.h>
 #include "general.h"
 #include "pgmutils.hpp"
+#include "sift.h"
+
+
 #define DEBUGLVL 0
 #define TEMPDIR "tempdir"
+
 namespace fs = boost::filesystem;
 using namespace std;
 
 HRImage::HRImage()
 {
-siftkeyfilename="";
-pgmfilename="";
+    siftkeyfilename="";
+    pgmfilename="";
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     cv_img=NULL;
@@ -24,8 +28,8 @@ pgmfilename="";
 }
 int HRImage::openim(string fname)
 {
-siftkeyfilename="";
-pgmfilename="";
+    siftkeyfilename="";
+    pgmfilename="";
     cv_img=NULL;
     if ( !boost::filesystem::exists( fname) )
     {
@@ -94,7 +98,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
 HRImage::HRImage(const HRImage &img)
 {
     siftkeyfilename="";
-pgmfilename="";
+    pgmfilename="";
     flag_valid=img.flag_valid;
 
     cv_img=cvCloneImage(img.cv_img);
@@ -350,6 +354,48 @@ void HRImage::updateImageInfo()
 
 
 }
+
+int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
+{
+    FILE *fp;
+
+    fp = fopen (filename.c_str(), "r");
+    if (! fp)
+        FatalError("Could not open file: %s", filename);
+
+//
+    int i, j, num, len, val;
+
+
+    if (fscanf(fp, "%d %d", &num, &len) != 2)
+        FatalError("Invalid keypoint file beginning.");
+
+    if (len != 128)
+        FatalError("Keypoint descriptor length invalid (should be 128).");
+
+    for (i = 0; i < num; i++)
+    {
+        HRPointFeatures newfeature( new HRFeature);
+
+        /* Allocate memory for the keypoint. */
+        newfeature->descriptor.reserve(len);
+
+        if (fscanf(fp, "%f %f %f %f", &(newfeature->location.y), &(newfeature->location.x), &(newfeature->scale),&(newfeature->ori)) != 4)
+            FatalError("Invalid keypoint file format.");
+
+        for (j = 0; j < len; j++)
+        {
+            if (fscanf(fp, "%d", &val) != 1 || val < 0 || val > 255)
+                FatalError("Invalid keypoint file value.");
+
+            newfeature->descriptor.push_back((double) val);
+        }
+        siftVector.push_back(newfeature);
+    }
+
+
+    fclose(fp);
+}
 int HRImage::findSIFTfeatures()
 {
     if (flag_valid==0)
@@ -365,9 +411,6 @@ int HRImage::findSIFTfeatures()
         return 0;
     }
 
-    //  HR2DVector;
-// HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
-//zzz                        imageCollection.push_back( hr_iptr );
 
     fs::path p( filename, fs::native );
     pgmfilename="";
@@ -410,22 +453,66 @@ int HRImage::findSIFTfeatures()
 
 
 //////////////ok now run sift//////////////
-if (system(NULL)==0)
+    if (system(NULL)==0)
+    {
+        cout<<"command processor not available , no features found"<<endl;
+        return 0;
+
+    }
+    string command_run=string("utils/sift ")+string("<")+pgmfilename+string("> ")+siftkeyfilename;
+
+    if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
+    system (command_run.c_str());
+//now read the key file into the feature list
+    int numfeatures= readSIFTfile(HR2DVector,siftkeyfilename);
+    cout<<"number of features found for : "<<filename<<" is equal to "<<numfeatures<<endl;
+
+
+}
+/** @brief shows image with features
+  * this function shows the featues superimposed on the images
+  */
+int HRImage::displayImageFeatures()
 {
- cout<<"command processor not available , no features found"<<endl;
- return 0;
 
+    if (flag_valid==0)
+    {
+        cout<<"image now created yet\n"<<endl;
+        return 0;
+    }
+    if (HR2DVector.size()<1)
+    {
+        cout<<"no features available yet\n"<<endl;
+        return 0;
+    }
+
+
+
+    IplImage* tempImage = cvCreateImage(cvGetSize(cv_img), IPL_DEPTH_8U, 4);
+    cvCvtColor(cv_img, tempImage, CV_GRAY2BGR);
+
+
+ vector<HRPointFeatures>::iterator feature_iterator;
+
+
+   feature_iterator = HR2DVector.begin();
+    while ( feature_iterator  != HR2DVector.end() )
+    {
+        draw_cross((*feature_iterator)->location,CV_RGB(0,255,0),4,tempImage);
+        ++feature_iterator;
+    }
+
+
+    cvNamedWindow(  filename.c_str(), CV_WINDOW_AUTOSIZE);
+    cvMoveWindow(filename.c_str(), 100, 100);
+    // show the image
+    cvShowImage(filename.c_str(), tempImage );
+
+//    wait for a key
+    cvWaitKey(0);
+    cvReleaseImage(&tempImage );
+    return 1;
 }
-string command_run=string("utils/sift ")+string("<")+pgmfilename+string("> ")+siftkeyfilename;
-
-if(DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-system (command_run.c_str());
-
-
-
-}
-
-
 
 ///////////////////////////////////////////////////////////CLASS HRCORRIMAGE:
 HRCORRImage::HRCORRImage()
@@ -590,6 +677,21 @@ void HRImageSet::showOneByOne()
 
 }
 
+void HRImageSet::showOneByOneFeature()
+{
+    if (DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
+    vector<HRImagePtr>::iterator img_iterator;
+
+
+    img_iterator = imageCollection.begin();
+    while ( img_iterator  != imageCollection.end() )
+    {
+        (*img_iterator)->displayImageFeatures();
+        ++img_iterator;
+    }
+
+}
+
 int  HRImageSet::open(string directoryName)
 {
     dirName=directoryName;
@@ -658,7 +760,7 @@ int  HRImageSet::open(string directoryName)
     numImages=file_count;
     // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
 //cout<<"________________LOOP FINISHED______________________________"<<endl;
-return file_count;
+    return file_count;
 }
 
 int HRImageSet::featureMatchSift()
