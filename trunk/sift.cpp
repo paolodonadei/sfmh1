@@ -177,8 +177,13 @@ void WritePGM(FILE *fp, Image image)
 	fputc(MAX(0, MIN(255, val)), fp);
       }
 }
+void WritePGM(char* filename, Image image)
+{
+FILE* fp=fopen(filename,"wb");
+WritePGM(fp,  image);
 
-
+fclose(fp);
+}
 /* Draw a white line from (r1,c1) to (r2,c2) on the image.  Both points
    must lie within the image.
 */

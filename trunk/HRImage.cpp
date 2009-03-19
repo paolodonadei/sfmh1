@@ -8,10 +8,10 @@
 #include "general.h"
 #include "pgmutils.hpp"
 #include "sift.h"
-
+#include "matching.hpp"
 
 #define DEBUGLVL 0
-#define TEMPDIR "tempdir"
+
 
 namespace fs = boost::filesystem;
 using namespace std;
@@ -355,120 +355,6 @@ void HRImage::updateImageInfo()
 
 }
 
-int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
-{
-    FILE *fp;
-
-    fp = fopen (filename.c_str(), "r");
-    if (! fp)
-        FatalError("Could not open file: %s", filename);
-
-//
-    int i, j, num, len, val;
-
-
-    if (fscanf(fp, "%d %d", &num, &len) != 2)
-        FatalError("Invalid keypoint file beginning.");
-
-    if (len != 128)
-        FatalError("Keypoint descriptor length invalid (should be 128).");
-
-    for (i = 0; i < num; i++)
-    {
-        HRPointFeatures newfeature( new HRFeature);
-
-        /* Allocate memory for the keypoint. */
-        newfeature->descriptor.reserve(len);
-
-        if (fscanf(fp, "%f %f %f %f", &(newfeature->location.y), &(newfeature->location.x), &(newfeature->scale),&(newfeature->ori)) != 4)
-            FatalError("Invalid keypoint file format.");
-
-        for (j = 0; j < len; j++)
-        {
-            if (fscanf(fp, "%d", &val) != 1 || val < 0 || val > 255)
-                FatalError("Invalid keypoint file value.");
-
-            newfeature->descriptor.push_back((double) val);
-        }
-        siftVector.push_back(newfeature);
-    }
-
-
-    fclose(fp);
-}
-int HRImage::findSIFTfeatures()
-{
-    if (flag_valid==0)
-    {
-        cout<<"image not loaded\n"<<endl;
-        return 0;
-    }
-
-    //check see if sift exists
-    if ( !fs::exists( "utils/sift" ) )
-    {
-        cout << "sift for matching is unavailable\n";
-        return 0;
-    }
-
-
-    fs::path p( filename, fs::native );
-    pgmfilename="";
-    siftkeyfilename=fs::basename(p)+".key";
-    pgmfilename=fs::basename(p)+".pgm";
-
-//create the directory for the files
-    fs::path temp_path = fs::system_complete( fs::path( TEMPDIR, fs::native ) );
-
-    if ( !fs::exists( temp_path ) )
-    {
-        create_directory( temp_path );
-        if ( !fs::exists( temp_path ) )
-        {
-            cout<<"cant create directory, exiting"<<endl;
-            return 0;
-        }
-    }
-
-
-    string tslash="/";
-    pgmfilename=TEMPDIR+tslash+pgmfilename;
-    siftkeyfilename=TEMPDIR+tslash+siftkeyfilename;
-
-    cout<<"saving file: "<<pgmfilename<<endl;
-
-
-    if (!write_pgm_image((char*)pgmfilename.c_str(), data, height,width, "Houman Rastgar",255))
-    {
-
-        cout<<"image "<<pgmfilename <<" not saved\n"<<endl;
-        return 0;
-    }
-    fs::path p2( pgmfilename, fs::native );
-    if ( !fs::exists( p2 ) )
-    {
-        cout << "file was not saved: "<<pgmfilename<<endl;
-        exit(EXIT_FAILURE  );
-    }
-
-
-//////////////ok now run sift//////////////
-    if (system(NULL)==0)
-    {
-        cout<<"command processor not available , no features found"<<endl;
-        return 0;
-
-    }
-    string command_run=string("utils/sift ")+string("<")+pgmfilename+string("> ")+siftkeyfilename;
-
-    if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-    system (command_run.c_str());
-//now read the key file into the feature list
-    int numfeatures= readSIFTfile(HR2DVector,siftkeyfilename);
-    cout<<"number of features found for : "<<filename<<" is equal to "<<numfeatures<<endl;
-
-
-}
 /** @brief shows image with features
   * this function shows the featues superimposed on the images
   */
@@ -763,7 +649,7 @@ int  HRImageSet::open(string directoryName)
     return file_count;
 }
 
-int HRImageSet::featureMatchSift()
+int HRImageSet::featureDetectSift()
 {
 
     if (DEBUGLVL>0)   cout<<"SIFT FEATURE MATCHER BEGINS"<<endl;
@@ -773,13 +659,9 @@ int HRImageSet::featureMatchSift()
     img_iterator = imageCollection.begin();
     while ( img_iterator  != imageCollection.end() )
     {
-        (*img_iterator)->findSIFTfeatures();
+        findSIFTfeatures(**img_iterator);
         ++img_iterator;
     }
-
-
-
-
 
 
 

@@ -43,6 +43,12 @@
 		<Unit filename="general.cpp" />
 		<Unit filename="general.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="matching.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="matching.hpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="pgmutils.cpp" />
 		<Unit filename="pgmutils.hpp" />
 		<Unit filename="sift.cpp" />

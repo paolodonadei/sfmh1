@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="15427" topLine="696" />
+	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="357" topLine="0" />
 	</File>
-	<File name="HRImage.hpp" open="1" top="1" tabpos="6">
-		<Cursor position="1581" topLine="73" />
+	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
+		<Cursor position="1351" topLine="72" />
 	</File>
 	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="120" topLine="0" />
+		<Cursor position="510" topLine="29" />
 	</File>
 	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
-		<Cursor position="345" topLine="0" />
+		<Cursor position="68" topLine="0" />
 	</File>
-	<File name="Makefile" open="0" top="0" tabpos="7">
-		<Cursor position="211" topLine="0" />
+	<File name="Makefile" open="1" top="0" tabpos="16">
+		<Cursor position="119" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />
 	</File>
 	<File name="argproc.h" open="1" top="0" tabpos="3">
-		<Cursor position="373" topLine="0" />
+		<Cursor position="78" topLine="0" />
 	</File>
 	<File name="general.cpp" open="1" top="0" tabpos="8">
 		<Cursor position="22" topLine="0" />
@@ -29,18 +29,24 @@
 		<Cursor position="577" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="460" topLine="0" />
+		<Cursor position="425" topLine="0" />
+	</File>
+	<File name="matching.cpp" open="1" top="0" tabpos="14">
+		<Cursor position="223" topLine="0" />
+	</File>
+	<File name="matching.hpp" open="1" top="0" tabpos="15">
+		<Cursor position="234" topLine="0" />
 	</File>
 	<File name="pgmutils.cpp" open="1" top="0" tabpos="11">
-		<Cursor position="3201" topLine="72" />
+		<Cursor position="613" topLine="0" />
 	</File>
 	<File name="pgmutils.hpp" open="1" top="0" tabpos="10">
-		<Cursor position="235" topLine="0" />
+		<Cursor position="44" topLine="0" />
 	</File>
 	<File name="sift.cpp" open="1" top="0" tabpos="12">
-		<Cursor position="8134" topLine="295" />
+		<Cursor position="5039" topLine="165" />
 	</File>
 	<File name="sift.h" open="1" top="0" tabpos="13">
-		<Cursor position="38" topLine="22" />
+		<Cursor position="858" topLine="11" />
 	</File>
 </CodeBlocks_layout_file>

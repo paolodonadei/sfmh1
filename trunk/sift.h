@@ -17,12 +17,9 @@ This file contains the headers for a sample program to read images and
 #include <string.h>
 
 /*------------------------------ Macros  ---------------------------------*/
-
 #define ABS(x)    (((x) > 0) ? (x) : (-(x)))
 #define MAX(x,y)  (((x) > (y)) ? (x) : (y))
 #define MIN(x,y)  (((x) < (y)) ? (x) : (y))
-
-
 /*---------------------------- Structures --------------------------------*/
 
 /* Data structure for a float image.
@@ -64,7 +61,7 @@ void FindMatches(Image im1, Keypoint keys1, Image im2, Keypoint keys2);
 Keypoint CheckForMatch(Keypoint key, Keypoint klist);
 int DistSquared(Keypoint k1, Keypoint k2);
 Image CombineImagesVertically(Image im1, Image im2);
-
+void WritePGM(char* filename, Image image);
 
 
 #endif //SIFT_HPP_INCLUDED

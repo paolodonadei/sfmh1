@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     {
         HRImageSet imSet(my_parms.dirName);
-imSet.featureMatchSift();
+imSet.featureDetectSift();
 imSet.showOneByOneFeature();
     }
     return 0;
