@@ -8,18 +8,21 @@
 #include <boost/shared_ptr.hpp>
 using namespace std;
 class HRCorrespondences;
-typedef boost::shared_ptr<double> HRFeatureDescriptor;
+
 
 
 class HRFeature
 {
+    public:
     HRFeature();
     ~HRFeature();
     HRFeature(int x,int y);
     CvPoint2D32f location;
-    vector<HRFeatureDescriptor> descriptor;
+    vector<double> descriptor;
     double pvi;
     bool valid;
+    float scale, ori;           /* Scale and orientation for sift (range [-PI,PI]) */
+
 };
 
 

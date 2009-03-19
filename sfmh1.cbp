@@ -45,6 +45,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="pgmutils.cpp" />
 		<Unit filename="pgmutils.hpp" />
+		<Unit filename="sift.cpp" />
+		<Unit filename="sift.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -15,6 +15,7 @@ typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 
 class HRImage
 {
+
 public:
     HRImage();
     HRImage(string fname);
@@ -38,6 +39,7 @@ public:
     int  getPixel(int y,int x) ;
     void setPixel(int y,int x,int pixValue);
     int displayImage();
+    int displayImageFeatures();
     unsigned char* get1d_array();
 //copies this technique from http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00053000000000000000
     inline unsigned char* operator[](const int rowIndx)
@@ -53,10 +55,11 @@ public:
 private:
 
     enum {BLACK=0,WHITE=255};
-
+    friend  int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename);
 
 
 };
+
 
 //i need to create a function that does this: void match(hrimage 1, hirimage 2, hirimage final, method, correspondences)
 ///////left off here i have to painin the two images, motion vectors with an alpha field, and be able to save this shape with the alpha field into eps
@@ -93,5 +96,8 @@ public:
     ~HRImageSet();
     int open(string directoryName);
     void showOneByOne();
+    void showOneByOneFeature();
+    int exhaustiveSIFTMatching();
+    int matchImagesSift(HRImagePtr im1, HRImagePtr im2);
 };
 #endif // HRIMAGE_HPP_INCLUDED

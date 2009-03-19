@@ -7,7 +7,8 @@
  #include <string>
  #include <typeinfo>
  #include <stdexcept>
-
+#include <cv.h>
+#include <highgui.h>
  class BadConversion : public std::runtime_error {
  public:
    BadConversion(const std::string& s)
@@ -25,6 +26,5 @@
    return o.str();
  }
 
-
-
+void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 #endif //HRPRIMITIVES_HPP_INCLUDED
