@@ -6,14 +6,16 @@
 #include "boost/filesystem/path.hpp"
 #include <time.h>
 #include "general.h"
-
+#include "pgmutils.hpp"
 #define DEBUGLVL 0
+#define TEMPDIR "tempdir"
 namespace fs = boost::filesystem;
 using namespace std;
 
 HRImage::HRImage()
 {
-
+siftkeyfilename="";
+pgmfilename="";
     cv_img=NULL;
     flag_valid=0;//object not redy yet
     cv_img=NULL;
@@ -22,7 +24,8 @@ HRImage::HRImage()
 }
 int HRImage::openim(string fname)
 {
-
+siftkeyfilename="";
+pgmfilename="";
     cv_img=NULL;
     if ( !boost::filesystem::exists( fname) )
     {
@@ -69,6 +72,8 @@ int HRImage::openim(string fname)
 }
 int HRImage::openim(int pheight, int pwidth,int initial)
 {
+    siftkeyfilename="";
+    pgmfilename="";
     cv_img=NULL;
     //use this to construct an empty image, not associated with any files, this is a one channel image
     if (flag_valid!=0)
@@ -88,7 +93,8 @@ int HRImage::openim(int pheight, int pwidth,int initial)
 }
 HRImage::HRImage(const HRImage &img)
 {
-
+    siftkeyfilename="";
+pgmfilename="";
     flag_valid=img.flag_valid;
 
     cv_img=cvCloneImage(img.cv_img);
@@ -356,7 +362,7 @@ int HRImage::findSIFTfeatures()
     if ( !fs::exists( "utils/sift" ) )
     {
         cout << "sift for matching is unavailable\n";
-       return 0;
+        return 0;
     }
 
     //  HR2DVector;
@@ -364,33 +370,57 @@ int HRImage::findSIFTfeatures()
 //zzz                        imageCollection.push_back( hr_iptr );
 
     fs::path p( filename, fs::native );
-    string pgmfilename="";
+    pgmfilename="";
+    siftkeyfilename=fs::basename(p)+".key";
+    pgmfilename=fs::basename(p)+".pgm";
 
-    if (!fs::extension(p)==".pgm") //create pgm version for sift binary
+//create the directory for the files
+    fs::path temp_path = fs::system_complete( fs::path( TEMPDIR, fs::native ) );
+
+    if ( !fs::exists( temp_path ) )
     {
-        p.replace_extension(".pgm");
-    }
-     else
+        create_directory( temp_path );
+        if ( !fs::exists( temp_path ) )
         {
-            pgmfilename=filename;
-        }
-
-        pgmfilename=p.path().string();
-        if (!cvSaveImage(pgmfilename.c_str(),cv_img))
-        {
-
-            cout<<"image "<<fname <<" not saved\n"<<endl;
+            cout<<"cant create directory, exiting"<<endl;
             return 0;
         }
-        fs::path p2( pgmfilename, fs::native );
-        if ( !fs::exists( p2 ) )
-        {
-            cout << "file was not saved: "<<pgmfilename<<endl;
-            exit(EXIT_FAILURE  );
-        }
-
-
     }
+
+
+    string tslash="/";
+    pgmfilename=TEMPDIR+tslash+pgmfilename;
+    siftkeyfilename=TEMPDIR+tslash+siftkeyfilename;
+
+    cout<<"saving file: "<<pgmfilename<<endl;
+
+
+    if (!write_pgm_image((char*)pgmfilename.c_str(), data, height,width, "Houman Rastgar",255))
+    {
+
+        cout<<"image "<<pgmfilename <<" not saved\n"<<endl;
+        return 0;
+    }
+    fs::path p2( pgmfilename, fs::native );
+    if ( !fs::exists( p2 ) )
+    {
+        cout << "file was not saved: "<<pgmfilename<<endl;
+        exit(EXIT_FAILURE  );
+    }
+
+
+//////////////ok now run sift//////////////
+if (system(NULL)==0)
+{
+ cout<<"command processor not available , no features found"<<endl;
+ return 0;
+
+}
+string command_run=string("utils/sift ")+string("<")+pgmfilename+string("> ")+siftkeyfilename;
+
+if(DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
+system (command_run.c_str());
+
 
 
 }
@@ -628,12 +658,22 @@ int  HRImageSet::open(string directoryName)
     numImages=file_count;
     // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
 //cout<<"________________LOOP FINISHED______________________________"<<endl;
+return file_count;
 }
 
 int HRImageSet::featureMatchSift()
 {
 
+    if (DEBUGLVL>0)   cout<<"SIFT FEATURE MATCHER BEGINS"<<endl;
+    vector<HRImagePtr>::iterator img_iterator;
 
+
+    img_iterator = imageCollection.begin();
+    while ( img_iterator  != imageCollection.end() )
+    {
+        (*img_iterator)->findSIFTfeatures();
+        ++img_iterator;
+    }
 
 
 
