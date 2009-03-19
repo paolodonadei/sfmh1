@@ -47,9 +47,9 @@ public:
     void updateImageInfo();
     void incrementPixel(int y,int x);
     int findSIFTfeatures();
-
-
-   vector<HRPointFeatures> HR2DVector;
+    string pgmfilename;//this is used for some external programs that need a pgm format, i.e. sift
+    string siftkeyfilename;
+    vector<HRPointFeatures> HR2DVector;
 private:
 
     enum {BLACK=0,WHITE=255};

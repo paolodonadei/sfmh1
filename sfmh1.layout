@@ -2,10 +2,10 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="7229" topLine="359" />
+		<Cursor position="7746" topLine="379" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="1444" topLine="18" />
 	</File>
 	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="100" topLine="0" />
@@ -14,7 +14,7 @@
 		<Cursor position="526" topLine="0" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="7">
-		<Cursor position="83" topLine="0" />
+		<Cursor position="202" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />
@@ -29,6 +29,12 @@
 		<Cursor position="100" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="399" topLine="0" />
+		<Cursor position="295" topLine="0" />
+	</File>
+	<File name="pgmutils.cpp" open="1" top="0" tabpos="12">
+		<Cursor position="3201" topLine="72" />
+	</File>
+	<File name="pgmutils.hpp" open="1" top="0" tabpos="11">
+		<Cursor position="235" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
