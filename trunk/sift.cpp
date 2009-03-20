@@ -78,7 +78,19 @@ float **AllocMatrix(int rows, int cols)
     return (m);
 }
 
+void DeAllocMatrix(float** matrix)
+{
 
+ if(matrix[0]) free(matrix[0]);
+ 	 if(matrix) free(matrix);
+
+}
+void freeImage(Image im)
+{
+    DeAllocMatrix(im->pixels);
+    free(im);
+
+}
 /*----------------- Read and write PGM files ------------------------*/
 
 
