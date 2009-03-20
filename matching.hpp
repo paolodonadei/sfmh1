@@ -14,7 +14,7 @@
 using namespace std;
 int findSIFTfeatures( HRImage& image);
 int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename);
-int matchTWOImagesNearestNeighbour(const HRImage& im1,const HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage=false)
+int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage=false);
 
 
 #endif // MATCHING_HPP_INCLUDED

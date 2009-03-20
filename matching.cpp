@@ -4,13 +4,14 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "pgmutils.hpp"
+#include "general.h"
 #define DEBUGLVL 0
 #define TEMPDIR "tempdir"
 namespace fs = boost::filesystem;
 using namespace std;
 
 
-int matchTWOImagesNearestNeighbour(const HRImage& im1,const HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage)
+int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage)
 {
 
 
@@ -21,8 +22,13 @@ int matchTWOImagesNearestNeighbour(const HRImage& im1,const HRImage& im2,HRCorre
     Image result;
 
     if (outputimage)
-        result = CombineImagesVertically(im1, im2);
-
+    {
+        Image tempim1=HRImagetoDLImage(im1);
+        Image tempim2=HRImagetoDLImage(im2);
+        result = CombineImagesVertically(tempim1, tempim2);
+        freeImage(tempim1);
+        freeImage(tempim2);
+    }
     /* Match the keys in list keys1 to their best matches in keys2.
     */
     for (k= keys1; k != NULL; k = k->next)
@@ -34,15 +40,15 @@ int matchTWOImagesNearestNeighbour(const HRImage& im1,const HRImage& im2,HRCorre
             if (match != NULL)
             {
                 count++;
-                DrawLine(result, (int) k->row, (int) k->col,
-                         (int) (match->row + im1->rows), (int) match->col);
+                if (outputimage)
+                {
+                    DrawLine(result, (int) k->row, (int) k->col,(int) (match->row + im1->rows), (int) match->col);
+                }
             }
         }
-        fs::path p1( im1.filename, fs::native );
-        fs::path p2( im2.filename, fs::native );
 
-        string fname=fs::basename(p1)+string("_")+fs::basename(p2)+string(".pgm");
-        WritePGM(stdout, (char*)fname.c_str());
+
+
     }
 
     /* Write result image to standard output. */
@@ -54,7 +60,15 @@ int matchTWOImagesNearestNeighbour(const HRImage& im1,const HRImage& im2,HRCorre
 
 
 
+    if (outputimage)
+    {
+        fs::path p1( im1.filename, fs::native );
+        fs::path p2( im2.filename, fs::native );
 
+        string fname=fs::basename(p1)+string("_")+fs::basename(p2)+string(".pgm");
+        WritePGM((char*)fname.c_str(),result);
+        freeImage(result);
+    }
 
 
 }

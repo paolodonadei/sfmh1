@@ -62,6 +62,6 @@ Keypoint CheckForMatch(Keypoint key, Keypoint klist);
 int DistSquared(Keypoint k1, Keypoint k2);
 Image CombineImagesVertically(Image im1, Image im2);
 void WritePGM(char* filename, Image image);
-
-
+void DeAllocMatrix(float** matrix);
+void freeImage(Image im);
 #endif //SIFT_HPP_INCLUDED

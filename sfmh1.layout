@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="357" topLine="0" />
+	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="6977" topLine="36" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="1351" topLine="72" />
@@ -23,19 +23,19 @@
 		<Cursor position="78" topLine="0" />
 	</File>
 	<File name="general.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="22" topLine="0" />
+		<Cursor position="677" topLine="0" />
 	</File>
 	<File name="general.h" open="1" top="0" tabpos="9">
-		<Cursor position="577" topLine="0" />
+		<Cursor position="260" topLine="0" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="425" topLine="0" />
 	</File>
 	<File name="matching.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="223" topLine="0" />
+		<Cursor position="917" topLine="12" />
 	</File>
 	<File name="matching.hpp" open="1" top="0" tabpos="15">
-		<Cursor position="234" topLine="0" />
+		<Cursor position="440" topLine="0" />
 	</File>
 	<File name="pgmutils.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="613" topLine="0" />
@@ -43,10 +43,10 @@
 	<File name="pgmutils.hpp" open="1" top="0" tabpos="10">
 		<Cursor position="44" topLine="0" />
 	</File>
-	<File name="sift.cpp" open="1" top="0" tabpos="12">
-		<Cursor position="5039" topLine="165" />
+	<File name="sift.cpp" open="1" top="1" tabpos="12">
+		<Cursor position="10751" topLine="372" />
 	</File>
 	<File name="sift.h" open="1" top="0" tabpos="13">
-		<Cursor position="858" topLine="11" />
+		<Cursor position="2296" topLine="37" />
 	</File>
 </CodeBlocks_layout_file>
