@@ -96,7 +96,9 @@ public:
     int open(string directoryName);
     void showOneByOne();
     void showOneByOneFeature();
+
+
     int exhaustiveSIFTMatching();
-    int matchImagesSift(HRImagePtr im1, HRImagePtr im2);
+
 };
 #endif // HRIMAGE_HPP_INCLUDED
