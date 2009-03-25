@@ -18,8 +18,7 @@ This file contains the headers for a sample program to read images and
 
 /*------------------------------ Macros  ---------------------------------*/
 #define ABS(x)    (((x) > 0) ? (x) : (-(x)))
-#define MAX(x,y)  (((x) > (y)) ? (x) : (y))
-#define MIN(x,y)  (((x) < (y)) ? (x) : (y))
+
 /*---------------------------- Structures --------------------------------*/
 
 /* Data structure for a float image.

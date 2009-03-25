@@ -9,6 +9,12 @@
 using namespace std;
 class HRCorrespondences;
 
+struct matchIndex
+{
+    int imindex1;
+    int imindex2;
+} ;
+
 class HRCorrespond2N
 {
 public:
@@ -16,8 +22,8 @@ public:
  int indexIm2;
  string im1Name;
  string im2Name;
- vector<int> im1Index;
- vector<int> im2Index;
+ vector<matchIndex> imIndices;
+
 HRCorrespond2N();
 ~HRCorrespond2N();
 HRCorrespond2N(int index1,int index2, string f1name, string f2name);

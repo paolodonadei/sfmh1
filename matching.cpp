@@ -5,6 +5,7 @@
 #include "boost/filesystem/path.hpp"
 #include "pgmutils.hpp"
 #include "general.h"
+#include "HRprimitives.h"
 #define DEBUGLVL 0
 #define TEMPDIR "tempdir"
 namespace fs = boost::filesystem;
@@ -15,7 +16,8 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 {
 
 
-    Keypoint k, match;
+    vector<HRPointFeatures>::iterator k;
+    int index=-1;
 
     int count = 0;
 
@@ -31,21 +33,31 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
     }
     /* Match the keys in list keys1 to their best matches in keys2.
     */
-    for (k= keys1; k != NULL; k = k->next)
-    {
-        match = CheckForMatch(k, keys2);
 
-        if (outputimage)
+
+
+
+
+    for (int i=0;i<im1.HR2DVector.size();i++)
+    {
+
+        index = CheckForMatch(im1.HR2DVector[i], im2.HR2DVector);
+
+        if (index != -1)
         {
-            if (match != NULL)
+            count++;
+
+            matchIndex indexTemp;
+            indexTemp.imindex1=i;
+            indexTemp.imindex2=index;
+            hr_correspond.imIndices.push_back(indexTemp);
+
+            if (outputimage)
             {
-                count++;
-                if (outputimage)
-                {
-                    DrawLine(result, (int) k->row, (int) k->col,(int) (match->row + im1->rows), (int) match->col);
-                }
+                DrawLine(result, (int) im1.HR2DVector[i]->location.y, (int) im1.HR2DVector[i]->location.x,(int) (im2.HR2DVector[index]->location.y + im1.height), im2.HR2DVector[index]->location.x);
             }
         }
+
 
 
 
@@ -56,10 +68,6 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
     fprintf(stderr,"Found %d matches.\n", count);
 
 
-
-
-
-
     if (outputimage)
     {
         fs::path p1( im1.filename, fs::native );
@@ -68,39 +76,68 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
         string fname=fs::basename(p1)+string("_")+fs::basename(p2)+string(".pgm");
         WritePGM((char*)fname.c_str(),result);
         freeImage(result);
+
+       // HRImage tempimage(fname);
+       // tempimage.displayImage();
+
     }
 
-
+return count;
 }
-//Keypoint CheckForMatch(Keypoint key, Keypoint klist)
-//{
-//    int dsq, distsq1 = 100000000, distsq2 = 100000000;
-//    Keypoint k, minkey = NULL;
-//
-//    /* Find the two closest matches, and put their squared distances in
-//       distsq1 and distsq2.
-//    */
-//    for (k = klist; k != NULL; k = k->next)
-//    {
-//        dsq = DistSquared(key, k);
-//
-//        if (dsq < distsq1)
-//        {
-//            distsq2 = distsq1;
-//            distsq1 = dsq;
-//            minkey = k;
-//        }
-//        else if (dsq < distsq2)
-//        {
-//            distsq2 = dsq;
-//        }
-//    }
-//
-//    /* Check whether closest distance is less than 0.6 of second. */
-//    if (10 * 10 * distsq1 < 6 * 6 * distsq2)
-//        return minkey;
-//    else return NULL;
-//}
+
+
+
+int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures)
+{
+    int dsq, distsq1 = 100000000, distsq2 = 100000000;
+   int minkey = -1;
+
+    /* Find the two closest matches, and put their squared distances in
+       distsq1 and distsq2.
+    */
+    for (int i=0;i<HR2Dfeatures.size();i++)
+    {
+        dsq = DistSquared(key, HR2Dfeatures[i]);
+
+        if (dsq < distsq1)
+        {
+            distsq2 = distsq1;
+            distsq1 = dsq;
+            minkey = i;
+        }
+        else if (dsq < distsq2)
+        {
+            distsq2 = dsq;
+        }
+    }
+
+    /* Check whether closest distance is less than 0.6 of second. */
+    if (10 * 10 * distsq1 < 6 * 6 * distsq2)
+        return minkey;
+    else return -1;
+}
+
+
+int DistSquared(const HRPointFeatures& k1, const HRPointFeatures& k2)
+{
+    int i, dif, distsq = 0;
+    vector<double>& pk1=k1->descriptor;
+    vector<double>& pk2=k2->descriptor;
+
+    if (pk1.size()!=pk2.size())
+    {
+        cout<<"the size of the two feature descriptors are not the same, quitting"<<endl;
+        return -1;
+
+    }
+
+    for (i = 0; i < pk1.size(); i++)
+    {
+        dif = (int) pk1[i] - (int) pk2[i];
+        distsq += dif * dif;
+    }
+    return distsq;
+}
 //
 //
 ///* Return squared distance between two keypoint descriptors.
@@ -144,6 +181,7 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 
 //
     int i, j, num, len, val;
+    i= j= num= len= val=0;
 
 
     if (fscanf(fp, "%d %d", &num, &len) != 2)
@@ -174,6 +212,7 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 
 
     fclose(fp);
+    return num;
 }
 
 int findSIFTfeatures( HRImage& image)

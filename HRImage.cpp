@@ -9,6 +9,7 @@
 #include "pgmutils.hpp"
 #include "sift.h"
 #include "matching.hpp"
+#include "HRprimitives.h"
 
 #define DEBUGLVL 0
 
@@ -378,10 +379,10 @@ int HRImage::displayImageFeatures()
     cvCvtColor(cv_img, tempImage, CV_GRAY2BGR);
 
 
- vector<HRPointFeatures>::iterator feature_iterator;
+    vector<HRPointFeatures>::iterator feature_iterator;
 
 
-   feature_iterator = HR2DVector.begin();
+    feature_iterator = HR2DVector.begin();
     while ( feature_iterator  != HR2DVector.end() )
     {
         draw_cross((*feature_iterator)->location,CV_RGB(0,255,0),4,tempImage);
@@ -667,4 +668,25 @@ int HRImageSet::featureDetectSift()
 
 
     return 0;
+}
+/** @brief exhaustiveSIFTMatching
+*
+* @todo: document this function
+*/
+int HRImageSet::exhaustiveSIFTMatching()
+{
+    int i,j;
+    vector<vector<HRCorrespond2N> > correspondences ( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
+
+
+
+    for (i=0;i<imageCollection.size();i++)
+    {
+        for (j=0;j<imageCollection.size();j++)
+        {
+            int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j],1);
+printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
+    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
+        }
+    }
 }
