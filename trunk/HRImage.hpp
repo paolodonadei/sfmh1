@@ -7,9 +7,12 @@
 #include "HRprimitives.h"
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "HRprimitives.h"
+
 
 using namespace std;
 
+class HRFeature;
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 
 
@@ -69,7 +72,7 @@ class HRCORRImage: public HRImage
     double whitespace_ratio;
     CvPoint im1_top_left;
     CvPoint im2_top_left;
-    HRCorrespondences *img_corrs;
+
 public:
     // HRCORRImage(IplImage* p_cv_im1,IplImage* p_cv_im2,HRCorrespondences *p_img_corrs);
     HRCORRImage();
