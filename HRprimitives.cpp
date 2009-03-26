@@ -1,5 +1,8 @@
 #include "HRprimitives.h"
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 using namespace std;
 /** @brief HRCorrespond2N
@@ -25,30 +28,30 @@ HRCorrespond2N::~HRCorrespond2N()
 }
 
 
-friend ostream &operator<<(ostream &stream, HRCorrespond2N ob)
+ostream &operator<<(ostream &stream, HRCorrespond2N ob)
 {
 
     double x1,x2,y1,y2;
 
 
-    if (hr1ptr=NULL || hr2ptr==NULL)
+    if (ob.hr1ptr==NULL || ob.hr2ptr==NULL)
     {
         stream<<"images have not been initialized"<<endl;
         return stream;
     }
 
-    stream << hr1ptr->filename <<"#   ( index="<<indexIm1 <<") "<< "                 "<<hr2ptr->filename <<" ( index="<<indexIm2 <<") "<<endl;
+    stream <<"#"<< ob.hr1ptr->filename <<"   ( index="<<ob.indexIm1 <<") "<< "                 "<<ob.hr2ptr->filename <<" ( index="<<ob.indexIm2 <<") "<<endl;
 
 
-    stream << "#match_num"<<"\t"<<setw(11)<<"X"<<"("<<indexIm1 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<indexIm1 <<")"<<"\t"<<setw(11)<<"X"<<"("<<indexIm2 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<indexIm2 <<")"<<endl;
+    stream << "#match_num"<<setw(11)<<"X"<<"("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"X"<<"("<<ob.indexIm2 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<ob.indexIm2 <<")"<<endl;
 
 
-    for (i=0;i<imIndices.size();i++)
+    for (int i=0;i<ob.imIndices.size();i++)
     {
-        x1=hr1ptr->HR2DVector[imIndices[i].imindex1]->location.x;
-        x2=hr1ptr->HR2DVector[imIndices[i].imindex1]->location.y;
-        y1=hr2ptr->HR2DVector[imIndices[i].imindex2]->location.x;
-        y2=hr2ptr->HR2DVector[imIndices[i].imindex2]->location.y;
+        x1=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.x;
+        x2=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.y;
+        y1=ob.hr2ptr->HR2DVector[ob.imIndices[i].imindex2]->location.x;
+        y2=ob.hr2ptr->HR2DVector[ob.imIndices[i].imindex2]->location.y;
 
 
         stream <<i<<"\t\t"<<setw(10)<<fixed<<setprecision(5)<<x1 <<"\t"<<setw(11)<<y1<<"\t"<<setw(11)<<x2<<"\t" <<setw(11)<<y2 <<"\t"<<endl;

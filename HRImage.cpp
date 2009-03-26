@@ -5,6 +5,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include <time.h>
+ #include <fstream>
 #include "general.h"
 #include "pgmutils.hpp"
 #include "sift.h"
@@ -12,7 +13,7 @@
 #include "HRprimitives.h"
 
 #define DEBUGLVL 0
-
+#define TEMPDIR "tempdir"
 
 namespace fs = boost::filesystem;
 using namespace std;
@@ -684,9 +685,24 @@ int HRImageSet::exhaustiveSIFTMatching()
     {
         for (j=0;j<i;j++)
         {
+            correspondences[i][j].indexIm1=i;
+            correspondences[i][j].indexIm2=j;
+
+            correspondences[i][j].hr1ptr=&(*imageCollection[i]);
+            correspondences[i][j].hr2ptr=&(*imageCollection[j]);
+
             int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j],1);
-printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
-    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
+            printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
+                   ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
+
+            string fname=TEMPDIR+string("/")+combineFnames((*imageCollection[i]).filename,(*imageCollection[j]).filename,"_matches.txt");
+
+
+            fstream fp_out;
+            fp_out.open(fname.c_str(), ios::out);
+            fp_out<<correspondences[i][j];
+            fp_out.close();
+
         }
     }
 }

@@ -45,3 +45,17 @@ bool checkTempPath()
     }
     return true;
 }
+
+string combineFnames(const string& f1,const string& f2,string extension)
+{
+
+        fs::path p1( f1, fs::native );
+        fs::path p2( f2, fs::native );
+
+        string fname=fs::basename(p1)+string("_")+fs::basename(p2)+extension;
+      return fname;
+
+
+
+
+}

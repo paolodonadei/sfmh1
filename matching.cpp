@@ -15,6 +15,7 @@ using namespace std;
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage)
 {
 
+    int x0,y0,x1,y1;
 
     vector<HRPointFeatures>::iterator k;
     int index=-1;
@@ -25,10 +26,14 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     if (outputimage)
     {
-        imgTemp=cvCreateImage(cvSize(im1.width,im1.height*2),IPL_DEPTH_8U,4);
+        imgTemp=cvCreateImage(cvSize(im1.width,im1.height*2),IPL_DEPTH_8U,3);
 
-        cvSetImageROI( imgTemp, cvRect( 0, 0, im1.width, im1.height ));
-        cvSetImageROI( imgTemp, cvRect( 0, im1.height, im1.width, im1.height*2 ));
+
+for(int i=0;i<im1.height;i++)
+{
+    for(int j=0; ///set image roi
+    //    cvSetImageROI( imgTemp, cvRect( 0, 0, im1.width, im1.height ));
+      //  cvSetImageROI( imgTemp, cvRect( 0, im1.height, im1.width, im1.height*2 ));
 
     }
     /* Match the keys in list keys1 to their best matches in keys2.
@@ -54,9 +59,12 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
             if (outputimage)
             {
-                cvLine(imgTemp, cvPoint((int)im1.HR2DVector[i]->location.x,(int)im1.HR2DVector[i]->location.y), \
-                       cvPoint((int)im2.HR2DVector[index]->location.x,(int)im2.HR2DVector[index]->location.y+im1.height),   \
-                       cvScalar(255,0,0), 1);
+                x0=im1.HR2DVector[i]->location.x;
+                y0=im1.HR2DVector[i]->location.y;
+                x1=im2.HR2DVector[index]->location.x;
+                y1=im2.HR2DVector[index]->location.y+im1.height;
+
+                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
             }
         }
 
@@ -75,12 +83,8 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
         if ( checkTempPath()==false)
             return count;
 
-        fs::path p1( im1.filename, fs::native );
-        fs::path p2( im2.filename, fs::native );
-
-        string fname=fs::basename(p1)+string("_")+fs::basename(p2)+string(".pgm");
         string tslash="/";
-        fname=TEMPDIR+tslash+fname;
+        string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".ppm");
 
         if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
 
