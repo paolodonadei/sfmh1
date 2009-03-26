@@ -21,15 +21,15 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     int count = 0;
 
-    Image result;
+    IplImage* imgTemp=NULL;
 
     if (outputimage)
     {
-        Image tempim1=HRImagetoDLImage(im1);
-        Image tempim2=HRImagetoDLImage(im2);
-        result = CombineImagesVertically(tempim1, tempim2);
-        freeImage(tempim1);
-        freeImage(tempim2);
+        imgTemp=cvCreateImage(cvSize(im1.width,im1.height*2),IPL_DEPTH_8U,4);
+
+        cvSetImageROI( imgTemp, cvRect( 0, 0, im1.width, im1.height ));
+        cvSetImageROI( imgTemp, cvRect( 0, im1.height, im1.width, im1.height*2 ));
+
     }
     /* Match the keys in list keys1 to their best matches in keys2.
     */
@@ -54,7 +54,9 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
             if (outputimage)
             {
-                DrawLine(result, (int) im1.HR2DVector[i]->location.y, (int) im1.HR2DVector[i]->location.x,(int) (im2.HR2DVector[index]->location.y + im1.height), im2.HR2DVector[index]->location.x);
+                cvLine(imgTemp, cvPoint((int)im1.HR2DVector[i]->location.x,(int)im1.HR2DVector[i]->location.y), \
+                       cvPoint((int)im2.HR2DVector[index]->location.x,(int)im2.HR2DVector[index]->location.y+im1.height),   \
+                       cvScalar(255,0,0), 1);
             }
         }
 
@@ -70,19 +72,25 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     if (outputimage)
     {
+        if ( checkTempPath()==false)
+            return count;
+
         fs::path p1( im1.filename, fs::native );
         fs::path p2( im2.filename, fs::native );
 
         string fname=fs::basename(p1)+string("_")+fs::basename(p2)+string(".pgm");
-        WritePGM((char*)fname.c_str(),result);
-        freeImage(result);
+        string tslash="/";
+        fname=TEMPDIR+tslash+fname;
 
-       // HRImage tempimage(fname);
-       // tempimage.displayImage();
+        if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
+
+        // HRImage tempimage(fname);
+        // tempimage.displayImage();
+        cvReleaseImage( &imgTemp );
 
     }
 
-return count;
+    return count;
 }
 
 
@@ -90,7 +98,7 @@ return count;
 int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures)
 {
     int dsq, distsq1 = 100000000, distsq2 = 100000000;
-   int minkey = -1;
+    int minkey = -1;
 
     /* Find the two closest matches, and put their squared distances in
        distsq1 and distsq2.
@@ -237,18 +245,8 @@ int findSIFTfeatures( HRImage& image)
     image.pgmfilename=fs::basename(p)+".pgm";
 
 //create the directory for the files
-    fs::path temp_path = fs::system_complete( fs::path( TEMPDIR, fs::native ) );
-
-    if ( !fs::exists( temp_path ) )
-    {
-        create_directory( temp_path );
-        if ( !fs::exists( temp_path ) )
-        {
-            cout<<"cant create directory, exiting"<<endl;
-            return 0;
-        }
-    }
-
+    if ( checkTempPath()==false)
+        return 0;
 
     string tslash="/";
     image.pgmfilename=TEMPDIR+tslash+image.pgmfilename;

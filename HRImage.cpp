@@ -682,7 +682,7 @@ int HRImageSet::exhaustiveSIFTMatching()
 
     for (i=0;i<imageCollection.size();i++)
     {
-        for (j=0;j<imageCollection.size();j++)
+        for (j=0;j<i;j++)
         {
             int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j],1);
 printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
