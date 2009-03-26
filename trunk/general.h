@@ -34,4 +34,5 @@ inline std::string stringify(const T& x)
 
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 bool checkTempPath();
+string combineFnames(const string& f1,const string& f2,string extension);
 #endif //HRPRIMITIVES_HPP_INCLUDED
