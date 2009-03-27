@@ -691,12 +691,13 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondences[i][j].hr1ptr=&(*imageCollection[i]);
             correspondences[i][j].hr2ptr=&(*imageCollection[j]);
 
-            int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j],1);
+            int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j]);
             printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
                    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
 
             string fname=TEMPDIR+string("/")+combineFnames((*imageCollection[i]).filename,(*imageCollection[j]).filename,"_matches.txt");
 
+            drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondences[i][j]);
 
             fstream fp_out;
             fp_out.open(fname.c_str(), ios::out);
@@ -705,4 +706,8 @@ int HRImageSet::exhaustiveSIFTMatching()
 
         }
     }
+
+
 }
+
+
