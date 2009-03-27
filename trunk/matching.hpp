@@ -17,4 +17,5 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename);
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage=false);
 int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures);
 int DistSquared(const HRPointFeatures& k1, const HRPointFeatures& k2);
+int Dist(const HRPointFeatures& k1, const HRPointFeatures& k2);
 #endif // MATCHING_HPP_INCLUDED

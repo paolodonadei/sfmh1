@@ -8,6 +8,14 @@
 #include "HRprimitives.h"
 #define DEBUGLVL 0
 #define TEMPDIR "tempdir"
+
+#define SIFT_MULT 0.6
+#define PCA_MULT 0.6
+
+#define SIFT_THRESH 90
+#define PCA_THRESH 3000
+
+#define SIFTPCA 1
 namespace fs = boost::filesystem;
 using namespace std;
 
@@ -26,18 +34,9 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     if (outputimage)
     {
-        imgTemp=cvCreateImage(cvSize(im1.width,im1.height*2),IPL_DEPTH_8U,3);
-
-
-for(int i=0;i<im1.height;i++)
-{
-    for(int j=0; ///set image roi
-    //    cvSetImageROI( imgTemp, cvRect( 0, 0, im1.width, im1.height ));
-      //  cvSetImageROI( imgTemp, cvRect( 0, im1.height, im1.width, im1.height*2 ));
+        imgTemp=concatImagesVertical(im1.cv_img,im2.cv_img);
 
     }
-    /* Match the keys in list keys1 to their best matches in keys2.
-    */
 
 
 
@@ -65,6 +64,11 @@ for(int i=0;i<im1.height;i++)
                 y1=im2.HR2DVector[index]->location.y+im1.height;
 
                 cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
+
+                //print correspondences 1 to 1
+                if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), count);
+
+
             }
         }
 
@@ -84,7 +88,7 @@ for(int i=0;i<im1.height;i++)
             return count;
 
         string tslash="/";
-        string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".ppm");
+        string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".png");
 
         if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
 
@@ -102,6 +106,7 @@ for(int i=0;i<im1.height;i++)
 int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures)
 {
     int dsq, distsq1 = 100000000, distsq2 = 100000000;
+
     int minkey = -1;
 
     /* Find the two closest matches, and put their squared distances in
@@ -109,7 +114,7 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
     */
     for (int i=0;i<HR2Dfeatures.size();i++)
     {
-        dsq = DistSquared(key, HR2Dfeatures[i]);
+        dsq = Dist(key, HR2Dfeatures[i]);
 
         if (dsq < distsq1)
         {
@@ -123,10 +128,27 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
         }
     }
 
-    /* Check whether closest distance is less than 0.6 of second. */
-    if (10 * 10 * distsq1 < 6 * 6 * distsq2)
-        return minkey;
-    else return -1;
+    if (SIFTPCA)  //siftpca claims to work better with an absolute threshold distance whereas the author of sift pca claims sift works better with relative distance so here i modified the program
+    {
+
+        /* PCA-SIFT KEYS */
+        if (distsq1 < PCA_THRESH)
+            return minkey;
+        return -1;
+
+    }
+    else
+    {
+        /* SIFT KEYS */
+        if (distsq1 < SIFT_MULT * distsq2)
+            return minkey;
+        else return -1;
+
+    }
+//    /* Check whether closest distance is less than 0.6 of second. */
+//    if (10 * 10 * distsq1 < 6 * 6 * distsq2)
+//        return minkey;
+//    else return -1;
 }
 
 
@@ -150,6 +172,30 @@ int DistSquared(const HRPointFeatures& k1, const HRPointFeatures& k2)
     }
     return distsq;
 }
+
+int Dist(const HRPointFeatures& k1, const HRPointFeatures& k2)
+{
+    int i, dif = 0;
+    long int  distsq=0;
+
+    vector<double>& pk1=k1->descriptor;
+    vector<double>& pk2=k2->descriptor;
+
+    if (pk1.size()!=pk2.size())
+    {
+        cout<<"the size of the two feature descriptors are not the same, quitting"<<endl;
+        return -1;
+
+    }
+
+    for (i = 0; i < pk1.size(); i++)
+    {
+        dif = (int) pk1[i] - (int) pk2[i];
+        distsq += dif * dif;
+    }
+    return (int) sqrt(distsq);
+}
+
 //
 //
 ///* Return squared distance between two keypoint descriptors.
@@ -200,7 +246,9 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
         FatalError("Invalid keypoint file beginning.");
 
     if (len != 128)
-        FatalError("Keypoint descriptor length invalid (should be 128).");
+    {
+        cout<<"reading PCA descriptors rather than plain sift"<<endl;
+    }
 
     for (i = 0; i < num; i++)
     {
@@ -214,7 +262,7 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 
         for (j = 0; j < len; j++)
         {
-            if (fscanf(fp, "%d", &val) != 1 || val < 0 || val > 255)
+            if (fscanf(fp, "%d", &val) != 1/* || val < 0 || val > 255 */)
                 FatalError("Invalid keypoint file value.");
 
             newfeature->descriptor.push_back((double) val);
@@ -229,6 +277,8 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 
 int findSIFTfeatures( HRImage& image)
 {
+
+    string siftpcaname="";
     if (image.flag_valid==0)
     {
         cout<<"image not loaded\n"<<endl;
@@ -246,6 +296,7 @@ int findSIFTfeatures( HRImage& image)
     fs::path p( image.filename, fs::native );
     image.pgmfilename="";
     image.siftkeyfilename=fs::basename(p)+".key";
+    siftpcaname=fs::basename(p)+"_pca.key";
     image.pgmfilename=fs::basename(p)+".pgm";
 
 //create the directory for the files
@@ -255,6 +306,7 @@ int findSIFTfeatures( HRImage& image)
     string tslash="/";
     image.pgmfilename=TEMPDIR+tslash+image.pgmfilename;
     image.siftkeyfilename=TEMPDIR+tslash+image.siftkeyfilename;
+    siftpcaname=TEMPDIR+tslash+siftpcaname;
 
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
@@ -282,8 +334,20 @@ int findSIFTfeatures( HRImage& image)
     }
     string command_run=string("utils/sift ")+string("<")+image.pgmfilename+string("> ")+image.siftkeyfilename;
 
+
+
     if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
     system (command_run.c_str());
+
+    //if pca then reproject
+    if (SIFTPCA)
+    {
+        string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname;
+        if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
+        system (command_run.c_str());
+        image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
+    }
+
 //now read the key file into the feature list
     int numfeatures= readSIFTfile(image.HR2DVector,image.siftkeyfilename);
     cout<<"number of features found for : "<<image.filename<<" is equal to "<<numfeatures<<endl;
