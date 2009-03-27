@@ -20,26 +20,14 @@ namespace fs = boost::filesystem;
 using namespace std;
 
 
-int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond,bool outputimage)
+int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
 
-    int x0,y0,x1,y1;
 
     vector<HRPointFeatures>::iterator k;
     int index=-1;
 
     int count = 0;
-
-    IplImage* imgTemp=NULL;
-
-    if (outputimage)
-    {
-        imgTemp=concatImagesVertical(im1.cv_img,im2.cv_img);
-
-    }
-
-
-
 
 
     for (int i=0;i<im1.HR2DVector.size();i++)
@@ -56,24 +44,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
             indexTemp.imindex2=index;
             hr_correspond.imIndices.push_back(indexTemp);
 
-            if (outputimage)
-            {
-                x0=im1.HR2DVector[i]->location.x;
-                y0=im1.HR2DVector[i]->location.y;
-                x1=im2.HR2DVector[index]->location.x;
-                y1=im2.HR2DVector[index]->location.y+im1.height;
-
-                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
-
-                //print correspondences 1 to 1
-                if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), count);
-
-
-            }
         }
-
-
-
 
     }
 
@@ -82,26 +53,53 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
     fprintf(stderr,"Found %d matches.\n", count);
 
 
-    if (outputimage)
-    {
-        if ( checkTempPath()==false)
-            return count;
-
-        string tslash="/";
-        string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".png");
-
-        if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
-
-        // HRImage tempimage(fname);
-        // tempimage.displayImage();
-        cvReleaseImage( &imgTemp );
-
-    }
 
     return count;
 }
 
+int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
+{
 
+
+
+    IplImage* imgTemp=concatImagesVertical(im1.cv_img,im2.cv_img);
+
+    int x0,y0,x1,y1;
+
+for(int i=0;i<hr_correspond.imIndices.size();i++)
+{
+
+        x0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.x;
+        y0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.y;
+        x1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.x;
+        y1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.y+im1.height;
+
+        cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
+
+     //print correspondences 1 to 1
+        if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), i);
+}
+
+
+
+
+
+    if ( checkTempPath()==false)
+        return 0;
+
+    string tslash="/";
+    string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".png");
+
+    if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
+
+    // HRImage tempimage(fname);
+    // tempimage.displayImage();
+    cvReleaseImage( &imgTemp );
+
+
+
+    return 0;
+}
 
 int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures)
 {

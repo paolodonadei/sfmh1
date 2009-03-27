@@ -99,8 +99,8 @@ public:
     int open(string directoryName);
     void showOneByOne();
     void showOneByOneFeature();
-
-
+  vector<vector<int> > matchTracks;
+   vector<vector<HRCorrespond2N> > correspondences;
     int exhaustiveSIFTMatching();
 
 };

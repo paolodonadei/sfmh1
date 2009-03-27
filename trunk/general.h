@@ -31,6 +31,62 @@ inline std::string stringify(const T& x)
                             + typeid(x).name() + ")");
     return o.str();
 }
+
+template<typename T>  // See section on templates for more
+ class Matrix {
+ public:
+   Matrix(unsigned nrows, unsigned ncols);
+   // Throws a BadSize object if either size is zero
+   class BadSize { };
+
+   // No need for any of The Big Three!
+
+   // Access methods to get the (i,j) element:
+   T&       operator() (unsigned i, unsigned j);
+   const T& operator() (unsigned i, unsigned j) const;
+   // These throw a BoundsViolation object if i or j is too big
+   class BoundsViolation { };
+
+   unsigned nrows() const;  // #rows in this matrix
+   unsigned ncols() const;  // #columns in this matrix
+
+ private:
+   std::vector<std::vector<T> > data_;
+ };
+
+ template<typename T>
+ inline unsigned Matrix<T>::nrows() const
+ { return data_.size(); }
+
+ template<typename T>
+ inline unsigned Matrix<T>::ncols() const
+ { return data_[0].size(); }
+
+ template<typename T>
+ inline T& Matrix<T>::operator() (unsigned row, unsigned col)
+ {
+   if (row >= nrows() || col >= ncols()) throw BoundsViolation();
+   return data_[row][col];
+ }
+
+ template<typename T>
+ inline const T& Matrix<T>::operator() (unsigned row, unsigned col) const
+ {
+   if (row >= nrows() || col >= ncols()) throw BoundsViolation();
+   return data_[row][col];
+ }
+
+ template<typename T>
+ Matrix<T>::Matrix(unsigned nrows, unsigned ncols)
+   : data_ (nrows)
+ {
+   if (nrows == 0 || ncols == 0)
+     throw BadSize();
+   for (unsigned i = 0; i < nrows; ++i)
+     data_[i].resize(ncols);
+ }
+
+
 IplImage* concatImagesVertical(IplImage* im1,IplImage* im2);
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 bool checkTempPath();
