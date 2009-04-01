@@ -9,7 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include "HRprimitives.h"
 
-
+class HRCorrespond2N;
 using namespace std;
 
 class HRFeature;
