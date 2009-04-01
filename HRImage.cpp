@@ -6,6 +6,7 @@
 #include "boost/filesystem/path.hpp"
 #include <time.h>
 #include <fstream>
+#include <iomanip>
 #include "general.h"
 #include "pgmutils.hpp"
 #include "sift.h"
@@ -677,7 +678,7 @@ int HRImageSet::featureDetectSift()
 int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
-    vector<vector<HRCorrespond2N> > correspondences ( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
+    correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
 
 
 
@@ -685,23 +686,23 @@ int HRImageSet::exhaustiveSIFTMatching()
     {
         for (j=0;j<i;j++)
         {
-            correspondences[i][j].indexIm1=i;
-            correspondences[i][j].indexIm2=j;
+            correspondencesPairWise[i][j].indexIm1=i;
+            correspondencesPairWise[i][j].indexIm2=j;
 
-            correspondences[i][j].hr1ptr=&(*imageCollection[i]);
-            correspondences[i][j].hr2ptr=&(*imageCollection[j]);
+            correspondencesPairWise[i][j].hr1ptr=&(*imageCollection[i]);
+            correspondencesPairWise[i][j].hr2ptr=&(*imageCollection[j]);
 
-            int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondences[i][j]);
+            int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
             printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
                    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
 
             string fname=TEMPDIR+string("/")+combineFnames((*imageCollection[i]).filename,(*imageCollection[j]).filename,"_matches.txt");
 
-            drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondences[i][j]);
+            drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
 
             fstream fp_out;
             fp_out.open(fname.c_str(), ios::out);
-            fp_out<<correspondences[i][j];
+            fp_out<<correspondencesPairWise[i][j];
             fp_out.close();
 
         }
@@ -723,21 +724,38 @@ int HRImageSet::createFeatureTrackMatrix()
         {
             for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
             {
+                cout<<"i is "<<i <<" and j is "<<j<<endl;
                 processPairMatchinTrack( trackMatrix, correspondencesPairWise[i][j], k);
 
             }
 
         }
     }
+calcFeatureTrackScores(trackMatrix);
 
-
-
+    writeTrackMatrix("trackbefore.txt");
+    drawImageTrackMatches(trackMatrix,imageCollection,"beforeprunetracks.png");
     pruneFeatureTrack( trackMatrix );
-
-
+    writeTrackMatrix("trackafter.txt");
+    drawImageTrackMatches(trackMatrix,imageCollection,"afterprunetracks.png");
 }
 
+int HRImageSet::findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices)
+{
+    int i,j;
+    for (i=0;i<tMatrix.size(); i++)
+    {
+        for (j=0;j<tMatrix[i].size();j++)
+        {
+            if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+            {
+                matchedIndices.push_back(i);
+            }
 
+        }
+    }
+    return 1;
+}
 
 int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber)
 {
@@ -750,27 +768,42 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
 
     int i,j;
     int flag=0; //1 means add new row, 2 means
+    int flagFound=0;
+    vector<int> matchedIndex;
 
-    for (i=0;i<tMatrix.size(); i++)
+    findMatchinTrack(tMatrix, corrs,indexNumber,matchedIndex);
+
+    if (matchedIndex.size()==0) //add new row
     {
-        for (j=0;j<tMatrix[i].size();j++)
+        vector<int> newRow(imageCollection.size(),-1);
+        newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+        newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+
+        tMatrix.push_back(newRow);
+
+
+
+    }
+    else
+    {
+        for (i=0;i<matchedIndex.size();i++)
         {
-            if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
+            if (tMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
             {
-                if (tMatrix[i][corrs.indexIm2]==-1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+                if (tMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
                 {
-                    tMatrix[i][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                    tMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
                 }
                 else
                 {
                     flag=1;
                 }
             }
-            else if (tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+            else if (tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
             {
-                if (tMatrix[i][corrs.indexIm1]==-1 || tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
+                if (tMatrix[matchedIndex[i]][corrs.indexIm1]==-1 || tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
                 {
-                    tMatrix[i][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+                    tMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
 
                 }
                 else
@@ -778,20 +811,11 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
                     flag=1;
                 }
             }
-            else
-            {
-                vector<int> newRow(imageCollection.size(),-1);
-                newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
-                newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
 
-                tMatrix.push_back(newRow);
-
-
-            }
 
             if (flag==1)
             {
-                vector<int> newRow(tMatrix[i]);
+                vector<int> newRow(tMatrix[matchedIndex[i]]);
                 newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
                 newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
 
@@ -800,8 +824,13 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
                 flag=0;
             }
 
+
+
         }
     }
+
+
+
 }
 int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
 {
@@ -865,20 +894,52 @@ int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
 
 int HRImageSet::eraseTrackMatRow(int index)
 {
-int i,j,k,l;
+    int i,j,k,l;
+
+
+
+        for (j=0;j<trackMatrix[index].size();j++)
+        {
+            trackMatrix[index][j]=-1;
+
+        }
+
+
+    curScores[index]=0;
+
+    return 0;
+}
+
+void HRImageSet::writeTrackMatrix(string fname)
+{
+
+       string tslash="/";
+      string newfname=TEMPDIR+tslash+fname;
+
+
+    int i,j,k,l;
+
+    fstream file_op(newfname.c_str(),ios::out);
+
+if(curScores.size()!=trackMatrix.size())
+{
+   cout<<"the sizes of the matrices are not the same, quitting"<<endl;
+   return;
+}
 
 
     for (i=0;i<trackMatrix.size(); i++)
     {
-            for (j=0;j<trackMatrix[i].size();j++)
-            {
-                trackMatrix[i][j]=-1;
+        file_op<<i<<"\t\t"<<setw(10)<<curScores[i]<<setw(10);
+        for (j=0;j<trackMatrix[i].size();j++)
+        {
 
-            }
-
+            file_op<<setw(10)<<setprecision(5)<< trackMatrix[i][j]<<"\t";
+        }
+        file_op<<endl;
     }
-curScores[index]=-1;
 
-return 0;
+
+    file_op.close();
+
 }
-

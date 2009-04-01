@@ -107,9 +107,11 @@ int createFeatureTrackMatrix();
     int exhaustiveSIFTMatching();
     bool TrackMatrixContains(vector< vector<int> >& tMatrix);
 int processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber);
+int findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
 int pruneFeatureTrack(vector< vector<int> >& tMatrix);
 int calcFeatureTrackScores(vector< vector<int> >& tMatrix);
     vector<double> curScores;
     int eraseTrackMatRow(int index);
+    void writeTrackMatrix(string fname);
 };
 #endif // HRIMAGE_HPP_INCLUDED
