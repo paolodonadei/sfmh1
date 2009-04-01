@@ -99,9 +99,17 @@ public:
     int open(string directoryName);
     void showOneByOne();
     void showOneByOneFeature();
-  vector<vector<int> > matchTracks;
-   vector<vector<HRCorrespond2N> > correspondences;
-    int exhaustiveSIFTMatching();
 
+vector< vector<int> > trackMatrix;
+vector<vector<HRCorrespond2N> > correspondencesPairWise;
+int createFeatureTrackMatrix();
+
+    int exhaustiveSIFTMatching();
+    bool TrackMatrixContains(vector< vector<int> >& tMatrix);
+int processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber);
+int pruneFeatureTrack(vector< vector<int> >& tMatrix);
+int calcFeatureTrackScores(vector< vector<int> >& tMatrix);
+    vector<double> curScores;
+    int eraseTrackMatRow(int index);
 };
 #endif // HRIMAGE_HPP_INCLUDED

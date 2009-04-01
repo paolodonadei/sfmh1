@@ -5,7 +5,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include <time.h>
- #include <fstream>
+#include <fstream>
 #include "general.h"
 #include "pgmutils.hpp"
 #include "sift.h"
@@ -710,4 +710,175 @@ int HRImageSet::exhaustiveSIFTMatching()
 
 }
 
+
+int HRImageSet::createFeatureTrackMatrix()
+{
+
+
+    int i, j, k,q;
+
+    for (i=0;i<imageCollection.size();i++)
+    {
+        for (j=0;j<i;j++)
+        {
+            for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
+            {
+                processPairMatchinTrack( trackMatrix, correspondencesPairWise[i][j], k);
+
+            }
+
+        }
+    }
+
+
+
+    pruneFeatureTrack( trackMatrix );
+
+
+}
+
+
+
+int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber)
+{
+    //this function behaves as such, first it takes a single match between two images, so a single correspondence
+//   then it looks into the track matrix for the presence of any one of those correesponence points, if one exists, it looks at the correponding slot for the other image
+//if its empty then it populates it and adds in the score, if its none empty and its the same value that it would have been it does the same, but if its empty and has a dfferent
+//value for the other image then it clones that row with the new correspondence
+
+
+
+    int i,j;
+    int flag=0; //1 means add new row, 2 means
+
+    for (i=0;i<tMatrix.size(); i++)
+    {
+        for (j=0;j<tMatrix[i].size();j++)
+        {
+            if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
+            {
+                if (tMatrix[i][corrs.indexIm2]==-1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+                {
+                    tMatrix[i][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                }
+                else
+                {
+                    flag=1;
+                }
+            }
+            else if (tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+            {
+                if (tMatrix[i][corrs.indexIm1]==-1 || tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
+                {
+                    tMatrix[i][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+
+                }
+                else
+                {
+                    flag=1;
+                }
+            }
+            else
+            {
+                vector<int> newRow(imageCollection.size(),-1);
+                newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+
+                tMatrix.push_back(newRow);
+
+
+            }
+
+            if (flag==1)
+            {
+                vector<int> newRow(tMatrix[i]);
+                newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+
+                tMatrix.push_back(newRow);
+
+                flag=0;
+            }
+
+        }
+    }
+}
+int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
+{
+    int i,j,k,l;
+    int count=0;
+    curScores.resize(tMatrix.size(),0);
+
+    for (i=0;i<tMatrix.size(); i++)
+    {
+        count=0;
+        for (j=0;j<tMatrix[i].size();j++)
+        {
+            for (k=0;k<j;k++)
+            {
+                if (tMatrix[i][k]!=-1 && tMatrix[i][j]!=-1)
+                {
+                    for (l=0;l<correspondencesPairWise[j][k].imIndices.size();l++)
+                    {
+                        if (correspondencesPairWise[j][k].imIndices[l].imindex1==tMatrix[i][k] && correspondencesPairWise[j][k].imIndices[l].imindex2==tMatrix[i][j]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
+                        {
+                            curScores[i]+=correspondencesPairWise[j][k].imIndices[l].score;
+                            count++;
+
+                        }
+                    }
+                }
+            }
+        }
+        curScores[i]/=(double)count;
+
+    }
+}
+int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
+{
+    int i,j,k,l;
+
+
+    for (i=0;i<tMatrix.size(); i++)
+    {
+        for (j=0;j<i; j++)
+        {
+            for (k=0;k<tMatrix[i].size();k++)
+            {
+                if (tMatrix[i][k]==tMatrix[j][k])
+                {
+                    if ( curScores[i]>curScores[j])
+                    {
+                        eraseTrackMatRow(j);
+                    }
+                    else
+                    {
+                        eraseTrackMatRow(i);
+                    }
+
+                }
+            }
+        }
+    }
+
+}
+
+int HRImageSet::eraseTrackMatRow(int index)
+{
+int i,j,k,l;
+
+
+    for (i=0;i<trackMatrix.size(); i++)
+    {
+            for (j=0;j<trackMatrix[i].size();j++)
+            {
+                trackMatrix[i][j]=-1;
+
+            }
+
+    }
+curScores[index]=-1;
+
+return 0;
+}
 

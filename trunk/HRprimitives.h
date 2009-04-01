@@ -17,6 +17,7 @@ struct matchIndex
 {
     int imindex1;
     int imindex2;
+    double score; //higher is better
 } ;
 
 class HRCorrespond2N
