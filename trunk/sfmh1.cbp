@@ -18,7 +18,7 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="-D /home/houman/work/test_data/bt/" />
+				<Option parameters=" -D /home/houman/work/test_data/reduced/" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

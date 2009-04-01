@@ -22,7 +22,7 @@ using namespace std;
 
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
-double score;
+    double score;
 
     vector<HRPointFeatures>::iterator k;
     int index=-1;
@@ -33,7 +33,7 @@ double score;
     for (int i=0;i<im1.HR2DVector.size();i++)
     {
 
-          CheckForMatch(im1.HR2DVector[i], im2.HR2DVector,index,score);
+        CheckForMatch(im1.HR2DVector[i], im2.HR2DVector,index,score);
 
         if (index != -1)
         {
@@ -42,7 +42,7 @@ double score;
             matchIndex indexTemp;
             indexTemp.imindex1=i;
             indexTemp.imindex2=index;
-               indexTemp.score;
+            indexTemp.score;
             hr_correspond.imIndices.push_back(indexTemp);
 
         }
@@ -67,8 +67,8 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 
     int x0,y0,x1,y1;
 
-for(int i=0;i<hr_correspond.imIndices.size();i++)
-{
+    for (int i=0;i<hr_correspond.imIndices.size();i++)
+    {
 
         x0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.x;
         y0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.y;
@@ -77,9 +77,9 @@ for(int i=0;i<hr_correspond.imIndices.size();i++)
 
         cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
 
-     //print correspondences 1 to 1
+        //print correspondences 1 to 1
         if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), i);
-}
+    }
 
 
 
@@ -134,15 +134,15 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
         /* PCA-SIFT KEYS */
         if (distsq1 < PCA_THRESH)
         {
-             winKey=winKey;
-             score=-distsq1;
-             return 1;
+            winKey=winKey;
+            score=-distsq1;
+            return 1;
         }
         else
         {
-         winKey=-1;
-             score=-distsq1;
-        return -1;
+            winKey=-1;
+            score=-distsq1;
+            return -1;
         }
 
     }
@@ -152,13 +152,13 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
         if (distsq1 < SIFT_MULT * distsq2)
         {
             winKey=winKey;
-             score=-(distsq1/distsq2);
+            score=-(distsq1/distsq2);
             return 1;
         }
         else
         {
-             winKey=-1;
-             score=-(distsq1/distsq2);
+            winKey=-1;
+            score=-(distsq1/distsq2);
             return -1;
         }
 
@@ -371,5 +371,106 @@ int findSIFTfeatures( HRImage& image)
     int numfeatures= readSIFTfile(image.HR2DVector,image.siftkeyfilename);
     cout<<"number of features found for : "<<image.filename<<" is equal to "<<numfeatures<<endl;
     return 1;
+
+}
+
+int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRImagePtr>& imCollection,string filname)
+{
+#define SINGLEMATCHPRINT 1
+
+    int i, j, k;
+    int x0,y0,x1,y1;
+    IplImage* imgTemp=NULL;
+    IplImage* imgTempcopy=NULL;
+
+    if ( checkTempPath()==false)
+        return 0;
+
+    int heightImage=0;
+
+    if (imCollection.size()==0)
+    {
+        cout<<"no images exist in the database, quitting"<<endl;
+        return 0;
+
+    }
+    heightImage=(*imCollection[0]).height;
+
+
+    for (i=0;i<imCollection.size();i++)
+    {
+
+        IplImage* imgTemptemp=concatImagesVertical(imgTemp,(*imCollection[i]).cv_img);
+
+        cvReleaseImage( &imgTemp );
+        imgTemp=imgTemptemp;
+    }
+
+    if (SINGLEMATCHPRINT==1)
+    {
+        imgTempcopy=cvCloneImage(imgTemp);
+
+    }
+
+
+
+    for (i=0;i<tMatrix.size(); i++)
+    {
+        for (j=1;j<tMatrix[i].size();j++)
+        {
+
+            if (tMatrix[i][j]!=-1 && tMatrix[i][j-1]!=-1)
+            {
+                x0=(*imCollection[j-1]).HR2DVector[tMatrix[i][j-1]]->location.x;
+                y0=(*imCollection[j-1]).HR2DVector[tMatrix[i][j-1]]->location.y+ ((j-1)*heightImage);
+                x1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.x;
+                y1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.y+ ((j)*heightImage);
+
+                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
+
+                //print correspondences 1 to 1
+                if (SINGLEMATCHPRINT==1)
+                {
+                    IplImage* imgTemptempcopy;
+                    imgTemptempcopy=cvCloneImage(imgTempcopy);
+                    cvLine(imgTemptempcopy, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
+                    string tslash="/";
+                    string fname=TEMPDIR+tslash+combineFnames((*imCollection[j-1]).filename,(*imCollection[j]).filename,string("_"+stringify(i)+"_singletrack.png"));
+
+                    if (!cvSaveImage(fname.c_str(),imgTemptempcopy)) printf("Could not save: %s\n",fname.c_str());
+                    cvReleaseImage( &imgTemptempcopy );
+                }
+            }
+        }
+
+
+    }
+
+
+
+
+
+    string tslash="/";
+    string fname=TEMPDIR+tslash+filname;
+
+    if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
+
+
+    cvReleaseImage( &imgTemp );
+
+    if (SINGLEMATCHPRINT==1)
+    {
+        cvReleaseImage( &imgTempcopy );
+
+
+    }
+
+
+    return 0;
+
+
+
+
+
 
 }

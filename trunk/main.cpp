@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
         imSet.featureDetectSift();
       //  imSet.showOneByOneFeature();
         imSet.exhaustiveSIFTMatching();
+        imSet.createFeatureTrackMatrix();
     }
     return 0;
 }

@@ -63,6 +63,26 @@ string combineFnames(const string& f1,const string& f2,string extension)
 //this takes two single channel images and produces a 3 channel output image
 IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
 {
+
+    if (im1==NULL && im2==NULL)
+    {
+        cout<<"images are empty"<<endl;
+        return NULL;
+
+    }
+
+    if (im1==NULL)
+    {
+        IplImage* imgTemp=cvCloneImage(im2);
+        return imgTemp;
+    }
+
+    if (im2==NULL)
+    {
+        IplImage* imgTemp=cvCloneImage(im1);
+        return imgTemp;
+    }
+
     if (im1->width != im2->width || im1->height!=im2->height)
     {
         cout<<"images to be concatenated are not the same size"<<endl;
