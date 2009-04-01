@@ -5,7 +5,6 @@
 #include <highgui.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "HRprimitives.h"
 #include "HRImage.hpp"
 
 class HRImage;

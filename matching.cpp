@@ -22,7 +22,7 @@ using namespace std;
 
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
-
+double score;
 
     vector<HRPointFeatures>::iterator k;
     int index=-1;
@@ -33,7 +33,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
     for (int i=0;i<im1.HR2DVector.size();i++)
     {
 
-        index = CheckForMatch(im1.HR2DVector[i], im2.HR2DVector);
+          CheckForMatch(im1.HR2DVector[i], im2.HR2DVector,index,score);
 
         if (index != -1)
         {
@@ -42,6 +42,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
             matchIndex indexTemp;
             indexTemp.imindex1=i;
             indexTemp.imindex2=index;
+               indexTemp.score;
             hr_correspond.imIndices.push_back(indexTemp);
 
         }
@@ -101,11 +102,12 @@ for(int i=0;i<hr_correspond.imIndices.size();i++)
     return 0;
 }
 
-int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures)
+
+int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures, int& winKey, double& score)
 {
     int dsq, distsq1 = 100000000, distsq2 = 100000000;
 
-    int minkey = -1;
+    winKey= -1;
 
     /* Find the two closest matches, and put their squared distances in
        distsq1 and distsq2.
@@ -118,7 +120,7 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
         {
             distsq2 = distsq1;
             distsq1 = dsq;
-            minkey = i;
+            winKey = i;
         }
         else if (dsq < distsq2)
         {
@@ -131,16 +133,34 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
 
         /* PCA-SIFT KEYS */
         if (distsq1 < PCA_THRESH)
-            return minkey;
+        {
+             winKey=winKey;
+             score=-distsq1;
+             return 1;
+        }
+        else
+        {
+         winKey=-1;
+             score=-distsq1;
         return -1;
+        }
 
     }
     else
     {
         /* SIFT KEYS */
         if (distsq1 < SIFT_MULT * distsq2)
-            return minkey;
-        else return -1;
+        {
+            winKey=winKey;
+             score=-(distsq1/distsq2);
+            return 1;
+        }
+        else
+        {
+             winKey=-1;
+             score=-(distsq1/distsq2);
+            return -1;
+        }
 
     }
 //    /* Check whether closest distance is less than 0.6 of second. */
@@ -148,6 +168,7 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
 //        return minkey;
 //    else return -1;
 }
+
 
 
 int DistSquared(const HRPointFeatures& k1, const HRPointFeatures& k2)
