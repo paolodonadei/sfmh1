@@ -83,7 +83,7 @@ IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
         return imgTemp;
     }
 
-    if (im1->width != im2->width || im1->height!=im2->height)
+    if (im1->width != im2->width)
     {
         cout<<"images to be concatenated are not the same size"<<endl;
         return NULL;
@@ -91,7 +91,7 @@ IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
     }
 
 
-    IplImage* imgTemp=cvCreateImage(cvSize(im1->width,im1->height*2),IPL_DEPTH_8U,3);
+    IplImage* imgTemp=cvCreateImage(cvSize(im1->width,im1->height+im2->height),IPL_DEPTH_8U,3);
 
 
     int i,j;
@@ -123,7 +123,7 @@ IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
 
 
 
-    for (i=im1->height;i<(im1->height*2);i++)
+    for (i=im1->height;i<(im1->height+im2->height);i++)
     {
         for (j=0;j<im1->width;j++)
         {
