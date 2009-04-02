@@ -113,5 +113,6 @@ int calcFeatureTrackScores(vector< vector<int> >& tMatrix);
     vector<double> curScores;
     int eraseTrackMatRow(int index);
     void writeTrackMatrix(string fname);
+    bool rowExistsinTrack(const vector< vector<int> >& mMatrix,const vector<int>& indices, const vector<int>& newRow);
 };
 #endif // HRIMAGE_HPP_INCLUDED

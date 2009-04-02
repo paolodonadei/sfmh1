@@ -751,8 +751,7 @@ int HRImageSet::findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N&
         if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
         {
             //dont return this if they are tehre exactly
-            if (!(tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2))
-                matchedIndices.push_back(i);
+            matchedIndices.push_back(i);
         }
 
 
@@ -773,11 +772,17 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
     int flag=0; //1 means add new row, 2 means
     int flagFound=0;
     vector<int> matchedIndex(0);
-
+    int rowNumsSize=0;
 
     findMatchinTrack(tMatrix, corrs,indexNumber,matchedIndex);
 
-    cout<<"processing match " <<indexNumber<<" between images: "<<  corrs.indexIm1<<" and "<< corrs.indexIm1  <<endl;
+    cout<<"processing match " <<indexNumber<<" between images: "<<  corrs.indexIm1<<" and "<< corrs.indexIm2  <<endl;
+
+
+    cout<<",,,,,,,Original he content of the index are:";
+    for (int h=0;h<matchedIndex.size();h++) cout<<"  "<< matchedIndex[h]<<"  ";
+    cout<<" original size was "<< rowNumsSize<<endl;
+
 
     if (matchedIndex.size()==0) //add new row
     {
@@ -787,97 +792,116 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
 
         tMatrix.push_back(newRow);
 
-        cout<<"creatring new row"<<endl;
+        cout<<"creatring new row number "<<(tMatrix.size()-1) <<endl;
 
     }
     else
     {
+        rowNumsSize=matchedIndex.size() ;//this trick is done to make sure we dont keep readding same rows
         cout<<"+++++++++++found existing row of size "<<matchedIndex.size()<< " size of the track matrix is "<<tMatrix.size()<<endl;
-        for (i=0;i<matchedIndex.size();i++)
+        for (i=0;i<rowNumsSize;i++)
         {
-            if (tMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
+            if (tMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
             {
-                if (tMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
-                {
-                    tMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
-                    cout<<"updating match on the left"<<endl;
-                }
-                else
-                {
-                    flag=1;
-                    cout <<"adding match "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
-                    cout<<"bad match found on the left, we expected to see "<< corrs.imIndices[indexNumber].imindex2<< " but we found "<< tMatrix[matchedIndex[i]][corrs.indexIm2]<<endl;
-                }
+                continue;
             }
-            else if (tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+            else if (tMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || tMatrix[matchedIndex[i]][corrs.indexIm1]==-1)
             {
-                if (tMatrix[matchedIndex[i]][corrs.indexIm1]==-1 || tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
-                {
-                    tMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
-                    cout<<"updating match on the right"<<endl;
-                }
-                else
-                {
-                    flag=1;
-                    cout <<"adding match "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
-                    cout<<"bad match found on the right"<<endl;
-                }
+                tMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                tMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+                cout<<"editing row number "<<matchedIndex[i] <<endl;
             }
-
-
-            if (flag==1)
+            else
             {
-
-
-///zzzz seriously change the way this damn thing is written
                 vector<int> newRow(tMatrix[matchedIndex[i]]);
                 newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
                 newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
-                cout<<"couldnt find  "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
-
-                cout<<"bad match was: ";
-                for (int h=0;h<tMatrix[matchedIndex[i]].size();h++) cout<<"  "<< tMatrix[matchedIndex[i]][h]<<"  ";
-                cout<<endl;
 
 
-                cout<<"added: ";
-                for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
-                cout<<endl;
 
-                bool flagAdded=true;
-
-                if (i==0)
+                if (rowExistsinTrack(tMatrix,matchedIndex, newRow)==false)
                 {
-                    flagAdded=false;
+
+                    cout<<"couldnt find  "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
+
+                    cout<<"bad match was: ";
+                    for (int h=0;h<tMatrix[matchedIndex[i]].size();h++) cout<<"  "<< tMatrix[matchedIndex[i]][h]<<"  ";
+                    cout<<endl;
+
+
+                    cout<<"added: ";
+                    for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
+                    cout<<endl;
+                    tMatrix.push_back(newRow);
+                    matchedIndex.push_back(tMatrix.size()-1);
+                    cout<<"creatring new row number "<<(tMatrix.size()-1) <<endl;
+                    numTimes++;
                 }
                 else
                 {
-
-                    for (int h=0;h<tMatrix[tMatrix.size()-1].size();h++)
-                    {
-                        if (tMatrix[tMatrix.size()-1][h]!=newRow[h])
-                        {
-                            flagAdded=false;
-                            break;
-                        }
-                    }
-                }
-                if (flagAdded==false)
-                {
-                    tMatrix.push_back(newRow);
-                    numTimes++;
+                    cout<<"match was found in the temp array"<<endl;
 
                 }
-                flag=0;
+
             }
-
-
 
         }
     }
 
-    if (numTimes>1) cout<<"______________________above was added "<<numTimes<<" times"<<endl;
+    if (numTimes>1)
+    {
+        cout<<"______________________above was added "<<numTimes<<" times"<<endl;
+        cout<<",,,,,,,the content of the index are:";
+        for (int h=0;h<matchedIndex.size();h++) cout<<"  "<< matchedIndex[h]<<"  ";
+        cout<<" original size was "<< rowNumsSize<<endl;
 
+
+    }
+}
+
+bool HRImageSet::rowExistsinTrack(const vector< vector<int> >& mMatrix,const vector<int>& indices, const vector<int>& newRow)
+{
+    bool flagExists=true;
+
+    cout<<"looking for  : ";
+    for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
+
+    cout<<"in the following: ";
+    for (int i=0;i< indices.size();i++)
+    {
+
+        for (int j=0;j<mMatrix[indices[i]].size();j++)
+        {
+
+            cout<<"  "<< mMatrix[indices[i]][j]<<"  ";
+
+        }
+        cout<<endl;
+
+    }
+
+
+
+    for (int i=0;i< indices.size();i++)
+    {
+flagExists=true;
+        for (int j=0;j<mMatrix[indices[i]].size();j++)
+        {
+
+            if (mMatrix[indices[i]][j]!=newRow[j])
+            {
+                flagExists=false;
+                break;
+            }
+
+        }
+        if (flagExists==true) return true;
+
+
+    }
+
+
+    return flagExists;
 }
 int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
 {
@@ -900,14 +924,14 @@ int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
                         {
                             curScores[i]+=correspondencesPairWise[j][k].imIndices[l].score;
                             count++;
-
+                            break;
                         }
                     }
                 }
             }
         }
         if (count!=0)
-            curScores[i]/=(double)count;
+            curScores[i]=curScores[i]/(double)count;
 
     }
 }
@@ -922,15 +946,17 @@ int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
         {
             for (k=0;k<tMatrix[i].size();k++)
             {
-                if (tMatrix[i][k]==tMatrix[j][k])
+                if (tMatrix[i][k]==tMatrix[j][k] && tMatrix[j][k]!=-1)
                 {
                     if ( curScores[i]>curScores[j])
                     {
                         eraseTrackMatRow(j);
+                        break;
                     }
                     else
                     {
                         eraseTrackMatRow(i);
+                        break;
                     }
 
                 }
