@@ -884,7 +884,7 @@ bool HRImageSet::rowExistsinTrack(const vector< vector<int> >& mMatrix,const vec
 
     for (int i=0;i< indices.size();i++)
     {
-flagExists=true;
+        flagExists=true;
         for (int j=0;j<mMatrix[indices[i]].size();j++)
         {
 
@@ -920,9 +920,10 @@ int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
                 {
                     for (l=0;l<correspondencesPairWise[j][k].imIndices.size();l++)
                     {
-                        if (correspondencesPairWise[j][k].imIndices[l].imindex1==tMatrix[i][k] && correspondencesPairWise[j][k].imIndices[l].imindex2==tMatrix[i][j]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
+                        if (correspondencesPairWise[j][k].imIndices[l].imindex1==tMatrix[i][j] && correspondencesPairWise[j][k].imIndices[l].imindex2==tMatrix[i][k]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
                         {
                             curScores[i]+=correspondencesPairWise[j][k].imIndices[l].score;
+                            cout<<"score was "<<correspondencesPairWise[j][k].imIndices[l].score<<"    ";
                             count++;
                             break;
                         }
@@ -933,6 +934,7 @@ int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
         if (count!=0)
             curScores[i]=curScores[i]/(double)count;
 
+    cout<<endl<<"final score is "<<curScores[i]<<endl;
     }
 }
 int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)

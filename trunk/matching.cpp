@@ -43,7 +43,8 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
             matchIndex indexTemp;
             indexTemp.imindex1=i;
             indexTemp.imindex2=index;
-            indexTemp.score;
+            indexTemp.score=score;
+
             hr_correspond.imIndices.push_back(indexTemp);
 
         }
@@ -377,7 +378,7 @@ int findSIFTfeatures( HRImage& image)
 
 int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRImagePtr>& imCollection,string filname)
 {
-#define SINGLEMATCHPRINT 0
+#define SINGLEMATCHPRINT 1
 
     int i, j, k;
     int x0,y0,x1,y1;
@@ -434,7 +435,7 @@ int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRIm
                 x1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.x;
                 y1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.y+ ((j)*heightImage);
 
-                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), colors[i%3], 1);
+                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
 
                 //print correspondences 1 to 1
                 if (SINGLEMATCHPRINT==1)
@@ -447,7 +448,7 @@ int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRIm
         if (SINGLEMATCHPRINT==1)
         {
             string tslash="/";
-            string fname=TEMPDIR+tslash+string("track_i"+stringify(i)+"_d"+stringify(matchCountr)+".png");
+            string fname=TEMPDIR+tslash+string(filname+"track_i"+stringify(i)+"_d"+stringify(matchCountr)+".png");
 
             if (!cvSaveImage(fname.c_str(),imgTemptempcopy)) printf("Could not save: %s\n",fname.c_str());
             cvReleaseImage( &imgTemptempcopy );
