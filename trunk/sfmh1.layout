@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="21997" topLine="708" />
+	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="20754" topLine="811" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="3145" topLine="87" />
@@ -23,16 +23,16 @@
 		<Cursor position="78" topLine="0" />
 	</File>
 	<File name="general.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="1336" topLine="51" />
+		<Cursor position="3125" topLine="112" />
 	</File>
 	<File name="general.h" open="1" top="0" tabpos="9">
 		<Cursor position="990" topLine="8" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="551" topLine="0" />
+		<Cursor position="545" topLine="0" />
 	</File>
-	<File name="matching.cpp" open="1" top="1" tabpos="14">
-		<Cursor position="10774" topLine="413" />
+	<File name="matching.cpp" open="1" top="0" tabpos="14">
+		<Cursor position="9112" topLine="363" />
 	</File>
 	<File name="matching.hpp" open="1" top="0" tabpos="15">
 		<Cursor position="197" topLine="0" />

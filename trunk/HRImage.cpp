@@ -724,14 +724,16 @@ int HRImageSet::createFeatureTrackMatrix()
         {
             for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
             {
-                cout<<"i is "<<i <<" and j is "<<j<<endl;
+                //cout<<"i is "<<i <<" and j is "<<j<<endl;
                 processPairMatchinTrack( trackMatrix, correspondencesPairWise[i][j], k);
 
             }
 
         }
     }
-calcFeatureTrackScores(trackMatrix);
+
+    cout<<"number of feature tracks is ---------- "<<trackMatrix.size()<<endl;
+    calcFeatureTrackScores(trackMatrix);
 
     writeTrackMatrix("trackbefore.txt");
     drawImageTrackMatches(trackMatrix,imageCollection,"beforeprunetracks.png");
@@ -745,14 +747,15 @@ int HRImageSet::findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N&
     int i,j;
     for (i=0;i<tMatrix.size(); i++)
     {
-        for (j=0;j<tMatrix[i].size();j++)
-        {
-            if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
-            {
-                matchedIndices.push_back(i);
-            }
 
+        if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+        {
+            //dont return this if they are tehre exactly
+            if (!(tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2))
+                matchedIndices.push_back(i);
         }
+
+
     }
     return 1;
 }
@@ -765,13 +768,16 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
 //value for the other image then it clones that row with the new correspondence
 
 
-
+    int numTimes=0;
     int i,j;
     int flag=0; //1 means add new row, 2 means
     int flagFound=0;
-    vector<int> matchedIndex;
+    vector<int> matchedIndex(0);
+
 
     findMatchinTrack(tMatrix, corrs,indexNumber,matchedIndex);
+
+    cout<<"processing match " <<indexNumber<<" between images: "<<  corrs.indexIm1<<" and "<< corrs.indexIm1  <<endl;
 
     if (matchedIndex.size()==0) //add new row
     {
@@ -781,11 +787,12 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
 
         tMatrix.push_back(newRow);
 
-
+        cout<<"creatring new row"<<endl;
 
     }
     else
     {
+        cout<<"+++++++++++found existing row of size "<<matchedIndex.size()<< " size of the track matrix is "<<tMatrix.size()<<endl;
         for (i=0;i<matchedIndex.size();i++)
         {
             if (tMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
@@ -793,10 +800,13 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
                 if (tMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
                 {
                     tMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                    cout<<"updating match on the left"<<endl;
                 }
                 else
                 {
                     flag=1;
+                    cout <<"adding match "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
+                    cout<<"bad match found on the left, we expected to see "<< corrs.imIndices[indexNumber].imindex2<< " but we found "<< tMatrix[matchedIndex[i]][corrs.indexIm2]<<endl;
                 }
             }
             else if (tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
@@ -804,23 +814,60 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
                 if (tMatrix[matchedIndex[i]][corrs.indexIm1]==-1 || tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1)
                 {
                     tMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
-
+                    cout<<"updating match on the right"<<endl;
                 }
                 else
                 {
                     flag=1;
+                    cout <<"adding match "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
+                    cout<<"bad match found on the right"<<endl;
                 }
             }
 
 
             if (flag==1)
             {
+
+
+///zzzz seriously change the way this damn thing is written
                 vector<int> newRow(tMatrix[matchedIndex[i]]);
                 newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
                 newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+                cout<<"couldnt find  "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
 
-                tMatrix.push_back(newRow);
+                cout<<"bad match was: ";
+                for (int h=0;h<tMatrix[matchedIndex[i]].size();h++) cout<<"  "<< tMatrix[matchedIndex[i]][h]<<"  ";
+                cout<<endl;
 
+
+                cout<<"added: ";
+                for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
+                cout<<endl;
+
+                bool flagAdded=true;
+
+                if (i==0)
+                {
+                    flagAdded=false;
+                }
+                else
+                {
+
+                    for (int h=0;h<tMatrix[tMatrix.size()-1].size();h++)
+                    {
+                        if (tMatrix[tMatrix.size()-1][h]!=newRow[h])
+                        {
+                            flagAdded=false;
+                            break;
+                        }
+                    }
+                }
+                if (flagAdded==false)
+                {
+                    tMatrix.push_back(newRow);
+                    numTimes++;
+
+                }
                 flag=0;
             }
 
@@ -829,7 +876,7 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
         }
     }
 
-
+    if (numTimes>1) cout<<"______________________above was added "<<numTimes<<" times"<<endl;
 
 }
 int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
@@ -859,7 +906,8 @@ int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
                 }
             }
         }
-        curScores[i]/=(double)count;
+        if (count!=0)
+            curScores[i]/=(double)count;
 
     }
 }
@@ -890,6 +938,8 @@ int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
         }
     }
 
+
+    return 0;
 }
 
 int HRImageSet::eraseTrackMatRow(int index)
@@ -898,11 +948,11 @@ int HRImageSet::eraseTrackMatRow(int index)
 
 
 
-        for (j=0;j<trackMatrix[index].size();j++)
-        {
-            trackMatrix[index][j]=-1;
+    for (j=0;j<trackMatrix[index].size();j++)
+    {
+        trackMatrix[index][j]=-1;
 
-        }
+    }
 
 
     curScores[index]=0;
@@ -913,19 +963,19 @@ int HRImageSet::eraseTrackMatRow(int index)
 void HRImageSet::writeTrackMatrix(string fname)
 {
 
-       string tslash="/";
-      string newfname=TEMPDIR+tslash+fname;
+    string tslash="/";
+    string newfname=TEMPDIR+tslash+fname;
 
 
     int i,j,k,l;
 
     fstream file_op(newfname.c_str(),ios::out);
 
-if(curScores.size()!=trackMatrix.size())
-{
-   cout<<"the sizes of the matrices are not the same, quitting"<<endl;
-   return;
-}
+    if (curScores.size()!=trackMatrix.size())
+    {
+        cout<<"the sizes of the matrices are not the same, quitting"<<endl;
+        return;
+    }
 
 
     for (i=0;i<trackMatrix.size(); i++)
