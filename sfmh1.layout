@@ -2,16 +2,16 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="20754" topLine="811" />
+		<Cursor position="16961" topLine="741" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="3145" topLine="87" />
+		<Cursor position="3119" topLine="80" />
 	</File>
 	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="276" topLine="6" />
 	</File>
 	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
-		<Cursor position="332" topLine="6" />
+		<Cursor position="196" topLine="0" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="16">
 		<Cursor position="119" topLine="0" />
@@ -29,13 +29,13 @@
 		<Cursor position="990" topLine="8" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="545" topLine="0" />
+		<Cursor position="539" topLine="0" />
 	</File>
 	<File name="matching.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="9112" topLine="363" />
+		<Cursor position="7861" topLine="350" />
 	</File>
 	<File name="matching.hpp" open="1" top="0" tabpos="15">
-		<Cursor position="197" topLine="0" />
+		<Cursor position="278" topLine="1" />
 	</File>
 	<File name="pgmutils.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="613" topLine="0" />
