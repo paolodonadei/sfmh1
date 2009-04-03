@@ -990,7 +990,7 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
                         if (pairCorrespondences[j][k].imIndices[l].imindex1==trackMatrix[i][j] && pairCorrespondences[j][k].imIndices[l].imindex2==trackMatrix[i][k]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
                         {
                             curScores[i]+=pairCorrespondences[j][k].imIndices[l].score;
-                            cout<<"score was "<<pairCorrespondences[j][k].imIndices[l].score<<"    ";
+
                             count++;
                             break;
                         }
@@ -1001,7 +1001,7 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
         if (count!=0)
             curScores[i]=curScores[i]/(double)count;
 
-    cout<<endl<<"final score is "<<curScores[i]<<endl;
+
     }
 }
 int FeatureTrack::pruneFeatureTrack()
