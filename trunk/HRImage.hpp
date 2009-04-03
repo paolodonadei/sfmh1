@@ -4,16 +4,18 @@
 
 #include <cv.h>
 #include <highgui.h>
-#include "HRprimitives.h"
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "HRprimitives.h"
-
-class HRCorrespond2N;
-using namespace std;
-
 class HRFeature;
+class HRCorrespond2N;
+class FeatureTrack;
+using namespace std;
+class HRImage;
+
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
+typedef boost::shared_ptr<HRImage> HRImagePtr;
+
 
 
 class HRImage
@@ -84,7 +86,25 @@ public:
     void close();
 };
 
-typedef boost::shared_ptr<HRImage> HRImagePtr;
+class FeatureTrack
+{
+public:
+    FeatureTrack();
+
+    vector< vector<int> > trackMatrix;
+
+    int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
+    int findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
+    int pruneFeatureTrack();
+    int calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& pairCorrespondences);
+    vector<double> curScores;
+    int eraseTrackMatRow(int index);
+    void writeTrackMatrix(string fname);
+    bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);
+int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
+
+};
+
 class HRImageSet
 {
 
@@ -99,20 +119,13 @@ public:
     int open(string directoryName);
     void showOneByOne();
     void showOneByOneFeature();
-
-vector< vector<int> > trackMatrix;
 vector<vector<HRCorrespond2N> > correspondencesPairWise;
+    int exhaustiveSIFTMatching();
+FeatureTrack myTracks;
+
 int createFeatureTrackMatrix();
 
-    int exhaustiveSIFTMatching();
-    bool TrackMatrixContains(vector< vector<int> >& tMatrix);
-int processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber);
-int findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
-int pruneFeatureTrack(vector< vector<int> >& tMatrix);
-int calcFeatureTrackScores(vector< vector<int> >& tMatrix);
-    vector<double> curScores;
-    int eraseTrackMatRow(int index);
-    void writeTrackMatrix(string fname);
-    bool rowExistsinTrack(const vector< vector<int> >& mMatrix,const vector<int>& indices, const vector<int>& newRow);
 };
+
+
 #endif // HRIMAGE_HPP_INCLUDED

@@ -1,8 +1,13 @@
-#include "matching.hpp"
-#include "sift.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
+
+
+#include "matching.hpp"
+#include "sift.h"
 #include "pgmutils.hpp"
 #include "general.h"
 #include "HRprimitives.h"
@@ -19,7 +24,7 @@
 namespace fs = boost::filesystem;
 using namespace std;
 
-CvScalar colors[3]={cvScalar(255,0,0), cvScalar(0,255,0), cvScalar(0,0,255)};
+
 
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
@@ -376,111 +381,14 @@ int findSIFTfeatures( HRImage& image)
 
 }
 
-int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRImagePtr>& imCollection,string filname)
-{
-#define SINGLEMATCHPRINT 1
-
-    int i, j, k;
-    int x0,y0,x1,y1;
-    IplImage* imgTemp=NULL;
-    IplImage* imgTempcopy=NULL;
-    IplImage* imgTemptempcopy=NULL;
-    if ( checkTempPath()==false)
-        return 0;
-
-    int heightImage=0;
-
-    if (imCollection.size()==0)
-    {
-        cout<<"no images exist in the database, quitting"<<endl;
-        return 0;
-
-    }
-    heightImage=(*imCollection[0]).height;
-
-
-    for (i=0;i<imCollection.size();i++)
-    {
-
-        IplImage* imgTemptemp=concatImagesVertical(imgTemp,(*imCollection[i]).cv_img);
-
-        cvReleaseImage( &imgTemp );
-        imgTemp=imgTemptemp;
-    }
-
-    if (SINGLEMATCHPRINT==1)
-    {
-        imgTempcopy=cvCloneImage(imgTemp);
-
-    }
-
-    int matchCountr=0;
-
-    for (i=0;i<tMatrix.size(); i++)
-    {
-        if (SINGLEMATCHPRINT==1)
-        {
-
-            imgTemptempcopy=cvCloneImage(imgTempcopy);
-        }
-        matchCountr=0;
-        for (j=1;j<tMatrix[i].size();j++)
-        {
-
-            if (tMatrix[i][j]!=-1 && tMatrix[i][j-1]!=-1)
-            {
-                matchCountr++;
-                x0=(*imCollection[j-1]).HR2DVector[tMatrix[i][j-1]]->location.x;
-                y0=(*imCollection[j-1]).HR2DVector[tMatrix[i][j-1]]->location.y+ ((j-1)*heightImage);
-                x1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.x;
-                y1=(*imCollection[j]).HR2DVector[tMatrix[i][j]]->location.y+ ((j)*heightImage);
-
-                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
-
-                //print correspondences 1 to 1
-                if (SINGLEMATCHPRINT==1)
-                {
-                    cvLine(imgTemptempcopy, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
-
-                }
-            }
-        }
-        if (SINGLEMATCHPRINT==1)
-        {
-            string tslash="/";
-            string fname=TEMPDIR+tslash+string(filname+"track_i"+stringify(i)+"_d"+stringify(matchCountr)+".png");
-
-            if (!cvSaveImage(fname.c_str(),imgTemptempcopy)) printf("Could not save: %s\n",fname.c_str());
-            cvReleaseImage( &imgTemptempcopy );
-        }
-
-    }
-
-
-
-
-
-    string tslash="/";
-    string fname=TEMPDIR+tslash+filname;
-
-    if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
-
-
-    cvReleaseImage( &imgTemp );
-
-    if (SINGLEMATCHPRINT==1)
-    {
-        cvReleaseImage( &imgTempcopy );
-
-
-    }
-
-
-    return 0;
 
 
 
 
 
 
-}
+
+
+
+
+

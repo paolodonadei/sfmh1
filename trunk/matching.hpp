@@ -11,7 +11,11 @@
 #include <cv.h>
 #include <highgui.h>
 #include "HRImage.hpp"
+
 using namespace std;
+
+
+
 int findSIFTfeatures( HRImage& image);
 int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename);
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond);
@@ -19,5 +23,9 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
 int DistSquared(const HRPointFeatures& k1, const HRPointFeatures& k2);
 int Dist(const HRPointFeatures& k1, const HRPointFeatures& k2);
 int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond);
-int drawImageTrackMatches(const vector< vector<int> >& tMatrix,const vector<HRImagePtr>& imCollection,string filname);
+
+
+
+
+
 #endif // MATCHING_HPP_INCLUDED
