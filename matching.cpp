@@ -363,14 +363,14 @@ int findSIFTfeatures( HRImage& image)
 
 
     if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-//zzz    system (command_run.c_str());
+    system (command_run.c_str());
 
     //if pca then reproject
     if (SIFTPCA)
     {
         string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname;
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-  //zzz     system (command_run.c_str());
+    system (command_run.c_str());
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
     }
 
