@@ -1,20 +1,22 @@
-#include "HRImage.hpp"
-#include <iostream>
-#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
-#include <iostream>
-#include "boost/filesystem/operations.hpp"
-#include "boost/filesystem/path.hpp"
 #include <time.h>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
+#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/path.hpp"
+
+#include "HRImage.hpp"
 #include "general.h"
 #include "pgmutils.hpp"
 #include "sift.h"
 #include "matching.hpp"
-#include "HRprimitives.h"
-
 #define DEBUGLVL 0
 #define TEMPDIR "tempdir"
+
+
+CvScalar colors[3]={cvScalar(255,0,0), cvScalar(0,255,0), cvScalar(0,0,255)};
+
 
 namespace fs = boost::filesystem;
 using namespace std;
@@ -725,30 +727,148 @@ int HRImageSet::createFeatureTrackMatrix()
             for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
             {
                 //cout<<"i is "<<i <<" and j is "<<j<<endl;
-                processPairMatchinTrack( trackMatrix, correspondencesPairWise[i][j], k);
+               myTracks.processPairMatchinTrack( correspondencesPairWise[i][j], k,imageCollection.size());
 
             }
 
         }
     }
 
-    cout<<"number of feature tracks is ---------- "<<trackMatrix.size()<<endl;
-    calcFeatureTrackScores(trackMatrix);
+    cout<<"number of feature tracks is ---------- "<<myTracks.trackMatrix.size()<<endl;
+    myTracks.calcFeatureTrackScores(correspondencesPairWise);
 
-    writeTrackMatrix("trackbefore.txt");
-    drawImageTrackMatches(trackMatrix,imageCollection,"beforeprunetracks.png");
-    pruneFeatureTrack( trackMatrix );
-    writeTrackMatrix("trackafter.txt");
-    drawImageTrackMatches(trackMatrix,imageCollection,"afterprunetracks.png");
+    myTracks.writeTrackMatrix("trackbefore.txt");
+    myTracks.drawImageTrackMatches(imageCollection,"beforeprunetracks.png");
+    myTracks.pruneFeatureTrack(  );
+    myTracks.writeTrackMatrix("trackafter.txt");
+    myTracks.drawImageTrackMatches(imageCollection,"afterprunetracks.png");
 }
 
-int HRImageSet::findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices)
+
+
+
+
+ FeatureTrack::FeatureTrack()
 {
-    int i,j;
-    for (i=0;i<tMatrix.size(); i++)
+
+
+}
+int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname)
+{
+#define SINGLEMATCHPRINT 1
+
+    int i, j, k;
+    int x0,y0,x1,y1;
+    IplImage* imgTemp=NULL;
+    IplImage* imgTempcopy=NULL;
+    IplImage* imgTemptempcopy=NULL;
+    if ( checkTempPath()==false)
+        return 0;
+
+    int heightImage=0;
+
+    if (imCollection.size()==0)
+    {
+        cout<<"no images exist in the database, quitting"<<endl;
+        return 0;
+
+    }
+    heightImage=(*imCollection[0]).height;
+
+
+    for (i=0;i<imCollection.size();i++)
     {
 
-        if (tMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || tMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+        IplImage* imgTemptemp=concatImagesVertical(imgTemp,(*imCollection[i]).cv_img);
+
+        cvReleaseImage( &imgTemp );
+        imgTemp=imgTemptemp;
+    }
+
+    if (SINGLEMATCHPRINT==1)
+    {
+        imgTempcopy=cvCloneImage(imgTemp);
+
+    }
+
+    int matchCountr=0;
+
+    for (i=0;i<trackMatrix.size(); i++)
+    {
+        if (SINGLEMATCHPRINT==1)
+        {
+
+            imgTemptempcopy=cvCloneImage(imgTempcopy);
+        }
+        matchCountr=0;
+        for (j=1;j<trackMatrix[i].size();j++)
+        {
+
+            if (trackMatrix[i][j]!=-1 && trackMatrix[i][j-1]!=-1)
+            {
+                matchCountr++;
+                x0=(*imCollection[j-1]).HR2DVector[trackMatrix[i][j-1]]->location.x;
+                y0=(*imCollection[j-1]).HR2DVector[trackMatrix[i][j-1]]->location.y+ ((j-1)*heightImage);
+                x1=(*imCollection[j]).HR2DVector[trackMatrix[i][j]]->location.x;
+                y1=(*imCollection[j]).HR2DVector[trackMatrix[i][j]]->location.y+ ((j)*heightImage);
+
+                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
+
+                //print correspondences 1 to 1
+                if (SINGLEMATCHPRINT==1)
+                {
+                    cvLine(imgTemptempcopy, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
+
+                }
+            }
+        }
+        if (SINGLEMATCHPRINT==1)
+        {
+            string tslash="/";
+            string fname=TEMPDIR+tslash+string(filname+"track_i"+stringify(i)+"_d"+stringify(matchCountr)+".png");
+
+            if (!cvSaveImage(fname.c_str(),imgTemptempcopy)) printf("Could not save: %s\n",fname.c_str());
+            cvReleaseImage( &imgTemptempcopy );
+        }
+
+    }
+
+
+
+
+
+    string tslash="/";
+    string fname=TEMPDIR+tslash+filname;
+
+    if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
+
+
+    cvReleaseImage( &imgTemp );
+
+    if (SINGLEMATCHPRINT==1)
+    {
+        cvReleaseImage( &imgTempcopy );
+
+
+    }
+
+
+    return 0;
+
+
+
+
+
+
+}
+
+int FeatureTrack::findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices)
+{
+    int i,j;
+    for (i=0;i<trackMatrix.size(); i++)
+    {
+
+        if (trackMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || trackMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
         {
             //dont return this if they are tehre exactly
             matchedIndices.push_back(i);
@@ -759,7 +879,7 @@ int HRImageSet::findMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N&
     return 1;
 }
 
-int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorrespond2N& corrs, int indexNumber)
+int FeatureTrack::processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize)
 {
     //this function behaves as such, first it takes a single match between two images, so a single correspondence
 //   then it looks into the track matrix for the presence of any one of those correesponence points, if one exists, it looks at the correponding slot for the other image
@@ -774,121 +894,68 @@ int HRImageSet::processPairMatchinTrack(vector< vector<int> >& tMatrix, HRCorres
     vector<int> matchedIndex(0);
     int rowNumsSize=0;
 
-    findMatchinTrack(tMatrix, corrs,indexNumber,matchedIndex);
-
-    cout<<"processing match " <<indexNumber<<" between images: "<<  corrs.indexIm1<<" and "<< corrs.indexIm2  <<endl;
-
-
-    cout<<",,,,,,,Original he content of the index are:";
-    for (int h=0;h<matchedIndex.size();h++) cout<<"  "<< matchedIndex[h]<<"  ";
-    cout<<" original size was "<< rowNumsSize<<endl;
+    findMatchinTrack( corrs,indexNumber,matchedIndex);
 
 
     if (matchedIndex.size()==0) //add new row
     {
-        vector<int> newRow(imageCollection.size(),-1);
+        vector<int> newRow(rowsize,-1);
         newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
         newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
 
-        tMatrix.push_back(newRow);
-
-        cout<<"creatring new row number "<<(tMatrix.size()-1) <<endl;
+        trackMatrix.push_back(newRow);
 
     }
     else
     {
         rowNumsSize=matchedIndex.size() ;//this trick is done to make sure we dont keep readding same rows
-        cout<<"+++++++++++found existing row of size "<<matchedIndex.size()<< " size of the track matrix is "<<tMatrix.size()<<endl;
         for (i=0;i<rowNumsSize;i++)
         {
-            if (tMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && tMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
+            if (trackMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && trackMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
             {
                 continue;
             }
-            else if (tMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || tMatrix[matchedIndex[i]][corrs.indexIm1]==-1)
+            else if (trackMatrix[matchedIndex[i]][corrs.indexIm2]==-1 || trackMatrix[matchedIndex[i]][corrs.indexIm1]==-1)
             {
-                tMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
-                tMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
-                cout<<"editing row number "<<matchedIndex[i] <<endl;
+                trackMatrix[matchedIndex[i]][corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
+                trackMatrix[matchedIndex[i]][corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
+
             }
             else
             {
-                vector<int> newRow(tMatrix[matchedIndex[i]]);
+                vector<int> newRow(trackMatrix[matchedIndex[i]]);
                 newRow[corrs.indexIm2]=corrs.imIndices[indexNumber].imindex2;
                 newRow[corrs.indexIm1]=corrs.imIndices[indexNumber].imindex1;
 
 
 
-                if (rowExistsinTrack(tMatrix,matchedIndex, newRow)==false)
+                if (rowExistsinTrack(matchedIndex, newRow)==false)
                 {
+                    trackMatrix.push_back(newRow);
+                    matchedIndex.push_back(trackMatrix.size()-1);
 
-                    cout<<"couldnt find  "<< corrs.imIndices[indexNumber].imindex1 <<"    "<<corrs.imIndices[indexNumber].imindex2<<endl;
-
-                    cout<<"bad match was: ";
-                    for (int h=0;h<tMatrix[matchedIndex[i]].size();h++) cout<<"  "<< tMatrix[matchedIndex[i]][h]<<"  ";
-                    cout<<endl;
-
-
-                    cout<<"added: ";
-                    for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
-                    cout<<endl;
-                    tMatrix.push_back(newRow);
-                    matchedIndex.push_back(tMatrix.size()-1);
-                    cout<<"creatring new row number "<<(tMatrix.size()-1) <<endl;
-                    numTimes++;
-                }
-                else
-                {
-                    cout<<"match was found in the temp array"<<endl;
 
                 }
+
 
             }
 
         }
     }
 
-    if (numTimes>1)
-    {
-        cout<<"______________________above was added "<<numTimes<<" times"<<endl;
-        cout<<",,,,,,,the content of the index are:";
-        for (int h=0;h<matchedIndex.size();h++) cout<<"  "<< matchedIndex[h]<<"  ";
-        cout<<" original size was "<< rowNumsSize<<endl;
-
-
-    }
 }
 
-bool HRImageSet::rowExistsinTrack(const vector< vector<int> >& mMatrix,const vector<int>& indices, const vector<int>& newRow)
+bool FeatureTrack::rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow)
 {
     bool flagExists=true;
-
-    cout<<"looking for  : ";
-    for (int h=0;h<newRow.size();h++) cout<<"  "<< newRow[h]<<"  ";
-
-    cout<<"in the following: ";
-    for (int i=0;i< indices.size();i++)
-    {
-
-        for (int j=0;j<mMatrix[indices[i]].size();j++)
-        {
-
-            cout<<"  "<< mMatrix[indices[i]][j]<<"  ";
-
-        }
-        cout<<endl;
-
-    }
-
-
 
     for (int i=0;i< indices.size();i++)
     {
         flagExists=true;
-        for (int j=0;j<mMatrix[indices[i]].size();j++)
+        for (int j=0;j<trackMatrix[indices[i]].size();j++)
         {
 
-            if (mMatrix[indices[i]][j]!=newRow[j])
+            if (trackMatrix[indices[i]][j]!=newRow[j])
             {
                 flagExists=false;
                 break;
@@ -903,27 +970,27 @@ bool HRImageSet::rowExistsinTrack(const vector< vector<int> >& mMatrix,const vec
 
     return flagExists;
 }
-int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
+int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& pairCorrespondences)
 {
     int i,j,k,l;
     int count=0;
-    curScores.resize(tMatrix.size(),0);
+    curScores.resize(trackMatrix.size(),0);
 
-    for (i=0;i<tMatrix.size(); i++)
+    for (i=0;i<trackMatrix.size(); i++)
     {
         count=0;
-        for (j=0;j<tMatrix[i].size();j++)
+        for (j=0;j<trackMatrix[i].size();j++)
         {
             for (k=0;k<j;k++)
             {
-                if (tMatrix[i][k]!=-1 && tMatrix[i][j]!=-1)
+                if (trackMatrix[i][k]!=-1 && trackMatrix[i][j]!=-1)
                 {
-                    for (l=0;l<correspondencesPairWise[j][k].imIndices.size();l++)
+                    for (l=0;l<pairCorrespondences[j][k].imIndices.size();l++)
                     {
-                        if (correspondencesPairWise[j][k].imIndices[l].imindex1==tMatrix[i][j] && correspondencesPairWise[j][k].imIndices[l].imindex2==tMatrix[i][k]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
+                        if (pairCorrespondences[j][k].imIndices[l].imindex1==trackMatrix[i][j] && pairCorrespondences[j][k].imIndices[l].imindex2==trackMatrix[i][k]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
                         {
-                            curScores[i]+=correspondencesPairWise[j][k].imIndices[l].score;
-                            cout<<"score was "<<correspondencesPairWise[j][k].imIndices[l].score<<"    ";
+                            curScores[i]+=pairCorrespondences[j][k].imIndices[l].score;
+                            cout<<"score was "<<pairCorrespondences[j][k].imIndices[l].score<<"    ";
                             count++;
                             break;
                         }
@@ -937,18 +1004,18 @@ int HRImageSet::calcFeatureTrackScores(vector< vector<int> >& tMatrix)
     cout<<endl<<"final score is "<<curScores[i]<<endl;
     }
 }
-int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
+int FeatureTrack::pruneFeatureTrack()
 {
     int i,j,k,l;
 
 
-    for (i=0;i<tMatrix.size(); i++)
+    for (i=0;i<trackMatrix.size(); i++)
     {
         for (j=0;j<i; j++)
         {
-            for (k=0;k<tMatrix[i].size();k++)
+            for (k=0;k<trackMatrix[i].size();k++)
             {
-                if (tMatrix[i][k]==tMatrix[j][k] && tMatrix[j][k]!=-1)
+                if (trackMatrix[i][k]==trackMatrix[j][k] && trackMatrix[j][k]!=-1)
                 {
                     if ( curScores[i]>curScores[j])
                     {
@@ -970,7 +1037,7 @@ int HRImageSet::pruneFeatureTrack(vector< vector<int> >& tMatrix)
     return 0;
 }
 
-int HRImageSet::eraseTrackMatRow(int index)
+int FeatureTrack::eraseTrackMatRow(int index)
 {
     int i,j,k,l;
 
@@ -988,7 +1055,7 @@ int HRImageSet::eraseTrackMatRow(int index)
     return 0;
 }
 
-void HRImageSet::writeTrackMatrix(string fname)
+void FeatureTrack::writeTrackMatrix(string fname)
 {
 
     string tslash="/";
@@ -1021,3 +1088,5 @@ void HRImageSet::writeTrackMatrix(string fname)
     file_op.close();
 
 }
+
+
