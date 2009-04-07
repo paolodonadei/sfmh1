@@ -755,7 +755,7 @@ int HRImageSet::createFeatureTrackMatrix()
 }
 int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname)
 {
-#define SINGLEMATCHPRINT 1
+#define SINGLEMATCHPRINT 0
 
     int i, j, k;
     int x0,y0,x1,y1;

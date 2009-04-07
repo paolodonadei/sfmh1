@@ -32,7 +32,7 @@ HRCorrespond2N::~HRCorrespond2N()
 // Copy Constructor
 HRCorrespond2N::HRCorrespond2N(const HRCorrespond2N & rec)
 {
-   int indexIm1;
+    int indexIm1;
     int indexIm2;
     HRImage* hr1ptr;
     HRImage* hr2ptr;
@@ -40,22 +40,22 @@ HRCorrespond2N::HRCorrespond2N(const HRCorrespond2N & rec)
 
 
 
-      imIndices=vector<matchIndex>(rec.imIndices);
-      indexIm1=rec.indexIm1;
-       indexIm2=rec.indexIm2;
-       hr1ptr =rec.hr1ptr ;
-         hr2ptr =rec.hr2ptr ;
+    imIndices=vector<matchIndex>(rec.imIndices);
+    indexIm1=rec.indexIm1;
+    indexIm2=rec.indexIm2;
+    hr1ptr =rec.hr1ptr ;
+    hr2ptr =rec.hr2ptr ;
 
 }
 
 // assignment operator
 HRCorrespond2N & HRCorrespond2N::operator=(const HRCorrespond2N & rhs) throw()
 {
-              imIndices=vector<matchIndex>(rhs.imIndices);
-      indexIm1=rhs.indexIm1;
-       indexIm2=rhs.indexIm2;
-       hr1ptr =rhs.hr1ptr ;
-         hr2ptr =rhs.hr2ptr ;
+    imIndices=vector<matchIndex>(rhs.imIndices);
+    indexIm1=rhs.indexIm1;
+    indexIm2=rhs.indexIm2;
+    hr1ptr =rhs.hr1ptr ;
+    hr2ptr =rhs.hr2ptr ;
 
     return *this;
 }
@@ -217,7 +217,7 @@ MotionGeometry::MotionGeometry()
 {
     motionError=0;//in pixels
     numOutlier=0;
-    MotionModel=NULL;
+    MotionModel = cvCreateMat(3,3,CV_32FC1);
 
     valid=0;
 }
@@ -250,11 +250,10 @@ float MotionGeometry::getMotionElement(int i,int j) const
 */
 int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices )
 {
-    if ( MotionModel!=NULL)
-    {
-        cout<<"overwriting motion model, is this intended?"<<endl;
 
-    }
+
+
+
     if (hr1==NULL || hr2==NULL)
     {
         cout<<"images have not been initialized"<<endl;
@@ -275,9 +274,9 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
     CvMat* err_array;
 
 
-    points1  = cvCreateMat(2,numPoints,CV_32F);
-    points2  = cvCreateMat(2,numPoints,CV_32F);
-    status   = cvCreateMat(1,numPoints,CV_32F);
+    points1  = cvCreateMat(1,numPoints,CV_32FC2);
+    points2  = cvCreateMat(1,numPoints,CV_32FC2);
+    status   = cvCreateMat(1,numPoints,CV_8UC1);
     err_array = cvCreateMat( 1, numPoints, CV_32FC1 );
 
     for (int i=0;i<numPoints;i++)
@@ -287,13 +286,12 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
         points2->data.fl[i*2]=hr2->HR2DVector[indices[i].imindex2]->location.x;
         points2->data.fl[i*2+1]=hr2->HR2DVector[indices[i].imindex2]->location.y;
-
-        status->data.fl[i]=0;
+        status->data.ptr[i]=0;
     }
 
 
 
-    MotionModel = cvCreateMat(3,3,CV_32F);
+
     int num = cvFindFundamentalMat(points1,points2,MotionModel,CV_FM_RANSAC,1.0,0.99,status);
     computeReprojErrorF( points1,points2, MotionModel, err_array );
 
@@ -304,14 +302,15 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
     std::vector<matchIndex>::iterator it;
     for (int i=(numPoints-1);i>=0;i--)
     {
-        pointsRejected=pointsRejected+(1-status->data.fl[i]);
+        pointsRejected=pointsRejected+(1-status->data.ptr[i]);
         error+=err_array->data.fl[i];
         indices[i].motionError=err_array->data.fl[i];
-        if (status->data.fl[i]==0) //outlier
+        if (status->data.ptr[i]==0) //outlier
         {
             it = indices.begin() + i; //removing outliers, should i do this?
-            indices.erase( it);
+              indices.erase( it);
         }
+        cout<<"the error here is "<<err_array->data.fl[i]<<endl;
     }
 
 
