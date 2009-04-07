@@ -153,7 +153,3 @@ int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int
 
 
 }
-
-
-
-

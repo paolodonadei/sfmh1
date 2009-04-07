@@ -12,6 +12,12 @@
 #include "sift.h"
 #include "HRImage.hpp"
 
+#define TEMPDIR "tempdir"
+using namespace std;
+
+
+class HRImage;
+
 Image HRImagetoDLImage(HRImage& hr_im);
 
 class BadConversion : public std::runtime_error
@@ -92,4 +98,5 @@ void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 bool checkTempPath();
 string combineFnames(const string& f1,const string& f2,string extension);
 int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int indexname);
+
 #endif //HRPRIMITIVES_HPP_INCLUDED

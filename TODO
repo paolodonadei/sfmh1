@@ -1,4 +1,11 @@
-___________________________________________________________________________________________________________________________________________________
+
+- prune out the pairwise matches using the fundamental Matrix
+* can we find trifocal tensor rather than f matrix?
+* build a dependency graph where every image is related to its closest neighbour and process them in a pipeline as such instead of processing all things at the same timer_t
+of course inintially everything will be processed together but later we will change this and show that it can improve performance
+
+
+__________________________________________________________________________________________________________________________________________________
 -do some testing on your results
--the next thing to do is to add in the feature track class to the right file and also to create a pairwise image relation that contains the geometry and then calculate that geometry 
+-the next thing to do is to add in the feature track class to the right file and also to create a pairwise image relation that contains the geometry and then calculate that geometry
 -from now on use this text file
