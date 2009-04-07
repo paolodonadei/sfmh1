@@ -698,14 +698,14 @@ int HRImageSet::exhaustiveSIFTMatching()
             printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
                    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
 
-            string fname=TEMPDIR+string("/")+combineFnames((*imageCollection[i]).filename,(*imageCollection[j]).filename,"_matches.txt");
+            correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
+correspondencesPairWise[i][j].WriteMatches();
+correspondencesPairWise[i][j].WriteMotion();
+
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
 
-            fstream fp_out;
-            fp_out.open(fname.c_str(), ios::out);
-            fp_out<<correspondencesPairWise[i][j];
-            fp_out.close();
+
 
         }
     }
