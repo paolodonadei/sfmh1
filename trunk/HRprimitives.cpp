@@ -45,23 +45,25 @@ HRCorrespond2N::HRCorrespond2N(const HRCorrespond2N & rec)
     indexIm2=rec.indexIm2;
     hr1ptr =rec.hr1ptr ;
     hr2ptr =rec.hr2ptr ;
+    motion =rec.motion;
 
 }
 
 // assignment operator
 HRCorrespond2N & HRCorrespond2N::operator=(const HRCorrespond2N & rhs) throw()
 {
+       if(this == &rhs) return *this;
     imIndices=vector<matchIndex>(rhs.imIndices);
     indexIm1=rhs.indexIm1;
     indexIm2=rhs.indexIm2;
     hr1ptr =rhs.hr1ptr ;
     hr2ptr =rhs.hr2ptr ;
-
+ motion =rhs.motion;
     return *this;
 }
 
 
-ostream &operator<<(ostream &stream, HRCorrespond2N ob)
+ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
 {
 
     double x1,x2,y1,y2;
@@ -106,7 +108,7 @@ void HRCorrespond2N::WriteMatches()
 
     fstream fp_out;
     fp_out.open(fname.c_str(), ios::out);
-    fp_out<<this;
+    fp_out<<(*this);
     fp_out.close();
 
 }
@@ -203,10 +205,11 @@ void MotionGeometry::writeMotionMatrix()
   */
 MotionGeometry::~MotionGeometry()
 {
-    if ( MotionModel!=NULL)
+if ( MotionModel!=NULL)
     {
         cvReleaseMat(&MotionModel);
     }
+
 }
 
 /** @brief MotionGeometry
@@ -215,17 +218,19 @@ MotionGeometry::~MotionGeometry()
   */
 MotionGeometry::MotionGeometry()
 {
+    MotionModel = cvCreateMat(3,3,CV_64FC1);
+
     motionError=0;//in pixels
     numOutlier=0;
-    MotionModel = cvCreateMat(3,3,CV_32FC1);
+
 
     valid=0;
 }
 
 
-float MotionGeometry::getMotionElement(int i,int j) const
+double MotionGeometry::getMotionElement(int i,int j) const
 {
-    if ( MotionModel==NULL)
+    if ( MotionModel->height==0 ||MotionModel->width==0 )
     {
 
         cout<<"accessing unintialized matrix, returning zero"<<endl;
@@ -239,8 +244,8 @@ float MotionGeometry::getMotionElement(int i,int j) const
         return 0;
     }
 
-    int   step  = MotionModel->step/sizeof(float);
-    float *data = MotionModel->data.fl;
+    int   step  = MotionModel->step/sizeof(double);
+    double *data = MotionModel->data.db;
 
     return (data+i*step)[j];
 }
@@ -350,7 +355,20 @@ int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vect
 
 
 }
+int MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
+{
 
+vector<CvPoint3D32f> lines[2];
+//fill this out, make sure you knwo what youre dooing look at the pdf for poencv, and ultimately check your results with the other method see if they are consistent
+zzz
+
+
+
+
+
+
+
+}
 
 
 //this was stolen from opencv , i didnt know how else to use it without having to use the whole class
@@ -361,29 +379,31 @@ int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, con
 //    _m1temp=_m1;
 //    _m1= _m2;
 //    _m2=_m1temp;
-    int i, count = _m1->rows*_m1->cols;
-    const CvPoint2D64f* m1 = (const CvPoint2D64f*)_m1->data.ptr;
-    const CvPoint2D64f* m2 = (const CvPoint2D64f*)_m2->data.ptr;
-    const double* F = model->data.db;
+
+
+    int i, count = _m1->cols;
+   const float* m1 = _m1->data.fl;
+   const float* m2 = _m2->data.fl;
+    const double* FF = model->data.db;
     float* err = _err->data.fl;
 
     for ( i = 0; i < count; i++ )
     {
         double a, b, c, d1, d2, s1, s2;
 
-        a = F[0]*m1[i].x + F[1]*m1[i].y + F[2];
-        b = F[3]*m1[i].x + F[4]*m1[i].y + F[5];
-        c = F[6]*m1[i].x + F[7]*m1[i].y + F[8];
+        a = FF[0]*m1[i*2] + FF[1]*m1[i*2+1] + FF[2];
+        b = FF[3]*m1[i*2] + FF[4]*m1[i*2+1] + FF[5];
+        c = FF[6]*m1[i*2] + FF[7]*m1[i*2+1] + FF[8];
 
         s2 = 1./(a*a + b*b);
-        d2 = m2[i].x*a + m2[i].y*b + c;
+        d2 = m2[i*2]*a + m2[i*2+1]*b + c;
 
-        a = F[0]*m2[i].x + F[3]*m2[i].y + F[6];
-        b = F[1]*m2[i].x + F[4]*m2[i].y + F[7];
-        c = F[2]*m2[i].x + F[5]*m2[i].y + F[8];
+        a = FF[0]*m2[i*2] + FF[3]*m2[i*2+1] + FF[6];
+        b = FF[1]*m2[i*2] + FF[4]*m2[i*2+1] + FF[7];
+        c = FF[2]*m2[i*2] + FF[5]*m2[i*2+1] + FF[8];
 
         s1 = 1./(a*a + b*b);
-        d1 = m1[i].x*a + m1[i].y*b + c;
+        d1 = m1[i*2]*a + m1[i*2+1]*b + c;
 
         err[i] = (float)(d1*d1*s1 + d2*d2*s2);
         cout<<"error was "<<(float)(d1*d1*s1 + d2*d2*s2)<<endl;
@@ -395,7 +415,7 @@ int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, con
 ostream &operator<<(ostream &stream,  const MotionGeometry& ob)
 {
 
-    if ( ob.MotionModel==NULL)
+     if ( ob.MotionModel->height==0 || ob.MotionModel->width==0 )
     {
         stream<<"EMPTY"<<endl;
         return stream;
@@ -429,4 +449,31 @@ ostream &operator<<(ostream &stream,  const MotionGeometry& ob)
 
 
 
+}
+
+
+
+MotionGeometry::MotionGeometry(const MotionGeometry & rec)
+{
+
+      MotionModel=cvCloneMat( rec.MotionModel);
+
+
+
+}
+
+// assignment operator
+MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
+{
+      if(this == &rhs) return *this;
+
+      if ( MotionModel!=NULL)
+    {
+        cvReleaseMat(&MotionModel);
+    }
+
+
+MotionModel=cvCloneMat( rhs.MotionModel);
+
+    return *this;
 }

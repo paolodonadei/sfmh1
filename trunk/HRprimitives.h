@@ -35,11 +35,12 @@ class MotionGeometry
     double calculateError();
 
 
-    float getMotionElement(int i,int j) const;
+    double getMotionElement(int i,int j) const;
     int findMotionModel(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
     int findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
 
 int computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
+int computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
 friend ostream &operator<<(ostream &stream,  const MotionGeometry& ob);
 
 MotionGeometry(const MotionGeometry & rec);
@@ -56,7 +57,7 @@ class HRCorrespond2N
 public:
    int findGeomtry(MotionType mtype=FUNDAMENTAL);
 
-    friend ostream &operator<<(ostream &stream, HRCorrespond2N ob);
+    friend ostream &operator<<(ostream &stream, const HRCorrespond2N& ob);
     HRCorrespond2N();
  int removeOutliers(const CvMat* tstatus);
 MotionGeometry motion;

@@ -47,7 +47,8 @@ bool inBound(CvPoint2D32f inter, double width, double height)
 
 double givenXfindY(double a, double b, double c, double X)
 {
-    double y=(-c-(a*X))/b;
+    double y=(-c-(a*X));
+	y/=b;
     return y;
 
 }
@@ -55,7 +56,8 @@ double givenXfindY(double a, double b, double c, double X)
 
 double givenYfindX(double a, double b, double c, double Y)
 {
-    double x=(-c-(b*Y))/a;
+    double x=(-c-(b*Y));
+x/=a;
     return x;
 
 }
@@ -86,7 +88,7 @@ void imgclick(int event, int x, int y, int flags, void* param)
         draw_cross(location, CV_RGB(255,0,0),4,(*direction==1)?img1:img2 );
 
 
-        printf("clicked location %d , %d \n",x,y);
+     //   printf("clicked location %d , %d \n",x,y);
         points1->data.fl[0]=x;
         points1->data.fl[1]=y;
 
@@ -104,11 +106,11 @@ void imgclick(int event, int x, int y, int flags, void* param)
         intersects[1].y=givenXfindY(lines->data.fl[0],lines->data.fl[1], lines->data.fl[2], intersects[1].x);
 
         intersects[2].y=0;
-        intersects[2].x=givenYfindX(lines->data.fl[0],lines->data.fl[1], lines->data.fl[2], intersects[2].x);
+        intersects[2].x=givenYfindX(lines->data.fl[0],lines->data.fl[1], lines->data.fl[2], intersects[2].y);
 
 
         intersects[3].y=((*direction==1)?img2:img1)->height-1;
-        intersects[3].x=givenYfindX(lines->data.fl[0],lines->data.fl[1], lines->data.fl[2], intersects[3].x);
+        intersects[3].x=givenYfindX(lines->data.fl[0],lines->data.fl[1], lines->data.fl[2], intersects[3].y);
 
         int j=0;
         for (int i=0;i<4;i++)
@@ -128,8 +130,7 @@ void imgclick(int event, int x, int y, int flags, void* param)
         end=intersects[ptindex[1]];
 
 
-        printf(" for point x=%f and y=%f calculated line with parameters a=%f b=%f c=%f and the intersections ended up being start.x=%f start.y=%f and end.x=%f end.y=%f \n",
-               points1->data.fl[0],points1->data.fl[1],lines->data.fl[0],lines->data.fl[1],lines->data.fl[2],start.x, start.y,end.x,end.y);
+       // printf(" for point x=%f and y=%f calculated line with parameters a=%f b=%f c=%f and the intersections ended up being start.x=%f start.y=%f and end.x=%f end.y=%f \n", points1->data.fl[0],points1->data.fl[1],lines->data.fl[0],lines->data.fl[1],lines->data.fl[2],start.x, start.y,end.x,end.y);
 
 
 
