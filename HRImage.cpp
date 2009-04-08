@@ -587,7 +587,7 @@ int  HRImageSet::open(string directoryName)
 {
     dirName=directoryName;
     numImages=0;
-
+    string tslash="/";
 
 
 
@@ -624,6 +624,10 @@ int  HRImageSet::open(string directoryName)
                         cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
 
                         HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
+
+
+
+
                         imageCollection.push_back( hr_iptr );
 
 
@@ -699,8 +703,8 @@ int HRImageSet::exhaustiveSIFTMatching()
                    ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
 
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
-correspondencesPairWise[i][j].WriteMatches();
-correspondencesPairWise[i][j].WriteMotion();
+            correspondencesPairWise[i][j].WriteMatches();
+            correspondencesPairWise[i][j].WriteMotion();
 
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
@@ -727,7 +731,7 @@ int HRImageSet::createFeatureTrackMatrix()
             for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
             {
                 //cout<<"i is "<<i <<" and j is "<<j<<endl;
-               myTracks.processPairMatchinTrack( correspondencesPairWise[i][j], k,imageCollection.size());
+                myTracks.processPairMatchinTrack( correspondencesPairWise[i][j], k,imageCollection.size());
 
             }
 
@@ -748,7 +752,7 @@ int HRImageSet::createFeatureTrackMatrix()
 
 
 
- FeatureTrack::FeatureTrack()
+FeatureTrack::FeatureTrack()
 {
 
 

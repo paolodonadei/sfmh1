@@ -28,6 +28,19 @@ public:
     { }
 };
 
+template <class T> T from_string(const std::string& s,std::ios_base& (*f)(std::ios_base&))
+{
+    T t;
+
+
+
+    std::istringstream iss(s);
+    if ((iss >> f >> t).fail())
+        return -1;
+    else
+        return t;
+}
+
 template<typename T>
 inline std::string stringify(const T& x)
 {
