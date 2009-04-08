@@ -2,22 +2,22 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
 	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="3541" topLine="155" />
+		<Cursor position="14921" topLine="680" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="901" topLine="29" />
 	</File>
 	<File name="HRprimitives.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="7514" topLine="358" />
+		<Cursor position="7660" topLine="336" />
 	</File>
 	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
-		<Cursor position="1865" topLine="65" />
+		<Cursor position="573" topLine="24" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="16">
 		<Cursor position="119" topLine="0" />
 	</File>
 	<File name="TODO" open="1" top="0" tabpos="17">
-		<Cursor position="34" topLine="0" />
+		<Cursor position="36" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />

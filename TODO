@@ -1,5 +1,5 @@
-
-! the matches file is not working
+! read up on matrix stuff on opencv
+! the epipolar errors dont work, fix it
 ____________________________________________________________________________________
 - prune out the pairwise matches using the fundamental Matrix
 * can we find trifocal tensor rather than f matrix?
