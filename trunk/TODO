@@ -1,4 +1,6 @@
 
+! the matches file is not working
+____________________________________________________________________________________
 - prune out the pairwise matches using the fundamental Matrix
 * can we find trifocal tensor rather than f matrix?
 * build a dependency graph where every image is related to its closest neighbour and process them in a pipeline as such instead of processing all things at the same timer_t

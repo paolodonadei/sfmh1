@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
-		<Cursor position="16961" topLine="741" />
+	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="3541" topLine="155" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="3119" topLine="80" />
+		<Cursor position="901" topLine="29" />
 	</File>
-	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="276" topLine="6" />
+	<File name="HRprimitives.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="7514" topLine="358" />
 	</File>
 	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
-		<Cursor position="196" topLine="0" />
+		<Cursor position="1865" topLine="65" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="16">
 		<Cursor position="119" topLine="0" />
+	</File>
+	<File name="TODO" open="1" top="0" tabpos="17">
+		<Cursor position="34" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />
@@ -23,16 +26,16 @@
 		<Cursor position="78" topLine="0" />
 	</File>
 	<File name="general.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="3125" topLine="112" />
+		<Cursor position="2086" topLine="46" />
 	</File>
 	<File name="general.h" open="1" top="0" tabpos="9">
-		<Cursor position="990" topLine="8" />
+		<Cursor position="2449" topLine="85" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="539" topLine="0" />
 	</File>
 	<File name="matching.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="7861" topLine="350" />
+		<Cursor position="2374" topLine="82" />
 	</File>
 	<File name="matching.hpp" open="1" top="0" tabpos="15">
 		<Cursor position="278" topLine="1" />
@@ -47,6 +50,6 @@
 		<Cursor position="7122" topLine="256" />
 	</File>
 	<File name="sift.h" open="1" top="0" tabpos="13">
-		<Cursor position="652" topLine="5" />
+		<Cursor position="2237" topLine="36" />
 	</File>
 </CodeBlocks_layout_file>

@@ -38,6 +38,7 @@
 		<Unit filename="HRprimitives.cpp" />
 		<Unit filename="HRprimitives.h" />
 		<Unit filename="Makefile" />
+		<Unit filename="TODO" />
 		<Unit filename="argproc.cpp" />
 		<Unit filename="argproc.h" />
 		<Unit filename="general.cpp" />

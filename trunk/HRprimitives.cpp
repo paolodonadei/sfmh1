@@ -307,10 +307,10 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
         indices[i].motionError=err_array->data.fl[i];
         if (status->data.ptr[i]==0) //outlier
         {
-            it = indices.begin() + i; //removing outliers, should i do this?
+            it = indices.begin() + i; //removing outliers, should i do this? i have to move backwards in the array or this wont work
               indices.erase( it);
         }
-        cout<<"the error here is "<<err_array->data.fl[i]<<endl;
+
     }
 
 
@@ -356,6 +356,11 @@ int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vect
 //this was stolen from opencv , i didnt know how else to use it without having to use the whole class
 int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
 {
+
+//    const CvMat* _m1temp;
+//    _m1temp=_m1;
+//    _m1= _m2;
+//    _m2=_m1temp;
     int i, count = _m1->rows*_m1->cols;
     const CvPoint2D64f* m1 = (const CvPoint2D64f*)_m1->data.ptr;
     const CvPoint2D64f* m2 = (const CvPoint2D64f*)_m2->data.ptr;
@@ -381,6 +386,7 @@ int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, con
         d1 = m1[i].x*a + m1[i].y*b + c;
 
         err[i] = (float)(d1*d1*s1 + d2*d2*s2);
+        cout<<"error was "<<(float)(d1*d1*s1 + d2*d2*s2)<<endl;
     }
 
     return i;
