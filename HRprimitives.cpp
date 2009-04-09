@@ -52,13 +52,13 @@ HRCorrespond2N::HRCorrespond2N(const HRCorrespond2N & rec)
 // assignment operator
 HRCorrespond2N & HRCorrespond2N::operator=(const HRCorrespond2N & rhs) throw()
 {
-       if(this == &rhs) return *this;
+    if (this == &rhs) return *this;
     imIndices=vector<matchIndex>(rhs.imIndices);
     indexIm1=rhs.indexIm1;
     indexIm2=rhs.indexIm2;
     hr1ptr =rhs.hr1ptr ;
     hr2ptr =rhs.hr2ptr ;
- motion =rhs.motion;
+    motion =rhs.motion;
     return *this;
 }
 
@@ -67,6 +67,10 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
 {
 
     double x1,x2,y1,y2;
+
+    double cscore; //higher is better
+    double cmotionError;
+    int cinlier; //we dont
 
 
     if (ob.hr1ptr==NULL || ob.hr2ptr==NULL)
@@ -78,7 +82,11 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
     stream <<"#"<< ob.hr1ptr->filename <<"   ( index="<<ob.indexIm1 <<") "<< "                 "<<ob.hr2ptr->filename <<" ( index="<<ob.indexIm2 <<") "<<endl;
 
 
-    stream << "#match_num"<<setw(11)<<"X"<<"("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"X"<<"("<<ob.indexIm2 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<ob.indexIm2 <<")"<<endl;
+    stream << "#match_num"<<setw(11)<<"X"<<"("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"Y"<<
+    "("<<ob.indexIm1 <<")"<<"\t"<<setw(11)<<"X"<<"("<<ob.indexIm2 <<")"<<"\t"<<setw(11)<<"Y"<<"("<<ob.indexIm2 <<")"
+    <<"\t"<<setw(11)<<"score"<<"\t"<<setw(11)<<"motion error"<<"\t"<<setw(11)<<"inlier"
+    <<endl;
+
 
 
     for (int i=0;i<ob.imIndices.size();i++)
@@ -88,8 +96,13 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
         y1=ob.hr2ptr->HR2DVector[ob.imIndices[i].imindex2]->location.x;
         y2=ob.hr2ptr->HR2DVector[ob.imIndices[i].imindex2]->location.y;
 
+        cscore=ob.imIndices[i].score; //higher is better
+        cmotionError=ob.imIndices[i].motionError;
+        cinlier=ob.imIndices[i].inlier;
 
-        stream <<i<<"\t\t"<<setw(10)<<fixed<<setprecision(5)<<x1 <<"\t"<<setw(11)<<y1<<"\t"<<setw(11)<<x2<<"\t" <<setw(11)<<y2 <<"\t"<<endl;
+        stream <<i<<"\t\t"<<setw(10)<<fixed<<setprecision(5)<<x1 <<"\t"<<setw(11)<<y1<<"\t"<<setw(11)<<x2<<"\t" <<setw(11)<<y2 <<"\t"
+        <<"\t"<<setw(11)<<cscore<<"\t"<<setw(11)<<cmotionError<<"\t"<<setw(11)<<cinlier
+        <<endl;
 
     }
 
@@ -205,7 +218,7 @@ void MotionGeometry::writeMotionMatrix()
   */
 MotionGeometry::~MotionGeometry()
 {
-if ( MotionModel!=NULL)
+    if ( MotionModel!=NULL)
     {
         cvReleaseMat(&MotionModel);
     }
@@ -296,25 +309,20 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
 
 
-
-    int num = cvFindFundamentalMat(points1,points2,MotionModel,CV_FM_RANSAC,1.0,0.99,status);
-    computeReprojErrorF( points1,points2, MotionModel, err_array );
-
     int pointsRejected=0;
     double error=0;
+    int num = cvFindFundamentalMat(points1,points2,MotionModel,CV_FM_RANSAC,1.0,0.99,status);
+    error= computeReprojErrorF( points1,points2, MotionModel, err_array );
 
 
-    std::vector<matchIndex>::iterator it;
+
+
     for (int i=(numPoints-1);i>=0;i--)
     {
         pointsRejected=pointsRejected+(1-status->data.ptr[i]);
-        error+=err_array->data.fl[i];
+
         indices[i].motionError=err_array->data.fl[i];
-        if (status->data.ptr[i]==0) //outlier
-        {
-            it = indices.begin() + i; //removing outliers, should i do this? i have to move backwards in the array or this wont work
-              indices.erase( it);
-        }
+        indices[i].inlier=status->data.ptr[i];
 
     }
 
@@ -355,14 +363,39 @@ int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vect
 
 
 }
-int MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
+double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
 {
+    int i;
+    int N=_m1->cols;
+    vector<CvPoint3D32f> lines[2];
 
-vector<CvPoint3D32f> lines[2];
-//fill this out, make sure you knwo what youre dooing look at the pdf for poencv, and ultimately check your results with the other method see if they are consistent
-zzz
+    lines[0].resize(N);
+    lines[1].resize(N);
+    CvMat _L1 = cvMat(1, N, CV_32FC3, &lines[0][0]);
+    CvMat _L2 = cvMat(1, N, CV_32FC3, &lines[1][0]);
+    float* terr = _err->data.fl;
+    const float* m1 = _m1->data.fl;
+    const float* m2 = _m2->data.fl;
 
+    cvComputeCorrespondEpilines( _m1, 1, model, &_L1 );
+    cvComputeCorrespondEpilines( _m2, 2, model, &_L2 );
+    double avgErr = 0;
+    for ( i = 0; i < N; i++ )
+    {
+        double err = fabs(m1[i*2]*lines[1][i].x +
+                          m1[i*2+1]*lines[1][i].y + lines[1][i].z)
+                     + fabs(m2[i*2]*lines[0][i].x +
+                            m2[i*2+1]*lines[0][i].y + lines[0][i].z);
 
+        terr[i] = (float)err;
+        avgErr += err;
+        //  printf("the type two error is %f\n",err);
+    }
+    avgErr/=((double)N);
+
+    // printf( "avg err = %f for %d points\n", avgErr ,N);
+
+    return avgErr;
 
 
 
@@ -372,7 +405,7 @@ zzz
 
 
 //this was stolen from opencv , i didnt know how else to use it without having to use the whole class
-int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
+double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
 {
 
 //    const CvMat* _m1temp;
@@ -382,11 +415,12 @@ int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, con
 
 
     int i, count = _m1->cols;
-   const float* m1 = _m1->data.fl;
-   const float* m2 = _m2->data.fl;
+    const float* m1 = _m1->data.fl;
+    const float* m2 = _m2->data.fl;
     const double* FF = model->data.db;
     float* err = _err->data.fl;
 
+    double totalerr=0;
     for ( i = 0; i < count; i++ )
     {
         double a, b, c, d1, d2, s1, s2;
@@ -405,17 +439,20 @@ int MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, con
         s1 = 1./(a*a + b*b);
         d1 = m1[i*2]*a + m1[i*2+1]*b + c;
 
-        err[i] = (float)(d1*d1*s1 + d2*d2*s2);
-        cout<<"error was "<<(float)(d1*d1*s1 + d2*d2*s2)<<endl;
+        err[i] = sqrt((float)(d1*d1*s1)) + sqrt((float)(d2*d2*s2));
+        totalerr+=err[i];
+        // cout<<"error was "<<err[i]<<endl;
     }
+    totalerr/=((double)count);
+    // printf ("average error method 1 is %f with %d points\n",totalerr,count);
 
-    return i;
+    return totalerr;
 }
 
 ostream &operator<<(ostream &stream,  const MotionGeometry& ob)
 {
 
-     if ( ob.MotionModel->height==0 || ob.MotionModel->width==0 )
+    if ( ob.MotionModel->height==0 || ob.MotionModel->width==0 )
     {
         stream<<"EMPTY"<<endl;
         return stream;
@@ -456,7 +493,7 @@ ostream &operator<<(ostream &stream,  const MotionGeometry& ob)
 MotionGeometry::MotionGeometry(const MotionGeometry & rec)
 {
 
-      MotionModel=cvCloneMat( rec.MotionModel);
+    MotionModel=cvCloneMat( rec.MotionModel);
 
 
 
@@ -465,15 +502,15 @@ MotionGeometry::MotionGeometry(const MotionGeometry & rec)
 // assignment operator
 MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
 {
-      if(this == &rhs) return *this;
+    if (this == &rhs) return *this;
 
-      if ( MotionModel!=NULL)
+    if ( MotionModel!=NULL)
     {
         cvReleaseMat(&MotionModel);
     }
 
 
-MotionModel=cvCloneMat( rhs.MotionModel);
+    MotionModel=cvCloneMat( rhs.MotionModel);
 
     return *this;
 }

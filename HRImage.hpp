@@ -45,6 +45,8 @@ public:
     void setPixel(int y,int x,int pixValue);
     int displayImage();
     int displayImageFeatures();
+    int writeImageFeatures();
+      int writeFeatures();
     unsigned char* get1d_array();
 //copies this technique from http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00053000000000000000
     inline unsigned char* operator[](const int rowIndx)
@@ -98,6 +100,7 @@ public:
     int pruneFeatureTrack();
     int calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& pairCorrespondences);
     vector<double> curScores;
+    vector<int> inliersStates;//this is different from the pairwise inlier variable, this is for when we remove a whole track
     int eraseTrackMatRow(int index);
     void writeTrackMatrix(string fname);
     bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);

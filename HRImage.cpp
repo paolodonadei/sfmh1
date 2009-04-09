@@ -15,7 +15,7 @@
 #define TEMPDIR "tempdir"
 
 
-CvScalar colors[3]={cvScalar(255,0,0), cvScalar(0,255,0), cvScalar(0,0,255)};
+CvScalar colors[2]={cvScalar(255,0,0), cvScalar(0,255,0)};
 
 
 namespace fs = boost::filesystem;
@@ -359,6 +359,117 @@ void HRImage::updateImageInfo()
 
 
 }
+int HRImage::writeFeatures()
+{
+
+    if (flag_valid==0)
+    {
+        cout<<"image now created yet\n"<<endl;
+        return 0;
+    }
+    if (HR2DVector.size()<1)
+    {
+        cout<<"no features available yet\n"<<endl;
+        return 0;
+    }
+
+    int i;
+
+    string tempfilename="";
+    fs::path p( filename, fs::native );
+
+    tempfilename=fs::basename(p)+"features.txt";
+
+    string tslash="/";
+    tempfilename=TEMPDIR+tslash+tempfilename;
+
+
+
+
+    if ( checkTempPath()==false)
+        return 0;
+
+    fstream fp_out;
+    fp_out.open(tempfilename.c_str(), ios::out);
+    fp_out<<"#\t\t feature number \t\t X \t\t Y"<<endl;
+
+
+
+
+    for (i=0;i<HR2DVector.size();i++)
+    {
+        fp_out<<i<<"  \t\t  "<<HR2DVector[i]->location.x<<"  \t\t  "<<HR2DVector[i]->location.y<<endl;
+
+
+    }
+
+
+
+
+
+
+    fp_out.close();
+
+    return 1;
+
+
+
+}
+int  HRImage::writeImageFeatures()
+{
+
+    if (flag_valid==0)
+    {
+        cout<<"image now created yet\n"<<endl;
+        return 0;
+    }
+    if (HR2DVector.size()<1)
+    {
+        cout<<"no features available yet\n"<<endl;
+        return 0;
+    }
+
+
+
+    IplImage* tempImage = cvCreateImage(cvGetSize(cv_img), IPL_DEPTH_8U, 4);
+    cvCvtColor(cv_img, tempImage, CV_GRAY2BGR);
+
+
+    vector<HRPointFeatures>::iterator feature_iterator;
+
+
+    feature_iterator = HR2DVector.begin();
+    while ( feature_iterator  != HR2DVector.end() )
+    {
+        draw_cross((*feature_iterator)->location,CV_RGB(0,255,0),4,tempImage);
+        ++feature_iterator;
+    }
+
+    string tempfilename="";
+    fs::path p( filename, fs::native );
+
+    tempfilename=fs::basename(p)+"features.jpg";
+
+    string tslash="/";
+    tempfilename=TEMPDIR+tslash+tempfilename;
+
+
+
+
+    if ( checkTempPath()==false)
+        return 0;
+    if (!cvSaveImage(tempfilename.c_str(),tempImage ))
+    {
+
+        cout<<"image "<<tempfilename<<" not saved\n"<<endl;
+        return 0;
+    }
+
+
+    return 1;
+
+}
+
 
 /** @brief shows image with features
   * this function shows the featues superimposed on the images
@@ -669,6 +780,8 @@ int HRImageSet::featureDetectSift()
     while ( img_iterator  != imageCollection.end() )
     {
         findSIFTfeatures(**img_iterator);
+        (*img_iterator)->writeImageFeatures(); //remove this if you dont want to see the features
+        (*img_iterator)->writeFeatures();
         ++img_iterator;
     }
 
@@ -731,8 +844,10 @@ int HRImageSet::createFeatureTrackMatrix()
             for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
             {
                 //cout<<"i is "<<i <<" and j is "<<j<<endl;
-                myTracks.processPairMatchinTrack( correspondencesPairWise[i][j], k,imageCollection.size());
-
+                if (correspondencesPairWise[i][j].imIndices[k].inlier==1)
+                {
+                    myTracks.processPairMatchinTrack( correspondencesPairWise[i][j], k,imageCollection.size());
+                }
             }
 
         }
@@ -816,7 +931,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
                 x1=(*imCollection[j]).HR2DVector[trackMatrix[i][j]]->location.x;
                 y1=(*imCollection[j]).HR2DVector[trackMatrix[i][j]]->location.y+ ((j)*heightImage);
 
-                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), colors[j%3], 1);
+                cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), (inliersStates[i])?colors[j%2]:cvScalar(0,0,255), 1);
 
                 //print correspondences 1 to 1
                 if (SINGLEMATCHPRINT==1)
@@ -979,7 +1094,7 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
     int i,j,k,l;
     int count=0;
     curScores.resize(trackMatrix.size(),0);
-
+    inliersStates.resize(trackMatrix.size(),1);//all start out as inliers
     for (i=0;i<trackMatrix.size(); i++)
     {
         count=0;
@@ -1045,16 +1160,23 @@ int FeatureTrack::eraseTrackMatRow(int index)
 {
     int i,j,k,l;
 
+    cout<<"removing index "<<index<<endl;
 
-
-    for (j=0;j<trackMatrix[index].size();j++)
+    if (index<0 || index>=inliersStates.size())
     {
-        trackMatrix[index][j]=-1;
+        cout<<"wrong index used. quitting."<<endl;
+        return -1;
 
     }
+    inliersStates[index]=0;
+//    for (j=0;j<trackMatrix[index].size();j++)
+//    {
+//        trackMatrix[index][j]=-1;
+//
+//    }
+//  curScores[index]=0;
 
 
-    curScores[index]=0;
 
     return 0;
 }
@@ -1075,11 +1197,16 @@ void FeatureTrack::writeTrackMatrix(string fname)
         cout<<"the sizes of the matrices are not the same, quitting"<<endl;
         return;
     }
+    if (inliersStates.size()!=trackMatrix.size())
+    {
+        cout<<"the sizes of the matrices are not the same, quitting"<<endl;
+        return;
+    }
 
 
     for (i=0;i<trackMatrix.size(); i++)
     {
-        file_op<<i<<"\t\t"<<setw(10)<<curScores[i]<<setw(10);
+        file_op<<i<<"\t\t"<<setw(10)<<curScores[i]<<setw(10)<<"\t\t"<<setw(10)<<inliersStates[i]<<setw(10);
         for (j=0;j<trackMatrix[i].size();j++)
         {
 
