@@ -19,6 +19,7 @@ struct matchIndex
     int imindex2;
     double score; //higher is better
     double motionError;
+    int inlier; //we dont delete matches, we will just tag them outliers, so 1 would mean inlier
 } ;
 
 
@@ -39,8 +40,8 @@ class MotionGeometry
     int findMotionModel(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
     int findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
 
-int computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
-int computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
+double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
+double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
 friend ostream &operator<<(ostream &stream,  const MotionGeometry& ob);
 
 MotionGeometry(const MotionGeometry & rec);

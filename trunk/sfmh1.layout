@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="HRImage.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="14921" topLine="680" />
+	<File name="HRImage.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="7344" topLine="385" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="901" topLine="29" />
+		<Cursor position="1071" topLine="19" />
 	</File>
-	<File name="HRprimitives.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="7660" topLine="336" />
+	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="3067" topLine="120" />
 	</File>
 	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
-		<Cursor position="573" topLine="24" />
+		<Cursor position="345" topLine="9" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="16">
 		<Cursor position="119" topLine="0" />
 	</File>
 	<File name="TODO" open="1" top="0" tabpos="17">
-		<Cursor position="36" topLine="0" />
+		<Cursor position="490" topLine="0" />
 	</File>
 	<File name="argproc.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="1387" topLine="0" />
 	</File>
 	<File name="argproc.h" open="1" top="0" tabpos="3">
-		<Cursor position="78" topLine="0" />
+		<Cursor position="226" topLine="0" />
 	</File>
 	<File name="general.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="2086" topLine="46" />
+		<Cursor position="3922" topLine="125" />
 	</File>
 	<File name="general.h" open="1" top="0" tabpos="9">
 		<Cursor position="2449" topLine="85" />
 	</File>
 	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="539" topLine="0" />
+		<Cursor position="427" topLine="0" />
 	</File>
 	<File name="matching.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="2374" topLine="82" />
+		<Cursor position="2112" topLine="68" />
 	</File>
 	<File name="matching.hpp" open="1" top="0" tabpos="15">
 		<Cursor position="278" topLine="1" />

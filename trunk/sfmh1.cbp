@@ -18,7 +18,7 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" -D /home/houman/work/test_data/reduced4/" />
+				<Option parameters=" -D ~/Desktop/data/reduced/ " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

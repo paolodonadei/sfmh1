@@ -73,6 +73,7 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
     IplImage* imgTemp=concatImagesVertical(im1.cv_img,im2.cv_img);
 
     int x0,y0,x1,y1;
+    int inlier;
 
     for (int i=0;i<hr_correspond.imIndices.size();i++)
     {
@@ -82,7 +83,9 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
         x1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.x;
         y1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.y+im1.height;
 
-        cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), cvScalar(255,0,0), 1);
+    inlier=hr_correspond.imIndices[i].inlier;
+
+        cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), (inlier)?cvScalar(0,255,0):cvScalar(0,0,255), 1);
 
         //print correspondences 1 to 1
         if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), i);
@@ -368,7 +371,7 @@ int findSIFTfeatures( HRImage& image)
     //if pca then reproject
     if (SIFTPCA)
     {
-        string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname;
+        string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
     system (command_run.c_str());
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
