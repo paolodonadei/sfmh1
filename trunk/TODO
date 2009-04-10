@@ -1,11 +1,12 @@
-! cant suppress sift exec output_iterator_tag
+
 ! feature pruning, debug it to see if it actually works
-! how come if we find the error with respect to both inliers and outliers its so small? check to see if we do get a big error for outliers
-! calculate error wrt inliers
 ! show bad matches in red
 ! write down features per image so that the tracking matrix makes sense, otherwise the indices point to nothing
 ! write down the header for the track text file
 !check memory leaks with valgrind
+! i get negative errors in the matches file
+! in teh matches file some points have zero error but they seem to be outliers
+!match two images should return the number of inliers found and if such is small (like zero) the two images should be decoupled
 ____________________________________________________________________________________
 - prune out the pairwise matches using the fundamental Matrix
 * can we find trifocal tensor rather than f matrix?

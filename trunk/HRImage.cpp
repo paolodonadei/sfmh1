@@ -729,7 +729,7 @@ int  HRImageSet::open(string directoryName)
                 if ( fs::is_regular( dir_itr->status() ) )
                 {
                     if (fs::extension(dir_itr->path())==".pgm" || fs::extension(dir_itr->path())==".bpm" ||
-                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff")
+                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff" || fs::extension(dir_itr->path())==".ppm")
                     {
                         ++file_count;
                         cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
@@ -1132,21 +1132,24 @@ int FeatureTrack::pruneFeatureTrack()
     {
         for (j=0;j<i; j++)
         {
-            for (k=0;k<trackMatrix[i].size();k++)
+            if (inliersStates[i]==1 && inliersStates[j]==1) //zzz this should make a differnce
             {
-                if (trackMatrix[i][k]==trackMatrix[j][k] && trackMatrix[j][k]!=-1)
+                for (k=0;k<trackMatrix[i].size();k++)
                 {
-                    if ( curScores[i]>curScores[j])
+                    if (trackMatrix[i][k]==trackMatrix[j][k] && trackMatrix[j][k]!=-1)
                     {
-                        eraseTrackMatRow(j);
-                        break;
-                    }
-                    else
-                    {
-                        eraseTrackMatRow(i);
-                        break;
-                    }
+                        if ( curScores[i]>curScores[j])
+                        {
+                            eraseTrackMatRow(j);
+                            break;
+                        }
+                        else
+                        {
+                            eraseTrackMatRow(i);
+                            break;
+                        }
 
+                    }
                 }
             }
         }
