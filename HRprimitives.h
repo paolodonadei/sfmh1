@@ -40,8 +40,8 @@ class MotionGeometry
     int findMotionModel(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
     int findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
 
-double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
-double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err );
+double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
+double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
 friend ostream &operator<<(ostream &stream,  const MotionGeometry& ob);
 
 MotionGeometry(const MotionGeometry & rec);

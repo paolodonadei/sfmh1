@@ -284,8 +284,18 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     }
 
+        int numPoints = indices.size();
+
+
+    if(numPoints<9)
+    {
+
+     cout<<"not enough points for matching\n"<<endl;
+     return 0;
+    }
+
     ///find F
-    int numPoints = indices.size();
+
     CvMat* points1;
     CvMat* points2;
     CvMat* status;
@@ -312,7 +322,7 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
     int pointsRejected=0;
     double error=0;
     int num = cvFindFundamentalMat(points1,points2,MotionModel,CV_FM_RANSAC,1.0,0.99,status);
-    error= computeReprojErrorF( points1,points2, MotionModel, err_array );
+    error= computeReprojErrorF( points1,points2, MotionModel, err_array ,status);
 
 
 
@@ -363,10 +373,11 @@ int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vect
 
 
 }
-double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
+double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err, const CvMat* status )
 {
     int i;
     int N=_m1->cols;
+    int numOutliers=0;
     vector<CvPoint3D32f> lines[2];
 
     lines[0].resize(N);
@@ -382,16 +393,21 @@ double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const
     double avgErr = 0;
     for ( i = 0; i < N; i++ )
     {
-        double err = fabs(m1[i*2]*lines[1][i].x +
+
+                double err = fabs(m1[i*2]*lines[1][i].x +
                           m1[i*2+1]*lines[1][i].y + lines[1][i].z)
                      + fabs(m2[i*2]*lines[0][i].x +
                             m2[i*2+1]*lines[0][i].y + lines[0][i].z);
 
         terr[i] = (float)err;
+
+        if(status->data.ptr[i]==1)//dont add outliers to error
         avgErr += err;
+        else
+        numOutliers++;
         //  printf("the type two error is %f\n",err);
     }
-    avgErr/=((double)N);
+    avgErr/=((double)(N-numOutliers));
 
     // printf( "avg err = %f for %d points\n", avgErr ,N);
 
@@ -405,14 +421,14 @@ double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const
 
 
 //this was stolen from opencv , i didnt know how else to use it without having to use the whole class
-double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err )
+double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status )
 {
 
 //    const CvMat* _m1temp;
 //    _m1temp=_m1;
 //    _m1= _m2;
 //    _m2=_m1temp;
-
+int numOutliers=0;
 
     int i, count = _m1->cols;
     const float* m1 = _m1->data.fl;
@@ -423,6 +439,7 @@ double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, 
     double totalerr=0;
     for ( i = 0; i < count; i++ )
     {
+
         double a, b, c, d1, d2, s1, s2;
 
         a = FF[0]*m1[i*2] + FF[1]*m1[i*2+1] + FF[2];
@@ -440,10 +457,16 @@ double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, 
         d1 = m1[i*2]*a + m1[i*2+1]*b + c;
 
         err[i] = sqrt((float)(d1*d1*s1)) + sqrt((float)(d2*d2*s2));
+
+        if(status->data.ptr[i]==1)
         totalerr+=err[i];
-        // cout<<"error was "<<err[i]<<endl;
+        else
+        numOutliers++;
+
+       // cout<<i<<"\t\t"<<err[i]<<endl;
+        if(err[i]<0) cout<<"whaaaaaaaaaaaaaaaaaaat negative error\n"<<endl;
     }
-    totalerr/=((double)count);
+    totalerr/=((double)(count-numOutliers));
     // printf ("average error method 1 is %f with %d points\n",totalerr,count);
 
     return totalerr;
