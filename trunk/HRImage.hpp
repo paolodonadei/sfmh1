@@ -91,8 +91,9 @@ public:
 class FeatureTrack
 {
 public:
+const vector<HRImagePtr>* trackImageCollection;
     FeatureTrack();
-
+CvPoint2D32f pointFromTrackloc(int row, int col);
     vector< vector<int> > trackMatrix;
 
     int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
