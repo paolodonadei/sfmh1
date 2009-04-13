@@ -833,7 +833,7 @@ int HRImageSet::exhaustiveSIFTMatching()
 
 int HRImageSet::createFeatureTrackMatrix()
 {
-
+myTracks.trackImageCollection=&imageCollection;
 
     int i, j, k,q;
 
@@ -1172,18 +1172,30 @@ int FeatureTrack::eraseTrackMatRow(int index)
 
     }
     inliersStates[index]=0;
-//    for (j=0;j<trackMatrix[index].size();j++)
-//    {
-//        trackMatrix[index][j]=-1;
-//
-//    }
+
+    cout<<"removing :\t";
+    for (j=0;j<trackMatrix[index].size();j++)
+    {
+        CvPoint2D32f temploc=pointFromTrackloc(index, j);
+        trackMatrix[index][j]=-1;
+
+    }
 //  curScores[index]=0;
 
 
 
     return 0;
 }
+CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
+{
 
+return (*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+
+
+
+
+
+}
 void FeatureTrack::writeTrackMatrix(string fname)
 {
 
