@@ -164,7 +164,7 @@ int HRCorrespond2N::findGeomtry(MotionType mtype)
 
     if ( num == 1 )
     {
-        printf("Fundamental matrix was found between images: %d and %d, number of outliers: %d with error %f\n",indexIm1,indexIm2,motion.numOutlier, motion.motionError);
+        printf("Fundamental matrix was found between images: %d and %d, number of outliers: %d, inliers: %d with error %f\n",indexIm1,indexIm2,motion.numOutlier, motion.numInliers,motion.motionError);
     }
     else
     {
@@ -235,7 +235,7 @@ MotionGeometry::MotionGeometry()
 
     motionError=0;//in pixels
     numOutlier=0;
-
+numInliers=0;
 
     valid=0;
 }
@@ -339,6 +339,7 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     motionError=error;
     numOutlier=pointsRejected;
+    numInliers=numPoints-numOutlier;
 
 
 

@@ -1,11 +1,20 @@
-
-! feature pruning, debug it to see if it actually works
-! show bad matches in red
-! write down features per image so that the tracking matrix makes sense, otherwise the indices point to nothing
+! boat sequence not working
+! results are not the same as when using sift execs
+! the pgm is not written right, think of using netbm, or maybe the way the buffer is used
+*use the fast matching method using random zero trees
+* allow for motions betwen two images where the relation is homography and use this to create the dependency graph, see below item
+* take all the interrelations and create a linear sequence of images where every image is connected to its closes neighbour , so \
+the proximity is measures by the number of matches between two images, but then the problem arises that two images that are two similar \
+might have small baseline and the motion model might not be good between them,\
+ so its good to fit the F matrix and use the error as a measure of their closeness, converting a netgwork to a tree or sequence
+_____________________________________________________________________________
+c! feature pruning, debug it to see if it actually works
+c! show bad matches in red
+c! write down features per image so that the tracking matrix makes sense, otherwise the indices point to nothing
 ! write down the header for the track text file
 !check memory leaks with valgrind
-! i get negative errors in the matches file
-! in teh matches file some points have zero error but they seem to be outliers
+c! i get negative errors in the matches file
+c! in teh matches file some points have zero error but they seem to be outliers
 !match two images should return the number of inliers found and if such is small (like zero) the two images should be decoupled
 ____________________________________________________________________________________
 - prune out the pairwise matches using the fundamental Matrix

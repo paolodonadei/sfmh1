@@ -28,8 +28,8 @@ CvMat* MotionModel_tpose;
 CvMat* points1;
 CvMat* lines;
 
-
-
+char* fil_name1;
+char* fil_name2;
 
 bool inBound(CvPoint2D32f inter, double width, double height)
 {
@@ -137,8 +137,8 @@ void imgclick(int event, int x, int y, int flags, void* param)
 
         cvLine( ((*direction==1)?img2:img1),cvPoint( start.x , start.y ), cvPoint( end.x , end.y  ), CV_RGB(0,255,0), 1, 0 );
 
-        cvShowImage("mainWin1", img1 );
-        cvShowImage("mainWin2", img2 );
+        cvShowImage(fil_name1, img1 );
+        cvShowImage(fil_name2, img2 );
 
     }
 
@@ -235,7 +235,8 @@ int main(int argc, char *argv[])
     img2=cvLoadImage(argv[1]);
 
 
-
+ fil_name1= argv[2] ;
+ fil_name2= argv[1]  ;
 
 
     if (!img1 || !img2)
@@ -268,21 +269,21 @@ int main(int argc, char *argv[])
     cout<<endl;
 
     // create a window
-    cvNamedWindow("mainWin1", CV_WINDOW_AUTOSIZE);
-    cvMoveWindow("mainWin", 100, 100);
+    cvNamedWindow(fil_name1, CV_WINDOW_AUTOSIZE);
+    cvMoveWindow(fil_name1, 100, 100);
 
-    cvNamedWindow("mainWin2", CV_WINDOW_AUTOSIZE);
-    cvMoveWindow("mainWin", 200, 500);
+    cvNamedWindow( fil_name2, CV_WINDOW_AUTOSIZE);
+    cvMoveWindow( fil_name2, 200, 500);
 
     // show the image
-    cvShowImage("mainWin1", img1 );
-    cvShowImage("mainWin2", img2 );
+    cvShowImage(fil_name1, img1 );
+    cvShowImage( fil_name2, img2 );
 
     int forward=1;
     int backward=2;
 
-    cvSetMouseCallback("mainWin1",imgclick,&forward);
-    cvSetMouseCallback("mainWin2",imgclick,&backward);
+    cvSetMouseCallback(fil_name1,imgclick,&forward);
+    cvSetMouseCallback(fil_name2,imgclick,&backward);
     // wait for a key
     int key;
     while (1)
@@ -314,8 +315,8 @@ int main(int argc, char *argv[])
             cvReleaseImage( &img2 );
             img1=cvCloneImage(img1clone);
             img2=cvCloneImage(img2clone);
-            cvShowImage("mainWin1", img1 );
-            cvShowImage("mainWin2", img2 );
+            cvShowImage(fil_name1, img1 );
+            cvShowImage(fil_name2, img2 );
             break;
         }
     }

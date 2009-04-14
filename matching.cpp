@@ -19,6 +19,7 @@
 
 #define SIFT_THRESH 90
 #define PCA_THRESH 3000
+#define RECREATEFILES 0
 
 #define SIFTPCA 1
 namespace fs = boost::filesystem;
@@ -83,7 +84,7 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
         x1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.x;
         y1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.y+im1.height;
 
-    inlier=hr_correspond.imIndices[i].inlier;
+        inlier=hr_correspond.imIndices[i].inlier;
 
         cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), (inlier)?cvScalar(0,255,0):cvScalar(0,0,255), 1);
 
@@ -339,8 +340,28 @@ int findSIFTfeatures( HRImage& image)
 
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
+    printf("the step size is %d \n",image.step);
 
-    if (!write_pgm_image((char*)image.pgmfilename.c_str(), image.data, image.height,image.width, "Houman Rastgar",255))
+
+//this is necessary due to the step parameter
+    unsigned char* dataptr=(unsigned char*) malloc(sizeof(unsigned char)*(image.height*image.width)  +1);
+
+    // invert the image
+    int z=0;
+
+    for (int i=0;i<image.height;i++)
+    {
+        for (int j=0;j<image.width;j++)
+        {
+         //   printf(" i=%d and j=%d and z=%d\n",i,j,z);
+            dataptr[z]= image.data[i*image.step+j];
+            z++;
+        }
+    }
+
+
+
+    if (!write_pgm_image((char*)image.pgmfilename.c_str(), dataptr, image.height,image.width, "Houman Rastgar",255))
     {
 
         cout<<"image "<<image.pgmfilename <<" not saved\n"<<endl;
@@ -353,7 +374,7 @@ int findSIFTfeatures( HRImage& image)
         exit(EXIT_FAILURE  );
     }
 
-
+    free(dataptr);
 //////////////ok now run sift//////////////
     if (system(NULL)==0)
     {
@@ -366,14 +387,27 @@ int findSIFTfeatures( HRImage& image)
 
 
     if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-    system (command_run.c_str());
+
+    fs::path p3( image.siftkeyfilename, fs::native );
+
+    if (RECREATEFILES || !fs::exists( p3 ) )
+    {
+        system (command_run.c_str());
+    }
+
+
 
     //if pca then reproject
     if (SIFTPCA)
     {
         string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
-    system (command_run.c_str());
+
+        fs::path p4( siftpcaname, fs::native );
+
+        if (RECREATEFILES || !fs::exists( p4 ) )
+            system (command_run.c_str());
+
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
     }
 

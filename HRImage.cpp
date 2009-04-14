@@ -431,7 +431,7 @@ int  HRImage::writeImageFeatures()
 
 
 
-    IplImage* tempImage = cvCreateImage(cvGetSize(cv_img), IPL_DEPTH_8U, 4);
+    IplImage* tempImage = cvCreateImage(cvGetSize(cv_img), IPL_DEPTH_8U, 3);//png doesnt support alpha channel in opencv
     cvCvtColor(cv_img, tempImage, CV_GRAY2BGR);
 
 
@@ -448,7 +448,7 @@ int  HRImage::writeImageFeatures()
     string tempfilename="";
     fs::path p( filename, fs::native );
 
-    tempfilename=fs::basename(p)+"features.jpg";
+    tempfilename=fs::basename(p)+"features.png";
 
     string tslash="/";
     tempfilename=TEMPDIR+tslash+tempfilename;
@@ -729,7 +729,8 @@ int  HRImageSet::open(string directoryName)
                 if ( fs::is_regular( dir_itr->status() ) )
                 {
                     if (fs::extension(dir_itr->path())==".pgm" || fs::extension(dir_itr->path())==".bpm" ||
-                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff" || fs::extension(dir_itr->path())==".ppm")
+                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff"
+                            || fs::extension(dir_itr->path())==".ppm" || fs::extension(dir_itr->path())==".png")
                     {
                         ++file_count;
                         cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
@@ -833,7 +834,7 @@ int HRImageSet::exhaustiveSIFTMatching()
 
 int HRImageSet::createFeatureTrackMatrix()
 {
-myTracks.trackImageCollection=&imageCollection;
+    myTracks.trackImageCollection=&imageCollection;
 
     int i, j, k,q;
 
@@ -1126,28 +1127,25 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
 int FeatureTrack::pruneFeatureTrack()
 {
     int i,j,k,l;
+    int indexRemove=0;
 
 
     for (i=0;i<trackMatrix.size(); i++)
     {
         for (j=0;j<i; j++)
         {
-            if (inliersStates[i]==1 && inliersStates[j]==1) //zzz this should make a differnce
+            if (inliersStates[i]==1 && inliersStates[j]==1)
             {
                 for (k=0;k<trackMatrix[i].size();k++)
                 {
                     if (trackMatrix[i][k]==trackMatrix[j][k] && trackMatrix[j][k]!=-1)
                     {
-                        if ( curScores[i]>curScores[j])
-                        {
-                            eraseTrackMatRow(j);
-                            break;
-                        }
-                        else
-                        {
-                            eraseTrackMatRow(i);
-                            break;
-                        }
+                        indexRemove=(curScores[i]>curScores[j])?j:i;
+                        eraseTrackMatRow(indexRemove);
+                        cout<<"removing: "<<endl;
+                        displayTrackRow((curScores[i]>curScores[j])?j:i);
+                        cout<<"keeping: "<<endl;
+                        displayTrackRow((curScores[i]<=curScores[j])?j:i);
 
                     }
                 }
@@ -1159,11 +1157,27 @@ int FeatureTrack::pruneFeatureTrack()
     return 0;
 }
 
+bool FeatureTrack::displayTrackRow(int row)
+{
+
+    cout<<"Track index : "<<row;
+    for (int j=0;j<trackMatrix[row].size();j++)
+    {
+        fs::path p( (*trackImageCollection)[j]->filename, fs::native );
+
+        string tempfilename=fs::basename(p);
+        CvPoint2D32f temploc=pointFromTrackloc(row, j);
+        printf("{%s ( %d, %d) }\t",tempfilename.c_str(),(int)temploc.x, (int)temploc.y);
+
+    }
+    cout<<endl;
+    return true;
+}
 int FeatureTrack::eraseTrackMatRow(int index)
 {
     int i,j,k,l;
 
-    cout<<"removing index "<<index<<endl;
+
 
     if (index<0 || index>=inliersStates.size())
     {
@@ -1173,15 +1187,6 @@ int FeatureTrack::eraseTrackMatRow(int index)
     }
     inliersStates[index]=0;
 
-    cout<<"removing :\t";
-    for (j=0;j<trackMatrix[index].size();j++)
-    {
-        CvPoint2D32f temploc=pointFromTrackloc(index, j);
-        trackMatrix[index][j]=-1;
-
-    }
-//  curScores[index]=0;
-
 
 
     return 0;
@@ -1189,7 +1194,7 @@ int FeatureTrack::eraseTrackMatRow(int index)
 CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
 {
 
-return (*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+    return (*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
 
 
 

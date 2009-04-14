@@ -106,6 +106,7 @@ CvPoint2D32f pointFromTrackloc(int row, int col);
     void writeTrackMatrix(string fname);
     bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);
 int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
+bool displayTrackRow(int row);
 
 };
 
