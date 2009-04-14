@@ -1,6 +1,7 @@
 ! boat sequence not working
 ! results are not the same as when using sift execs
 ! the pgm is not written right, think of using netbm, or maybe the way the buffer is used
+* put in options for reading the correspondences so i dont have to redo it again
 *use the fast matching method using random zero trees
 * allow for motions betwen two images where the relation is homography and use this to create the dependency graph, see below item
 * take all the interrelations and create a linear sequence of images where every image is connected to its closes neighbour , so \

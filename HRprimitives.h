@@ -58,7 +58,7 @@ class HRCorrespond2N
 {
 public:
    int findGeomtry(MotionType mtype=FUNDAMENTAL);
-
+void writeIndices();
     friend ostream &operator<<(ostream &stream, const HRCorrespond2N& ob);
     HRCorrespond2N();
  int removeOutliers(const CvMat* tstatus);
@@ -73,7 +73,7 @@ MotionGeometry motion;
     HRImage* hr2ptr;
     vector<matchIndex> imIndices;
 
-
+int readMatches(string filename);
 HRCorrespond2N(const HRCorrespond2N& rec);
 HRCorrespond2N& operator=(const HRCorrespond2N & rhs) throw();
 
