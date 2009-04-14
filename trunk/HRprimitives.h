@@ -50,6 +50,7 @@ MotionGeometry & operator=(const MotionGeometry & rhs) throw();
  double motionError;//in pixels
     int numOutlier;
      int valid;
+     int numInliers;
 
 };
 
