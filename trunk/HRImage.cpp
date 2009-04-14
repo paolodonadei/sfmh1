@@ -1142,10 +1142,10 @@ int FeatureTrack::pruneFeatureTrack()
                     {
                         indexRemove=(curScores[i]>curScores[j])?j:i;
                         eraseTrackMatRow(indexRemove);
-                        cout<<"removing: "<<endl;
-                        displayTrackRow((curScores[i]>curScores[j])?j:i);
-                        cout<<"keeping: "<<endl;
-                        displayTrackRow((curScores[i]<=curScores[j])?j:i);
+//                        cout<<"removing: "<<endl;
+//                        displayTrackRow((curScores[i]>curScores[j])?j:i);
+//                        cout<<"keeping: "<<endl;
+//                        displayTrackRow((curScores[i]<=curScores[j])?j:i);
 
                     }
                 }
@@ -1193,6 +1193,32 @@ int FeatureTrack::eraseTrackMatRow(int index)
 }
 CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
 {
+    CvPoint2D32f temp;
+    temp.x=-1;
+    temp.y=-1;
+
+    if (row>=trackMatrix.size())
+    {
+        cout<<"1-calling on a nonexistent row, track this bug"<<endl;
+        return temp;
+
+    }
+    if (col<0 || col>=(*trackImageCollection).size())
+    {
+        cout<<"2-calling on a nonexistent row, track this bug"<<endl;
+        return temp;
+    }
+    if (trackMatrix[row][col]==-1)
+    {
+        return temp;
+
+    }
+
+    if (trackMatrix[row][col]<0 || trackMatrix[row][col]>= (*trackImageCollection)[col]->HR2DVector.size())//this is becasue some columns will be -1
+    {
+        cout<<"3-calling on a nonexistent row, track this bug"<<endl;
+        return temp;
+    }
 
     return (*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
 

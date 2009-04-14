@@ -112,6 +112,132 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
     return stream;
 
 }
+
+int HRCorrespond2N::readMatches(string filename)
+{
+    int numatches=0;
+    char str[2000];
+
+    fstream fp_in;
+    fp_in.open(filename.c_str(), ios::in);
+
+
+    if (!fp_in.is_open())
+    {
+        cout << "File " <<  filename << " does not exist" << endl;
+        exit(1);
+    }
+
+    while (!fp_in.eof())
+    {
+        fp_in.getline(str,2000);
+        numatches++;
+
+    }
+
+    numatches=numatches-3; //1 because there is two comment lines, and one because of the last line
+    if (numatches<1)
+    {
+        cout<<"number of matches found is less than 1, quitting"<<endl;
+        return 0;
+
+    }
+
+    fp_in.clear();
+    fp_in.seekg (0, ios::beg);  //rewinding
+    fp_in.getline(str,2000);
+    fp_in.getline(str,2000);
+
+
+    int i=0;
+
+
+    if (imIndices.size()>0)
+    {
+        cout<<"WARNING:the size of the existing matches is more than zero, we are now appending matches , is this intended?"<<endl;
+    }
+
+
+    while (!fp_in.eof() && i<numatches) //second check is redundant, being safe
+    {
+        fp_in.getline(str,2000);
+
+        string s(str);
+        string out;
+        istringstream ss;
+        ss.str(s);
+
+        ss>>out; //first one is the match number
+
+        matchIndex indexTemp;
+
+
+
+
+        ss>>out;
+        indexTemp.imindex1=from_string<int>(out, std::dec);
+
+        ss>>out;
+        indexTemp.imindex2=from_string<int>(out, std::dec);
+
+        ss>>out;
+        indexTemp.score=from_string<double>(out, std::dec);
+
+        imIndices.push_back(indexTemp);
+
+
+        i++;
+
+    }
+
+    fp_in.close();
+
+   fprintf(stderr,"Found %d matches.\n", numatches);
+
+   return numatches;
+
+}
+void HRCorrespond2N::writeIndices()
+{
+    string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_indices.txt");
+
+
+
+    fstream fp_out;
+    fp_out.open(fname.c_str(), ios::out);
+    if(!fp_out) {
+    cout << "Cannot open file.  "<<fname<<endl;
+    return ;
+   }
+
+
+    if (hr1ptr==NULL ||hr2ptr==NULL)
+    {
+        cout<<"images have not been initialized"<<endl;
+        return ;
+    }
+
+    fp_out <<"#"<< hr1ptr->filename <<"   ( index="<<indexIm1 <<") "<< "                 "<<hr2ptr->filename <<" ( index="<<indexIm2 <<") "<<endl;
+
+
+    fp_out << "#match_num"<<setw(11)<<"index1"<<"("<<indexIm1 <<")"<<"\t"<<setw(11)<<"index2"<<"("<<indexIm2 <<")"<<"\t"<<setw(11)<<"score" <<endl;
+
+
+
+    for (int i=0;i<imIndices.size();i++)
+    {
+
+       fp_out <<i<<"\t\t"<<imIndices[i].imindex1<<"\t\t"<<imIndices[i].imindex2 <<"\t\t"<<setw(10)<<fixed<<setprecision(10)<< imIndices[i].score <<endl;
+
+    }
+
+
+
+    fp_out.close();
+
+
+
+}
 void HRCorrespond2N::WriteMatches()
 {
 
@@ -235,7 +361,7 @@ MotionGeometry::MotionGeometry()
 
     motionError=0;//in pixels
     numOutlier=0;
-numInliers=0;
+    numInliers=0;
 
     valid=0;
 }
@@ -284,14 +410,14 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     }
 
-        int numPoints = indices.size();
+    int numPoints = indices.size();
 
 
-    if(numPoints<9)
+    if (numPoints<9)
     {
 
-     cout<<"not enough points for matching\n"<<endl;
-     return 0;
+        cout<<"not enough points for matching\n"<<endl;
+        return 0;
     }
 
     ///find F
@@ -395,17 +521,17 @@ double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const
     for ( i = 0; i < N; i++ )
     {
 
-                double err = fabs(m1[i*2]*lines[1][i].x +
+        double err = fabs(m1[i*2]*lines[1][i].x +
                           m1[i*2+1]*lines[1][i].y + lines[1][i].z)
                      + fabs(m2[i*2]*lines[0][i].x +
                             m2[i*2+1]*lines[0][i].y + lines[0][i].z);
 
         terr[i] = (float)err;
 
-        if(status->data.ptr[i]==1)//dont add outliers to error
-        avgErr += err;
+        if (status->data.ptr[i]==1)//dont add outliers to error
+            avgErr += err;
         else
-        numOutliers++;
+            numOutliers++;
         //  printf("the type two error is %f\n",err);
     }
     avgErr/=((double)(N-numOutliers));
@@ -429,7 +555,7 @@ double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, 
 //    _m1temp=_m1;
 //    _m1= _m2;
 //    _m2=_m1temp;
-int numOutliers=0;
+    int numOutliers=0;
 
     int i, count = _m1->cols;
     const float* m1 = _m1->data.fl;
@@ -459,13 +585,13 @@ int numOutliers=0;
 
         err[i] = sqrt((float)(d1*d1*s1)) + sqrt((float)(d2*d2*s2));
 
-        if(status->data.ptr[i]==1)
-        totalerr+=err[i];
+        if (status->data.ptr[i]==1)
+            totalerr+=err[i];
         else
-        numOutliers++;
+            numOutliers++;
 
-       // cout<<i<<"\t\t"<<err[i]<<endl;
-        if(err[i]<0) cout<<"whaaaaaaaaaaaaaaaaaaat negative error\n"<<endl;
+        // cout<<i<<"\t\t"<<err[i]<<endl;
+        if (err[i]<0) cout<<"whaaaaaaaaaaaaaaaaaaat negative error\n"<<endl;
     }
     totalerr/=((double)(count-numOutliers));
     // printf ("average error method 1 is %f with %d points\n",totalerr,count);

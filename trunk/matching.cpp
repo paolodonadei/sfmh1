@@ -30,11 +30,21 @@ using namespace std;
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
     double score;
-
     vector<HRPointFeatures>::iterator k;
     int index=-1;
 
     int count = 0;
+
+
+    string fname=TEMPDIR+string("/")+combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt");
+    fs::path p1( fname, fs::native );
+    if (!RECREATEFILES && fs::exists( p1 ) )
+    {
+        hr_correspond.readMatches(fname);
+        return count;
+    }
+
+
 
 
     for (int i=0;i<im1.HR2DVector.size();i++)
@@ -59,9 +69,9 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     /* Write result image to standard output. */
 
-    fprintf(stderr,"Found %d matches.\n", count);
+    fprintf(stderr,"read Found %d matches.\n", count);
 
-
+hr_correspond.writeIndices();
 
     return count;
 }
@@ -353,7 +363,7 @@ int findSIFTfeatures( HRImage& image)
     {
         for (int j=0;j<image.width;j++)
         {
-         //   printf(" i=%d and j=%d and z=%d\n",i,j,z);
+            //   printf(" i=%d and j=%d and z=%d\n",i,j,z);
             dataptr[z]= image.data[i*image.step+j];
             z++;
         }
