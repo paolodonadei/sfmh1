@@ -12,6 +12,7 @@ void set_default_param(Parameters *params)
     params->dirName="";
     params->matchType=SIFTCLOSEST;
     params->featureType=SIFT;
+    params->tempdirname="temporary";
 }
 
 

@@ -11,9 +11,11 @@
 #include "pgmutils.hpp"
 #include "sift.h"
 #include "matching.hpp"
+#include "argproc.h"
 #define DEBUGLVL 0
-#define TEMPDIR "tempdir"
 
+
+const char* TEMPDIR;
 
 CvScalar colors[2]={cvScalar(255,0,0), cvScalar(0,255,0)};
 
@@ -380,17 +382,17 @@ int HRImage::writeFeatures()
 
     tempfilename=fs::basename(p)+"features.txt";
 
-    string tslash="/";
-    tempfilename=TEMPDIR+tslash+tempfilename;
+    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).string();
 
-
-
-
-    if ( checkTempPath()==false)
-        return 0;
 
     fstream fp_out;
     fp_out.open(tempfilename.c_str(), ios::out);
+    if (!fp_out)
+    {
+        cout << "Cannot open file.\n";
+        return 1;
+    }
+
     fp_out<<"#\t\t feature number \t\t X \t\t Y"<<endl;
 
 
@@ -450,10 +452,7 @@ int  HRImage::writeImageFeatures()
 
     tempfilename=fs::basename(p)+"features.png";
 
-    string tslash="/";
-    tempfilename=TEMPDIR+tslash+tempfilename;
-
-
+    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).string();
 
 
     if ( checkTempPath()==false)
@@ -655,10 +654,11 @@ void HRCORRImage::close()
 HRImageSet::HRImageSet()
 {
     numImages=0;
+    temporaryDir="emptidir";
 }
-HRImageSet::HRImageSet(string directoryName)
+HRImageSet:: HRImageSet(string directoryName,string TEMPdirectoryName)
 {
-    open(directoryName);
+    open(directoryName,TEMPdirectoryName);
 }
 HRImageSet::~HRImageSet()
 {
@@ -678,7 +678,45 @@ void HRImageSet::showOneByOne()
     }
 
 }
+void HRImageSet::showOneByOneFeatureMotions()
+{
 
+    string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw"), fs::native )).string();
+    if ( !fs::exists( funddrawname ) )
+    {
+        cout << "funddraw for matching is unavailable\n";
+        return ;
+    }
+
+    if (system(NULL)==0)
+    {
+        cout<<"command processor not available , no features found"<<endl;
+        return ;
+
+    }
+
+
+
+    int i,j;
+
+    for (i=0;i<imageCollection.size();i++)
+    {
+        for (j=0;j<i;j++)
+        {
+
+            string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filename;
+           cout<<command_run<<endl;
+            system (command_run.c_str());
+
+
+        }
+    }
+
+
+
+
+
+}
 void HRImageSet::showOneByOneFeature()
 {
     if (DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
@@ -694,12 +732,13 @@ void HRImageSet::showOneByOneFeature()
 
 }
 
-int  HRImageSet::open(string directoryName)
+int  HRImageSet::open(string directoryName, string TEMPdirectoryName)
 {
+    temporaryDir=TEMPdirectoryName;
     dirName=directoryName;
     numImages=0;
-    string tslash="/";
 
+    vector<string> fnameArray;
 
 
     unsigned long file_count = 0;
@@ -736,9 +775,7 @@ int  HRImageSet::open(string directoryName)
                         cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
 
                         HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
-
-
-
+                        fnameArray.push_back( dir_itr->path().string() );
 
                         imageCollection.push_back( hr_iptr );
 
@@ -767,6 +804,23 @@ int  HRImageSet::open(string directoryName)
     numImages=file_count;
     // cout<<"finished processing images, size of the collection is : "<<imageCollection.size()<<endl;
 //cout<<"________________LOOP FINISHED______________________________"<<endl;
+    dirStemName=findSeedDirName(fnameArray)+"sfmh";
+
+    fs::path temp_path=temporaryDir;
+    temp_path/=dirStemName;
+    if ( !fs::exists(temp_path ) )
+    {
+        create_directories( temp_path );
+        if ( !fs::exists( temp_path ) )
+        {
+            cout<<"cant create directory, exiting"<<endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
+    temporaryDir=temp_path.string();
+    TEMPDIR=temporaryDir.c_str();
     return file_count;
 }
 
@@ -944,8 +998,10 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
         }
         if (SINGLEMATCHPRINT==1)
         {
-            string tslash="/";
-            string fname=TEMPDIR+tslash+string(filname+"track_i"+stringify(i)+"_d"+stringify(matchCountr)+".png");
+
+            string  fname=(fs::path( TEMPDIR, fs::native )/fs::path( fname, fs::native )).string();
+
+
 
             if (!cvSaveImage(fname.c_str(),imgTemptempcopy)) printf("Could not save: %s\n",fname.c_str());
             cvReleaseImage( &imgTemptempcopy );
@@ -955,10 +1011,12 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 
 
 
+    fs::path tempath( TEMPDIR, fs::native );
+    string fname=filname;
+    tempath/=fname;
+    fname=tempath.string();
 
 
-    string tslash="/";
-    string fname=TEMPDIR+tslash+filname;
 
     if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
 
@@ -1230,9 +1288,10 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
 void FeatureTrack::writeTrackMatrix(string fname)
 {
 
-    string tslash="/";
-    string newfname=TEMPDIR+tslash+fname;
 
+    fs::path tempath( TEMPDIR, fs::native );
+    tempath/=fname;
+    string newfname=tempath.string();
 
     int i,j,k,l;
 

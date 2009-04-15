@@ -3,6 +3,8 @@
 #include "argproc.h"
 #include "HRImage.hpp"
 
+
+
 int main(int argc, char *argv[])
 {
 
@@ -17,10 +19,11 @@ int main(int argc, char *argv[])
     printf("directory is %s \n",my_parms.dirName.c_str());
 
     {
-        HRImageSet imSet(my_parms.dirName);
+        HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
    //   imSet.showOneByOneFeature();
         imSet.exhaustiveSIFTMatching();
+        imSet.showOneByOneFeatureMotions();
         imSet.createFeatureTrackMatrix();
     }
     return 0;

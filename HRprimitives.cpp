@@ -3,8 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include "argproc.h"
 
-
+extern const char* TEMPDIR;
 
 using namespace std;
 /** @brief HRCorrespond2N
@@ -256,7 +257,7 @@ void HRCorrespond2N::WriteMotion()
 
     string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_Motion.txt");
 
-
+motion.filename=fname;
 
     fstream fp_out;
     fp_out.open(fname.c_str(), ios::out);
@@ -362,7 +363,7 @@ MotionGeometry::MotionGeometry()
     motionError=0;//in pixels
     numOutlier=0;
     numInliers=0;
-
+filename="";
     valid=0;
 }
 

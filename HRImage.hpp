@@ -117,18 +117,21 @@ class HRImageSet
     string dirName;
     int numImages;
 public:
+ string dirStemName;
     int featureDetectSift();
     HRImageSet();
-    HRImageSet(string directoryName);
+    HRImageSet(string directoryName,string TEMPdirectoryName);
+
     ~HRImageSet();
-    int open(string directoryName);
+    int open(string directoryName, string TEMPdirectoryName);
     void showOneByOne();
     void showOneByOneFeature();
 vector<vector<HRCorrespond2N> > correspondencesPairWise;
     int exhaustiveSIFTMatching();
 FeatureTrack myTracks;
-
+string temporaryDir;
 int createFeatureTrackMatrix();
+void showOneByOneFeatureMotions();
 
 };
 

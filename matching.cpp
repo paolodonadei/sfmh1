@@ -11,8 +11,9 @@
 #include "pgmutils.hpp"
 #include "general.h"
 #include "HRprimitives.h"
+#include "argproc.h"
 #define DEBUGLVL 0
-#define TEMPDIR "tempdir"
+
 
 #define SIFT_MULT 0.6
 #define PCA_MULT 0.6
@@ -22,6 +23,8 @@
 #define RECREATEFILES 0
 
 #define SIFTPCA 1
+extern const char* TEMPDIR;
+
 namespace fs = boost::filesystem;
 using namespace std;
 
@@ -35,9 +38,10 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     int count = 0;
 
+fs::path p1(fs::path( TEMPDIR, fs::native )/fs::path( combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt"), fs::native ));
 
-    string fname=TEMPDIR+string("/")+combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt");
-    fs::path p1( fname, fs::native );
+string fname=p1.string();
+
     if (!RECREATEFILES && fs::exists( p1 ) )
     {
         hr_correspond.readMatches(fname);
@@ -71,7 +75,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     fprintf(stderr,"read Found %d matches.\n", count);
 
-hr_correspond.writeIndices();
+    hr_correspond.writeIndices();
 
     return count;
 }
@@ -109,8 +113,10 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
     if ( checkTempPath()==false)
         return 0;
 
-    string tslash="/";
-    string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,".png");
+    fs::path tempath( TEMPDIR, fs::native );
+    string fname=combineFnames(im1.filename,im2.filename,".png");
+    tempath/=fname;
+    fname=tempath.string();
 
     if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
 
@@ -343,11 +349,11 @@ int findSIFTfeatures( HRImage& image)
     if ( checkTempPath()==false)
         return 0;
 
-    string tslash="/";
-    image.pgmfilename=TEMPDIR+tslash+image.pgmfilename;
-    image.siftkeyfilename=TEMPDIR+tslash+image.siftkeyfilename;
-    siftpcaname=TEMPDIR+tslash+siftpcaname;
 
+
+image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, fs::native )).string();
+    image.siftkeyfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.siftkeyfilename, fs::native )).string();
+    siftpcaname=(fs::path( TEMPDIR, fs::native )/fs::path( siftpcaname, fs::native )).string();
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
     printf("the step size is %d \n",image.step);
