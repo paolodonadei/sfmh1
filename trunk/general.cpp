@@ -242,7 +242,7 @@ string findSeedDirName(const vector<string>& oArray)
 
 
 
-    cout<<"returned : "<<dirname<<endl;
+    //cout<<"returned : "<<dirname<<endl;
 
 
 

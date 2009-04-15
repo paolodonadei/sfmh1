@@ -22,7 +22,7 @@
 #define PCA_THRESH 3000
 #define RECREATEFILES 0
 
-#define SIFTPCA 1
+#define SIFTPCA 0
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;
@@ -335,7 +335,7 @@ int findSIFTfeatures( HRImage& image)
     if ( !fs::exists( "utils/sift" ) )
     {
         cout << "sift for matching is unavailable\n";
-        return 0;
+        exit(EXIT_FAILURE);
     }
 
 
@@ -356,7 +356,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
     siftpcaname=(fs::path( TEMPDIR, fs::native )/fs::path( siftpcaname, fs::native )).string();
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
-    printf("the step size is %d \n",image.step);
+   // printf("the step size is %d \n",image.step);
 
 
 //this is necessary due to the step parameter
@@ -395,7 +395,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
     if (system(NULL)==0)
     {
         cout<<"command processor not available , no features found"<<endl;
-        return 0;
+          exit(EXIT_FAILURE);
 
     }
     string command_run=string("utils/sift ")+string("<")+image.pgmfilename+string("> ")+image.siftkeyfilename;
@@ -409,6 +409,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
     if (RECREATEFILES || !fs::exists( p3 ) )
     {
         system (command_run.c_str());
+         cout<<" command is "<<command_run<<endl;
     }
 
 
@@ -420,9 +421,15 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
 
         fs::path p4( siftpcaname, fs::native );
+///zzzz remove this is for debig
+
+
+ cout<<" command is "<<command_run<<endl;
+
 
         if (RECREATEFILES || !fs::exists( p4 ) )
             system (command_run.c_str());
+
 
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
     }
