@@ -463,7 +463,7 @@ int  HRImage::writeImageFeatures()
         cout<<"image "<<tempfilename<<" not saved\n"<<endl;
         return 0;
     }
-
+    cvReleaseImage(&tempImage );
 
     return 1;
 
@@ -705,7 +705,7 @@ void HRImageSet::showOneByOneFeatureMotions()
         {
 
             string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filename;
-           cout<<command_run<<endl;
+            cout<<command_run<<endl;
             system (command_run.c_str());
 
 
