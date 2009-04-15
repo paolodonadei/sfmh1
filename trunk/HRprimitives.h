@@ -30,7 +30,7 @@ class MotionGeometry
     MotionGeometry();
     ~MotionGeometry();
 
-
+string filename;
 
     void writeMotionMatrix();
     double calculateError();

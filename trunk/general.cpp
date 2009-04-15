@@ -3,10 +3,15 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 
+#include "argproc.h"
 #define DEBUGLVL 0
-#define TEMPDIR "tempdir"
+
+extern const char* TEMPDIR;
 namespace fs = boost::filesystem;
+using namespace boost::filesystem;
+using namespace boost;
 using namespace std;
+
 
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img )
 {
@@ -145,11 +150,101 @@ int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int
 {
     IplImage* imglineTemp=concatImagesVertical(im1.cv_img,im2.cv_img);
     cvLine(imglineTemp, p1,p2, cvScalar(255,0,0), 1);
-    string tslash="/";
-    string fname=TEMPDIR+tslash+combineFnames(im1.filename,im2.filename,string(stringify(indexname)+".jpg"));
+
+    fs::path tempath( TEMPDIR, fs::native );
+    string fname=combineFnames(im1.filename,im2.filename,string(stringify(indexname)+".jpg"));
+    tempath/=fname;
+    fname=tempath.string();
+
+
+
     if (!cvSaveImage(fname.c_str(),imglineTemp)) printf("Could not save: %s\n",fname.c_str());
     cvReleaseImage( &imglineTemp );
 
 
 
+}
+string findSeedDirName(const vector<string>& oArray)
+{
+    if (oArray.size()<1) return string("emptydir");
+
+    int i,j;
+
+    path pb(oArray[0]);
+
+    pb.remove_leaf();
+    pb.remove_leaf();
+    path pathname(pb.leaf());
+
+    if (pathname.string()!="reduced")
+    {
+        return pathname.string();
+
+    }
+
+
+
+
+
+
+    vector<string> sArray;
+    for (i=0;i<oArray.size();i++)
+    {
+
+        fs::path p( oArray[i], fs::native );
+
+        sArray.push_back(fs::basename(p));
+
+    }
+
+
+
+    if (sArray.size()<1)
+    {
+        cout<<"number of file names is zero"<<endl;
+        return string("emptydir");
+
+    }
+
+    string dirname="";
+
+    string firstfName=sArray[0];
+
+
+    bool keepgoing=true;
+    for (j = 0; j < sArray[0].length(); j++)
+    {
+        sArray[0][j];
+        for (i=1;i<sArray.size();i++)
+        {
+            if (j>=sArray[i].size() || sArray[0][j]!=sArray[i][j])
+            {
+                keepgoing=false;
+                break;
+            }
+
+        }
+        if (keepgoing==false)
+        {
+            break;
+        }
+        else
+        {
+            if (isalnum(sArray[0][j]) && !isdigit(sArray[0][j]))
+                dirname+=sArray[0][j];
+
+        }
+    }
+
+
+    if (dirname.length()==0)
+        dirname=string("emptyd");
+
+
+
+    cout<<"returned : "<<dirname<<endl;
+
+
+
+    return dirname;
 }

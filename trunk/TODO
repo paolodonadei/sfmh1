@@ -8,6 +8,9 @@
 the proximity is measures by the number of matches between two images, but then the problem arises that two images that are two similar \
 might have small baseline and the motion model might not be good between them,\
  so its good to fit the F matrix and use the error as a measure of their closeness, converting a netgwork to a tree or sequence
+ *maybe i should clip the number of sift points to a max of 1000 per image, any more is useless and it would be much faster to first find the F matrix from the first 1000 and
+ then increase the number of matches via guided matching with correlation, this can be done by first using canny to edge detect the images then find all the matches with correlatio
+ then i can use my interpolation technique to increase the number of matches around edges (the same idea in my old paper with boof)
 _____________________________________________________________________________
 c! feature pruning, debug it to see if it actually works
 c! show bad matches in red

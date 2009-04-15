@@ -19,6 +19,7 @@ typedef struct
 string dirName;
 int matchType;
 int featureType;
+char* tempdirname;
 } Parameters;
 
 void set_default_param(Parameters *params);
