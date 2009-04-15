@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
     cvMoveWindow(fil_name1, 100, 100);
 
     cvNamedWindow( fil_name2, CV_WINDOW_AUTOSIZE);
-    cvMoveWindow( fil_name2, 200, 500);
+    cvMoveWindow( fil_name2, 600, 100);
 
     // show the image
     cvShowImage(fil_name1, img1 );
@@ -288,8 +288,8 @@ int main(int argc, char *argv[])
     int key;
     while (1)
     {
-        key=cvWaitKey(0);
-        printf("typed %d \n",key);
+        key=cvWaitKey(5);
+      
         if (key==27) break;
         if (key==33) break;
 
