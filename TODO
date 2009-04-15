@@ -11,6 +11,7 @@ might have small baseline and the motion model might not be good between them,\
 *maybe i should clip the number of sift points to a max of 1000 per image, any more is useless and it would be much faster to first find the F matrix from the first 1000 and
  then increase the number of matches via guided matching with correlation, this can be done by first using canny to edge detect the images then find all the matches with correlatio
  then i can use my interpolation technique to increase the number of matches around edges (the same idea in my old paper with boof)
+ * how come for homography i end up actually fitting a correct fundamental matrix, shouldnt it be degenerate? the weird thing is that the number of points that work are small, so if i have 5000 matches i find 100 inliers, so somehow i think maybe the code finds a set of points who conform to a findamental matrix, later i haver to check for this because if the motion model is a homography even though two images might have tons of correspondences the image set is useless for depth resolution (i think)
 _____________________________________________________________________________
 c! feature pruning, debug it to see if it actually works
 c! show bad matches in red
