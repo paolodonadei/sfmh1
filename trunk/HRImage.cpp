@@ -703,12 +703,16 @@ void HRImageSet::showOneByOneFeatureMotions()
     {
         for (j=0;j<i;j++)
         {
-
-            string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filename;
-            cout<<command_run<<endl;
-            system (command_run.c_str());
-
-
+            {
+                string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filenameF+string(" 1");
+                cout<<command_run<<endl;
+                system (command_run.c_str());
+            }
+            {
+                string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filenameH+string(" 2");
+                cout<<command_run<<endl;
+                system (command_run.c_str());
+            }
         }
     }
 

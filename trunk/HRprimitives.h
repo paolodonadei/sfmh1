@@ -3,6 +3,7 @@
 #include <string>
 #include <cv.h>
 #include <highgui.h>
+#include <cxcore.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "HRImage.hpp"
@@ -26,43 +27,50 @@ struct matchIndex
 
 class MotionGeometry
 {
-    public:
+public:
     MotionGeometry();
     ~MotionGeometry();
 
-string filename;
+    string filenameH;
+    string filenameF;
 
-    void writeMotionMatrix();
     double calculateError();
 
 
-    double getMotionElement(int i,int j) const;
-    int findMotionModel(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
+    double getMotionElement(int i,int j,MotionType mtype=FUNDAMENTAL) const;
+    int findMotionModels(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
     int findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
+    int findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
+    double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
+    double computeReprojErrorH( const CvMat* m1, const CvMat* m2, const CvMat* model, CvMat* _err , double thresh,int* numinliers);
+    double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
+    void writeMatrix(ostream &stream,MotionType mtype=FUNDAMENTAL);
 
-double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
-double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
-friend ostream &operator<<(ostream &stream,  const MotionGeometry& ob);
+    MotionGeometry(const MotionGeometry & rec);
+    MotionGeometry & operator=(const MotionGeometry & rhs) throw();
+    CvMat* MotionModel_F;
+    CvMat* MotionModel_H;
+    double motionError_F;//in pixels
+    int numOutlier_F;
+    int valid;
+    int numInliers_F;
 
-MotionGeometry(const MotionGeometry & rec);
-MotionGeometry & operator=(const MotionGeometry & rhs) throw();
-    CvMat* MotionModel;
- double motionError;//in pixels
-    int numOutlier;
-     int valid;
-     int numInliers;
+    double motionError_H;//in pixels
+    int numOutlier_H;
+
+    int numInliers_H;
 
 };
 
 class HRCorrespond2N
 {
 public:
-   int findGeomtry(MotionType mtype=FUNDAMENTAL);
-void writeIndices();
+    int findGeomtry();
+    void writeIndices();
     friend ostream &operator<<(ostream &stream, const HRCorrespond2N& ob);
     HRCorrespond2N();
- int removeOutliers(const CvMat* tstatus);
-MotionGeometry motion;
+    int removeOutliers(const CvMat* tstatus);
+    MotionGeometry motion;
     ~HRCorrespond2N();
     void WriteMatches();
     void WriteMotion();
@@ -73,9 +81,9 @@ MotionGeometry motion;
     HRImage* hr2ptr;
     vector<matchIndex> imIndices;
 
-int readMatches(string filename);
-HRCorrespond2N(const HRCorrespond2N& rec);
-HRCorrespond2N& operator=(const HRCorrespond2N & rhs) throw();
+    int readMatches(string filename);
+    HRCorrespond2N(const HRCorrespond2N& rec);
+    HRCorrespond2N& operator=(const HRCorrespond2N & rhs) throw();
 
 
 };

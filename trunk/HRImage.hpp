@@ -46,7 +46,7 @@ public:
     int displayImage();
     int displayImageFeatures();
     int writeImageFeatures();
-      int writeFeatures();
+    int writeFeatures();
     unsigned char* get1d_array();
 //copies this technique from http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00053000000000000000
     inline unsigned char* operator[](const int rowIndx)
@@ -91,9 +91,9 @@ public:
 class FeatureTrack
 {
 public:
-const vector<HRImagePtr>* trackImageCollection;
+    const vector<HRImagePtr>* trackImageCollection;
     FeatureTrack();
-CvPoint2D32f pointFromTrackloc(int row, int col);
+    CvPoint2D32f pointFromTrackloc(int row, int col);
     vector< vector<int> > trackMatrix;
 
     int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
@@ -105,8 +105,8 @@ CvPoint2D32f pointFromTrackloc(int row, int col);
     int eraseTrackMatRow(int index);
     void writeTrackMatrix(string fname);
     bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);
-int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
-bool displayTrackRow(int row);
+    int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
+    bool displayTrackRow(int row);
 
 };
 
@@ -117,7 +117,7 @@ class HRImageSet
     string dirName;
     int numImages;
 public:
- string dirStemName;
+    string dirStemName;
     int featureDetectSift();
     HRImageSet();
     HRImageSet(string directoryName,string TEMPdirectoryName);
@@ -126,12 +126,12 @@ public:
     int open(string directoryName, string TEMPdirectoryName);
     void showOneByOne();
     void showOneByOneFeature();
-vector<vector<HRCorrespond2N> > correspondencesPairWise;
+    vector<vector<HRCorrespond2N> > correspondencesPairWise;
     int exhaustiveSIFTMatching();
-FeatureTrack myTracks;
-string temporaryDir;
-int createFeatureTrackMatrix();
-void showOneByOneFeatureMotions();
+    FeatureTrack myTracks;
+    string temporaryDir;
+    int createFeatureTrackMatrix();
+    void showOneByOneFeatureMotions();
 
 };
 

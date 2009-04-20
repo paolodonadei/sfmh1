@@ -21,7 +21,7 @@ using namespace std;
 
 IplImage* img1;
 IplImage* img2 ;
-
+IplImage* img3 ;
 CvMat* MotionModel_temp_temp;
 CvMat* MotionModel;
 CvMat* MotionModel_tpose;
@@ -30,7 +30,8 @@ CvMat* lines;
 
 char* fil_name1;
 char* fil_name2;
-
+enum MotionT {FUNDAMENTAL, HOMOGRAPHY};
+MotionT MotionType;
 bool inBound(CvPoint2D32f inter, double width, double height)
 {
 
@@ -86,11 +87,13 @@ void imgclick(int event, int x, int y, int flags, void* param)
         int* direction=(int*)param;
 
         draw_cross(location, CV_RGB(255,0,0),4,(*direction==1)?img1:img2 );
-
-
-     //   printf("clicked location %d , %d \n",x,y);
-        points1->data.fl[0]=x;
+  points1->data.fl[0]=x;
         points1->data.fl[1]=y;
+
+if(MotionType==FUNDAMENTAL)
+{
+     //   printf("clicked location %d , %d \n",x,y);
+      
 
         cvComputeCorrespondEpilines( points1, (*direction)+1,MotionModel,lines);
 
@@ -136,7 +139,26 @@ void imgclick(int event, int x, int y, int flags, void* param)
 
 
         cvLine( ((*direction==1)?img2:img1),cvPoint( start.x , start.y ), cvPoint( end.x , end.y  ), CV_RGB(0,255,0), 1, 0 );
+}
+else if (MotionType==HOMOGRAPHY)
+{
+const float* H = (*direction==1)?MotionModel_tpose->data.fl:MotionModel->data.fl;
 
+        double ww = 1./(H[6]*location.x + H[7]*location.y + 1.);
+        double dx = (H[0]*location.x + H[1]*location.y + H[2])*ww ;
+        double dy = (H[3]*location.x + H[4]*location.y + H[5])*ww ;
+       
+
+  CvPoint2D32f location2;
+location2.x= dx ;
+location2.y= dy ;
+        draw_cross(location2, CV_RGB(255,0,0),4,(*direction==1)?img2:img1 );
+
+
+
+
+
+}
         cvShowImage(fil_name1, img1 );
         cvShowImage(fil_name2, img2 );
 
@@ -226,7 +248,7 @@ int main(int argc, char *argv[])
 
     if (argc<4)
     {
-        printf("Usage: main <image-file-name1> <image-file-name2> <fundamental matrix>\n\7");
+        printf("Usage: main <image-file-name1> <image-file-name2> <fundamental matrix or homography> <motion type,1= F or 2=H>\n\7");
         exit(0);
     }
 
@@ -236,7 +258,7 @@ int main(int argc, char *argv[])
 
 
  fil_name1= argv[2] ;
- fil_name2= argv[1]  ;
+ fil_name2= argv[1] ;
 
 
     if (!img1 || !img2)
@@ -260,9 +282,22 @@ int main(int argc, char *argv[])
     img2clone=cvCloneImage(img2);
 
     readFfromfile(&MotionModel,string(argv[3]));
-    cvTranspose( MotionModel, MotionModel_tpose );
+   
 
-    printf("the fund matrix is:\n");
+
+if(atoi(argv[4])==1)
+{
+MotionType=FUNDAMENTAL;
+ cvTranspose( MotionModel, MotionModel_tpose );
+}
+else
+{
+MotionType=HOMOGRAPHY;
+cvInvert( MotionModel, MotionModel_tpose );
+}
+
+
+    printf("the motion matrix %s is:\n",(atoi(argv[4])==1)?"Fundamental":"homography" );
 
     for (i=0;i<9;i++)
         cout<<" \t"<<MotionModel->data.fl[i];
@@ -296,18 +331,11 @@ int main(int argc, char *argv[])
         switch (key)
         {
         case 't':
-
-            MotionModel_temp_temp=MotionModel;
-            MotionModel=MotionModel_tpose;
-            MotionModel_tpose=MotionModel_temp_temp;
-
-            printf("the fund matrix is:\n");
-
-            for (i=0;i<9;i++)
-                cout<<" \t"<<MotionModel->data.fl[i];
-            cout<<endl;
-
-
+      		img3= img1;
+		img1=img2  ;
+		img2 =img3;
+        cvShowImage(fil_name1, img1 );
+        cvShowImage(fil_name2, img2 );
             break;
         case 'c':
 
