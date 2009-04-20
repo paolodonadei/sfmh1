@@ -73,9 +73,10 @@ float **AllocMatrix(int rows, int cols)
 
     m = (float **) malloc(rows * sizeof(float *));
     v = (float *) malloc(rows * cols * sizeof(float));
-    for (i = 0; i < rows; i++) {
-	m[i] = v;
-	v += cols;
+    for (i = 0; i < rows; i++)
+    {
+        m[i] = v;
+        v += cols;
     }
     return (m);
 }
@@ -83,8 +84,8 @@ float **AllocMatrix(int rows, int cols)
 void DeAllocMatrix(float** matrix)
 {
 
- if(matrix[0]) free(matrix[0]);
- 	 if(matrix) free(matrix);
+    if (matrix[0]) free(matrix[0]);
+    if (matrix) free(matrix);
 
 }
 void freeImage(Image im)
@@ -107,7 +108,7 @@ Image ReadPGMFile(char *filename)
     */
     file = fopen (filename, "rb");
     if (! file)
-	FatalError("Could not open file: %s", filename);
+        FatalError("Could not open file: %s", filename);
 
     return ReadPGM(file);
 }
@@ -123,40 +124,41 @@ Image ReadPGMFile(char *filename)
 */
 Image ReadPGM(FILE *fp)
 {
-  int char1, char2, width, height, max, c1, c2, c3, r, c;
-  Image image, nextimage;
+    int char1, char2, width, height, max, c1, c2, c3, r, c;
+    Image image, nextimage;
 
-  char1 = fgetc(fp);
-  char2 = fgetc(fp);
-  SkipComments(fp);
-  c1 = fscanf(fp, "%d", &width);
-  SkipComments(fp);
-  c2 = fscanf(fp, "%d", &height);
-  SkipComments(fp);
-  c3 = fscanf(fp, "%d", &max);
+    char1 = fgetc(fp);
+    char2 = fgetc(fp);
+    SkipComments(fp);
+    c1 = fscanf(fp, "%d", &width);
+    SkipComments(fp);
+    c2 = fscanf(fp, "%d", &height);
+    SkipComments(fp);
+    c3 = fscanf(fp, "%d", &max);
 
-  if (char1 != 'P' || char2 != '5' || c1 != 1 || c2 != 1 || c3 != 1 ||
-      max > 255)
-    FatalError("Input is not a standard raw 8-bit PGM file.\n"
-	    "Use xv or pnmdepth to convert file to 8-bit PGM format.\n");
+    if (char1 != 'P' || char2 != '5' || c1 != 1 || c2 != 1 || c3 != 1 ||
+            max > 255)
+        FatalError("Input is not a standard raw 8-bit PGM file.\n"
+                   "Use xv or pnmdepth to convert file to 8-bit PGM format.\n");
 
-  fgetc(fp);  /* Discard exactly one byte after header. */
+    fgetc(fp);  /* Discard exactly one byte after header. */
 
-  /* Create floating point image with pixels in range [0,1]. */
-  image = CreateImage(height, width);
-  for (r = 0; r < height; r++)
-    for (c = 0; c < width; c++)
-      image->pixels[r][c] = ((float) fgetc(fp)) / 255.0;
+    /* Create floating point image with pixels in range [0,1]. */
+    image = CreateImage(height, width);
+    for (r = 0; r < height; r++)
+        for (c = 0; c < width; c++)
+            image->pixels[r][c] = ((float) fgetc(fp)) / 255.0;
 
-  /* Check if there is another image in this file, as the latest PGM
-     standard allows for multiple images. */
-  SkipComments(fp);
-  if (getc(fp) == 'P') {
-    ungetc('P', fp);
-    nextimage = ReadPGM(fp);
-    image->next = nextimage;
-  }
-  return image;
+    /* Check if there is another image in this file, as the latest PGM
+       standard allows for multiple images. */
+    SkipComments(fp);
+    if (getc(fp) == 'P')
+    {
+        ungetc('P', fp);
+        nextimage = ReadPGM(fp);
+        image->next = nextimage;
+    }
+    return image;
 }
 
 
@@ -168,10 +170,11 @@ void SkipComments(FILE *fp)
     int ch;
 
     fscanf(fp," ");      /* Skip white space. */
-    while ((ch = fgetc(fp)) == '#') {
-      while ((ch = fgetc(fp)) != '\n'  &&  ch != EOF)
-	;
-      fscanf(fp," ");
+    while ((ch = fgetc(fp)) == '#')
+    {
+        while ((ch = fgetc(fp)) != '\n'  &&  ch != EOF)
+            ;
+        fscanf(fp," ");
     }
     ungetc(ch, fp);      /* Replace last character read. */
 }
@@ -186,17 +189,18 @@ void WritePGM(FILE *fp, Image image)
     fprintf(fp, "P5\n%d %d\n255\n", image->cols, image->rows);
 
     for (r = 0; r < image->rows; r++)
-      for (c = 0; c < image->cols; c++) {
-	val = (int) (255.0 * image->pixels[r][c]);
-	fputc(MAX(0, MIN(255, val)), fp);
-      }
+        for (c = 0; c < image->cols; c++)
+        {
+            val = (int) (255.0 * image->pixels[r][c]);
+            fputc(MAX(0, MIN(255, val)), fp);
+        }
 }
 void WritePGM(char* filename, Image image)
 {
-FILE* fp=fopen(filename,"wb");
-WritePGM(fp,  image);
+    FILE* fp=fopen(filename,"wb");
+    WritePGM(fp,  image);
 
-fclose(fp);
+    fclose(fp);
 }
 /* Draw a white line from (r1,c1) to (r2,c2) on the image.  Both points
    must lie within the image.
@@ -206,31 +210,44 @@ void DrawLine(Image image, int r1, int c1, int r2, int c2)
     int i, dr, dc, temp;
 
     if (r1 == r2 && c1 == c2)  /* Line of zero length. */
-      return;
+        return;
 
     /* Is line more horizontal than vertical? */
-    if (ABS(r2 - r1) < ABS(c2 - c1)) {
+    if (ABS(r2 - r1) < ABS(c2 - c1))
+    {
 
-      /* Put points in increasing order by column. */
-      if (c1 > c2) {
-	temp = r1; r1 = r2; r2 = temp;
-	temp = c1; c1 = c2; c2 = temp;
-      }
-      dr = r2 - r1;
-      dc = c2 - c1;
-      for (i = c1; i <= c2; i++)
-	image->pixels[r1 + (i - c1) * dr / dc][i] = 1.0;
+        /* Put points in increasing order by column. */
+        if (c1 > c2)
+        {
+            temp = r1;
+            r1 = r2;
+            r2 = temp;
+            temp = c1;
+            c1 = c2;
+            c2 = temp;
+        }
+        dr = r2 - r1;
+        dc = c2 - c1;
+        for (i = c1; i <= c2; i++)
+            image->pixels[r1 + (i - c1) * dr / dc][i] = 1.0;
 
-    } else {
+    }
+    else
+    {
 
-      if (r1 > r2) {
-	temp = r1; r1 = r2; r2 = temp;
-	temp = c1; c1 = c2; c2 = temp;
-      }
-      dr = r2 - r1;
-      dc = c2 - c1;
-      for (i = r1; i <= r2; i++)
-	image->pixels[i][c1 + (i - r1) * dc / dr] = 1.0;
+        if (r1 > r2)
+        {
+            temp = r1;
+            r1 = r2;
+            r2 = temp;
+            temp = c1;
+            c1 = c2;
+            c2 = temp;
+        }
+        dr = r2 - r1;
+        dc = c2 - c1;
+        for (i = r1; i <= r2; i++)
+            image->pixels[i][c1 + (i - r1) * dc / dr] = 1.0;
     }
 }
 
@@ -247,7 +264,7 @@ Keypoint ReadKeyFile(char *filename)
 
     file = fopen (filename, "r");
     if (! file)
-	FatalError("Could not open file: %s", filename);
+        FatalError("Could not open file: %s", filename);
 
     return ReadKeys(file);
 }
@@ -269,27 +286,29 @@ Keypoint ReadKeys(FILE *fp)
     Keypoint k, keys = NULL;
 
     if (fscanf(fp, "%d %d", &num, &len) != 2)
-	FatalError("Invalid keypoint file beginning.");
+        FatalError("Invalid keypoint file beginning.");
 
     if (len != 128)
-	FatalError("Keypoint descriptor length invalid (should be 128).");
+        FatalError("Keypoint descriptor length invalid (should be 128).");
 
-    for (i = 0; i < num; i++) {
-      /* Allocate memory for the keypoint. */
-      k = (Keypoint) malloc(sizeof(struct KeypointSt));
-      k->next = keys;
-      keys = k;
-      k->descrip =(unsigned char*) malloc(len);
+    for (i = 0; i < num; i++)
+    {
+        /* Allocate memory for the keypoint. */
+        k = (Keypoint) malloc(sizeof(struct KeypointSt));
+        k->next = keys;
+        keys = k;
+        k->descrip =(unsigned char*) malloc(len);
 
-      if (fscanf(fp, "%f %f %f %f", &(k->row), &(k->col), &(k->scale),
-		 &(k->ori)) != 4)
-	FatalError("Invalid keypoint file format.");
+        if (fscanf(fp, "%f %f %f %f", &(k->row), &(k->col), &(k->scale),
+                   &(k->ori)) != 4)
+            FatalError("Invalid keypoint file format.");
 
-      for (j = 0; j < len; j++) {
-	if (fscanf(fp, "%d", &val) != 1 || val < 0 || val > 255)
-	  FatalError("Invalid keypoint file value.");
-	k->descrip[j] = (unsigned char) val;
-      }
+        for (j = 0; j < len; j++)
+        {
+            if (fscanf(fp, "%d", &val) != 1 || val < 0 || val > 255)
+                FatalError("Invalid keypoint file value.");
+            k->descrip[j] = (unsigned char) val;
+        }
     }
     return keys;
 }
@@ -355,18 +374,20 @@ void FindMatches(Image im1, Keypoint keys1, Image im2, Keypoint keys2)
 
     /* Match the keys in list keys1 to their best matches in keys2.
     */
-    for (k= keys1; k != NULL; k = k->next) {
-      match = CheckForMatch(k, keys2);
+    for (k= keys1; k != NULL; k = k->next)
+    {
+        match = CheckForMatch(k, keys2);
 
-      /* Draw a line on the image from keys1 to match.  Note that we
-	 must add row count of first image to row position in second so
-	 that line ends at correct location in second image.
-      */
-      if (match != NULL) {
-	count++;
-	DrawLine(result, (int) k->row, (int) k->col,
-		 (int) (match->row + im1->rows), (int) match->col);
-      }
+        /* Draw a line on the image from keys1 to match.  Note that we
+        must add row count of first image to row position in second so
+        that line ends at correct location in second image.
+        */
+        if (match != NULL)
+        {
+            count++;
+            DrawLine(result, (int) k->row, (int) k->col,
+                     (int) (match->row + im1->rows), (int) match->col);
+        }
     }
 
     /* Write result image to standard output. */
@@ -388,21 +409,25 @@ Keypoint CheckForMatch(Keypoint key, Keypoint klist)
     /* Find the two closest matches, and put their squared distances in
        distsq1 and distsq2.
     */
-    for (k = klist; k != NULL; k = k->next) {
-      dsq = DistSquared(key, k);
+    for (k = klist; k != NULL; k = k->next)
+    {
+        dsq = DistSquared(key, k);
 
-      if (dsq < distsq1) {
-	distsq2 = distsq1;
-	distsq1 = dsq;
-	minkey = k;
-      } else if (dsq < distsq2) {
-	distsq2 = dsq;
-      }
+        if (dsq < distsq1)
+        {
+            distsq2 = distsq1;
+            distsq1 = dsq;
+            minkey = k;
+        }
+        else if (dsq < distsq2)
+        {
+            distsq2 = dsq;
+        }
     }
 
     /* Check whether closest distance is less than 0.6 of second. */
     if (10 * 10 * distsq1 < 6 * 6 * distsq2)
-      return minkey;
+        return minkey;
     else return NULL;
 }
 
@@ -417,9 +442,10 @@ int DistSquared(Keypoint k1, Keypoint k2)
     pk1 = k1->descrip;
     pk2 = k2->descrip;
 
-    for (i = 0; i < 128; i++) {
-      dif = (int) *pk1++ - (int) *pk2++;
-      distsq += dif * dif;
+    for (i = 0; i < 128; i++)
+    {
+        dif = (int) *pk1++ - (int) *pk2++;
+        distsq += dif * dif;
     }
     return distsq;
 }
@@ -438,16 +464,16 @@ Image CombineImagesVertically(Image im1, Image im2)
 
     /* Set all pixels to 0,5, so that blank regions are grey. */
     for (r = 0; r < rows; r++)
-      for (c = 0; c < cols; c++)
-	result->pixels[r][c] = 0.5;
+        for (c = 0; c < cols; c++)
+            result->pixels[r][c] = 0.5;
 
     /* Copy images into result. */
     for (r = 0; r < im1->rows; r++)
-      for (c = 0; c < im1->cols; c++)
-	result->pixels[r][c] = im1->pixels[r][c];
+        for (c = 0; c < im1->cols; c++)
+            result->pixels[r][c] = im1->pixels[r][c];
     for (r = 0; r < im2->rows; r++)
-      for (c = 0; c < im2->cols; c++)
-	result->pixels[r + im1->rows][c] = im2->pixels[r][c];
+        for (c = 0; c < im2->cols; c++)
+            result->pixels[r + im1->rows][c] = im2->pixels[r][c];
 
     return result;
 }

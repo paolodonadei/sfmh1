@@ -4,10 +4,87 @@
 #include <fstream>
 #include <iomanip>
 #include "argproc.h"
+#include "_cvmodelest.h"
 
 extern const char* TEMPDIR;
 
 using namespace std;
+
+
+
+
+
+
+
+
+void MotionGeometry::writeMatrix(ostream &stream,MotionType mtype)
+{
+    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
+    if ( MotionModel->height==0 || MotionModel->width==0 )
+    {
+        stream<<"EMPTY"<<endl;
+        return;
+    }
+
+    int n_rows = MotionModel->rows;
+
+    int n_cols = MotionModel->cols;
+
+
+
+
+
+    for (int i = 0; i < n_rows; ++i)
+    {
+        for (int j = 0; j < n_cols; ++j)
+        {
+
+
+            stream<< getMotionElement( i, j, mtype) << "\t";
+        }
+        stream << "\n";
+
+    }
+
+
+}
+
+MotionGeometry::MotionGeometry(const MotionGeometry & rec)
+{
+
+    MotionModel_F=cvCloneMat( rec.MotionModel_F);
+    MotionModel_H=cvCloneMat( rec.MotionModel_H);
+
+
+}
+
+// assignment operator
+MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
+{
+    if (this == &rhs) return *this;
+
+    if ( MotionModel_F!=NULL)
+    {
+        cvReleaseMat(&MotionModel_F);
+    }
+
+    if ( MotionModel_H!=NULL)
+    {
+        cvReleaseMat(&MotionModel_H);
+    }
+    MotionModel_F=cvCloneMat( rhs.MotionModel_F);
+    MotionModel_H=cvCloneMat( rhs.MotionModel_H);
+    return *this;
+}
+
+
+
+
+
+
+
+
+
 /** @brief HRCorrespond2N
   *
   * @todo: document this function
@@ -193,9 +270,9 @@ int HRCorrespond2N::readMatches(string filename)
 
     fp_in.close();
 
-   fprintf(stderr,"Found %d matches.\n", numatches);
+    fprintf(stderr,"Found %d matches.\n", numatches);
 
-   return numatches;
+    return numatches;
 
 }
 void HRCorrespond2N::writeIndices()
@@ -206,10 +283,11 @@ void HRCorrespond2N::writeIndices()
 
     fstream fp_out;
     fp_out.open(fname.c_str(), ios::out);
-    if(!fp_out) {
-    cout << "Cannot open file.  "<<fname<<endl;
-    return ;
-   }
+    if (!fp_out)
+    {
+        cout << "Cannot open file.  "<<fname<<endl;
+        return ;
+    }
 
 
     if (hr1ptr==NULL ||hr2ptr==NULL)
@@ -228,7 +306,7 @@ void HRCorrespond2N::writeIndices()
     for (int i=0;i<imIndices.size();i++)
     {
 
-       fp_out <<i<<"\t\t"<<imIndices[i].imindex1<<"\t\t"<<imIndices[i].imindex2 <<"\t\t"<<setw(10)<<fixed<<setprecision(10)<< imIndices[i].score <<endl;
+        fp_out <<i<<"\t\t"<<imIndices[i].imindex1<<"\t\t"<<imIndices[i].imindex2 <<"\t\t"<<setw(10)<<fixed<<setprecision(10)<< imIndices[i].score <<endl;
 
     }
 
@@ -254,15 +332,27 @@ void HRCorrespond2N::WriteMatches()
 }
 void HRCorrespond2N::WriteMotion()
 {
+    {
+        string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_FMotion.txt");
 
-    string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_Motion.txt");
+        motion.filenameF=fname;
 
-motion.filename=fname;
+        fstream fp_out;
+        fp_out.open(motion.filenameF.c_str(), ios::out);
+        motion.writeMatrix( fp_out, FUNDAMENTAL);
+        fp_out.close();
+    }
+    {
+        string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_HMotion.txt");
 
-    fstream fp_out;
-    fp_out.open(fname.c_str(), ios::out);
-    fp_out<<motion;
-    fp_out.close();
+        motion.filenameH=fname;
+
+        fstream fp_out;
+        fp_out.open(motion.filenameH.c_str(), ios::out);
+        motion.writeMatrix(fp_out ,HOMOGRAPHY);
+        fp_out.close();
+    }
+
 }
 
 
@@ -283,21 +373,23 @@ int HRCorrespond2N::removeOutliers(const CvMat* tstatus)
 }
 
 
-int HRCorrespond2N::findGeomtry(MotionType mtype)
+int HRCorrespond2N::findGeomtry()
 {
 
 
-    int num=motion.findMotionModel(hr1ptr,hr2ptr,imIndices,  mtype);
+    int num=motion.findMotionModels(hr1ptr,hr2ptr,imIndices,  FUNDAMENTAL);
+    motion.findMotionModels(hr1ptr,hr2ptr,imIndices,  HOMOGRAPHY);
 
     if ( num == 1 )
     {
-        printf("Fundamental matrix was found between images: %d and %d, number of outliers: %d, inliers: %d with error %f\n",indexIm1,indexIm2,motion.numOutlier, motion.numInliers,motion.motionError);
+        printf("Fundamental matrix was found between images: %d and %d, number of outliers: %d, inliers: %d with error %f\n",indexIm1,indexIm2,motion.numOutlier_F, motion.numInliers_F,motion.motionError_F);
+
     }
     else
     {
         printf("Fundamental matrix was not found between images: %d and %d\n",indexIm1,indexIm2);
     }
-
+    printf("Homography matrix was found between images: %d and %d, number of outliers: %d, inliers: %d with error %f\n",indexIm1,indexIm2,motion.numOutlier_H, motion.numInliers_H,motion.motionError_H);
 }
 
 HRFeature::HRFeature()
@@ -330,14 +422,7 @@ double MotionGeometry::calculateError()
 
 }
 
-/** @brief writeMotionMatrix
-  *
-  * @todo: document this function
-  */
-void MotionGeometry::writeMotionMatrix()
-{
 
-}
 
 /** @brief ~MotionGeometry
   *
@@ -345,11 +430,14 @@ void MotionGeometry::writeMotionMatrix()
   */
 MotionGeometry::~MotionGeometry()
 {
-    if ( MotionModel!=NULL)
+    if ( MotionModel_F!=NULL)
     {
-        cvReleaseMat(&MotionModel);
+        cvReleaseMat(&MotionModel_F);
     }
-
+    if ( MotionModel_H!=NULL)
+    {
+        cvReleaseMat(&MotionModel_H);
+    }
 }
 
 /** @brief MotionGeometry
@@ -358,18 +446,24 @@ MotionGeometry::~MotionGeometry()
   */
 MotionGeometry::MotionGeometry()
 {
-    MotionModel = cvCreateMat(3,3,CV_64FC1);
-
-    motionError=0;//in pixels
-    numOutlier=0;
-    numInliers=0;
-filename="";
+    MotionModel_F = cvCreateMat(3,3,CV_64FC1);
+    MotionModel_H = cvCreateMat(3,3,CV_64FC1);
+    motionError_F=0;//in pixels
+    numOutlier_F=0;
+    numInliers_F=0;
+    motionError_H=0;//in pixels
+    numOutlier_H=0;
+    numInliers_H=0;
+    filenameF="";
+    filenameH="";
     valid=0;
 }
 
 
-double MotionGeometry::getMotionElement(int i,int j) const
+double MotionGeometry::getMotionElement(int i,int j,MotionType mtype) const
 {
+    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
+
     if ( MotionModel->height==0 ||MotionModel->width==0 )
     {
 
@@ -388,6 +482,87 @@ double MotionGeometry::getMotionElement(int i,int j) const
     double *data = MotionModel->data.db;
 
     return (data+i*step)[j];
+}
+
+
+int MotionGeometry::findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices )
+{
+
+
+
+
+    if (hr1==NULL || hr2==NULL)
+    {
+        cout<<"images have not been initialized"<<endl;
+        return 0;
+    }
+    if (indices.size()==0)
+    {
+        cout<<"matches dont exist, returning nothing"<<endl;
+        return 0;
+
+    }
+
+    int numPoints = indices.size();
+
+
+    if (numPoints<9)
+    {
+
+        cout<<"not enough points for matching\n"<<endl;
+        return 0;
+    }
+
+    ///find F
+
+    CvMat* points1;
+    CvMat* points2;
+    CvMat* status;
+    CvMat* err_array;
+
+
+    points1  = cvCreateMat(1,numPoints,CV_32FC2);
+    points2  = cvCreateMat(1,numPoints,CV_32FC2);
+    status   = cvCreateMat(1,numPoints,CV_8UC1);
+    err_array = cvCreateMat( 1, numPoints, CV_32FC1 );
+
+    for (int i=0;i<numPoints;i++)
+    {
+        points1->data.fl[i*2]=hr1->HR2DVector[indices[i].imindex1]->location.x;
+        points1->data.fl[i*2+1]=hr1->HR2DVector[indices[i].imindex1]->location.y;
+
+        points2->data.fl[i*2]=hr2->HR2DVector[indices[i].imindex2]->location.x;
+        points2->data.fl[i*2+1]=hr2->HR2DVector[indices[i].imindex2]->location.y;
+        status->data.ptr[i]=0;
+    }
+
+
+
+    int pointsRejected=0;
+    double error=0;
+    // int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
+
+    cvFindHomography2(	points1,points2,MotionModel_H,0,	1.5,(CvMat*)NULL);
+
+    int numinliers=0;
+    error= computeReprojErrorH( points1,points2, MotionModel_H, err_array ,1.5,&numinliers);
+
+    motionError_H=error;
+    numOutlier_H=numPoints-numinliers;
+    numInliers_H=numinliers;
+
+
+
+
+
+    cvReleaseMat(&points1);
+    cvReleaseMat(&points2);
+    cvReleaseMat(&status);
+    cvReleaseMat(&err_array);
+
+
+//    return num;
+
 }
 /** @brief (one liner)
 *
@@ -448,8 +623,8 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     int pointsRejected=0;
     double error=0;
-    int num = cvFindFundamentalMat(points1,points2,MotionModel,CV_FM_RANSAC,1.0,0.99,status);
-    error= computeReprojErrorF( points1,points2, MotionModel, err_array ,status);
+    int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
+    error= computeReprojErrorF( points1,points2, MotionModel_F, err_array ,status);
 
 
 
@@ -464,9 +639,9 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
     }
 
 
-    motionError=error;
-    numOutlier=pointsRejected;
-    numInliers=numPoints-numOutlier;
+    motionError_F=error;
+    numOutlier_F=pointsRejected;
+    numInliers_F=numPoints-numOutlier_F;
 
 
 
@@ -480,13 +655,18 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     return num;
 }
-int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype)
+int MotionGeometry::findMotionModels(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype)
 {
 
 
     if (mtype==FUNDAMENTAL)
     {
         return findFMatrix( hr1,hr2,  indices );
+
+    }
+    if (mtype==HOMOGRAPHY)
+    {
+        return findHMatrix( hr1,hr2,  indices );
 
     }
     else
@@ -496,51 +676,6 @@ int MotionGeometry::findMotionModel(const HRImage* hr1,const HRImage* hr2,  vect
         return -1;
 
     }
-
-
-
-
-}
-double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err, const CvMat* status )
-{
-    int i;
-    int N=_m1->cols;
-    int numOutliers=0;
-    vector<CvPoint3D32f> lines[2];
-
-    lines[0].resize(N);
-    lines[1].resize(N);
-    CvMat _L1 = cvMat(1, N, CV_32FC3, &lines[0][0]);
-    CvMat _L2 = cvMat(1, N, CV_32FC3, &lines[1][0]);
-    float* terr = _err->data.fl;
-    const float* m1 = _m1->data.fl;
-    const float* m2 = _m2->data.fl;
-
-    cvComputeCorrespondEpilines( _m1, 1, model, &_L1 );
-    cvComputeCorrespondEpilines( _m2, 2, model, &_L2 );
-    double avgErr = 0;
-    for ( i = 0; i < N; i++ )
-    {
-
-        double err = fabs(m1[i*2]*lines[1][i].x +
-                          m1[i*2+1]*lines[1][i].y + lines[1][i].z)
-                     + fabs(m2[i*2]*lines[0][i].x +
-                            m2[i*2+1]*lines[0][i].y + lines[0][i].z);
-
-        terr[i] = (float)err;
-
-        if (status->data.ptr[i]==1)//dont add outliers to error
-            avgErr += err;
-        else
-            numOutliers++;
-        //  printf("the type two error is %f\n",err);
-    }
-    avgErr/=((double)(N-numOutliers));
-
-    // printf( "avg err = %f for %d points\n", avgErr ,N);
-
-    return avgErr;
-
 
 
 
@@ -600,68 +735,78 @@ double MotionGeometry::computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, 
     return totalerr;
 }
 
-ostream &operator<<(ostream &stream,  const MotionGeometry& ob)
+double MotionGeometry::computeReprojErrorH( const CvMat* m1, const CvMat* m2, const CvMat* model, CvMat* _err , double thresh,int* numinliers)
 {
-
-    if ( ob.MotionModel->height==0 || ob.MotionModel->width==0 )
+    int i, count = m1->cols;
+    const float*  M = m1->data.fl;
+    const float*  m = m2->data.fl;
+    const double* H = model->data.db;
+    float* err = _err->data.fl;
+    float curerror=0;
+    float totalerror=0;
+    (*numinliers)=0;
+    for ( i = 0; i < count; i++ )
     {
-        stream<<"EMPTY"<<endl;
-        return stream;
-    }
-
-    int n_rows = ob.MotionModel->rows;
-
-    int n_cols = ob.MotionModel->cols;
-
-
-
-
-
-    for (int i = 0; i < n_rows; ++i)
-    {
-        for (int j = 0; j < n_cols; ++j)
+        double ww = 1./(H[6]*M[i*2] + H[7]*M[i*2+1] + 1.);
+        double dx = (H[0]*M[i*2] + H[1]*M[i*2+1] + H[2])*ww - m[i*2];
+        double dy = (H[3]*M[i*2] + H[4]*M[i*2+1] + H[5])*ww - m[i*2+1];
+        curerror= (float)(dx*dx + dy*dy);
+        if (curerror<thresh)
         {
-
-
-            stream<< ob.getMotionElement( i, j) << "\t";
+            (*numinliers)++;
+            totalerror+= curerror ;
         }
-        stream << "\n";
 
+        err[i] =curerror;
     }
-
-
-
-
-    return stream;
-
-
-
-
+    totalerror=totalerror/ ((double)*numinliers);
+    return totalerror;
 }
 
 
-
-MotionGeometry::MotionGeometry(const MotionGeometry & rec)
+double MotionGeometry::computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err, const CvMat* status )
 {
+    int i;
+    int N=_m1->cols;
+    int numOutliers=0;
+    vector<CvPoint3D32f> lines[2];
 
-    MotionModel=cvCloneMat( rec.MotionModel);
+    lines[0].resize(N);
+    lines[1].resize(N);
+    CvMat _L1 = cvMat(1, N, CV_32FC3, &lines[0][0]);
+    CvMat _L2 = cvMat(1, N, CV_32FC3, &lines[1][0]);
+    float* terr = _err->data.fl;
+    const float* m1 = _m1->data.fl;
+    const float* m2 = _m2->data.fl;
 
-
-
-}
-
-// assignment operator
-MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
-{
-    if (this == &rhs) return *this;
-
-    if ( MotionModel!=NULL)
+    cvComputeCorrespondEpilines( _m1, 1, model, &_L1 );
+    cvComputeCorrespondEpilines( _m2, 2, model, &_L2 );
+    double avgErr = 0;
+    for ( i = 0; i < N; i++ )
     {
-        cvReleaseMat(&MotionModel);
+
+        double err = fabs(m1[i*2]*lines[1][i].x +
+                          m1[i*2+1]*lines[1][i].y + lines[1][i].z)
+                     + fabs(m2[i*2]*lines[0][i].x +
+                            m2[i*2+1]*lines[0][i].y + lines[0][i].z);
+
+        terr[i] = (float)err;
+
+        if (status->data.ptr[i]==1)//dont add outliers to error
+            avgErr += err;
+        else
+            numOutliers++;
+        //  printf("the type two error is %f\n",err);
     }
+    avgErr/=((double)(N-numOutliers));
+
+    // printf( "avg err = %f for %d points\n", avgErr ,N);
+
+    return avgErr;
 
 
-    MotionModel=cvCloneMat( rhs.MotionModel);
 
-    return *this;
+
+
 }
+

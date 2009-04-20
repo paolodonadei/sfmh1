@@ -1,4 +1,5 @@
 ! boat sequence not working
+** the measure of proximity of two frames must not be the number of matches between them, but the number of inliers for the estimated motion model between them
 c! results are not the same as when using sift execs
 c! the pgm is not written right, think of using netbm, or maybe the way the buffer is used
 c* put in options for reading the correspondences so i dont have to redo it again

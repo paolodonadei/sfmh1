@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     {
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
-   //   imSet.showOneByOneFeature();
+        //   imSet.showOneByOneFeature();
         imSet.exhaustiveSIFTMatching();
         imSet.showOneByOneFeatureMotions();
         imSet.createFeatureTrackMatrix();

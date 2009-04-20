@@ -38,9 +38,9 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     int count = 0;
 
-fs::path p1(fs::path( TEMPDIR, fs::native )/fs::path( combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt"), fs::native ));
+    fs::path p1(fs::path( TEMPDIR, fs::native )/fs::path( combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt"), fs::native ));
 
-string fname=p1.string();
+    string fname=p1.string();
 
     if (!RECREATEFILES && fs::exists( p1 ) )
     {
@@ -351,12 +351,12 @@ int findSIFTfeatures( HRImage& image)
 
 
 
-image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, fs::native )).string();
+    image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, fs::native )).string();
     image.siftkeyfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.siftkeyfilename, fs::native )).string();
     siftpcaname=(fs::path( TEMPDIR, fs::native )/fs::path( siftpcaname, fs::native )).string();
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
-   // printf("the step size is %d \n",image.step);
+    // printf("the step size is %d \n",image.step);
 
 
 //this is necessary due to the step parameter
@@ -395,7 +395,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
     if (system(NULL)==0)
     {
         cout<<"command processor not available , no features found"<<endl;
-          exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
 
     }
     string command_run=string("utils/sift ")+string("<")+image.pgmfilename+string("> ")+image.siftkeyfilename;
@@ -409,7 +409,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
     if (RECREATEFILES || !fs::exists( p3 ) )
     {
         system (command_run.c_str());
-         cout<<" command is "<<command_run<<endl;
+        cout<<" command is "<<command_run<<endl;
     }
 
 
@@ -424,7 +424,7 @@ image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, 
 ///zzzz remove this is for debig
 
 
- cout<<" command is "<<command_run<<endl;
+        cout<<" command is "<<command_run<<endl;
 
 
         if (RECREATEFILES || !fs::exists( p4 ) )
