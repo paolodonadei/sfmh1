@@ -39,8 +39,11 @@
 		<Unit filename="HRprimitives.h" />
 		<Unit filename="Makefile" />
 		<Unit filename="TODO" />
+		<Unit filename="_cvmodelest.h" />
 		<Unit filename="argproc.cpp" />
 		<Unit filename="argproc.h" />
+		<Unit filename="cvfundam.cpp" />
+		<Unit filename="cvmodelest.cpp" />
 		<Unit filename="general.cpp" />
 		<Unit filename="general.h" />
 		<Unit filename="main.cpp" />
