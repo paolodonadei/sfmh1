@@ -17,78 +17,9 @@ using namespace std;
 
 
 
-void MotionGeometry::writeMatrix(ostream &stream,MotionType mtype)
-{
-    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
-    if ( MotionModel->height==0 || MotionModel->width==0 )
-    {
-        stream<<"EMPTY"<<endl;
-        return;
-    }
-
-    int n_rows = MotionModel->rows;
-
-    int n_cols = MotionModel->cols;
 
 
 
-
-
-    for (int i = 0; i < n_rows; ++i)
-    {
-        for (int j = 0; j < n_cols; ++j)
-        {
-
-
-            stream<< getMotionElement( i, j, mtype) << "\t";
-        }
-        stream << "\n";
-
-    }
-
-
-}
-
-MotionGeometry::MotionGeometry(const MotionGeometry & rec)
-{
-
-    MotionModel_F=cvCloneMat( rec.MotionModel_F);
-    MotionModel_H=cvCloneMat( rec.MotionModel_H);
-
-
-}
-
-// assignment operator
-MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
-{
-    if (this == &rhs) return *this;
-
-    if ( MotionModel_F!=NULL)
-    {
-        cvReleaseMat(&MotionModel_F);
-    }
-
-    if ( MotionModel_H!=NULL)
-    {
-        cvReleaseMat(&MotionModel_H);
-    }
-    MotionModel_F=cvCloneMat( rhs.MotionModel_F);
-    MotionModel_H=cvCloneMat( rhs.MotionModel_H);
-    return *this;
-}
-
-
-
-
-
-
-
-
-
-/** @brief HRCorrespond2N
-  *
-  * @todo: document this function
-  */
 HRCorrespond2N::HRCorrespond2N()
 {
     indexIm1=0;
@@ -413,10 +344,69 @@ HRFeature::~HRFeature()
 }
 
 
-/** @brief calculateError
-  *
-  * @todo: document this function
-  */
+/////////////////////////////////////////////////////////
+
+
+void MotionGeometry::writeMatrix(ostream &stream,MotionType mtype)
+{
+    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
+    if ( MotionModel->height==0 || MotionModel->width==0 )
+    {
+        stream<<"EMPTY"<<endl;
+        return;
+    }
+
+    int n_rows = MotionModel->rows;
+
+    int n_cols = MotionModel->cols;
+
+
+
+
+
+    for (int i = 0; i < n_rows; ++i)
+    {
+        for (int j = 0; j < n_cols; ++j)
+        {
+
+
+            stream<< getMotionElement( i, j, mtype) << "\t";
+        }
+        stream << "\n";
+
+    }
+
+
+}
+
+MotionGeometry::MotionGeometry(const MotionGeometry & rec)
+{
+
+    MotionModel_F=cvCloneMat( rec.MotionModel_F);
+    MotionModel_H=cvCloneMat( rec.MotionModel_H);
+
+
+}
+
+// assignment operator
+MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
+{
+    if (this == &rhs) return *this;
+
+    if ( MotionModel_F!=NULL)
+    {
+        cvReleaseMat(&MotionModel_F);
+    }
+
+    if ( MotionModel_H!=NULL)
+    {
+        cvReleaseMat(&MotionModel_H);
+    }
+    MotionModel_F=cvCloneMat( rhs.MotionModel_F);
+    MotionModel_H=cvCloneMat( rhs.MotionModel_H);
+    return *this;
+}
+
 double MotionGeometry::calculateError()
 {
 
