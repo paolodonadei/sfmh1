@@ -38,9 +38,9 @@ public:
 
 
     double getMotionElement(int i,int j,MotionType mtype=FUNDAMENTAL) const;
-    int findMotionModels(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
-    int findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
-    int findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices );
+    int findMotionModels(const vector<HRPointFeatures>& hr1vec,const vector<HRPointFeatures>&  hr2vec,  vector<matchIndex>& indices ,MotionType mtype=FUNDAMENTAL);
+    int findFMatrix(const vector<HRPointFeatures>& hr1vec,const vector<HRPointFeatures>&  hr2vec,  vector<matchIndex>& indices );
+    int findHMatrix(const vector<HRPointFeatures>& hr1vec,const vector<HRPointFeatures>& hr2vec,  vector<matchIndex>& indices );
     double computeReprojErrorF( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );
     double computeReprojErrorH( const CvMat* m1, const CvMat* m2, const CvMat* model, CvMat* _err , double thresh,int* numinliers);
     double computeReprojErrorFfromEpipolars( const CvMat* _m1, const CvMat* _m2, const CvMat* model, CvMat* _err , const CvMat* status );

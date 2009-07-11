@@ -377,8 +377,8 @@ int HRCorrespond2N::findGeomtry()
 {
 
 
-    int num=motion.findMotionModels(hr1ptr,hr2ptr,imIndices,  FUNDAMENTAL);
-    motion.findMotionModels(hr1ptr,hr2ptr,imIndices,  HOMOGRAPHY);
+    int num=motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  FUNDAMENTAL);
+    motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  HOMOGRAPHY);
 
     if ( num == 1 )
     {
@@ -485,18 +485,11 @@ double MotionGeometry::getMotionElement(int i,int j,MotionType mtype) const
 }
 
 
-int MotionGeometry::findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices )
+int MotionGeometry::findHMatrix(const vector<HRPointFeatures>&  hr1vec,const vector<HRPointFeatures>& hr2vec,  vector<matchIndex>& indices )
 {
 
 
-
-
-    if (hr1==NULL || hr2==NULL)
-    {
-        cout<<"images have not been initialized"<<endl;
-        return 0;
-    }
-    if (indices.size()==0)
+    if (indices.size()==0 || hr1vec.size()==0 || hr2vec.size()==0)
     {
         cout<<"matches dont exist, returning nothing"<<endl;
         return 0;
@@ -528,11 +521,11 @@ int MotionGeometry::findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     for (int i=0;i<numPoints;i++)
     {
-        points1->data.fl[i*2]=hr1->HR2DVector[indices[i].imindex1]->location.x;
-        points1->data.fl[i*2+1]=hr1->HR2DVector[indices[i].imindex1]->location.y;
+        points1->data.fl[i*2]=hr1vec[indices[i].imindex1]->location.x;
+        points1->data.fl[i*2+1]=hr1vec[indices[i].imindex1]->location.y;
 
-        points2->data.fl[i*2]=hr2->HR2DVector[indices[i].imindex2]->location.x;
-        points2->data.fl[i*2+1]=hr2->HR2DVector[indices[i].imindex2]->location.y;
+        points2->data.fl[i*2]=hr2vec[indices[i].imindex2]->location.x;
+        points2->data.fl[i*2+1]=hr2vec[indices[i].imindex2]->location.y;
         status->data.ptr[i]=0;
     }
 
@@ -568,18 +561,12 @@ int MotionGeometry::findHMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 *
 * (documentation goes here)
 */
-int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices )
+int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vector<HRPointFeatures>&  hr2vec,  vector<matchIndex>& indices )
 {
 
 
 
-
-    if (hr1==NULL || hr2==NULL)
-    {
-        cout<<"images have not been initialized"<<endl;
-        return 0;
-    }
-    if (indices.size()==0)
+    if (indices.size()==0 || hr1vec.size()==0 || hr2vec.size()==0)
     {
         cout<<"matches dont exist, returning nothing"<<endl;
         return 0;
@@ -611,11 +598,11 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     for (int i=0;i<numPoints;i++)
     {
-        points1->data.fl[i*2]=hr1->HR2DVector[indices[i].imindex1]->location.x;
-        points1->data.fl[i*2+1]=hr1->HR2DVector[indices[i].imindex1]->location.y;
+        points1->data.fl[i*2]=hr1vec[indices[i].imindex1]->location.x;
+        points1->data.fl[i*2+1]=hr1vec[indices[i].imindex1]->location.y;
 
-        points2->data.fl[i*2]=hr2->HR2DVector[indices[i].imindex2]->location.x;
-        points2->data.fl[i*2+1]=hr2->HR2DVector[indices[i].imindex2]->location.y;
+        points2->data.fl[i*2]=hr2vec[indices[i].imindex2]->location.x;
+        points2->data.fl[i*2+1]=hr2vec[indices[i].imindex2]->location.y;
         status->data.ptr[i]=0;
     }
 
@@ -655,18 +642,18 @@ int MotionGeometry::findFMatrix(const HRImage* hr1,const HRImage* hr2,  vector<m
 
     return num;
 }
-int MotionGeometry::findMotionModels(const HRImage* hr1,const HRImage* hr2,  vector<matchIndex>& indices ,MotionType mtype)
+int MotionGeometry::findMotionModels(const vector<HRPointFeatures>& hr1vec,const vector<HRPointFeatures>&  hr2vec,  vector<matchIndex>& indices ,MotionType mtype)
 {
 
 
     if (mtype==FUNDAMENTAL)
     {
-        return findFMatrix( hr1,hr2,  indices );
+        return findFMatrix( hr1vec,hr2vec,  indices );
 
     }
     if (mtype==HOMOGRAPHY)
     {
-        return findHMatrix( hr1,hr2,  indices );
+        return findHMatrix( hr1vec,hr2vec,  indices );
 
     }
     else
