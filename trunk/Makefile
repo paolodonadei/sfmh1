@@ -5,7 +5,7 @@ LDFLAGS=
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
-PROJECT = hrlib.a
+PROJECT = libhrlib.a
 
 lib: $(PROJECT)
 
