@@ -56,5 +56,7 @@ void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 bool checkTempPath();
 string combineFnames(const string& f1,const string& f2,string extension);
 int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int indexname);
+void writeCVMatrix(ostream &stream,const CvMat* M);
 string findSeedDirName(const vector<string>& oArray);
+void readCvMatFfromfile(CvMat** tmodel,const string& mfname);
 #endif //HRPRIMITIVES_HPP_INCLUDED
