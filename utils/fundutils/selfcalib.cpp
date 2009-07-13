@@ -116,3 +116,27 @@ cvReleaseMat(&F);
 //     writeMatrixRaw(projectionCamPrev,3,4,"proj1_synth_data.txt");
 //     writeMatrixRaw(projectionCamCur,3,4,"proj2_synth_data.txt");
 //     writeMatrixRaw(intrinsicMatrix,3,3,"intrinsic_synth_data.txt");
+int  estimateFocalLengthStrum(const CvMat* pF)
+{
+
+
+
+    if(pF==NULL)
+    {
+     printf("****matrix is null\n");
+        return;
+
+    }
+
+    if ( pF->rows!=3 || pF->cols!=3 )
+    {
+        cout<<"fundamental matrix is the wrong size dudes"<<endl;
+        return;
+    }
+
+
+
+
+
+
+}
