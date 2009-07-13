@@ -11,7 +11,7 @@
 #include <iomanip>
 #include <sstream>
 #include "projdecompose.h"
-
+#include "general.h"
 using namespace std;
 
 
@@ -196,6 +196,7 @@ void cvDecomposeProjectionMatrix( const CvMat *projMatr, CvMat *calibMatr,
                              CvMat *rotMatrX, CvMat *rotMatrY,
                              CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
 {
+//    writeCVMatrix(cout,projMatr);
     CvMat *tmpProjMatr = 0;
     CvMat *tmpMatrixD = 0;
     CvMat *tmpMatrixV = 0;
@@ -240,14 +241,24 @@ tmpMatrixM = cvCreateMat(3, 3, CV_64F);
 
 
 
-    //for(i = 0; i < 4; i++)
-	// cvmSet(posVect, i, 0, cvmGet(tmpMatrixV, 3, i)); // Solution is last row of V.
+    for(i = 0; i < 4; i++)
+	 cvmSet(posVect, i, 0, cvmGet(tmpMatrixV, 3, i)); // Solution is last row of V.
 
     /* Compute calibration and rotation matrices via RQ decomposition. */
 
     cvGetCols(projMatr, tmpMatrixM, 0, 3); // M is first square matrix of P.
 
-    assert(cvDet(tmpMatrixM) != 0.0); // So far only finite cameras could be decomposed, so M has to be nonsingular [det(M) != 0].
+
+
+
+
+
+    //  writeCVMatrix(cout,tmpMatrixM);
+    double d = cvDet(tmpMatrixM);
+
+
+//printf("\n\nthe determinent of M is %f\n",d);
+    assert(d != 0.0); // So far only finite cameras could be decomposed, so M has to be nonsingular [det(M) != 0].
 
     cvRQDecomp3x3(tmpMatrixM, calibMatr, rotMatr, rotMatrX, rotMatrY, rotMatrZ, eulerAngles);
 
