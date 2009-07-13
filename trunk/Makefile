@@ -5,16 +5,23 @@ LDFLAGS=
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
+PROJECT = hrlib.a
 
-
+lib: $(PROJECT)
 
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
 
+
+$(PROJECT): $(OBJECTS)
+	ar rcs  $(PROJECT) $(OBJECTS)
+
+
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
+
 clean:
-	rm -f *.o core *.core $(EXECUTABLE) *~
+	rm -f *.o core *.core $(EXECUTABLE) *~ $(PROJECT)
 
