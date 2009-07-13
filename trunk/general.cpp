@@ -2,7 +2,9 @@
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
-
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 #include "argproc.h"
 #define DEBUGLVL 0
 
@@ -248,3 +250,113 @@ string findSeedDirName(const vector<string>& oArray)
 
     return dirname;
 }
+
+
+
+void writeCVMatrix(ostream &stream,const CvMat* M)
+{
+
+    if(M==NULL)
+    {
+     printf("****matrix is null\n");
+        return;
+
+    }
+
+    if ( M->rows==0 || M->cols==0 )
+    {
+        stream<<"EMPTY"<<endl;
+        return;
+    }
+
+    int n_rows = M->rows;
+
+    int n_cols = M->cols;
+
+
+printf("\nnumber of rows is %d and number of cols is %d \n",n_rows,n_cols);
+
+
+
+
+
+    for (int i = 0; i < n_rows; ++i)
+    {
+        for (int j = 0; j < n_cols; ++j)
+        {
+
+
+            stream<< cvmGet( M,i,j ) << "\t";
+        }
+        stream << "\n";
+
+    }
+
+
+}
+
+
+
+
+void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
+{
+
+
+    if((*tmodel)==NULL)
+    {
+     printf("****matrix is null\n");
+        return;
+
+    }
+
+    if ( (*tmodel)->rows==0 || (*tmodel)->cols==0 )
+    {
+        cout<<"EMPTY"<<endl;
+        return;
+    }
+
+    int n_rows = (*tmodel)->rows;
+
+    int n_cols = (*tmodel)->cols;
+
+
+    printf("\nnumber of rows is %d and number of cols is %d and reading from file %s \n",n_rows,n_cols,mfname.c_str());
+//this function is not very error resilient, it will crash and burn if the data file is not the right format
+    string fname(mfname);
+
+
+    fstream file_cm(fname.c_str(),ios::in);
+    if (!file_cm.is_open())
+    {
+        cout << "File +" <<  fname << "+ does not exist" << endl;
+        exit(1);
+    }
+
+    char str[2000];
+
+    int i=0;
+    int j=0;
+
+
+    while (!file_cm.eof() && j<n_rows) //second check is redundant, being safe
+    {
+        file_cm.getline(str,2000);
+
+        string s(str);
+        string out;
+        istringstream ss;
+        ss.str(s);
+
+	for(i=0;i<n_cols;i++)
+	{
+        ss>>out;
+	cvmSet((*tmodel),j,i, from_string<float>(out, std::dec));
+	}
+
+	j++;
+
+
+    }
+
+}
+
