@@ -3,7 +3,7 @@ INC = -I../../
 CFLAGS=$(INC) -c -g -Wall  `pkg-config --cflags opencv`
 LIBS=-lm  `pkg-config --libs opencv` -lhrlib -lboost_filesystem
 LDFLAGS=-L../../
-SOURCES=selfcalib.cpp projdecompose.cpp
+SOURCES=selfcalib.cpp projdecompose.cpp focallength.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic 
 
