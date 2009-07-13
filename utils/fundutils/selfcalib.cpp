@@ -19,6 +19,7 @@
 #include "general.h"
 #include "HRprimitives.h"
 #include "projdecompose.h"
+#include "focallength.h"
 using namespace std;
 
 IplImage* img1;
@@ -100,6 +101,10 @@ printf("intrinsics matrix found was:\n");
 writeCVMatrix(cout,K );
 cout<<endl;
 
+
+double foc1,foc2;
+estimateFocalLengthStrum(F,400,500,foc1,foc2);
+
 cvReleaseMat(&T);
 cvReleaseMat(&R);
 cvReleaseMat(&K);
@@ -116,27 +121,4 @@ cvReleaseMat(&F);
 //     writeMatrixRaw(projectionCamPrev,3,4,"proj1_synth_data.txt");
 //     writeMatrixRaw(projectionCamCur,3,4,"proj2_synth_data.txt");
 //     writeMatrixRaw(intrinsicMatrix,3,3,"intrinsic_synth_data.txt");
-int  estimateFocalLengthStrum(const CvMat* pF)
-{
 
-
-
-    if(pF==NULL)
-    {
-     printf("****matrix is null\n");
-        return;
-
-    }
-
-    if ( pF->rows!=3 || pF->cols!=3 )
-    {
-        cout<<"fundamental matrix is the wrong size dudes"<<endl;
-        return;
-    }
-
-
-
-
-
-
-}
