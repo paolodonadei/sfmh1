@@ -428,6 +428,15 @@ MotionGeometry::~MotionGeometry()
     {
         cvReleaseMat(&MotionModel_H);
     }
+    if ( MotionModel_P1!=NULL)
+    {
+        cvReleaseMat(&MotionModel_P1);
+    }
+
+    if ( MotionModel_P2!=NULL)
+    {
+        cvReleaseMat(&MotionModel_P2);
+    }
 }
 
 /** @brief MotionGeometry
@@ -438,6 +447,8 @@ MotionGeometry::MotionGeometry()
 {
     MotionModel_F = cvCreateMat(3,3,CV_64FC1);
     MotionModel_H = cvCreateMat(3,3,CV_64FC1);
+    MotionModel_P1 = cvCreateMat(3,4,CV_64FC1);
+    MotionModel_P2 = cvCreateMat(3,4,CV_64FC1);
     motionError_F=0;//in pixels
     numOutlier_F=0;
     numInliers_F=0;

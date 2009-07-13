@@ -5,16 +5,16 @@
 		<Cursor position="15210" topLine="660" />
 	</File>
 	<File name="HRImage.hpp" open="1" top="0" tabpos="6">
-		<Cursor position="297" topLine="0" />
+		<Cursor position="269" topLine="0" />
 	</File>
-	<File name="HRprimitives.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="9530" topLine="437" />
+	<File name="HRprimitives.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="9305" topLine="740" />
 	</File>
-	<File name="HRprimitives.h" open="1" top="1" tabpos="7">
-		<Cursor position="779" topLine="0" />
+	<File name="HRprimitives.h" open="1" top="0" tabpos="7">
+		<Cursor position="941" topLine="42" />
 	</File>
 	<File name="Makefile" open="1" top="0" tabpos="13">
-		<Cursor position="312" topLine="0" />
+		<Cursor position="65" topLine="0" />
 	</File>
 	<File name="TODO" open="1" top="0" tabpos="9">
 		<Cursor position="414" topLine="5" />

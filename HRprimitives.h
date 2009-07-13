@@ -66,6 +66,8 @@ public:
     MotionGeometry & operator=(const MotionGeometry & rhs) throw();
     CvMat* MotionModel_F;
     CvMat* MotionModel_H;
+    CvMat* MotionModel_P1;
+    CvMat* MotionModel_P2;
     double motionError_F;//in pixels
     int numOutlier_F;
     int valid;
