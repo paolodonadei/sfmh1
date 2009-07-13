@@ -16,7 +16,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
+#include "general.h"
 #include "HRprimitives.h"
 #include "projdecompose.h"
 using namespace std;
@@ -54,8 +54,10 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
     char str[2000];
 
     int i=0;
+    int j=0;
 
-    while (!file_cm.eof() && i<12) //second check is redundant, being safe
+
+    while (!file_cm.eof() && j<3) //second check is redundant, being safe
     {
         file_cm.getline(str,2000);
 
@@ -65,20 +67,20 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
         ss.str(s);
 
         ss>>out;
-
-        (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
-
-        ss>>out;
-        (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
+	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
 
         ss>>out;
-        (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
+	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
+
+        ss>>out;
+	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
 
 
         ss>>out;
-        (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
+	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
 
-
+	j++;
+	i=0;
 
     }
 
@@ -86,10 +88,11 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
 
 int main(int argc, char *argv[])
 {
-    CvMat TT = cvMat(4, 1, CV_64F);
-    CvMat R = cvMat(3, 3, CV_64F);
-    CvMat K = cvMat(3, 3, CV_64F);
   
+    CvMat* T = cvCreateMat(4, 1, CV_64F);
+CvMat* R = cvCreateMat(3,3, CV_64F);
+CvMat* K = cvCreateMat(3,3, CV_64F);
+
 
     int i,j,k;
 
@@ -104,25 +107,40 @@ int main(int argc, char *argv[])
 
  fil_name1= argv[1] ;
 
-
-for(i = 0; i < 4; i++)
- cvmSet(&TT, i, 0, 1); // Solution is last row of V.
    
 MotionGeometry mymotion;
 readFfromfile(&mymotion.MotionModel_P1,fil_name1);
 
 
 printf("projection matrix read was\n");
-    for (i=0;i<12;i++)
-        cout<<" \t"<<mymotion.MotionModel_P1->data.fl[i];
-    cout<<endl;
+writeCVMatrix(cout,mymotion.MotionModel_P1 );
+cout<<endl;
 
-printf("finished reading\n");
 
-    cvDecomposeProjectionMatrix(mymotion.MotionModel_P1, &K, &R,&TT, 0, 0, 0, 0);
+cvDecomposeProjectionMatrix(mymotion.MotionModel_P1, K, R,T, 0, 0, 0, 0);
   
 
 
+printf("rotation matrix found was:\n");
+writeCVMatrix(cout,R );
+cout<<endl;
+
+
+
+printf("translation matrix found was:\n");
+writeCVMatrix(cout,T );
+cout<<endl;
+
+
+
+
+printf("intrinsics matrix found was:\n");
+writeCVMatrix(cout,K );
+cout<<endl;
+
+cvReleaseMat(&T);
+cvReleaseMat(&R);
+cvReleaseMat(&K);
     return 0;
 }
 
