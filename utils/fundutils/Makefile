@@ -1,11 +1,11 @@
 CC=g++
-CFLAGS=-c -g -Wall  `pkg-config --cflags opencv`
-LIBS=-lm  `pkg-config --libs opencv`
-LDFLAGS=
-SOURCES=funddraw.cpp
+INC = -I../../
+CFLAGS=$(INC) -c -g -Wall  `pkg-config --cflags opencv`
+LIBS=-lm  `pkg-config --libs opencv` -lhrlib -lboost_filesystem
+LDFLAGS=-L../../
+SOURCES=intrinsics.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=funddraw
-
+EXECUTABLE=intrinsic 
 
 
 all: $(EXECUTABLE)
