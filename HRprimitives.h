@@ -9,6 +9,7 @@
 #include "HRImage.hpp"
 #include "general.h"
 
+
 class HRImage;
 
 using namespace std;
@@ -24,6 +25,21 @@ struct matchIndex
 } ;
 
 
+class HRFeature
+{
+public:
+    HRFeature();
+    ~HRFeature();
+    HRFeature(int x,int y);
+    CvPoint2D32f location;
+    vector<double> descriptor;
+    double pvi;
+    bool valid;
+    float scale, ori;           /* Scale and orientation for sift (range [-PI,PI]) */
+
+};
+
+typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 
 class MotionGeometry
 {
@@ -85,20 +101,6 @@ public:
     HRCorrespond2N(const HRCorrespond2N& rec);
     HRCorrespond2N& operator=(const HRCorrespond2N & rhs) throw();
 
-
-};
-
-class HRFeature
-{
-public:
-    HRFeature();
-    ~HRFeature();
-    HRFeature(int x,int y);
-    CvPoint2D32f location;
-    vector<double> descriptor;
-    double pvi;
-    bool valid;
-    float scale, ori;           /* Scale and orientation for sift (range [-PI,PI]) */
 
 };
 
