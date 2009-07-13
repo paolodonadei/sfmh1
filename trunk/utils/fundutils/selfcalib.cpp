@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "HRprimitives.h"
+#include "projdecompose.h"
 using namespace std;
 
 IplImage* img1;
@@ -54,7 +55,7 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
 
     int i=0;
 
-    while (!file_cm.eof() && i<9) //second check is redundant, being safe
+    while (!file_cm.eof() && i<12) //second check is redundant, being safe
     {
         file_cm.getline(str,2000);
 
@@ -74,6 +75,9 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
         (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
 
 
+        ss>>out;
+        (*tmodel)->data.fl[i++]=from_string<float>(out, std::dec);
+
 
 
     }
@@ -82,7 +86,9 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
 
 int main(int argc, char *argv[])
 {
-
+    CvMat TT = cvMat(4, 1, CV_64F);
+    CvMat R = cvMat(3, 3, CV_64F);
+    CvMat K = cvMat(3, 3, CV_64F);
   
 
     int i,j,k;
@@ -99,17 +105,32 @@ int main(int argc, char *argv[])
  fil_name1= argv[1] ;
 
 
-    
+for(i = 0; i < 4; i++)
+ cvmSet(&TT, i, 0, 1); // Solution is last row of V.
    
 MotionGeometry mymotion;
-readFfromfile(&mymotion.MotionModel_F,fil_name1);
+readFfromfile(&mymotion.MotionModel_P1,fil_name1);
 
-    for (i=0;i<9;i++)
-        cout<<" \t"<<mymotion.MotionModel_F->data.fl[i];
+
+printf("projection matrix read was\n");
+    for (i=0;i<12;i++)
+        cout<<" \t"<<mymotion.MotionModel_P1->data.fl[i];
     cout<<endl;
+
+printf("finished reading\n");
+
+    cvDecomposeProjectionMatrix(mymotion.MotionModel_P1, &K, &R,&TT, 0, 0, 0, 0);
+  
 
 
     return 0;
 }
 
 
+
+
+//     writeMatrixRaw(translationMatrix2,3,1,"trans_synth_data.txt");
+//     writeMatrixRaw(rotationMatrix2,3,3,"rotation_synth_data.txt");
+//     writeMatrixRaw(projectionCamPrev,3,4,"proj1_synth_data.txt");
+//     writeMatrixRaw(projectionCamCur,3,4,"proj2_synth_data.txt");
+//     writeMatrixRaw(intrinsicMatrix,3,3,"intrinsic_synth_data.txt");
