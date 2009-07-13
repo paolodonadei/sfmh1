@@ -37,87 +37,49 @@ MotionType MotionType;
 
 
 
-
-void readFfromfile(CvMat** tmodel,const string& mfname)
-{
-//this function is not very error resilient, it will crash and burn if the data file is not the right format
-    string fname(mfname);
-
-
-    fstream file_cm(fname.c_str(),ios::in);
-    if (!file_cm.is_open())
-    {
-        cout << "File +" <<  fname << "+ does not exist" << endl;
-        exit(1);
-    }
-
-    char str[2000];
-
-    int i=0;
-    int j=0;
-
-
-    while (!file_cm.eof() && j<3) //second check is redundant, being safe
-    {
-        file_cm.getline(str,2000);
-
-        string s(str);
-        string out;
-        istringstream ss;
-        ss.str(s);
-
-        ss>>out;
-	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
-
-        ss>>out;
-	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
-
-        ss>>out;
-	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
-
-
-        ss>>out;
-	cvmSet((*tmodel),j,i++, from_string<float>(out, std::dec));
-
-	j++;
-	i=0;
-
-    }
-
-}
-
 int main(int argc, char *argv[])
 {
   
     CvMat* T = cvCreateMat(4, 1, CV_64F);
 CvMat* R = cvCreateMat(3,3, CV_64F);
 CvMat* K = cvCreateMat(3,3, CV_64F);
+CvMat* P1 = cvCreateMat(3,4, CV_64F);
+CvMat* F = cvCreateMat(3,3, CV_64F);
 
 
     int i,j,k;
 
     if (argc<2)
     {
-        printf("Usage: main <projection matrix>\n\7");
+        printf("Usage: main <projection matrix> [fundamental matrix]\n\7");
         exit(0);
     }
 
  
 
 
- fil_name1= argv[1] ;
+    fil_name1= argv[1] ;
+    readCvMatFfromfile(&P1,fil_name1);
+    
 
-   
-MotionGeometry mymotion;
-readFfromfile(&mymotion.MotionModel_P1,fil_name1);
+    if (argc==3)
+    {
 
+    fil_name1= argv[2] ;
+    readCvMatFfromfile(&F,fil_name1);
+
+    printf("Fundamental matrix read was\n");
+    writeCVMatrix(cout,F );
+    cout<<endl;
+
+    }
 
 printf("projection matrix read was\n");
-writeCVMatrix(cout,mymotion.MotionModel_P1 );
+writeCVMatrix(cout,P1 );
 cout<<endl;
 
 
-cvDecomposeProjectionMatrix(mymotion.MotionModel_P1, K, R,T, 0, 0, 0, 0);
+cvDecomposeProjectionMatrix(P1, K, R,T, 0, 0, 0, 0);
   
 
 
@@ -141,6 +103,8 @@ cout<<endl;
 cvReleaseMat(&T);
 cvReleaseMat(&R);
 cvReleaseMat(&K);
+cvReleaseMat(&P1);
+cvReleaseMat(&F);
     return 0;
 }
 
