@@ -29,3 +29,9 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
 int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height);
 
 int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
+
+
+
+int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
+   int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
+   int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
