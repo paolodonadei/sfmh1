@@ -103,7 +103,7 @@ cout<<endl;
 
 
 double foc1,foc2;
-estimateFocalLengthStrum(F,400,500,foc1,foc2);
+estimateFocalLengthStrum(F,256*2,256*2,foc1,foc2);
 
 cvReleaseMat(&T);
 cvReleaseMat(&R);
