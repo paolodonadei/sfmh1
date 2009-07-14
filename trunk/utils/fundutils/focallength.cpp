@@ -23,7 +23,7 @@
 #include "HRprimitives.h"
 #include "projdecompose.h"
 #include "focallength.h"
-const double typicalF= 7000;
+const double typicalF= 1.0;
 
 using namespace std;
 /* Copyright (C) 1978-1999 Ken Turkowski. <turk@computer.org>
@@ -132,6 +132,7 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
 
     status = createPseudoFundMatrix(pF,G,width, height);
 
+
     cvSVD( G, W,  U, V );
     status= solveFfromUVW(foc1, foc2,U,V,W);
 
@@ -191,6 +192,7 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
     cvMatMul(leftMatr,pF , Gtemp1);   // Ma*Mb   -> Mc
     cvMatMul(Gtemp1,rightMatr , Gtemp2);   // Ma*Mb   -> Mc
 
+
 //now multiply by some random F value
 
     cvSetIdentity(rightMatr);
@@ -207,11 +209,12 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
 
 
 //normalizing the forbenius norm
-    double norm = cvNorm( Gtemp2, 0, CV_L2 );
+    double norm =cvNorm( Gtemp2, 0, CV_L2 );
     norm = ((double)1.0)/norm;
     cvConvertScale( Gtemp2,Gtemp1,norm );
 
 
+    cvConvertScale( Gtemp1,pG,((double)1.0) );
 
     cvReleaseMat(&leftMatr);
     cvReleaseMat(&rightMatr);
@@ -239,6 +242,18 @@ int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const 
     printf("focal length accordign to Q is %f \n",f1_q);
 
 
+
+//all for debugging
+    CvMat* AA = cvCreateMat(3,3, CV_64F);
+    CvMat* BB = cvCreateMat(3,3, CV_64F);
+    CvMat* CC = cvCreateMat(3,3, CV_64F);
+
+
+    cvMatMul(pU,pW ,AA);   // Ma*Mb   -> Mc
+    cvTranspose(pV, BB);      // transpose(Ma) -> Mb 
+    cvMatMul(AA,BB ,CC);   // Ma*Mb   -> Mc
+    
+    
 
     return 0;
 }
@@ -304,6 +319,8 @@ int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
     double top=-U31*V32*((a*U31*V31)+(b*U32*V32));
     double bottom=(a*V31*V32*(1-(U31*U31)))+(b*U31*U32*(1-(V32*V32)));
+    
+    printf("top is %f and bottomn is %f\n",top,bottom);
     
     f=top/bottom;
     
