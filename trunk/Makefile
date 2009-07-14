@@ -7,9 +7,11 @@ OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a
 
-lib: $(PROJECT)
+
 
 all: $(EXECUTABLE)
+
+lib: $(PROJECT)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
