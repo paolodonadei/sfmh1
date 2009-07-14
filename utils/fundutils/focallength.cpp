@@ -23,7 +23,7 @@
 #include "HRprimitives.h"
 #include "projdecompose.h"
 #include "focallength.h"
-const double typicalF= 1.0;
+const double typicalF= 7000.0;
 
 using namespace std;
 /* Copyright (C) 1978-1999 Ken Turkowski. <turk@computer.org>
@@ -111,7 +111,10 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
     foc1=foc2=0;
     CvMat* G = cvCreateMat(3,3, CV_64F);
     CvMat* U = cvCreateMat(3,3, CV_64F);
+    CvMat* UT = cvCreateMat(3,3, CV_64F);
+
     CvMat* V = cvCreateMat(3,3, CV_64F);
+    CvMat* VT = cvCreateMat(3,3, CV_64F);
     CvMat* W = cvCreateMat(3,3, CV_64F);
 
 
@@ -133,7 +136,16 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
     status = createPseudoFundMatrix(pF,G,width, height);
 
 
-    cvSVD( G, W,  U, V );
+    //printf("G matrix read was\n");
+    //writeCVMatrix(cout,G );
+
+
+
+    cvSVD( G, W,  U, V );  //change all of the below back to U
+
+    
+
+
     status= solveFfromUVW(foc1, foc2,U,V,W);
 
 
@@ -143,6 +155,9 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
     cvReleaseMat(&G);
     cvReleaseMat(&U);
     cvReleaseMat(&V);
+    cvReleaseMat(&VT);
+    cvReleaseMat(&UT);
+
     cvReleaseMat(&W);
 
     return 0;
@@ -264,30 +279,46 @@ int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 {
     double f=0;
     
-    double a,b,U31,U32,U33,V31,V32,V33;
+    double a,b,U31,U32,V31,V32;
+
+    a    =  cvmGet( pW, 0,0 )  ;
+    b =  cvmGet( pW, 1,1 )  ;
+
+ //    printf("a is %f and b is %f \n",a,b);
+
+
+//     printf("W matrix read was\n");
+//     writeCVMatrix(cout,pW );
+
+
+//     printf("V matrix read was\n");
+//     writeCVMatrix(cout,pV );
+
+
+//     printf("U matrix read was\n");
+//     writeCVMatrix(cout,pU );
+
+
 
     a    =  cvmGet( pW, 0,0 )  ;
     b =  cvmGet( pW, 1,1 )  ;
     U31 =  cvmGet( pU, 2,0 )  ;
     U32 =  cvmGet( pU, 2,1 )  ;
-    U33 =  cvmGet( pU, 2,2 )  ;
     V31 =  cvmGet( pV, 2,0 )  ;
     V32 =  cvmGet( pV, 2,1 )  ;
-    V33 =  cvmGet( pV, 2,2 )  ;
-
 
 
     double top=-U32*V31*((a*U31*V31)+(b*U32*V32));
     double bottom=(a*U31*U32*(1-(V31*V31)))+(b*V31*V32*(1-(U32*U32)));
-    
+
     f=top/bottom;
-    
+    //   printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);    
 
     f=sqrt(f);
 
     //undoing the efffects of the multiplication by the typical f
     f*=typicalF;
-    f*=typicalF;
+
 
     
     F1=F2=f;
@@ -304,31 +335,30 @@ int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
     double f=0;
     
-    double a,b,U31,U32,U33,V31,V32,V33;
+    double a,b,U31,U32,V31,V32;
 
     a    =  cvmGet( pW, 0,0 )  ;
     b =  cvmGet( pW, 1,1 )  ;
     U31 =  cvmGet( pU, 2,0 )  ;
     U32 =  cvmGet( pU, 2,1 )  ;
-    U33 =  cvmGet( pU, 2,2 )  ;
     V31 =  cvmGet( pV, 2,0 )  ;
     V32 =  cvmGet( pV, 2,1 )  ;
-    V33 =  cvmGet( pV, 2,2 )  ;
+
 
 
 
     double top=-U31*V32*((a*U31*V31)+(b*U32*V32));
     double bottom=(a*V31*V32*(1-(U31*U31)))+(b*U31*U32*(1-(V32*V32)));
     
-    printf("top is %f and bottomn is %f\n",top,bottom);
+
     
     f=top/bottom;
     
-
+    //  printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);    
     f=sqrt(f);
     //undoing the efffects of the multiplication by the typical f
     f*=typicalF;
-    f*=typicalF;
+
 
     
     F1=F2=f;
@@ -347,19 +377,22 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
     double f=0;
     
-    double a,b,U31,U32,U33,V31,V32,V33;
+    double a,b,U31,U32,V31,V32;
 
     a    =  cvmGet( pW, 0,0 )  ;
     b =  cvmGet( pW, 1,1 )  ;
     U31 =  cvmGet( pU, 2,0 )  ;
     U32 =  cvmGet( pU, 2,1 )  ;
-    U33 =  cvmGet( pU, 2,2 )  ;
     V31 =  cvmGet( pV, 2,0 )  ;
     V32 =  cvmGet( pV, 2,1 )  ;
-    V33 =  cvmGet( pV, 2,2 )  ;
+      
     
-    double AQ,BQ,CQ;
+    //   printf("a is %f and b is %f and U31 is %f and U32 is %f and V31 is %f and V32 is %f\n",a,b,U31,U32,V31,V32);
 
+
+
+    double AQ,BQ,CQ;
+    
     AQ=(a*a*(1.0-(U31*U31))*(1.0-(V31*V31)))-(b*b*(1.0-(U32*U32))*(1.0-(V32*V32)));
     
     
