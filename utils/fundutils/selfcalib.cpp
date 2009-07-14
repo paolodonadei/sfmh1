@@ -47,12 +47,16 @@ CvMat* K = cvCreateMat(3,3, CV_64F);
 CvMat* P1 = cvCreateMat(3,4, CV_64F);
 CvMat* F = cvCreateMat(3,3, CV_64F);
 
+double width,height;
 
-    int i,j,k;
+height=width=256.0*2.0;
+    
+
+int i,j,k;
 
     if (argc<2)
     {
-        printf("Usage: main <projection matrix> [fundamental matrix]\n\7");
+        printf("Usage: main <projection matrix> [fundamental matrix] [width] [height]\n\7");
         exit(0);
     }
 
@@ -63,7 +67,7 @@ CvMat* F = cvCreateMat(3,3, CV_64F);
     readCvMatFfromfile(&P1,fil_name1);
     
 
-    if (argc==3)
+    if (argc>2)
     {
 
     fil_name1= argv[2] ;
@@ -74,6 +78,14 @@ CvMat* F = cvCreateMat(3,3, CV_64F);
     cout<<endl;
 
     }
+
+if (argc>3)
+{
+    
+width=  atof(argv[3] );
+height=  atof(argv[4] );
+
+}
 
 printf("projection matrix read was\n");
 writeCVMatrix(cout,P1 );
@@ -103,7 +115,7 @@ cout<<endl;
 
 
 double foc1,foc2;
-estimateFocalLengthStrum(F,256*2,256*2,foc1,foc2);
+estimateFocalLengthStrum(F,width,height,foc1,foc2);
 
 cvReleaseMat(&T);
 cvReleaseMat(&R);

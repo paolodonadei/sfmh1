@@ -262,6 +262,10 @@ tmpMatrixM = cvCreateMat(3, 3, CV_64F);
 
     cvRQDecomp3x3(tmpMatrixM, calibMatr, rotMatr, rotMatrX, rotMatrY, rotMatrZ, eulerAngles);
 
+    double lastel=cvmGet(calibMatr, 2, 2);
+    for(i = 0; i < 3; i++)
+        for(k = 0; k < 3; k++)
+	    cvmSet(calibMatr, i, k, cvmGet(calibMatr, i, k)/lastel);
 
 
     cvReleaseMat(&tmpProjMatr);
