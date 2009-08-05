@@ -157,7 +157,7 @@ void CvHomographyEstimator::computeReprojError( const CvMat* m1, const CvMat* m2
 
 bool CvHomographyEstimator::refine( const CvMat* m1, const CvMat* m2, CvMat* model, int maxIters )
 {
-    CvLevMarq solver(8, 0, cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, maxIters, DBL_EPSILON));
+    CvLevMarqHR solver(8, 0, cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, maxIters, DBL_EPSILON));
     int i, j, k, count = m1->rows*m1->cols;
     const CvPoint2D64f* M = (const CvPoint2D64f*)m1->data.ptr;
     const CvPoint2D64f* m = (const CvPoint2D64f*)m2->data.ptr;

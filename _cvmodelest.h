@@ -48,18 +48,33 @@
 #include <cv.h>
 #include <highgui.h>
 
+#ifdef __GNUC__
+    #undef alloca
+    #define alloca __builtin_alloca
+#elif defined WIN32 || defined WIN64
+    #if defined _MSC_VER || defined __BORLANDC__
+        #include <malloc.h>
+    #endif
+#elif defined HAVE_ALLOCA_H
+    #include <alloca.h>
+#elif defined HAVE_ALLOCA
+    #include <stdlib.h>
+#elif
+    #error
+#endif
+
 #define  CV_MALLOC_ALIGN    32
 #define cvStackAlloc(size) cvAlignPtr( alloca((size) + CV_MALLOC_ALIGN), CV_MALLOC_ALIGN )
 void cvConvertPointsHomogeneous( const CvMat* src, CvMat* dst );
 
-CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR CV_DEFAULT(0) );
-struct CV_EXPORTS CvLevMarq
+CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR );
+struct CV_EXPORTS CvLevMarqHR
 {
-    CvLevMarq();
-    CvLevMarq( int nparams, int nerrs, CvTermCriteria criteria=
+    CvLevMarqHR();
+    CvLevMarqHR( int nparams, int nerrs, CvTermCriteria criteria=
         cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,DBL_EPSILON),
         bool completeSymmFlag=false );
-    ~CvLevMarq();
+    ~CvLevMarqHR();
     void init( int nparams, int nerrs, CvTermCriteria criteria=
         cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,DBL_EPSILON),
         bool completeSymmFlag=false );
