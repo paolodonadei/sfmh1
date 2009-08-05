@@ -32,10 +32,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="C:\Program Files\OpenCV\cv\include" />
-			<Add directory="C:\Program Files\OpenCV\cvaux\include" />
-			<Add directory="C:\Program Files\OpenCV\cxcore\include" />
-			<Add directory="C:\Program Files\OpenCV\otherlibs\highgui" />
+			<Add directory="$(#opencv)\cv\include" />
+			<Add directory="$(#opencv)\cvaux\include" />
+			<Add directory="$(#opencv)\cxcore\include" />
+			<Add directory="$(#opencv)\otherlibs\highgui" />
 		</Compiler>
 		<Linker>
 			<Add option="-lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system" />
