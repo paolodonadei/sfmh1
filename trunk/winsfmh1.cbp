@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="sfmh1" />
+		<Option pch_mode="2" />
+		<Option compiler="cygwin" />
+		<MakeCommands>
+			<Build command="$make " />
+			<CompileFile command="$make " />
+			<Clean command="$make clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+		</MakeCommands>
+		<Build>
+			<Target title="Debug">
+				<Option output="sfmh1" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\sfmh1" />
+				<Option object_output="..\sfmh1" />
+				<Option type="1" />
+				<Option compiler="cygwin" />
+				<Option parameters=" -D ~/Desktop/data/reduced/ " />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make " />
+					<CompileFile command="$make " />
+					<Clean command="$make clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="C:\Program Files\OpenCV\cv\include" />
+			<Add directory="C:\Program Files\OpenCV\cvaux\include" />
+			<Add directory="C:\Program Files\OpenCV\cxcore\include" />
+			<Add directory="C:\Program Files\OpenCV\otherlibs\highgui" />
+		</Compiler>
+		<Linker>
+			<Add option="-lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system" />
+			<Add directory="C:\Program Files\OpenCV\lib" />
+		</Linker>
+		<Unit filename="HRImage.cpp" />
+		<Unit filename="HRImage.hpp" />
+		<Unit filename="HRprimitives.cpp" />
+		<Unit filename="HRprimitives.h" />
+		<Unit filename="Makefile">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="TODO">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="_cvmodelest.h" />
+		<Unit filename="argproc.cpp" />
+		<Unit filename="argproc.h" />
+		<Unit filename="cvfundam.cpp" />
+		<Unit filename="cvmodelest.cpp" />
+		<Unit filename="general.cpp" />
+		<Unit filename="general.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="matching.cpp" />
+		<Unit filename="matching.hpp" />
+		<Unit filename="pgmutils.cpp" />
+		<Unit filename="pgmutils.hpp" />
+		<Unit filename="sift.cpp" />
+		<Unit filename="sift.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

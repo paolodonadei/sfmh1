@@ -397,7 +397,7 @@ bool CvModelEstimator2::checkSubset( const CvMat* m, int count )
 }
 //////////////////////////////////////////////////////////////////
 
-CvLevMarq::CvLevMarq()
+CvLevMarqHR::CvLevMarqHR()
 {
     mask = prevParam = param = J = err = JtJ = JtJN = JtErr = JtJV = JtJW = 0;
     lambdaLg10 = 0; state = DONE;
@@ -406,13 +406,13 @@ CvLevMarq::CvLevMarq()
     completeSymmFlag = false;
 }
 
-CvLevMarq::CvLevMarq( int nparams, int nerrs, CvTermCriteria criteria0, bool _completeSymmFlag )
+CvLevMarqHR::CvLevMarqHR( int nparams, int nerrs, CvTermCriteria criteria0, bool _completeSymmFlag )
 {
     mask = prevParam = param = J = err = JtJ = JtJN = JtErr = JtJV = JtJW = 0;
     init(nparams, nerrs, criteria0, _completeSymmFlag);
 }
 
-void CvLevMarq::clear()
+void CvLevMarqHR::clear()
 {
     cvReleaseMat(&mask);
     cvReleaseMat(&prevParam);
@@ -426,12 +426,12 @@ void CvLevMarq::clear()
     cvReleaseMat(&JtJW);
 }
 
-CvLevMarq::~CvLevMarq()
+CvLevMarqHR::~CvLevMarqHR()
 {
     clear();
 }
 
-void CvLevMarq::init( int nparams, int nerrs, CvTermCriteria criteria0, bool _completeSymmFlag )
+void CvLevMarqHR::init( int nparams, int nerrs, CvTermCriteria criteria0, bool _completeSymmFlag )
 {
     if( !param || param->rows != nparams || nerrs != (err ? err->rows : 0) )
         clear();
@@ -465,7 +465,7 @@ void CvLevMarq::init( int nparams, int nerrs, CvTermCriteria criteria0, bool _co
     completeSymmFlag = _completeSymmFlag;
 }
 
-bool CvLevMarq::update( const CvMat*& _param, CvMat*& _J, CvMat*& _err )
+bool CvLevMarqHR::update( const CvMat*& _param, CvMat*& _J, CvMat*& _err )
 {
     double change;
 
@@ -536,7 +536,7 @@ bool CvLevMarq::update( const CvMat*& _param, CvMat*& _J, CvMat*& _err )
 }
 
 
-bool CvLevMarq::updateAlt( const CvMat*& _param, CvMat*& _JtJ, CvMat*& _JtErr, double*& _errNorm )
+bool CvLevMarqHR::updateAlt( const CvMat*& _param, CvMat*& _JtJ, CvMat*& _JtErr, double*& _errNorm )
 {
     double change;
 
@@ -603,7 +603,7 @@ bool CvLevMarq::updateAlt( const CvMat*& _param, CvMat*& _JtJ, CvMat*& _JtErr, d
     return true;
 }
 
-void CvLevMarq::step()
+void CvLevMarqHR::step()
 {
     const double LOG10 = log(10.);
     double lambda = exp(lambdaLg10*LOG10);
