@@ -1,0 +1,28 @@
+CC=g++
+
+INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
+CFLAGS=$(INC) -c -g -Wall
+LIBS=-lm -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system
+LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
+SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=sfmh1
+PROJECT = libhrlib.a
+
+
+all: $(EXECUTABLE)
+
+lib: $(PROJECT)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
+
+$(PROJECT): $(OBJECTS)
+	ar rcs  $(PROJECT) $(OBJECTS)
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+clean:
+	del -f *.o core *.core $(EXECUTABLE).exe $(PROJECT) *~
+
