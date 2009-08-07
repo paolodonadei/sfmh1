@@ -1,0 +1,21 @@
+CC=g++
+
+INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
+CFLAGS=$(INC) -c -g -Wall  
+LIBS=-lm  -L'$(OPENCV_HOME)\lib' -lhrlib  -I'$(BOOST_HOME)\bin' -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system
+LDFLAGS=-L../../
+SOURCES=selfcalib.cpp projdecompose.cpp focallength.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=intrinsic
+
+
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+clean:
+	del -f *.o core *.core $(EXECUTABLE).exe *~
+
