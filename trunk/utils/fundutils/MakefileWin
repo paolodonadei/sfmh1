@@ -1,0 +1,21 @@
+CC=g++
+
+INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' 
+CFLAGS=$(INC) -c -g -Wall  
+LIBS=-lm   -lhighgui -lcxcore -lcv 
+LDFLAGS=-L'$(OPENCV_HOME)\lib'
+SOURCES=funddraw.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=funddraw
+
+
+all: $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+clean:
+	rm -f *.o core *.core $(EXECUTABLE).exe *~
+
