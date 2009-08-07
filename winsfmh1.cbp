@@ -13,10 +13,10 @@
 		</MakeCommands>
 		<Build>
 			<Target title="Debug">
-				<Option output="sfmh1" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="..\sfmh1" />
+				<Option output="libhrlib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
 				<Option object_output="..\sfmh1" />
-				<Option type="1" />
+				<Option type="2" />
 				<Option compiler="cygwin" />
 				<Option parameters=" -D ~/Desktop/data/reduced/ " />
 				<Compiler>
