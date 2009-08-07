@@ -40,7 +40,7 @@ MotionType MotionType;
 
 int main(int argc, char *argv[])
 {
-  
+
     CvMat* T = cvCreateMat(4, 1, CV_64F);
 CvMat* R = cvCreateMat(3,3, CV_64F);
 CvMat* K = cvCreateMat(3,3, CV_64F);
@@ -50,7 +50,7 @@ CvMat* F = cvCreateMat(3,3, CV_64F);
 double width,height;
 
 height=width=256.0*2.0;
-    
+
 
 int i,j,k;
 
@@ -60,12 +60,12 @@ int i,j,k;
         exit(0);
     }
 
- 
+
 
 
     fil_name1= argv[1] ;
     readCvMatFfromfile(&P1,fil_name1);
-    
+
 
     if (argc>2)
     {
@@ -81,7 +81,7 @@ int i,j,k;
 
 if (argc>3)
 {
-    
+
 width=  atof(argv[3] );
 height=  atof(argv[4] );
 
@@ -92,8 +92,8 @@ writeCVMatrix(cout,P1 );
 cout<<endl;
 
 
-cvDecomposeProjectionMatrix(P1, K, R,T, 0, 0, 0, 0);
-  
+cvDecomposeProjectionMatrixHR(P1, K, R,T, 0, 0, 0, 0);
+
 
 
 printf("rotation matrix found was:\n");
@@ -114,8 +114,8 @@ writeCVMatrix(cout,K );
 cout<<endl;
 
 
-double foc1,foc2;
-estimateFocalLengthStrum(F,width,height,foc1,foc2);
+double foc;
+estimateFocalLengthStrum(F,width,height,foc);
 
 cvReleaseMat(&T);
 cvReleaseMat(&R);

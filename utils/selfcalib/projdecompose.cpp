@@ -21,7 +21,7 @@ using namespace std;
 
 void cvRQDecomp3x3( const CvMat *matrixM, CvMat *matrixR, CvMat *matrixQ, CvMat *matrixQx, CvMat *matrixQy, CvMat *matrixQz, CvPoint3D64f *eulerAngles)
 {
-    
+
     double _M[3][3], _R[3][3], _Q[3][3];
     CvMat M = cvMat(3, 3, CV_64F, _M);
     CvMat R = cvMat(3, 3, CV_64F, _R);
@@ -187,11 +187,11 @@ void cvRQDecomp3x3( const CvMat *matrixM, CvMat *matrixR, CvMat *matrixQ, CvMat 
         cvConvert(&Qz, matrixQz);
     }
 
-    
+
 }
 
 
-void cvDecomposeProjectionMatrix( const CvMat *projMatr, CvMat *calibMatr,
+void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                              CvMat *rotMatr, CvMat *posVect,
                              CvMat *rotMatrX, CvMat *rotMatrY,
                              CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
@@ -202,7 +202,7 @@ void cvDecomposeProjectionMatrix( const CvMat *projMatr, CvMat *calibMatr,
     CvMat *tmpMatrixV = 0;
     CvMat *tmpMatrixM = 0;
 
-    ///CV_FUNCNAME("cvDecomposeProjectionMatrix");
+    ///CV_FUNCNAME("cvDecomposeProjectionMatrixHR");
 
 
     /* Validate parameters. */

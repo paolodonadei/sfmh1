@@ -24,7 +24,7 @@
 
 using namespace std;
 
-int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc1, double& foc2);
+int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc);
 
 int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height);
 

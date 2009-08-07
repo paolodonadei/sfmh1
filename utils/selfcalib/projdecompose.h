@@ -15,16 +15,11 @@
 #ifdef CV_NO_FUNC_NAMES
     #define CV_FUNCNAME( Name )
     #define cvFuncName ""
-#else    
+#else
     #define CV_FUNCNAME( Name )  \
     static char cvFuncName[] = Name
 #endif
 
 /* Computes projection matrix decomposition */
-CVAPI(void) cvDecomposeProjectionMatrix( const CvMat *projMatr, CvMat *calibMatr,
-                                         CvMat *rotMatr, CvMat *posVect,
-                                         CvMat *rotMatrX CV_DEFAULT(NULL),
-                                         CvMat *rotMatrY CV_DEFAULT(NULL),
-                                         CvMat *rotMatrZ CV_DEFAULT(NULL),
-                                         CvPoint3D64f *eulerAngles CV_DEFAULT(NULL));
+CVAPI(void) cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr, CvMat *rotMatr, CvMat *posVect, CvMat *rotMatrX CV_DEFAULT(NULL), CvMat *rotMatrY CV_DEFAULT(NULL), CvMat *rotMatrZ CV_DEFAULT(NULL), CvPoint3D64f *eulerAngles CV_DEFAULT(NULL));
 

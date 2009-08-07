@@ -30,7 +30,7 @@ using namespace std;
 
 enum SELFCALIBMETHOD{STRUM, POLLEFEY, HARTLEY};
 
-int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,enum SELFCALIBMETHOD)
+int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method)
 {
   if(pF==NULL ||K1==NULL || K2==NULL  )
     {
@@ -45,47 +45,47 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
       return -1;
     }
 
-  if(SELFCALIBMETHOD==STRUM)
+  if(method==STRUM)
     {
       if(width1!=width2 || height1!=height2)
 	{
 	  cout<<"using the strum method both images need to have the same size"<<endl;
 	}
-      
+
       double foc;
       estimateFocalLengthStrum(pF,width1,height1,foc);
 
       cvSetIdentity(K1);
-      
-      
+
+
       cvmSet(K1, 0, 0, foc);
       cvmSet(K1, 1, 1, foc);
       cvmSet(K1, 0, 2, ((double)(width1/2.00)));
       cvmSet(K1, 1, 2, ((double)(height1/2.00)));
-      
+
       cvCopy(K1,K2);
-      
+
     }
-  
-  if(SELFCALIBMETHOD==POLLEFEY)
+
+  if(method==POLLEFEY)
     {
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     }
-  if(SELFCALIBMETHOD==HARTLEY)
+  if(method==HARTLEY)
     {
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
     }
-  
+
 
 }
 
@@ -177,7 +177,7 @@ int FindQuadraticRoots(const FLOAT coeff[3], FLOAT re[2], FLOAT im[2])
 int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc)
 {
 
-  double foc1=foc2=0;
+
   CvMat* G = cvCreateMat(3,3, CV_64F);
   CvMat* U = cvCreateMat(3,3, CV_64F);
   CvMat* UT = cvCreateMat(3,3, CV_64F);
@@ -212,9 +212,9 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
 
   cvSVD( G, W,  U, V );  //change all of the below back to U
 
-    
 
 
+	double foc1,foc2;
   status= solveFfromUVW(foc1, foc2,U,V,W);
 
   foc=foc1;
@@ -241,7 +241,7 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
   CvMat* rightMatr = cvCreateMat(3,3, CV_64F);
 
 
-    
+
   double ux, vy, skew;
 
   //determinig skew and camera center (this should be known, but here we simply them)
@@ -252,10 +252,10 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
   skew=((double)1.0);
 
   printf("ux is %f and vy is %f \n",ux,vy);
-  cvSetZero(leftMatr); 
-  cvSetZero(rightMatr); 
-  cvSetZero(Gtemp1); 
-  cvSetZero(Gtemp2); 
+  cvSetZero(leftMatr);
+  cvSetZero(rightMatr);
+  cvSetZero(Gtemp1);
+  cvSetZero(Gtemp2);
   cvSetZero(standMatrix);
 
   //left one
@@ -284,7 +284,7 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
 
   cvmSet(rightMatr, 0, 0,typicalF );
   cvmSet(rightMatr, 1, 1,typicalF);
-   
+
 
 
 
@@ -336,7 +336,7 @@ int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const 
 int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW)
 {
   double f=0;
-    
+
   double a,b,U31,U32,V31,V32;
 
   a    =  cvmGet( pW, 0,0 )  ;
@@ -370,7 +370,7 @@ int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
   double bottom=(a*U31*U32*(1-(V31*V31)))+(b*V31*V32*(1-(U32*U32)));
 
   f=top/bottom;
-  //   printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);    
+  //   printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);
 
   f=sqrt(f);
 
@@ -378,9 +378,9 @@ int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
   f*=typicalF;
 
 
-    
+
   F1=F2=f;
-   
+
   return 0;
 }
 
@@ -392,7 +392,7 @@ int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
 
   double f=0;
-    
+
   double a,b,U31,U32,V31,V32;
 
   a    =  cvmGet( pW, 0,0 )  ;
@@ -407,18 +407,18 @@ int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
   double top=-U31*V32*((a*U31*V31)+(b*U32*V32));
   double bottom=(a*V31*V32*(1-(U31*U31)))+(b*U31*U32*(1-(V32*V32)));
-    
 
-    
+
+
   f=top/bottom;
-    
-  //  printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);    
+
+  //  printf("top is %f and bottomn is %f and f2 is %f\n",top,bottom,f);
   f=sqrt(f);
   //undoing the efffects of the multiplication by the typical f
   f*=typicalF;
 
 
-    
+
   F1=F2=f;
 
   return 0;
@@ -434,7 +434,7 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
 
   double f=0;
-    
+
   double a,b,U31,U32,V31,V32;
 
   a    =  cvmGet( pW, 0,0 )  ;
@@ -443,37 +443,37 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
   U32 =  cvmGet( pU, 2,1 )  ;
   V31 =  cvmGet( pV, 2,0 )  ;
   V32 =  cvmGet( pV, 2,1 )  ;
-      
-    
+
+
   //   printf("a is %f and b is %f and U31 is %f and U32 is %f and V31 is %f and V32 is %f\n",a,b,U31,U32,V31,V32);
 
 
 
   double AQ,BQ,CQ;
-    
+
   AQ=(a*a*(1.0-(U31*U31))*(1.0-(V31*V31)))-(b*b*(1.0-(U32*U32))*(1.0-(V32*V32)));
-    
-    
+
+
   BQ=(a*a*((U31*U31)+(V31*V31)-(2.0*(U31*U31)*(V31*V31))))-(b*b*((U32*U32)+(V32*V32)-(2.0*(U32*U32)*(V32*V32))));
-    
-    
+
+
   CQ=(a*a*U31*U31*V31*V31)-(b*b*U32*U32*V32*V32);
-    
-    
+
+
   FLOAT coeff[3];
   FLOAT re[2];
   FLOAT im[2];
-    
+
   coeff[2]=AQ   ;
   coeff[1]= BQ  ;
   coeff[0]=  CQ ;
-   
+
   int status= FindQuadraticRoots(coeff, re, im);
-    
+
   if(status==2)
     {
       printf("  2 real roots %f and %f \n",re[0],re[1]);
-	
+
 
     }
   if(status==1)
@@ -488,7 +488,7 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
   //undoing the efffects of the multiplication by the typical f
   f*=typicalF;
   F1=F2=f;
-    
+
   return 0;
 }
 
