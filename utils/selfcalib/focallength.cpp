@@ -23,6 +23,8 @@
 #include "HRprimitives.h"
 #include "projdecompose.h"
 #include "focallength.h"
+
+
 const double typicalF= 5000.0;
 
 using namespace std;
@@ -69,6 +71,7 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
 
   if(method==POLLEFEY)
     {
+
 
 
 
