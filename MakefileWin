@@ -4,13 +4,13 @@ INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system
 LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
-SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp
+SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp visiongen.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a
 
 
-all: $(EXECUTABLE)
+all: $(EXECUTABLE) $(PROJECT)
 
 lib: $(PROJECT)
 
