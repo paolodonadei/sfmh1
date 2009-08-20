@@ -1,10 +1,10 @@
 CC=g++
 
 INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
-CFLAGS=$(INC) -c -g -Wall  
+CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm  -lhrlib   -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system
 LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
-SOURCES=selfcalib.cpp projdecompose.cpp focallength.cpp
+SOURCES=selfcalib.cpp focallength.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
 
