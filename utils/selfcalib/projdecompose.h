@@ -23,5 +23,10 @@
 /* Computes projection matrix decomposition */
 CVAPI(void) cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr, CvMat *rotMatr, CvMat *posVect, CvMat *rotMatrX CV_DEFAULT(NULL), CvMat *rotMatrY CV_DEFAULT(NULL), CvMat *rotMatrZ CV_DEFAULT(NULL), CvPoint3D64f *eulerAngles CV_DEFAULT(NULL));
 
-void ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2);
-void ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2);
+int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2);
+int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scale );
+int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2);
+bool checkMatrixOK(const CvMat *in,int w,int h);
+int skewSymmetrify(const CvMat *in, CvMat *out);
+int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F);
+int findCameraCenter(const CvMat* P, const CvMat* C);
