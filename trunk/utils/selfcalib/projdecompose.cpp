@@ -189,34 +189,6 @@ void cvRQDecomp3x3( const CvMat *matrixM, CvMat *matrixR, CvMat *matrixQ, CvMat 
 
 }
 
-void ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2)
-{
-//to see the purpose of v and scale see page 256 in the multiple view book
-    CvMat* v = cvCreateMat(3,1, CV_64F);
-
-    cvmSet(v, 0, 0,0.0 );
-    cvmSet(v, 1, 0,0.0 );
-    cvmSet(v, 2, 0,0.0);
-
-    ProjectiveMatFromF( F, P1,P2,v,1.00 );
-    cvReleaseMat(&v);
-
-}
-void findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2)
-{
-
-http://www4.ncsu.edu/~ipsen/REU09/chapter4.pdf
-
-
-}
-
-void ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat v,double scale )
-{
-
-
-
-
-}
 
 void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                                     CvMat *rotMatr, CvMat *posVect,
@@ -302,3 +274,271 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
 }
 
 
+
+/////////////////////////////////////////////
+int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2)
+{
+//to see the purpose of v and scale see page 256 in the multiple view book
+    CvMat* v = cvCreateMat(3,1, CV_64F);
+
+    cvmSet(v, 0, 0,0.0 );
+    cvmSet(v, 1, 0,0.0 );
+    cvmSet(v, 2, 0,0.0);
+
+    ProjectiveMatFromF( F, P1,P2,v,1.00 );
+    cvReleaseMat(&v);
+
+}
+int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2)
+{
+    if (checkMatrixOK(F,3,3)== false || checkMatrixOK(e1,3,1)==false || checkMatrixOK(e2,3,1)==false)
+    {
+        return 0;
+    }
+
+    //http://www4.ncsu.edu/~ipsen/REU09/chapter4.pdf
+    CvMat* U = cvCreateMat(3,3, CV_64F);
+    CvMat* V = cvCreateMat(3,3, CV_64F);
+    CvMat* W = cvCreateMat(3,3, CV_64F);
+    CvMat* FC;
+
+
+    FC=cvCloneMat(F);
+
+    cvSVD( FC, W,  U, V );  //change all of the below back to U
+
+//epipole 1, left null vector
+    cvmSet(e1, 0, 0,cvmGet(V,0,2) );
+    cvmSet(e1, 1, 0,cvmGet(V,1,2) );
+    cvmSet(e1, 2, 0,cvmGet(V,2,2));
+
+
+//epipole 2, right null vector
+    cvmSet(e2, 0, 0,cvmGet(U,0,2) );
+    cvmSet(e2, 1, 0,cvmGet(U,1,2) );
+    cvmSet(e2, 2, 0,cvmGet(U,2,2));
+
+
+
+
+
+
+    printf("Debugging info for epipole estimation: \n Fundamental matrix read was\n");
+    writeCVMatrix(cout,F );
+    printf("Left Epipole (left null space) was\n");
+    writeCVMatrix(cout,e1 );
+    printf("Right Epipole (left null space) was\n");
+    writeCVMatrix(cout,e2 );
+
+
+    cout<<endl;
+
+
+
+
+
+
+
+
+    cvReleaseMat(&FC);
+
+    cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&W);
+}
+
+int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scale )
+{
+    CvMat* e1 = cvCreateMat(3,1, CV_64F);
+    CvMat* e2 = cvCreateMat(3,1, CV_64F);
+    CvMat* e1s = cvCreateMat(3,3, CV_64F);
+
+    CvMat* left1= cvCreateMat(3,3, CV_64F);
+    CvMat* left2 = cvCreateMat(3,3, CV_64F);
+    CvMat* left3 = cvCreateMat(3,3, CV_64F);
+    CvMat* right = cvCreateMat(3,1, CV_64F);
+    CvMat* vT = cvCreateMat(1,3, CV_64F);
+
+    findEpipoles(F, e1,e2);
+    skewSymmetrify(e1, e1s);
+
+    cvMatMul(e1s, F, left1);   // Ma*Mb   -> Mc
+
+
+    cvTranspose(v, vT);
+    cvMatMul(e1s, vT, left2);   // Ma*Mb   -> Mc
+
+    cvAdd(left1, left2, left3);      // Ma+Mb   -> Mc
+
+    cvSetIdentity(P1);
+
+    int i,j;
+
+
+    for (i=0;i<=2;i++)
+    {
+        for (j=0;j<=2;j++)
+        {
+            cvmSet(P2,i,j,cvmGet(left3,i,j)); // Set M(i,j)
+
+        }
+
+    }
+
+    for (i=0;i<=2;i++)
+    {
+
+        cvmSet(P2,i,3,scale*cvmGet(e1,i,j)); // Set M(i,j)
+    }
+
+
+    cvReleaseMat(&e1);
+    cvReleaseMat(&e2);
+    cvReleaseMat(&e1s);
+    cvReleaseMat(&left1);
+    cvReleaseMat(&left2);
+    cvReleaseMat(&left3);
+    cvReleaseMat(&right);
+    cvReleaseMat(&vT);
+}
+
+
+int skewSymmetrify(const CvMat *in, CvMat *out)
+{
+    if (checkMatrixOK(in,3,1)== false || checkMatrixOK(out,3,3)==false)
+    {
+        return 0;
+    }
+    cvSetZero( out);
+
+    cvmSet(out, 0, 1,-1.0*cvmGet(in,2,0));
+    cvmSet(out, 0, 2,cvmGet(in,1,0));
+
+    cvmSet(out, 1, 0,cvmGet(in,2,0));
+    cvmSet(out, 1, 2,-1.0*cvmGet(in,0,0));
+
+    cvmSet(out, 2, 0,-1.0*cvmGet(in,1,0));
+    cvmSet(out, 2, 1,cvmGet(in,0,0));
+
+
+    printf("Debugging info for skew symmetric estimation, input: \n");
+    writeCVMatrix(cout,in );
+    printf("output\n");
+    writeCVMatrix(cout,out );
+
+    return true;
+
+}
+bool checkMatrixOK(const CvMat *in,int w,int h)
+{
+    if (in == 0)
+    {
+        printf("parameters is a NULL pointer!");
+        return false;
+    }
+
+    if (!CV_IS_MAT(in))
+    {
+        printf("Input parameter must be a matrix!");
+        return false;
+    }
+
+    if (in->cols != w ||in->rows != h)
+    {
+        printf( "Size of  matrix must be %d x %d but it is %d X %d!\n",w,h,in->cols,in->rows);
+        return false;
+    }
+
+    return true;
+}
+int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F)
+{
+
+
+}
+
+
+int findCameraCenter(const CvMat* P, const CvMat* C)
+{
+
+    checkMatrixOK(P,4,3);
+    checkMatrixOK(C,1,4);
+
+    //http://www4.ncsu.edu/~ipsen/REU09/chapter4.pdf
+    CvMat* U = cvCreateMat(4,4, CV_64F);
+    CvMat* V = cvCreateMat(4,4, CV_64F);
+    CvMat* W = cvCreateMat(4,4, CV_64F);
+    CvMat* PCl= cvCreateMat(4,4, CV_64F);
+
+    cvSetZero( PCl);
+    int i,j;
+
+
+    for (i=0;i<=2;i++)
+    {
+        for (j=0;j<=3;j++)
+        {
+            cvmSet(PCl,i,j,cvmGet(P,i,j)); // Set M(i,j)
+
+        }
+
+    }
+
+    cvSVD( PCl, W,  U, V );  //change all of the below back to U
+
+
+    for (j=0;j<=3;j++)
+    {
+        cvmSet(C,i,j,cvmGet(V,3,j)); // Set M(i,j)
+
+    }
+
+
+
+
+    cvReleaseMat(&PCl);
+    cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&W);
+}
+
+int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
+{
+    checkMatrixOK(in,3,4);
+    checkMatrixOK(out,4,4);
+
+
+    CvMat* U = cvCreateMat(4,4, CV_64F);
+    CvMat* V = cvCreateMat(4,4, CV_64F);
+    CvMat* W = cvCreateMat(4,4, CV_64F);
+    CvMat* inCl= cvCreateMat(4,4, CV_64F);
+
+
+    cvSetZero( inCl);
+    int i,j;
+
+
+    for (i=0;i<=2;i++)
+    {
+        for (j=0;j<=3;j++)
+        {
+            cvmSet(inCl,i,j,cvmGet(in,i,j)); // Set M(i,j)
+
+        }
+
+    }
+
+    cvSVD( inCl, W,  U, V );  //change all of the below back to U
+
+
+    for (i=0;i<=3;i++)
+    {
+        double t=cvmGet(W,i,i);
+        cvmSet(W,i,i,(t<0.00000000001)?0:(((doubzzzzle)1.0)/t); //inverse
+           }
+
+           cvReleaseMat(&inCl);
+    cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&W);
+}
