@@ -37,8 +37,6 @@
 		<Unit filename="MakefileWin" />
 		<Unit filename="focallength.cpp" />
 		<Unit filename="focallength.h" />
-		<Unit filename="projdecompose.cpp" />
-		<Unit filename="projdecompose.h" />
 		<Unit filename="selfcalib.cpp" />
 		<Extensions>
 			<code_completion />
