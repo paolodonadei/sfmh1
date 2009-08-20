@@ -58,6 +58,8 @@
 		<Unit filename="pgmutils.hpp" />
 		<Unit filename="sift.cpp" />
 		<Unit filename="sift.h" />
+		<Unit filename="visiongen.cpp" />
+		<Unit filename="visiongen.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
