@@ -19,7 +19,7 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="cygwin" />
-				<Option parameters=" -D ~/Desktop/data/reduced/ " />
+				<Option parameters="F:\houman\Desktop\data\imagedata\corridor\3D\bt.000.P F:\houman\Desktop\data\imagata\corridor\3D\bt.002.P" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
