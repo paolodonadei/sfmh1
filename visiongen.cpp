@@ -266,6 +266,10 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
         for (k = 0; k < 3; k++)
             cvmSet(calibMatr, i, k, cvmGet(calibMatr, i, k)/lastel);
 
+//i dont knwo if this is right but im getting the absolute value of the focal lenghts because they shouldnt be negative xxx
+ for (i = 0; i < 3; i++)
+      cvmSet(calibMatr, i, i, fabs(cvmGet(calibMatr, i, i)));
+
 
     cvReleaseMat(&tmpProjMatr);
     cvReleaseMat(&tmpMatrixD);
