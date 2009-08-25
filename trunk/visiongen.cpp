@@ -357,7 +357,7 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 {
     CvMat* e1 = cvCreateMat(3,1, CV_64F);
     CvMat* e2 = cvCreateMat(3,1, CV_64F);
-    CvMat* e1s = cvCreateMat(3,3, CV_64F);
+    CvMat* e2s = cvCreateMat(3,3, CV_64F);
 
     CvMat* left1= cvCreateMat(3,3, CV_64F);
     CvMat* left2 = cvCreateMat(3,3, CV_64F);
@@ -366,13 +366,13 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
     CvMat* vT = cvCreateMat(1,3, CV_64F);
 
     findEpipoles(F, e1,e2);
-    skewSymmetrify(e1, e1s);
+    skewSymmetrify(e2, e2s);
 
-    cvMatMul(e1s, F, left1);   // Ma*Mb   -> Mc
+    cvMatMul(e2s, F, left1);   // Ma*Mb   -> Mc
 
 
     cvTranspose(v, vT);
-    cvMatMul(e1, vT, left2);   // Ma*Mb   -> Mc
+    cvMatMul(e2, vT, left2);   // Ma*Mb   -> Mc
 
     cvAdd(left1, left2, left3);      // Ma+Mb   -> Mc
 
@@ -400,28 +400,28 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
     for (i=0;i<=2;i++)
     {
 
-        cvmSet(P2,i,3,scale*cvmGet(e1,i,0)); // Set M(i,j)
+        cvmSet(P2,i,3,scale*cvmGet(e2,i,0)); // Set M(i,j)
     }
 
 //debugging part
     {
-        CvMat* FDebug= cvCreateMat(3,3, CV_64F);
-        FfromProjectionMatrices(P1,P2,FDebug);
-
-
-        printf("Original F was: \nF:\n");
-        writeCVMatrix(cout,F );
-        printf("estimated projection matrices are: \nP1:\n");
-        writeCVMatrix(cout,P1 );
-        printf("\nP2:\n");
-        writeCVMatrix(cout,P2 );
-        printf("estimated F was: \nF:\n");
-        writeCVMatrix(cout,FDebug );
-        cvReleaseMat(&FDebug);
-    }
+//        CvMat* FDebug= cvCreateMat(3,3, CV_64F);
+//        FfromProjectionMatrices(P1,P2,FDebug);
+//
+//
+//        printf("Original F was: \nF:\n");
+//        writeCVMatrix(cout,F );
+//        printf("estimated projection matrices are: \nP1:\n");
+//        writeCVMatrix(cout,P1 );
+//        printf("\nP2:\n");
+//        writeCVMatrix(cout,P2 );
+//        printf("estimated F was: \nF:\n");
+//        writeCVMatrix(cout,FDebug );
+//        cvReleaseMat(&FDebug);
+   }
     cvReleaseMat(&e1);
     cvReleaseMat(&e2);
-    cvReleaseMat(&e1s);
+    cvReleaseMat(&e2s);
     cvReleaseMat(&left1);
     cvReleaseMat(&left2);
     cvReleaseMat(&left3);
