@@ -66,8 +66,9 @@
 #define  CV_MALLOC_ALIGN    32
 #define cvStackAlloc(size) cvAlignPtr( alloca((size) + CV_MALLOC_ALIGN), CV_MALLOC_ALIGN )
 void cvConvertPointsHomogeneous( const CvMat* src, CvMat* dst );
-
-CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR );
+//static void cvCompleteSymm( CvMat* matrix, int LtoR=0 );
+//CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR=0);
+CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR CV_DEFAULT(0) );
 struct CV_EXPORTS CvLevMarqHR
 {
     CvLevMarqHR();
