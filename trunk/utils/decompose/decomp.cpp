@@ -133,7 +133,6 @@ int main(int argc, char *argv[])
         writeCVMatrix(cout,C2 );
         cout<<endl;
 
-
         FfromProjectionMatrices( P1, P2, F1);
 
         cvTranspose(K2, K2T);

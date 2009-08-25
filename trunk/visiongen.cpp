@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -7,6 +6,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <assert.h>
+
 #include <iomanip>
 #include <sstream>
 #include "visiongen.h"
@@ -267,10 +268,10 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
             cvmSet(calibMatr, i, k, cvmGet(calibMatr, i, k)/lastel);
 
 //i dont knwo if this is right but im getting the absolute value of the focal lenghts because they shouldnt be negative xxx
- for (i = 0; i < 3; i++)
-      cvmSet(calibMatr, i, i, fabs(cvmGet(calibMatr, i, i)));
+    for (i = 0; i < 3; i++)
+        cvmSet(calibMatr, i, i, fabs(cvmGet(calibMatr, i, i)));
 
-
+    normalizeMatrix(posVect);
     cvReleaseMat(&tmpProjMatr);
     cvReleaseMat(&tmpMatrixD);
     cvReleaseMat(&tmpMatrixV);
@@ -323,7 +324,8 @@ int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2)
     cvmSet(e2, 2, 0,cvmGet(U,2,2));
 
 
-
+    normalizeMatrix(e1);
+    normalizeMatrix(e2);
 
 
 
@@ -370,13 +372,19 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 
 
     cvTranspose(v, vT);
-    cvMatMul(e1s, vT, left2);   // Ma*Mb   -> Mc
+    cvMatMul(e1, vT, left2);   // Ma*Mb   -> Mc
 
     cvAdd(left1, left2, left3);      // Ma+Mb   -> Mc
 
-    cvSetIdentity(P1);
-
     int i,j;
+    cvSetZero(P1);
+    for (j=0;j<=2;j++)
+    {
+        cvmSet(P1,j,j,((double)1.00)); // Set M(i,j)
+
+    }
+
+
 
 
     for (i=0;i<=2;i++)
@@ -392,7 +400,7 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
     for (i=0;i<=2;i++)
     {
 
-        cvmSet(P2,i,3,scale*cvmGet(e1,i,j)); // Set M(i,j)
+        cvmSet(P2,i,3,scale*cvmGet(e1,i,0)); // Set M(i,j)
     }
 
 //debugging part
@@ -440,15 +448,15 @@ int skewSymmetrify(const CvMat *in, CvMat *out)
     cvmSet(out, 2, 1,cvmGet(in,0,0));
 
 
-    printf("Debugging info for skew symmetric estimation, input: \n");
-    writeCVMatrix(cout,in );
-    printf("output\n");
-    writeCVMatrix(cout,out );
+//    printf("Debugging info for skew symmetric estimation, input: \n");
+//    writeCVMatrix(cout,in );
+//    printf("output\n");
+//    writeCVMatrix(cout,out );
 
     return true;
 
 }
-bool checkMatrixOK(const CvMat *in,int w,int h)
+bool checkMatrixOK(const CvMat *in,int h,int w)
 {
     if (in == 0)
     {
@@ -464,7 +472,9 @@ bool checkMatrixOK(const CvMat *in,int w,int h)
 
     if (in->cols != w ||in->rows != h)
     {
-        printf( "Size of  matrix must be %d x %d but it is %d X %d!\n",w,h,in->cols,in->rows);
+
+        printf( "Size of  matrix must be %d x %d but it is %d X %d!\n",h,w,in->rows,in->cols);
+        assert(0);
         return false;
     }
 
@@ -472,19 +482,24 @@ bool checkMatrixOK(const CvMat *in,int w,int h)
 }
 int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F)
 {
-    CvMat* P1pseudo = cvCreateMat(4,4, CV_64F);
-    CvMat* temp1 = cvCreateMat(4,4, CV_64F);
+    CvMat* P1pseudo = cvCreateMat(4,3, CV_64F);
+    CvMat* temp1 = cvCreateMat(3,4, CV_64F);
     CvMat* C = cvCreateMat(4,1, CV_64F);
     CvMat* e = cvCreateMat(3,1, CV_64F);
-    CvMat* e_skew = cvCreateMat(3,1, CV_64F);
+    CvMat* e_skew = cvCreateMat(3,3, CV_64F);
+
 
     findCameraCenter(P1, C);
+
     findPseudoInverse_3x4(P1,P1pseudo);
+
+
+
     cvMatMul(P2, C, e);
     skewSymmetrify(e,e_skew);
     cvMatMul(e_skew,P2, temp1);
     cvMatMul(temp1,P1pseudo, F);
-
+    normalizeMatrix(F);
 
     cvReleaseMat(&temp1);
     cvReleaseMat(&P1pseudo);
@@ -497,8 +512,8 @@ int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F)
 int findCameraCenter(const CvMat* P, CvMat* C)
 {
 
-    checkMatrixOK(P,4,3);
-    checkMatrixOK(C,1,4);
+    checkMatrixOK(P,3,4);
+    checkMatrixOK(C,4,1);
 
     //http://www4.ncsu.edu/~ipsen/REU09/chapter4.pdf
     CvMat* U = cvCreateMat(4,4, CV_64F);
@@ -525,13 +540,13 @@ int findCameraCenter(const CvMat* P, CvMat* C)
 
     for (j=0;j<=3;j++)
     {
-        cvmSet(C,i,j,cvmGet(V,3,j)); // Set M(i,j)
+        cvmSet(C,j,0,cvmGet(V,j,3)); // Set M(i,j)
 
     }
 
 
 
-
+    normalizeMatrix(C);
     cvReleaseMat(&PCl);
     cvReleaseMat(&U);
     cvReleaseMat(&V);
@@ -541,7 +556,7 @@ int findCameraCenter(const CvMat* P, CvMat* C)
 int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
 {
     checkMatrixOK(in,3,4);
-    checkMatrixOK(out,4,4);
+    checkMatrixOK(out,4,3);
 
 
     CvMat* U = cvCreateMat(4,4, CV_64F);
@@ -549,6 +564,7 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
     CvMat* V = cvCreateMat(4,4, CV_64F);
     CvMat* W = cvCreateMat(4,4, CV_64F);
     CvMat* inCl= cvCreateMat(4,4, CV_64F);
+    CvMat* outful= cvCreateMat(4,4, CV_64F);
 
 
     cvSetZero( inCl);
@@ -577,9 +593,21 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
     cvTranspose(U, UT);
 
     cvMatMul(V, W, inCl);
-    cvMatMul(inCl, UT, out);
+    cvMatMul(inCl, UT, outful);
 
 
+
+    for (i=0;i<=3;i++)
+    {
+        for (j=0;j<=2;j++)
+        {
+            cvmSet(out,i,j,cvmGet(outful,i,j)); // Set M(i,j)
+
+        }
+
+    }
+
+    cvReleaseMat(&outful);
     cvReleaseMat(&inCl);
     cvReleaseMat(&U);
     cvReleaseMat(&UT);
@@ -612,7 +640,7 @@ int normalizeMatrix( CvMat* in)
     }
     else
     {
-        scaleMatrix( in, s);
+        scaleMatrix( in, ((double)1.00)/s);
     }
 
 }

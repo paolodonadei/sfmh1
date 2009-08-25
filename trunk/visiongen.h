@@ -25,7 +25,7 @@ CVAPI(void) cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMa
 int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2);
 int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scale );
 int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2);
-bool checkMatrixOK(const CvMat *in,int w,int h);
+bool checkMatrixOK(const CvMat *in,int h,int w);
 int skewSymmetrify(const CvMat *in, CvMat *out);
 int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F);
 int findCameraCenter(const CvMat* P, CvMat* C);

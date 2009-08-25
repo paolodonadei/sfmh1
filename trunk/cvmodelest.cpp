@@ -41,8 +41,14 @@
 
 #include <cv.h>
 #include <highgui.h>
+#include <cxcore.h>
+#include <cvaux.h>
+
+
 #include "_cvmodelest.h"
 #include <stdio.h>
+
+
 
 ////////////////////////////////opencv stuff
 class CvFMEstimator : public CvModelEstimator2
