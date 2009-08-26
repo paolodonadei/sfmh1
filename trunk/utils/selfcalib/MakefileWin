@@ -11,8 +11,11 @@ EXECUTABLE=intrinsic
 
 all: $(EXECUTABLE)
 
+
+
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@

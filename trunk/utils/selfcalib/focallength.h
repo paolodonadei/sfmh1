@@ -23,7 +23,7 @@ enum SELFCALIBMETHOD{STRUM, POLLEFEY, HARTLEY};
 
 
 using namespace std;
-
+int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,double& f1,double& f2,SELFCALIBMETHOD method);
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method);
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);
 int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc);

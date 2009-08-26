@@ -12,22 +12,26 @@
 			<CompileFile command="$make " />
 			<Clean command="$make clean" />
 			<DistClean command="$make -f $makefile distclean$target" />
+			<AskRebuildNeeded command="$make -q -f $makefile $target" />
+			<SilentBuild command="$make -s -f $makefile $target" />
 		</MakeCommands>
 		<Build>
-			<Target title="Debug">
+			<Target title="all">
 				<Option output="sfmh1" prefix_auto="1" extension_auto="1" />
 				<Option object_output="." />
 				<Option type="1" />
-				<Option compiler="cygwin" />
+				<Option compiler="gcc" />
 				<Option parameters="F:\houman\Desktop\data\imagedata\corridor\3D\bt.000.P F:\houman\Desktop\data\imagata\corridor\3D\bt.002.P" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="$make -f $makefile" />
-					<CompileFile command="$make -f $makefile" />
+					<Build command="$make -f $makefile all" />
+					<CompileFile command="$make" />
 					<Clean command="$make -f $makefile clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<SilentBuild command="$make -s -f $makefile $target" />
 				</MakeCommands>
 			</Target>
 		</Build>
