@@ -14,6 +14,9 @@
 #include "argproc.h"
 #define DEBUGLVL 0
 
+#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
+#define OS_WIN
+#endif
 
 #define SIFT_MULT 0.6
 #define PCA_MULT 0.6
@@ -324,6 +327,13 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 int findSIFTfeatures( HRImage& image)
 {
 
+#ifdef OS_WIN
+ string siftexec="utils\\siftWin32.exe";
+
+#else
+   string siftexec="utils/sift";
+#endif
+
     string siftpcaname="";
     if (image.flag_valid==0)
     {
@@ -332,7 +342,7 @@ int findSIFTfeatures( HRImage& image)
     }
 
     //check see if sift exists
-    if ( !fs::exists( "utils/sift" ) )
+    if ( !fs::exists( siftexec ) )
     {
         cout << "sift for matching is unavailable\n";
         exit(EXIT_FAILURE);
@@ -398,7 +408,13 @@ int findSIFTfeatures( HRImage& image)
         exit(EXIT_FAILURE);
 
     }
-    string command_run=string("utils/sift ")+string("<")+image.pgmfilename+string("> ")+image.siftkeyfilename;
+
+
+
+
+
+
+ string command_run=string(siftexec)+string(" <")+image.pgmfilename+string("> ")+image.siftkeyfilename;
 
 
 
@@ -417,6 +433,11 @@ int findSIFTfeatures( HRImage& image)
     //if pca then reproject
     if (SIFTPCA)
     {
+
+#ifdef OS_WIN
+        printf("this does not exist for windows yet, skipping\n");
+#else
+
         string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
 
@@ -432,6 +453,7 @@ int findSIFTfeatures( HRImage& image)
 
 
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
+#endif
     }
 
 //now read the key file into the feature list

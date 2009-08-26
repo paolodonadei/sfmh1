@@ -877,6 +877,7 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
             correspondencesPairWise[i][j].WriteMatches();
             correspondencesPairWise[i][j].WriteMotion();
+correspondencesPairWise[i][j].findFocalLength();
 
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);

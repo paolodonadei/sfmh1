@@ -29,8 +29,24 @@ const double typicalF= 5000.0;
 
 using namespace std;
 
+int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,double& f1,double& f2,SELFCALIBMETHOD method)
+{
+
+    CvMat* K1 = cvCreateMat(3,3, CV_64F);
+    CvMat* K2 = cvCreateMat(3,3, CV_64F);
+
+    int retval=HRSelfCalibtwoFrame( pF, width1,  height1,  width2, height2,K1, K2, method);
 
 
+    f1=cvmGet( K1, 0,0 )  ;
+    f2=cvmGet( K2, 0,0 )  ;
+
+    cvReleaseMat(&K1);
+    cvReleaseMat(&K2);
+
+    return retval;
+
+}
 
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method)
 {
@@ -354,15 +370,18 @@ int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const 
     int status=0;
 
 
-    status= solveFfromUVWL1(f1_l1,f2_l1,pU,pV,pW);
-    printf("focal length accordign to L1 is %f \n",f1_l1);
+  //not gonna use the linear equations
 
-    status= solveFfromUVWL2(f1_l2,f2_l2,pU,pV,pW);
-    printf("focal length accordign to L2 is %f \n",f1_l2);
+//   status= solveFfromUVWL1(f1_l1,f2_l1,pU,pV,pW);
+//    printf("focal length accordign to L1 is %f \n",f1_l1);
+//
+//    status= solveFfromUVWL2(f1_l2,f2_l2,pU,pV,pW);
+//    printf("focal length accordign to L2 is %f \n",f1_l2);
 
     status= solveFfromUVWLQ(f1_q,f2_q,pU,pV,pW);
-    printf("focal length accordign to Q is %f \n",f1_q);
+   // printf("focal length accordign to Q is %f \n",f1_q);
 
+F1=F2=f1_q;
 
     //choose which to use
     return 0;
@@ -507,17 +526,17 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
     int status= FindQuadraticRoots(coeff, re, im);
 
-    if (status==2)
-    {
-        printf("  2 real roots %f and %f \n",re[0],re[1]);
-
-
-    }
-    if (status==1)
-        printf("  1 real, double root \n");
-
-    if (status==0)
-        printf("  2 complex roots \n");
+//    if (status==2)
+//    {
+//        printf("  2 real roots %f and %f \n",re[0],re[1]);
+//
+//
+//    }
+//    if (status==1)
+//        printf("  1 real, double root \n");
+//
+//    if (status==0)
+//        printf("  2 complex roots \n");
 
 
     f=sqrt(max(re[0],re[1]));

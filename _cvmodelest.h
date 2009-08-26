@@ -65,10 +65,24 @@
 
 #define  CV_MALLOC_ALIGN    32
 #define cvStackAlloc(size) cvAlignPtr( alloca((size) + CV_MALLOC_ALIGN), CV_MALLOC_ALIGN )
+
+#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
+#define OS_WIN
+#endif
+
+
 void cvConvertPointsHomogeneous( const CvMat* src, CvMat* dst );
+
+
 //static void cvCompleteSymm( CvMat* matrix, int LtoR=0 );
 //CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR=0);
+#ifdef OS_WIN
+CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR );
+#else
 CVAPI(void)  cvCompleteSymm( CvMat* matrix, int LtoR CV_DEFAULT(0) );
+#endif
+
+
 struct CV_EXPORTS CvLevMarqHR
 {
     CvLevMarqHR();
