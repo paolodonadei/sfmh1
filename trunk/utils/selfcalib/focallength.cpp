@@ -209,7 +209,26 @@ int FindQuadraticRoots(const FLOAT coeff[3], FLOAT re[2], FLOAT im[2])
 #undef a
 #undef b
 #undef c
+//solves:
+//       axy+by+cx+d=0
+//       exy+fx+gy+h=0
+int solveQuadratictwoUnknowns(const FLOAT coeff1[4], const FLOAT coeff2[4], FLOAT re[2], FLOAT im[2])
+{
 
+ double a =(coeff1[3])   ;
+ double b =(coeff1[2])   ;
+ double c =(coeff1[1])   ;
+ double d =(coeff1[0])   ;
+
+ double e =(coeff1[3])   ;
+ double f =(coeff1[2])   ;
+ double g =(coeff1[1])   ;
+ double h =(coeff1[0])   ;
+
+
+
+
+}
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2)
 {
     //estim
