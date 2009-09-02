@@ -27,11 +27,11 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method);
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);
 int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc);
-
+int solveFfromUVWHartleyMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW)
 int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height);
 
 int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
-
+int  solveFfromUVWLQMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
 
 
 int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
