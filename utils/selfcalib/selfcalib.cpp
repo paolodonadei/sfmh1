@@ -76,8 +76,9 @@ int main(int argc, char *argv[])
     double foc;
     // estimateFocalLengthStrum(F,width,height,foc);
 
-    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,POLLEFEY);
+    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,HARTLEY);
 
+    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,STRUM);
 
     cvReleaseMat(&F);
     cvReleaseMat(&K1);

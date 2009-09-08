@@ -25,7 +25,7 @@
 #include "focallength.h"
 #include "visiongen.h"
 
-const double typicalF= 5000.0;
+const double typicalF= 5000.0;//change this back
 
 using namespace std;
 
@@ -111,6 +111,25 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
     }
     if (method==HARTLEY)
     {
+  double foc1,foc2;
+        estimateFocalLengthsHartley(pF,width1,height1,width2,height2,foc1,foc2);
+
+
+
+
+        cvSetIdentity(K1);
+        cvSetIdentity(K2);
+
+        cvmSet(K1, 0, 0, foc1);
+        cvmSet(K1, 1, 1, foc1);
+        cvmSet(K1, 0, 2, ((double)(width1/2.00)));
+        cvmSet(K1, 1, 2, ((double)(height1/2.00)));
+
+        cvmSet(K2, 0, 0, foc2);
+        cvmSet(K2, 1, 1, foc2);
+        cvmSet(K2, 0, 2, ((double)(width2/2.00)));
+        cvmSet(K2, 1, 2, ((double)(height2/2.00)));
+
 
 
 
@@ -215,15 +234,15 @@ int FindQuadraticRoots(const FLOAT coeff[3], FLOAT re[2], FLOAT im[2])
 int solveQuadratictwoUnknowns(const FLOAT coeff1[4], const FLOAT coeff2[4], FLOAT re[2], FLOAT im[2])
 {
 
- double a =(coeff1[3])   ;
- double b =(coeff1[2])   ;
- double c =(coeff1[1])   ;
- double d =(coeff1[0])   ;
+    double a =(coeff1[3])   ;
+    double b =(coeff1[2])   ;
+    double c =(coeff1[1])   ;
+    double d =(coeff1[0])   ;
 
- double e =(coeff1[3])   ;
- double f =(coeff1[2])   ;
- double g =(coeff1[1])   ;
- double h =(coeff1[0])   ;
+    double e =(coeff1[3])   ;
+    double f =(coeff1[2])   ;
+    double g =(coeff1[1])   ;
+    double h =(coeff1[0])   ;
 
 
 
@@ -303,7 +322,61 @@ int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc
 
     return 0;
 }
+int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2)
+{
 
+    CvMat* G = cvCreateMat(3,3, CV_64F);
+    CvMat* U = cvCreateMat(3,3, CV_64F);
+    CvMat* UT = cvCreateMat(3,3, CV_64F);
+
+    CvMat* V = cvCreateMat(3,3, CV_64F);
+    CvMat* VT = cvCreateMat(3,3, CV_64F);
+    CvMat* W = cvCreateMat(3,3, CV_64F);
+
+
+    if (pF==NULL)
+    {
+        printf("****matrix is null\n");
+        return -1;
+
+    }
+
+    if ( pF->rows!=3 || pF->cols!=3 )
+    {
+        cout<<"fundamental matrix is the wrong size dudes"<<endl;
+        return -2;
+    }
+
+    int status=0;
+
+    status = createPseudoFundMatrix(pF,G,width1, height1);
+//cvCopy(pF,G);
+
+    //printf("G matrix read was\n");
+    //writeCVMatrix(cout,G );
+
+
+
+    cvSVD( G, W,  U, V );  //change all of the below back to U
+
+
+
+
+    status= solveFfromUVWHartleyMAPLE(foc1, foc2,U,V,W);
+
+
+
+
+    cvReleaseMat(&G);
+    cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&VT);
+    cvReleaseMat(&UT);
+
+    cvReleaseMat(&W);
+
+    return 0;
+}
 int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
 {
     CvMat* Gtemp1 = cvCreateMat(3,3, CV_64F);
@@ -389,7 +462,7 @@ int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const 
     int status=0;
 
 
-  //not gonna use the linear equations
+    //not gonna use the linear equations
 
 //   status= solveFfromUVWL1(f1_l1,f2_l1,pU,pV,pW);
 //    printf("focal length accordign to L1 is %f \n",f1_l1);
@@ -398,9 +471,9 @@ int solveFfromUVW(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const 
 //    printf("focal length accordign to L2 is %f \n",f1_l2);
 
     status= solveFfromUVWLQ(f1_q,f2_q,pU,pV,pW);
-   // printf("focal length accordign to Q is %f \n",f1_q);
+     printf("focal length accordign to Q is %f \n",f1_q);
 
-F1=F2=f1_q;
+    F1=F2=f1_q;
 
     //choose which to use
     return 0;
@@ -573,10 +646,33 @@ int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,con
 
 int solveFfromUVWHartleyMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW)
 {
-double f1_1 == -u31 * u32 / (u11 * u12 + u21 * u22);
-double f2_1 == -v32 * v31 / (v12 * v11 + v22 * v21);
-double f1_2 == -(-u31 * u31 * pow(sigma[0], 0.2e1) * v12 * v11 * v31 * v31 - u31 * u31 * pow(sigma[0], 0.2e1) * v22 * v21 * v31 * v31 + u31 * u31 * pow(sigma[0], 0.2e1) * v32 * v31 * v11 * v11 + u31 * u31 * pow(sigma[0], 0.2e1) * v32 * v31 * v21 * v21 - u31 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 * u32 + u31 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 * u32 + u31 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 * u32 + pow(sigma[1], 0.2e1) * u32 * u32 * v12 * v11 * v32 * v32 - pow(sigma[1], 0.2e1) * u32 * u32 * v32 * v31 * v12 * v12 + pow(sigma[1], 0.2e1) * u32 * u32 * v22 * v21 * v32 * v32 - pow(sigma[1], 0.2e1) * u32 * u32 * v32 * v31 * v22 * v22) / (-u11 * u11 * pow(sigma[0], 0.2e1) * v12 * v11 * v31 * v31 - u11 * u11 * pow(sigma[0], 0.2e1) * v22 * v21 * v31 * v31 + u11 * u11 * pow(sigma[0], 0.2e1) * v32 * v31 * v11 * v11 + u11 * u11 * pow(sigma[0], 0.2e1) * v32 * v31 * v21 * v21 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 + u11 * u12 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 + u11 * u12 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 + u12 * u12 * pow(sigma[1], 0.2e1) * v22 * v21 * v32 * v32 + u12 * u12 * pow(sigma[1], 0.2e1) * v12 * v11 * v32 * v32 - u12 * u12 * pow(sigma[1], 0.2e1) * v32 * v31 * v12 * v12 - u12 * u12 * pow(sigma[1], 0.2e1) * v32 * v31 * v22 * v22 + sigma[0] * u22 * u21 * v11 * v11 * sigma[1] * v32 * v32 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v22 * v22 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v12 * v12 + sigma[0] * u22 * u21 * v21 * v21 * sigma[1] * v32 * v32 - pow(sigma[1], 0.2e1) * v32 * v31 * v12 * v12 * u22 * u22 + pow(sigma[1], 0.2e1) * v12 * v11 * v32 * v32 * u22 * u22 - v22 * v21 * pow(sigma[0], 0.2e1) * u21 * u21 * v31 * v31 - v12 * v11 * pow(sigma[0], 0.2e1) * u21 * u21 * v31 * v31 + v32 * v31 * pow(sigma[0], 0.2e1) * u21 * u21 * v21 * v21 + pow(sigma[1], 0.2e1) * v22 * v21 * v32 * v32 * u22 * u22 + v32 * v31 * pow(sigma[0], 0.2e1) * u21 * u21 * v11 * v11 - pow(sigma[1], 0.2e1) * v32 * v31 * v22 * v22 * u22 * u22);
-double f2_2 == -(sigma[0] * u21 * u21 * sigma[1] * u32 * u32 * v32 * v31 - sigma[0] * u31 * u31 * sigma[1] * u22 * u22 * v32 * v31 + u32 * pow(sigma[0], 0.2e1) * u21 * u21 * u31 * v31 * v31 - sigma[0] * u31 * u31 * sigma[1] * u12 * u12 * v32 * v31 - pow(sigma[1], 0.2e1) * u32 * u31 * v32 * v32 * u22 * u22 + pow(sigma[1], 0.2e1) * u12 * u11 * v32 * v32 * u32 * u32 + pow(sigma[1], 0.2e1) * u22 * u21 * v32 * v32 * u32 * u32 + sigma[0] * u11 * u11 * sigma[1] * u32 * u32 * v32 * v31 + u32 * pow(sigma[0], 0.2e1) * u11 * u11 * u31 * v31 * v31 - pow(sigma[0], 0.2e1) * u31 * u31 * u22 * u21 * v31 * v31 - pow(sigma[0], 0.2e1) * u31 * u31 * u12 * u11 * v31 * v31 - pow(sigma[1], 0.2e1) * u32 * u31 * v32 * v32 * u12 * u12) / (-pow(sigma[0], 0.2e1) * u31 * u31 * u22 * u21 * v11 * v11 - pow(sigma[0], 0.2e1) * u31 * u31 * u12 * u11 * v11 * v11 + u32 * pow(sigma[0], 0.2e1) * u11 * u11 * u31 * v11 * v11 + u32 * pow(sigma[0], 0.2e1) * u21 * u21 * u31 * v11 * v11 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u22 * u22 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u12 * u12 + sigma[0] * v12 * v11 * u11 * u11 * sigma[1] * u32 * u32 + sigma[0] * v12 * v11 * u21 * u21 * sigma[1] * u32 * u32 - pow(sigma[1], 0.2e1) * u32 * u31 * v12 * v12 * u22 * u22 + pow(sigma[1], 0.2e1) * u22 * u21 * v12 * v12 * u32 * u32 + pow(sigma[1], 0.2e1) * u12 * u11 * v12 * v12 * u32 * u32 - pow(sigma[1], 0.2e1) * u32 * u31 * v12 * v12 * u12 * u12 + u32 * pow(sigma[0], 0.2e1) * u21 * u21 * u31 * v21 * v21 - pow(sigma[1], 0.2e1) * u32 * u31 * v22 * v22 * u12 * u12 + pow(sigma[1], 0.2e1) * u22 * u21 * v22 * v22 * u32 * u32 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u22 * u22 - pow(sigma[1], 0.2e1) * u32 * u31 * v22 * v22 * u22 * u22 - pow(sigma[0], 0.2e1) * u31 * u31 * u12 * u11 * v21 * v21 + sigma[0] * v22 * v21 * u21 * u21 * sigma[1] * u32 * u32 + sigma[0] * v22 * v21 * u11 * u11 * sigma[1] * u32 * u32 + pow(sigma[1], 0.2e1) * u12 * u11 * v22 * v22 * u32 * u32 + u32 * pow(sigma[0], 0.2e1) * u11 * u11 * u31 * v21 * v21 - pow(sigma[0], 0.2e1) * u31 * u31 * u22 * u21 * v21 * v21);
 
-printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",f1_1,f2_1 ,f1_2  ,f2_2 );
+    double a,b,v21 , v12 , v11 , v22 , u31,u32,v31,v32,u22,u21,u12, u11,sigma[3];
+
+    sigma[0]    =  cvmGet( pW, 0,0 )  ;
+    sigma[1]    =  cvmGet( pW, 1,1 )  ;
+    u31 =  cvmGet( pU, 2,0 )  ;
+    u32 =  cvmGet( pU, 2,1 )  ;
+    u11 =  cvmGet( pU, 0,0 )  ;
+    u12 =  cvmGet( pU, 0,1 )  ;
+    u21 =  cvmGet( pU, 1,0 )  ;
+    u22 =  cvmGet( pU, 1,1 )  ;
+
+    v12 =  cvmGet( pV, 0,1 )  ;
+    v11 =  cvmGet( pV, 0,0 )  ;
+    v22 =  cvmGet( pV, 1,1 )  ;
+    v21 =  cvmGet( pV, 1,0 )  ;
+
+
+    v31 =  cvmGet( pV, 2,0 )  ;
+    v32 =  cvmGet( pV, 2,1 )  ;
+
+
+double f1_1 = -u31 * u32 / (u11 * u12 + u22 * u21);
+double f2_1 = -v32 * v31 / (v12 * v11 + v22 * v21);
+ double f1_2 = -(pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v21 * v21 + pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v11 * v11 - pow(sigma[0], 2.0) * v22 * v21 * u31 * u31 * v31 * v31 - pow(sigma[0], 2.0) * v12 * v11 * u31 * u31 * v31 * v31 + u31 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 * u32 + u31 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 * u32 - pow(sigma[1], 2.0) * v22 * v22 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v22 * v21 - pow(sigma[1], 2.0) * v12 * v12 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v12 * v11) / (u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v21 * v21 + u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v11 * v11 - u11 * u11 * pow(sigma[0], 2.0) * v22 * v21 * v31 * v31 - u11 * u11 * pow(sigma[0], 2.0) * v12 * v11 * v31 * v31 + u11 * u12 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 + u11 * u12 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v12 * v12 + sigma[0] * u22 * u21 * v11 * v11 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v11 * v11 + sigma[0] * u22 * u21 * v21 * v21 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v21 * v21 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v22 * v22 - v22 * v21 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - v12 * v11 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 * u22 * u22 + pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 * u22 * u22 - pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 * u22 * u22);
+double f2_2 = -(-pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v31 * v31 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v31 * v31 + pow(sigma[1], 2.0) * u22 * u21 * v32 * v32 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u22 * u22 - sigma[0] * u31 * u31 * sigma[1] * u12 * u12 * v32 * v31 + pow(sigma[1], 2.0) * u12 * u11 * v32 * v32 * u32 * u32 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v31 * v31 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v31 * v31 - sigma[0] * u31 * u31 * sigma[1] * u22 * u22 * v32 * v31 + sigma[0] * u21 * u21 * sigma[1] * u32 * u32 * v32 * v31 + sigma[0] * u11 * u11 * sigma[1] * u32 * u32 * v32 * v31 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u12 * u12) / (u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v11 * v11 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v11 * v11 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u12 * u12 + sigma[0] * v12 * v11 * u11 * u11 * sigma[1] * u32 * u32 + sigma[0] * v12 * v11 * u21 * u21 * sigma[1] * u32 * u32 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u22 * u22 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v12 * v12 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v12 * v12 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u12 * u12 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u22 * u22 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v21 * v21 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v22 * v22 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v22 * v22 * u32 * u32 + sigma[0] * v22 * v21 * u21 * u21 * sigma[1] * u32 * u32 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v21 * v21 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v21 * v21 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v21 * v21 + sigma[0] * v22 * v21 * u11 * u11 * sigma[1] * u32 * u32);
+
+
+    printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
 }
