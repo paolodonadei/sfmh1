@@ -362,7 +362,7 @@ int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int wid
 
 
 
-    status= solveFfromUVWHartleyMAPLE(foc1, foc2,U,V,W);
+    status= solveFfromUVWHoumanMAPLE(foc1, foc2,U,V,W);//change back to hartlet
 
 
 
@@ -668,11 +668,44 @@ int solveFfromUVWHartleyMAPLE(double& F1, double& F2, const CvMat* pU,const CvMa
     v32 =  cvmGet( pV, 2,1 )  ;
 
 
-double f1_1 = -u31 * u32 / (u11 * u12 + u22 * u21);
-double f2_1 = -v32 * v31 / (v12 * v11 + v22 * v21);
+//double f1_1 = -u31 * u32 / (u11 * u12 + u22 * u21);
+//double f2_1 = -v32 * v31 / (v12 * v11 + v22 * v21);
  double f1_2 = -(pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v21 * v21 + pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v11 * v11 - pow(sigma[0], 2.0) * v22 * v21 * u31 * u31 * v31 * v31 - pow(sigma[0], 2.0) * v12 * v11 * u31 * u31 * v31 * v31 + u31 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 * u32 + u31 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 * u32 - pow(sigma[1], 2.0) * v22 * v22 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v22 * v21 - pow(sigma[1], 2.0) * v12 * v12 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v12 * v11) / (u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v21 * v21 + u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v11 * v11 - u11 * u11 * pow(sigma[0], 2.0) * v22 * v21 * v31 * v31 - u11 * u11 * pow(sigma[0], 2.0) * v12 * v11 * v31 * v31 + u11 * u12 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 + u11 * u12 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v12 * v12 + sigma[0] * u22 * u21 * v11 * v11 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v11 * v11 + sigma[0] * u22 * u21 * v21 * v21 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v21 * v21 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v22 * v22 - v22 * v21 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - v12 * v11 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 * u22 * u22 + pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 * u22 * u22 - pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 * u22 * u22);
 double f2_2 = -(-pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v31 * v31 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v31 * v31 + pow(sigma[1], 2.0) * u22 * u21 * v32 * v32 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u22 * u22 - sigma[0] * u31 * u31 * sigma[1] * u12 * u12 * v32 * v31 + pow(sigma[1], 2.0) * u12 * u11 * v32 * v32 * u32 * u32 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v31 * v31 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v31 * v31 - sigma[0] * u31 * u31 * sigma[1] * u22 * u22 * v32 * v31 + sigma[0] * u21 * u21 * sigma[1] * u32 * u32 * v32 * v31 + sigma[0] * u11 * u11 * sigma[1] * u32 * u32 * v32 * v31 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u12 * u12) / (u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v11 * v11 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v11 * v11 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u12 * u12 + sigma[0] * v12 * v11 * u11 * u11 * sigma[1] * u32 * u32 + sigma[0] * v12 * v11 * u21 * u21 * sigma[1] * u32 * u32 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u22 * u22 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v12 * v12 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v12 * v12 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u12 * u12 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u22 * u22 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v21 * v21 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v22 * v22 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v22 * v22 * u32 * u32 + sigma[0] * v22 * v21 * u21 * u21 * sigma[1] * u32 * u32 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v21 * v21 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v21 * v21 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v21 * v21 + sigma[0] * v22 * v21 * u11 * u11 * sigma[1] * u32 * u32);
 
+F1=  sqrt(f1_2)*typicalF;
+F2=  sqrt(f2_2)*typicalF;
+   // printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
+}
 
-    printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
+
+int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW)
+{
+
+    double V21 , V12 , V11 , V22 , U31,U32,V31,V32,U22,U21,U12, U11,sigma[3];
+
+    double a  =  cvmGet( pW, 0,0 )  ;
+    double b   =  cvmGet( pW, 1,1 )  ;
+    U31 =  cvmGet( pU, 2,0 )  ;
+    U32 =  cvmGet( pU, 2,1 )  ;
+    U11 =  cvmGet( pU, 0,0 )  ;
+    U12 =  cvmGet( pU, 0,1 )  ;
+    U21 =  cvmGet( pU, 1,0 )  ;
+    U22 =  cvmGet( pU, 1,1 )  ;
+
+    V12 =  cvmGet( pV, 0,1 )  ;
+    V11 =  cvmGet( pV, 0,0 )  ;
+    V22 =  cvmGet( pV, 1,1 )  ;
+    V21 =  cvmGet( pV, 1,0 )  ;
+
+
+    V31 =  cvmGet( pV, 2,0 )  ;
+    V32 =  cvmGet( pV, 2,1 )  ;
+
+double fo = (b * V31 * V32 * a * U31 * U31 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + U31 * b * b * V32 * V32 * U32) / (U31 * b * b * V32 * V32 * U32 - U31 * b * b * U32 + a * a * U31 * U32 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + b * V31 * V32 * a * U31 * U31);
+double  f1 = (a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32 - a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32) / (-a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32 + b * b * V31 * V32 - a * a * V31 * V32 + a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32);
+
+F1=  sqrt(fo)*typicalF;
+F2=  sqrt(f1)*typicalF;
+   // printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
 }
