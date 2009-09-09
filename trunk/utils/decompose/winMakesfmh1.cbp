@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="selfcalib" />
+		<Option title="decompose" />
 		<Option makefile="MakefileWin" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
@@ -39,9 +39,8 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="MakefileWin" />
-		<Unit filename="focallength.cpp" />
-		<Unit filename="focallength.h" />
-		<Unit filename="selfcalib.cpp" />
+		<Unit filename="decomp.cpp" />
+		
 		<Extensions>
 			<code_completion />
 			<debugger />
