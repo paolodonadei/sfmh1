@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="decomposition" />
+		<Option title="selfcalib" />
 		<Option makefile="MakefileWin" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
@@ -21,16 +21,16 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="F:\houman\Desktop\data\imagedata\corridor\3D\bt.000.P F:\houman\Desktop\data\imagata\corridor\3D\bt.002.P" />
+				<Option parameters=" -D ~/Desktop/data/reduced/ " />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="$make -f $makefile all" />
-					<CompileFile command="$make" />
-					<Clean command="$make -f $makefile clean" />
+					<Build command="$make" />
+					<CompileFile command="$make " />
+					<Clean command="$make clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<AskRebuildNeeded command="$make -q" />
 					<SilentBuild command="$make -s -f $makefile $target" />
 				</MakeCommands>
 			</Target>
@@ -39,7 +39,9 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="MakefileWin" />
-		<Unit filename="decomp.cpp" />
+		<Unit filename="focallength.cpp" />
+		<Unit filename="focallength.h" />
+		<Unit filename="selfcalib.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
