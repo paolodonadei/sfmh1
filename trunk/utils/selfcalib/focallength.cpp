@@ -352,8 +352,8 @@ int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int wid
     status = createPseudoFundMatrix(pF,G,width1, height1);
 //cvCopy(pF,G);
 
-    //printf("G matrix read was\n");
-    //writeCVMatrix(cout,G );
+    printf("G matrix read was\n");
+    writeCVMatrix(cout,G );
 
 
 
@@ -362,8 +362,8 @@ int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int wid
 
 
 
-    status= solveFfromUVWHoumanMAPLE(foc1, foc2,U,V,W);//change back to hartlet
-
+  //  status= solveFfromUVWHartleyMAPLE(foc1, foc2,U,V,W);//change back to hartlet
+   status= solveFfromUVWHoumanMAPLE(foc1, foc2,U,V,W);//change back to hartlet
 
 
 
@@ -394,7 +394,7 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
     ux/=((double)2.0);
     vy=height;
     vy/=((double)2.0);
-    skew=((double)1.0);
+    skew=((double)0);
 
     printf("ux is %f and vy is %f \n",ux,vy);
     cvSetZero(leftMatr);
@@ -675,7 +675,7 @@ double f2_2 = -(-pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v31 * v31 - pow(si
 
 F1=  sqrt(f1_2)*typicalF;
 F2=  sqrt(f2_2)*typicalF;
-   // printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
+     //printf("HARTLEY: f1 was %f and f2 was %f \n ",F1,F2 );
 }
 
 
@@ -686,6 +686,9 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
 
     double a  =  cvmGet( pW, 0,0 )  ;
     double b   =  cvmGet( pW, 1,1 )  ;
+
+    printf("a is %f and b is %f \n",a,b);
+
     U31 =  cvmGet( pU, 2,0 )  ;
     U32 =  cvmGet( pU, 2,1 )  ;
     U11 =  cvmGet( pU, 0,0 )  ;
@@ -707,5 +710,5 @@ double  f1 = (a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32 - a 
 
 F1=  sqrt(fo)*typicalF;
 F2=  sqrt(f1)*typicalF;
-   // printf("f1_1 was %f and f2_1 was %f and f1_2 was %f and f2_2 was %f \n ",sqrt(f1_1)*typicalF,sqrt(f2_1)*typicalF ,sqrt(f1_2) *typicalF ,sqrt(f2_2)*typicalF );
+  printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
 }
