@@ -78,7 +78,10 @@ int main(int argc, char *argv[])
 
     HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,HARTLEY);
 
+    cout<<" According to Hartley F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
+
     HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,STRUM);
+    cout<<" According to STRUM F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
 
     cvReleaseMat(&F);
     cvReleaseMat(&K1);

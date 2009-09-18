@@ -27,6 +27,7 @@ public:
             : std::runtime_error(s)
     { }
 };
+bool FileExists(string strFilename);
 
 template <class T> T from_string(const std::string& s,std::ios_base& (*f)(std::ios_base&))
 {
