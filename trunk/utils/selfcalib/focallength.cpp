@@ -397,6 +397,8 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
     vy/=((double)2.0);
     skew=((double)1.0);
 
+
+
   //  printf("ux is %f and vy is %f \n",ux,vy);
     cvSetZero(leftMatr);
     cvSetZero(rightMatr);

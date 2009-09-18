@@ -5,7 +5,7 @@ LIBS=-lm  `pkg-config --libs opencv` -lhrlib -lboost_filesystem
 LDFLAGS=-L../../
 SOURCES=decomp.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=intrinsic 
+EXECUTABLE=decompose
 
 
 all: $(EXECUTABLE)

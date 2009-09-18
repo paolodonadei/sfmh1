@@ -15,10 +15,15 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/path.hpp"
 #include <sstream>
 #include "general.h"
 #include "HRprimitives.h"
 #include "visiongen.h"
+
+#define filename "intrinsics.csv"
 
 using namespace std;
 
@@ -111,6 +116,25 @@ int main(int argc, char *argv[])
     writeCVMatrix(cout,C1 );
     cout<<endl;
 
+    if ( boost::filesystem::exists(string(filename))==false)
+    {
+        fstream file_cmin(filename,ios::out);
+        if (!file_cmin.is_open())
+        {
+            printf("error opening file %s\n",string(filename).c_str());
+        }
+        file_cmin<<"projection file , fx, fy, skew, ux, uy\n"<<endl;
+        file_cmin.clear();
+        file_cmin.close();
+
+    }
+    fstream file_cmin(filename,ios::out| ios::app);
+    if (!file_cmin.is_open())
+    {
+        printf("error opening file %s\n",string(filename).c_str());
+    }
+    file_cmin<< fil_name1 << " , " << cvmGet( K1,0,0 ) << " , " << cvmGet( K1,1,1 ) << " , " << cvmGet( K1,0,1 ) << " , " << cvmGet( K1,0,2 ) << " , " <<  cvmGet( K1,1,2 ) <<endl;
+
     if (numP==2)
     {
         cvDecomposeProjectionMatrixHR(P2, K2, R2,T2, 0, 0, 0, 0);
@@ -140,6 +164,18 @@ int main(int argc, char *argv[])
         cvMatMul(Etemp, K1, E1);
 
         printf("fundamental matrix was:\n");
+        writeCVMatrix(cout,F1 );
+
+        string fname=combineFnames(fil_name1,fil_name2,"_fundamental.txt");
+        fstream file_cmin(fname.c_str() ,ios::out);
+        writeCVMatrix(file_cmin,F1 );
+
+        file_cmin.close();
+
+
+
+
+
         writeCVMatrix(cout,F1 );
         cout<<endl;
 

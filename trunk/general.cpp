@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+
 #include "argproc.h"
 #define DEBUGLVL 0
 
@@ -256,9 +257,9 @@ string findSeedDirName(const vector<string>& oArray)
 void writeCVMatrix(ostream &stream,const CvMat* M)
 {
 
-    if(M==NULL)
+    if (M==NULL)
     {
-     printf("****matrix is null\n");
+        printf("****matrix is null\n");
         return;
 
     }
@@ -274,7 +275,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
     int n_cols = M->cols;
 
 
-printf("\nnumber of rows is %d and number of cols is %d \n",n_rows,n_cols);
+    printf("\nnumber of rows is %d and number of cols is %d \n",n_rows,n_cols);
 
 
 
@@ -296,15 +297,41 @@ printf("\nnumber of rows is %d and number of cols is %d \n",n_rows,n_cols);
 }
 
 
+bool FileExists(string strFilename)
+{
+    struct stat stFileInfo;
+    bool blnReturn;
+    int intStat;
 
+    // Attempt to get the file attributes
+    intStat = stat(strFilename.c_str(),&stFileInfo);
+    if (intStat == 0)
+    {
+        // We were able to get the file attributes
+        // so the file obviously exists.
+        blnReturn = true;
+    }
+    else
+    {
+        // We were not able to get the file attributes.
+        // This may mean that we don't have permission to
+        // access the folder which contains this file. If you
+        // need to do that level of checking, lookup the
+        // return values of stat which will give you
+        // more details on why stat failed.
+        blnReturn = false;
+    }
+
+    return(blnReturn);
+}
 
 void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
 {
 
 
-    if((*tmodel)==NULL)
+    if ((*tmodel)==NULL)
     {
-     printf("****matrix is null\n");
+        printf("****matrix is null\n");
         return;
 
     }
@@ -347,13 +374,13 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
         istringstream ss;
         ss.str(s);
 
-	for(i=0;i<n_cols;i++)
-	{
-        ss>>out;
-	cvmSet((*tmodel),j,i, from_string<float>(out, std::dec));
-	}
+        for (i=0;i<n_cols;i++)
+        {
+            ss>>out;
+            cvmSet((*tmodel),j,i, from_string<float>(out, std::dec));
+        }
 
-	j++;
+        j++;
 
 
     }
