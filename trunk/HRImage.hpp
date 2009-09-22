@@ -16,7 +16,18 @@ class HRImage;
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 typedef boost::shared_ptr<HRImage> HRImagePtr;
 
+class focalLengths
+{
+ public:
+    focalLengths();
+    ~focalLengths();
+    focalLengths(int numimages);
+     vector<vector<double> > fLengths;
+    vector<double> averageFs;
+    vector<double> varianceFs;
+     vector<double> suceessTrialF;
 
+};
 
 class HRImage
 {
@@ -130,8 +141,10 @@ public:
     int exhaustiveSIFTMatching();
     FeatureTrack myTracks;
     string temporaryDir;
+    focalLengths myFocals;
     int createFeatureTrackMatrix();
     void showOneByOneFeatureMotions();
+
 
 };
 

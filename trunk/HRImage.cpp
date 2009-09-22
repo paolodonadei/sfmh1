@@ -857,7 +857,8 @@ int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
     correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
-
+    wrtong
+    myFocals.resize( imageCollection.size(), vector<double> ( imageCollection.size() ) );
 
 
     for (i=0;i<imageCollection.size();i++)
@@ -877,7 +878,7 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
             correspondencesPairWise[i][j].WriteMatches();
             correspondencesPairWise[i][j].WriteMotion();
-correspondencesPairWise[i][j].findFocalLength();
+            correspondencesPairWise[i][j].findFocalLength();
 
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
