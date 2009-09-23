@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         imSet.featureDetectSift();
         //   imSet.showOneByOneFeature();
         imSet.exhaustiveSIFTMatching();
-        imSet.showOneByOneFeatureMotions();
+     //   imSet.showOneByOneFeatureMotions();
         imSet.createFeatureTrackMatrix();
     }
     return 0;

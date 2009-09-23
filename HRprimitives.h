@@ -84,7 +84,7 @@ class HRCorrespond2N
 {
 public:
     int findGeomtry();
-    int findFocalLength();
+    int findFocalLength(double &f1,double &f2 );
     void writeIndices();
     friend ostream &operator<<(ostream &stream, const HRCorrespond2N& ob);
     HRCorrespond2N();
@@ -93,7 +93,7 @@ public:
     ~HRCorrespond2N();
     void WriteMatches();
     void WriteMotion();
-    double f1,f2;
+
     int indexIm1;
     int indexIm2;
     HRImage* hr1ptr;

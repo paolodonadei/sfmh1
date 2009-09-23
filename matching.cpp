@@ -47,7 +47,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     if (!RECREATEFILES && fs::exists( p1 ) )
     {
-        hr_correspond.readMatches(fname);
+       count= hr_correspond.readMatches(fname);
         return count;
     }
 

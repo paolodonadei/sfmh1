@@ -1,12 +1,14 @@
 #ifndef HRIMAGE_HPP_INCLUDED
 #define HRIMAGE_HPP_INCLUDED
 
-
+#include "general.h"
 #include <cv.h>
 #include <highgui.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "HRprimitives.h"
+
+
 class HRFeature;
 class HRCorrespond2N;
 class FeatureTrack;
@@ -16,16 +18,30 @@ class HRImage;
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 typedef boost::shared_ptr<HRImage> HRImagePtr;
 
+struct stats
+{
+    double s_deviation;
+    double var;
+    double mean;
+    double max;
+    double min;
+    double count;
+    double accuracy;
+    double median;
+};
+stats findStatsArray(const vector<double>& argarray);
 class focalLengths
 {
- public:
+public:
     focalLengths();
-    ~focalLengths();
     focalLengths(int numimages);
-     vector<vector<double> > fLengths;
-    vector<double> averageFs;
-    vector<double> varianceFs;
-     vector<double> suceessTrialF;
+    ~focalLengths();
+
+    vector<vector<double> > fLengths;
+    vector<stats> mystats;
+    void open(int numimages);
+    void finished();
+    void insertF(int i, int j, double f1,double f2);
 
 };
 
