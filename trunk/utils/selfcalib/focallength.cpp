@@ -19,8 +19,7 @@
 #include <math.h>
 #include <stddef.h>
 
-#include "general.h"
-#include "HRprimitives.h"
+
 
 #include "focallength.h"
 #include "visiongen.h"
@@ -90,8 +89,9 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
         double foc1,foc2;
         estimateFocalLengthsPollefey(pF,width1,height1,width2,height2,foc1,foc2);
 
-
-
+//        //if one of them isnan then the other should be isnan
+//        if(isnan(foc1)) foc2=foc1;
+//        if(isnan(foc2)) foc1=foc2;
 
         cvSetIdentity(K1);
         cvSetIdentity(K2);
@@ -112,10 +112,14 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
     if (method==HARTLEY)
     {
   double foc1,foc2;
+
         estimateFocalLengthsHartley(pF,width1,height1,width2,height2,foc1,foc2);
 
 
-
+//
+//          //if one of them isnan then the other should be isnan
+//        if(isnan(foc1)) foc2=foc1;
+//        if(isnan(foc2)) foc1=foc2;
 
         cvSetIdentity(K1);
         cvSetIdentity(K2);

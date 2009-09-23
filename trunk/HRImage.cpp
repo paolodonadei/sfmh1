@@ -1,4 +1,6 @@
 #include <time.h>
+#include <cmath>
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -22,6 +24,65 @@ CvScalar colors[2]={cvScalar(255,0,0), cvScalar(0,255,0)};
 
 namespace fs = boost::filesystem;
 using namespace std;
+
+
+focalLengths::focalLengths()
+{
+
+}
+focalLengths::~focalLengths()
+{
+
+}
+
+focalLengths::focalLengths(int numimages)
+{
+    open( numimages);
+}
+
+void focalLengths::open(int numimages)
+{
+
+    fLengths.resize( numimages );
+
+    mystats.resize( numimages);
+
+
+
+}
+void focalLengths::finished()
+{
+    int i,j;
+
+    for (i=0;i<fLengths.size();i++)
+    {
+
+        mystats[i]=findStatsArray(fLengths[i]);
+
+
+    }
+
+    for (i=0;i<fLengths.size();i++)
+    {
+        printf(" frame %d has focal lengths estimated as :  ",i);
+
+        for (j=0;j<fLengths[i].size();j++)
+        {
+
+            printf("   %f    ", fLengths[i][j]);
+
+
+
+        }
+         printf("\n  median was: %f and number was %f and variance is %f \n",mystats[i].median,mystats[i].count,mystats[i].var );
+    }
+}
+
+void focalLengths::insertF(int i, int j, double f1,double f2)
+{
+    fLengths[i].push_back(f1);
+    fLengths[j].push_back(f2);
+}
 
 HRImage::HRImage()
 {
@@ -856,9 +917,10 @@ int HRImageSet::featureDetectSift()
 int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
+    double f1,f2;
     correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
-    wrtong
-    myFocals.resize( imageCollection.size(), vector<double> ( imageCollection.size() ) );
+
+    myFocals.open(imageCollection.size() );
 
 
     for (i=0;i<imageCollection.size();i++)
@@ -872,14 +934,14 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondencesPairWise[i][j].hr2ptr=&(*imageCollection[j]);
 
             int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
-            printf("between image %d having %d features and image %d with %d features, we found %d correspondences\n",i,(*imageCollection[i]).HR2DVector.size()
-                   ,j,(*imageCollection[j]).HR2DVector.size(),numf_found);
+            printf("between image %s having %d features and image %s with %d features, we found %d correspondences\n",(*imageCollection[i]).pgmfilename.c_str(),(*imageCollection[i]).HR2DVector.size()
+                   ,(*imageCollection[j]).pgmfilename.c_str(),(*imageCollection[j]).HR2DVector.size(),numf_found);
 
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
             correspondencesPairWise[i][j].WriteMatches();
             correspondencesPairWise[i][j].WriteMotion();
-            correspondencesPairWise[i][j].findFocalLength();
-
+            correspondencesPairWise[i][j].findFocalLength(f1,f2);
+            myFocals.insertF(i,j,f1,f2);
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
 
@@ -888,7 +950,7 @@ int HRImageSet::exhaustiveSIFTMatching()
         }
     }
 
-
+    myFocals.finished();
 }
 
 
@@ -1332,3 +1394,74 @@ void FeatureTrack::writeTrackMatrix(string fname)
 }
 
 
+
+stats findStatsArray(const vector<double>& argarray)
+{
+
+    int i;
+    vector<double> array;
+
+    for (i=0;i<argarray.size();i++)
+    {
+        if (isnan(argarray[i])==false)
+        {
+            array.push_back(argarray[i]);
+        }
+    }
+
+
+    int size=array.size();
+
+
+    stats mystats;
+
+    mystats.s_deviation=0;
+    mystats.var=0;
+    mystats.mean=0;
+    mystats.max=0;
+
+    mystats.count=0;
+
+    mystats.count=size;
+
+    if (size==0)
+    {
+        return mystats;
+    }
+
+    mystats.max=mystats.min=array[0];
+    double dsize=size;
+
+    for (i=0;i<size;i++)
+    {
+        mystats.mean+=array[i];
+
+        if (array[i]>mystats.max) mystats.max=array[i];
+        if (array[i]<mystats.min) mystats.min=array[i];
+    }
+
+    mystats.mean/=dsize;
+
+
+
+    for (i=0;i<size;i++)
+    {
+        mystats.var+=((array[i]-mystats.mean)*(array[i]-mystats.mean));
+    }
+
+    mystats.var/=dsize;
+
+    mystats.s_deviation=sqrt(mystats.var);
+
+     sort(array.begin(), array.end());
+
+     if(size%2==1)
+     mystats.median=array[(size+1)/2];
+     else
+     mystats.median=(array[(size/2)]+array[(size/2)+1]  )/2.0F;
+
+
+    return mystats;
+
+
+}
