@@ -111,7 +111,7 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
     }
     if (method==HARTLEY)
     {
-  double foc1,foc2;
+        double foc1,foc2;
 
         estimateFocalLengthsHartley(pF,width1,height1,width2,height2,foc1,foc2);
 
@@ -263,12 +263,104 @@ int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int w
 
 
 
+    CvMat* A = cvCreateMat(8,5, CV_64F);
+    CvMat* Y = cvCreateMat(8,1, CV_64F);
+    CvMat* Q = cvCreateMat(4,4, CV_64F);
+
+
+    formAYfromP1P2Pollefey(P1,P2, A,Y);
+    absoluteQuadricfromAY(A,Y,Q);
+
+    cvReleaseMat(&A);
+    cvReleaseMat(&Y);
+
+   cvReleaseMat(&Q);
+
     cvReleaseMat(&P1);
     cvReleaseMat(&P2);
 
 
 
 }
+int absoluteQuadricfromAY(const CvMat* pA,const CvMat* pY, CvMat* Q)
+{
+    CvMat* U = cvCreateMat(3,3, CV_64F);
+    CvMat* V = cvCreateMat(3,3, CV_64F);
+    CvMat* W = cvCreateMat(3,3, CV_64F);
+    CvMat* AC;
+
+       AC=cvCloneMat(pA);
+
+
+  cvSVD( AC, W,  U, V );  //change all of the below back to U
+
+
+   cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&W);
+}
+int formAYfromP1P2Pollefey(const CvMat* pP1,const CvMat* pP2, CvMat* pA, CvMat* pY)
+{
+    cvmSet(pA,0,0 , pow(cvmGet(pP1,0,0), 2.0) + pow(cvmGet(pP1,0,1), 2.0) - pow(cvmGet(pP1,1,0), 2.0) - pow(cvmGet(pP1,1,1), 2.0));
+    cvmSet(pA,0,1 , 2.0 * cvmGet(pP1,0,0) * cvmGet(pP1,0,3) - 2.0 * cvmGet(pP1,1,0) * cvmGet(pP1,1,3));
+    cvmSet(pA,0,2 , 2.0 * cvmGet(pP1,0,1) * cvmGet(pP1,0,3) - 2.0 * cvmGet(pP1,1,1) * cvmGet(pP1,1,3));
+    cvmSet(pA,0,3 , 2.0 * cvmGet(pP1,0,2) * cvmGet(pP1,0,3) - 2.0 * cvmGet(pP1,1,2) * cvmGet(pP1,1,3));
+    cvmSet(pA,0,4 , pow(cvmGet(pP1,0,3), 2.0) - pow(cvmGet(pP1,1,3), 2.0));
+    cvmSet(pA,1,0 , 2.0 * cvmGet(pP1,1,0) * cvmGet(pP1,0,0) + 2.0 * cvmGet(pP1,1,1) * cvmGet(pP1,0,1));
+    cvmSet(pA,1,1 , 2.0 * cvmGet(pP1,1,0) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,1,3) * cvmGet(pP1,0,0));
+    cvmSet(pA,1,2 , 2.0 * cvmGet(pP1,1,1) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,1,3) * cvmGet(pP1,0,1));
+    cvmSet(pA,1,3 , 2.0 * cvmGet(pP1,1,2) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,1,3) * cvmGet(pP1,0,2));
+    cvmSet(pA,1,4 , 2.0 * cvmGet(pP1,1,3) * cvmGet(pP1,0,3));
+    cvmSet(pA,2,0 , 2.0 * cvmGet(pP1,2,0) * cvmGet(pP1,0,0) + 2.0 * cvmGet(pP1,2,1) * cvmGet(pP1,0,1));
+    cvmSet(pA,2,1 , 2.0 * cvmGet(pP1,2,0) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,0,0));
+    cvmSet(pA,2,2 , 2.0 * cvmGet(pP1,2,1) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,0,1));
+    cvmSet(pA,2,3 , 2.0 * cvmGet(pP1,2,2) * cvmGet(pP1,0,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,0,2));
+    cvmSet(pA,2,4 , 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,0,3));
+    cvmSet(pA,3,0 , 2.0 * cvmGet(pP1,2,0) * cvmGet(pP1,1,0) + 2.0 * cvmGet(pP1,2,1) * cvmGet(pP1,1,1));
+    cvmSet(pA,3,1 , 2.0 * cvmGet(pP1,2,0) * cvmGet(pP1,1,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,1,0));
+    cvmSet(pA,3,2 , 2.0 * cvmGet(pP1,2,1) * cvmGet(pP1,1,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,1,1));
+    cvmSet(pA,3,3 , 2.0 * cvmGet(pP1,2,2) * cvmGet(pP1,1,3) + 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,1,2));
+    cvmSet(pA,3,4 , 2.0 * cvmGet(pP1,2,3) * cvmGet(pP1,1,3));
+
+
+//2nd projection matrix
+    cvmSet(pA,4,0 , pow(cvmGet(pP2,0,0), 2.0) + pow(cvmGet(pP2,0,1), 2.0) - pow(cvmGet(pP2,1,0), 2.0) - pow(cvmGet(pP2,1,1), 2.0));
+    cvmSet(pA,4,1 , 2.0 * cvmGet(pP2,0,0) * cvmGet(pP2,0,3) - 2.0 * cvmGet(pP2,1,0) * cvmGet(pP2,1,3));
+    cvmSet(pA,4,2 , 2.0 * cvmGet(pP2,0,1) * cvmGet(pP2,0,3) - 2.0 * cvmGet(pP2,1,1) * cvmGet(pP2,1,3));
+    cvmSet(pA,4,3 , 2.0 * cvmGet(pP2,0,2) * cvmGet(pP2,0,3) - 2.0 * cvmGet(pP2,1,2) * cvmGet(pP2,1,3));
+    cvmSet(pA,4,4 , pow(cvmGet(pP2,0,3), 2.0) - pow(cvmGet(pP2,1,3), 2.0));
+    cvmSet(pA,5,0 , 2.0 * cvmGet(pP2,1,0) * cvmGet(pP2,0,0) + 2.0 * cvmGet(pP2,1,1) * cvmGet(pP2,0,1));
+    cvmSet(pA,5,1 , 2.0 * cvmGet(pP2,1,0) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,1,3) * cvmGet(pP2,0,0));
+    cvmSet(pA,5,2 , 2.0 * cvmGet(pP2,1,1) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,1,3) * cvmGet(pP2,0,1));
+    cvmSet(pA,5,3 , 2.0 * cvmGet(pP2,1,2) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,1,3) * cvmGet(pP2,0,2));
+    cvmSet(pA,5,4 , 2.0 * cvmGet(pP2,1,3) * cvmGet(pP2,0,3));
+    cvmSet(pA,6,0 , 2.0 * cvmGet(pP2,2,0) * cvmGet(pP2,0,0) + 2.0 * cvmGet(pP2,2,1) * cvmGet(pP2,0,1));
+    cvmSet(pA,6,1 , 2.0 * cvmGet(pP2,2,0) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,0,0));
+    cvmSet(pA,6,2 , 2.0 * cvmGet(pP2,2,1) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,0,1));
+    cvmSet(pA,6,3 , 2.0 * cvmGet(pP2,2,2) * cvmGet(pP2,0,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,0,2));
+    cvmSet(pA,6,4 , 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,0,3));
+    cvmSet(pA,7,0 , 2.0 * cvmGet(pP2,2,0) * cvmGet(pP2,1,0) + 2.0 * cvmGet(pP2,2,1) * cvmGet(pP2,1,1));
+    cvmSet(pA,7,1 , 2.0 * cvmGet(pP2,2,0) * cvmGet(pP2,1,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,1,0));
+    cvmSet(pA,7,2 , 2.0 * cvmGet(pP2,2,1) * cvmGet(pP2,1,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,1,1));
+    cvmSet(pA,7,3 , 2.0 * cvmGet(pP2,2,2) * cvmGet(pP2,1,3) + 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,1,2));
+    cvmSet(pA,7,4 , 2.0 * cvmGet(pP2,2,3) * cvmGet(pP2,1,3));
+
+//now Y///
+
+    cvmSet(pY,0,0, pow(cvmGet(pP1,0,2), 2.0) - pow(cvmGet(pP1,1,2), 2.0));
+    cvmSet(pY,1,0, 2.0 * cvmGet(pP1,1,2) * cvmGet(pP1,0,2));
+    cvmSet(pY,2,0, 2.0 * cvmGet(pP1,2,2) * cvmGet(pP1,0,2));
+    cvmSet(pY,3,0, 2.0 * cvmGet(pP1,2,2) * cvmGet(pP1,1,2));
+
+//2nd projection matrix
+
+    cvmSet(pY,4,0, pow(cvmGet(pP2,0,2), 2.0) - pow(cvmGet(pP2,1,2), 2.0));
+    cvmSet(pY,5,0, 2.0 * cvmGet(pP2,1,2) * cvmGet(pP2,0,2));
+    cvmSet(pY,6,0, 2.0 * cvmGet(pP2,2,2) * cvmGet(pP2,0,2));
+    cvmSet(pY,7, 0,2.0 * cvmGet(pP2,2,2) * cvmGet(pP2,1,2));
+
+}
+
 int  estimateFocalLengthStrum(const CvMat* pF,int width, int height, double& foc)
 {
 
@@ -366,9 +458,9 @@ int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int wid
 
 
 
-  status= solveFfromUVWHartleyMAPLE(foc1, foc2,U,V,W);//change back to hartlet
-  // status= solveFfromUVWHoumanMAPLE(foc1, foc2,U,V,W);//change back to hartlet
-   // status= solveFfromUVWLQ(foc1, foc2,U,V,W);
+    status= solveFfromUVWHartleyMAPLE(foc1, foc2,U,V,W);//change back to hartlet
+    // status= solveFfromUVWHoumanMAPLE(foc1, foc2,U,V,W);//change back to hartlet
+    // status= solveFfromUVWLQ(foc1, foc2,U,V,W);
 
 
 
@@ -403,7 +495,7 @@ int createPseudoFundMatrix(const CvMat* pF,CvMat* pG,int width, int height)
 
 
 
-  //  printf("ux is %f and vy is %f \n",ux,vy);
+    //  printf("ux is %f and vy is %f \n",ux,vy);
     cvSetZero(leftMatr);
     cvSetZero(rightMatr);
     cvSetZero(Gtemp1);
@@ -676,12 +768,12 @@ int solveFfromUVWHartleyMAPLE(double& F1, double& F2, const CvMat* pU,const CvMa
 
 //double f1_1 = -u31 * u32 / (u11 * u12 + u22 * u21);
 //double f2_1 = -v32 * v31 / (v12 * v11 + v22 * v21);
- double f1_2 = -(pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v21 * v21 + pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v11 * v11 - pow(sigma[0], 2.0) * v22 * v21 * u31 * u31 * v31 * v31 - pow(sigma[0], 2.0) * v12 * v11 * u31 * u31 * v31 * v31 + u31 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 * u32 + u31 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 * u32 - pow(sigma[1], 2.0) * v22 * v22 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v22 * v21 - pow(sigma[1], 2.0) * v12 * v12 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v12 * v11) / (u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v21 * v21 + u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v11 * v11 - u11 * u11 * pow(sigma[0], 2.0) * v22 * v21 * v31 * v31 - u11 * u11 * pow(sigma[0], 2.0) * v12 * v11 * v31 * v31 + u11 * u12 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 + u11 * u12 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v12 * v12 + sigma[0] * u22 * u21 * v11 * v11 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v11 * v11 + sigma[0] * u22 * u21 * v21 * v21 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v21 * v21 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v22 * v22 - v22 * v21 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - v12 * v11 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 * u22 * u22 + pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 * u22 * u22 - pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 * u22 * u22);
-double f2_2 = -(-pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v31 * v31 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v31 * v31 + pow(sigma[1], 2.0) * u22 * u21 * v32 * v32 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u22 * u22 - sigma[0] * u31 * u31 * sigma[1] * u12 * u12 * v32 * v31 + pow(sigma[1], 2.0) * u12 * u11 * v32 * v32 * u32 * u32 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v31 * v31 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v31 * v31 - sigma[0] * u31 * u31 * sigma[1] * u22 * u22 * v32 * v31 + sigma[0] * u21 * u21 * sigma[1] * u32 * u32 * v32 * v31 + sigma[0] * u11 * u11 * sigma[1] * u32 * u32 * v32 * v31 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u12 * u12) / (u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v11 * v11 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v11 * v11 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u12 * u12 + sigma[0] * v12 * v11 * u11 * u11 * sigma[1] * u32 * u32 + sigma[0] * v12 * v11 * u21 * u21 * sigma[1] * u32 * u32 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u22 * u22 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v12 * v12 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v12 * v12 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u12 * u12 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u22 * u22 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v21 * v21 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v22 * v22 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v22 * v22 * u32 * u32 + sigma[0] * v22 * v21 * u21 * u21 * sigma[1] * u32 * u32 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v21 * v21 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v21 * v21 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v21 * v21 + sigma[0] * v22 * v21 * u11 * u11 * sigma[1] * u32 * u32);
+    double f1_2 = -(pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v21 * v21 + pow(sigma[0], 2.0) * v32 * v31 * u31 * u31 * v11 * v11 - pow(sigma[0], 2.0) * v22 * v21 * u31 * u31 * v31 * v31 - pow(sigma[0], 2.0) * v12 * v11 * u31 * u31 * v31 * v31 + u31 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 * u32 + u31 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 * u32 - u31 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 * u32 - pow(sigma[1], 2.0) * v22 * v22 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v22 * v21 - pow(sigma[1], 2.0) * v12 * v12 * u32 * u32 * v32 * v31 + pow(sigma[1], 2.0) * v32 * v32 * u32 * u32 * v12 * v11) / (u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v21 * v21 + u11 * u11 * pow(sigma[0], 2.0) * v32 * v31 * v11 * v11 - u11 * u11 * pow(sigma[0], 2.0) * v22 * v21 * v31 * v31 - u11 * u11 * pow(sigma[0], 2.0) * v12 * v11 * v31 * v31 + u11 * u12 * sigma[0] * v11 * v11 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v12 * v12 + u11 * u12 * sigma[0] * v21 * v21 * sigma[1] * v32 * v32 - u11 * u12 * sigma[0] * v31 * v31 * sigma[1] * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 - u12 * u12 * pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 + u12 * u12 * pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v12 * v12 + sigma[0] * u22 * u21 * v11 * v11 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v11 * v11 + sigma[0] * u22 * u21 * v21 * v21 * sigma[1] * v32 * v32 + v32 * v31 * pow(sigma[0], 2.0) * u21 * u21 * v21 * v21 - sigma[0] * u22 * u21 * v31 * v31 * sigma[1] * v22 * v22 - v22 * v21 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - v12 * v11 * pow(sigma[0], 2.0) * u21 * u21 * v31 * v31 - pow(sigma[1], 2.0) * v32 * v31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * v12 * v11 * v32 * v32 * u22 * u22 + pow(sigma[1], 2.0) * v22 * v21 * v32 * v32 * u22 * u22 - pow(sigma[1], 2.0) * v32 * v31 * v22 * v22 * u22 * u22);
+    double f2_2 = -(-pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v31 * v31 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v31 * v31 + pow(sigma[1], 2.0) * u22 * u21 * v32 * v32 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u22 * u22 - sigma[0] * u31 * u31 * sigma[1] * u12 * u12 * v32 * v31 + pow(sigma[1], 2.0) * u12 * u11 * v32 * v32 * u32 * u32 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v31 * v31 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v31 * v31 - sigma[0] * u31 * u31 * sigma[1] * u22 * u22 * v32 * v31 + sigma[0] * u21 * u21 * sigma[1] * u32 * u32 * v32 * v31 + sigma[0] * u11 * u11 * sigma[1] * u32 * u32 * v32 * v31 - pow(sigma[1], 2.0) * u32 * u31 * v32 * v32 * u12 * u12) / (u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v11 * v11 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v11 * v11 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v11 * v11 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u12 * u12 + sigma[0] * v12 * v11 * u11 * u11 * sigma[1] * u32 * u32 + sigma[0] * v12 * v11 * u21 * u21 * sigma[1] * u32 * u32 - sigma[0] * v12 * v11 * u31 * u31 * sigma[1] * u22 * u22 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v12 * v12 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v12 * v12 * u32 * u32 - pow(sigma[1], 2.0) * u32 * u31 * v12 * v12 * u12 * u12 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u12 * u12 - sigma[0] * v22 * v21 * u31 * u31 * sigma[1] * u22 * u22 + u32 * pow(sigma[0], 2.0) * u21 * u21 * u31 * v21 * v21 - pow(sigma[1], 2.0) * u32 * u31 * v22 * v22 * u22 * u22 + pow(sigma[1], 2.0) * u12 * u11 * v22 * v22 * u32 * u32 + pow(sigma[1], 2.0) * u22 * u21 * v22 * v22 * u32 * u32 + sigma[0] * v22 * v21 * u21 * u21 * sigma[1] * u32 * u32 - pow(sigma[0], 2.0) * u31 * u31 * u22 * u21 * v21 * v21 + u32 * pow(sigma[0], 2.0) * u11 * u11 * u31 * v21 * v21 - pow(sigma[0], 2.0) * u31 * u31 * u12 * u11 * v21 * v21 + sigma[0] * v22 * v21 * u11 * u11 * sigma[1] * u32 * u32);
 
-F1=  sqrt(f1_2)*typicalF;
-F2=  sqrt(f2_2)*typicalF;
-   // printf("HARTLEY: f1 was %f and f2 was %f \n ",F1,F2 );
+    F1=  sqrt(f1_2)*typicalF;
+    F2=  sqrt(f2_2)*typicalF;
+    // printf("HARTLEY: f1 was %f and f2 was %f \n ",F1,F2 );
 }
 
 
@@ -711,10 +803,10 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
     V31 =  cvmGet( pV, 2,0 )  ;
     V32 =  cvmGet( pV, 2,1 )  ;
 
-double fo = (b * V31 * V32 * a * U31 * U31 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + U31 * b * b * V32 * V32 * U32) / (U31 * b * b * V32 * V32 * U32 - U31 * b * b * U32 + a * a * U31 * U32 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + b * V31 * V32 * a * U31 * U31);
-double  f1 = (a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32 - a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32) / (-a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32 + b * b * V31 * V32 - a * a * V31 * V32 + a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32);
+    double fo = (b * V31 * V32 * a * U31 * U31 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + U31 * b * b * V32 * V32 * U32) / (U31 * b * b * V32 * V32 * U32 - U31 * b * b * U32 + a * a * U31 * U32 - a * a * U31 * U32 * V31 * V31 - b * V31 * V32 * U32 * U32 * a + b * V31 * V32 * a * U31 * U31);
+    double  f1 = (a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32 - a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32) / (-a * U31 * U32 * V31 * V31 * b - b * b * V31 * V32 * U32 * U32 + b * b * V31 * V32 - a * a * V31 * V32 + a * a * U31 * U31 * V31 * V32 + a * U31 * U32 * b * V32 * V32);
 
-F1=  sqrt(fo)*typicalF;
-F2=  sqrt(f1)*typicalF;
-  //printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
+    F1=  sqrt(fo)*typicalF;
+    F2=  sqrt(f1)*typicalF;
+    //printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
 }
