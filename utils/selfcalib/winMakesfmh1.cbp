@@ -26,9 +26,9 @@
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="$make" />
+					<Build command="$make  -f $makefile " />
 					<CompileFile command="$make " />
-					<Clean command="$make clean" />
+					<Clean command="$make  -f $makefile clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
 					<AskRebuildNeeded command="$make -q" />
 					<SilentBuild command="$make -s -f $makefile $target" />
