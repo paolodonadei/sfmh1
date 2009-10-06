@@ -2,15 +2,15 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="sfmh1" />
+		<Option title="fundutils" />
 		<Option makefile="MakefileWin" />
 		<Option makefile_is_custom="1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<MakeCommands>
-			<Build command="$make -f $makefile " />
+			<Build command="$make  -f $makefile " />
 			<CompileFile command="$make  -f $makefile " />
-			<Clean command="$make  -f $makefile  clean" />
+			<Clean command="$make  -f $makefile clean" />
 			<DistClean command="$make -f $makefile distclean$target" />
 			<AskRebuildNeeded command="$make -q -f $makefile $target" />
 			<SilentBuild command="$make -s -f $makefile $target" />
@@ -26,11 +26,11 @@
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="$make  -f $makefile " />
-					<CompileFile command="$make -f $makefile " />
-					<Clean command="$make  -f $makefile clean" />
+					<Build command="$make" />
+					<CompileFile command="$make " />
+					<Clean command="$make clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
+					<AskRebuildNeeded command="$make -q" />
 					<SilentBuild command="$make -s -f $makefile $target" />
 				</MakeCommands>
 			</Target>
@@ -38,32 +38,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="HRImage.cpp" />
-		<Unit filename="HRImage.hpp" />
-		<Unit filename="HRprimitives.cpp" />
-		<Unit filename="HRprimitives.h" />
 		<Unit filename="MakefileWin" />
-		<Unit filename="TODO" />
-		<Unit filename="_cvmodelest.h" />
-		<Unit filename="argproc.cpp" />
-		<Unit filename="argproc.h" />
-		<Unit filename="cvfundam.cpp" />
-		<Unit filename="cvmodelest.cpp" />
-		<Unit filename="general.cpp" />
-		<Unit filename="general.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="matching.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="matching.hpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="pgmutils.cpp" />
-		<Unit filename="pgmutils.hpp" />
-		<Unit filename="sift.cpp" />
-		<Unit filename="sift.h" />
-		<Unit filename="visiongen.cpp" />
-		<Unit filename="visiongen.h" />
+		<Unit filename="funddraw.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

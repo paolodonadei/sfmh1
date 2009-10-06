@@ -6,8 +6,7 @@ LIBS=-lm  -lhrlib   -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system
 LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
 SOURCES=decomp.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=intrinsic
-
+EXECUTABLE=decomp
 
 all: $(EXECUTABLE)
 
