@@ -16,5 +16,5 @@ $(EXECUTABLE): $(OBJECTS)
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
 clean:
-	del -f *.o core *.core $(EXECUTABLE).exe *~
+	rm  -f *.o core *.core $(EXECUTABLE).exe *~
 
