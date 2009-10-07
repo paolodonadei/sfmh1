@@ -1,8 +1,8 @@
 CC=g++
 
-INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' 
-CFLAGS=$(INC) -c -g -Wall  
-LIBS=-lm   -lhighgui -lcxcore -lcv 
+INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui'
+CFLAGS=$(INC) -c -g -Wall
+LIBS=-lm   -lhighgui -lcxcore -lcv
 LDFLAGS=-L'$(OPENCV_HOME)\lib'
 SOURCES=funddraw.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
