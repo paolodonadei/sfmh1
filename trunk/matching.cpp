@@ -25,7 +25,7 @@
 #define PCA_THRESH 3000
 #define RECREATEFILES 0
 
-#define SIFTPCA 0
+#define SIFTPCA 1
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;
@@ -43,7 +43,7 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     fs::path p1(fs::path( TEMPDIR, fs::native )/fs::path( combineFnames(hr_correspond.hr1ptr->filename,hr_correspond.hr2ptr->filename,"_indices.txt"), fs::native ));
 
-    string fname=p1.string();
+    string fname=p1.file_string();
 
     if (!RECREATEFILES && fs::exists( p1 ) )
     {
@@ -119,7 +119,7 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
     fs::path tempath( TEMPDIR, fs::native );
     string fname=combineFnames(im1.filename,im2.filename,".png");
     tempath/=fname;
-    fname=tempath.string();
+    fname=tempath.file_string();
 
     if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
 
@@ -355,15 +355,20 @@ int findSIFTfeatures( HRImage& image)
     siftpcaname=fs::basename(p)+"_pca.key";
     image.pgmfilename=fs::basename(p)+".pgm";
 
+
+
 //create the directory for the files
     if ( checkTempPath()==false)
         return 0;
 
 
 
-    image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, fs::native )).string();
-    image.siftkeyfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.siftkeyfilename, fs::native )).string();
-    siftpcaname=(fs::path( TEMPDIR, fs::native )/fs::path( siftpcaname, fs::native )).string();
+    image.pgmfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.pgmfilename, fs::native )).file_string();
+    image.siftkeyfilename=(fs::path( TEMPDIR, fs::native )/fs::path( image.siftkeyfilename, fs::native )).file_string();
+    siftpcaname=(fs::path( TEMPDIR, fs::native )/fs::path( siftpcaname, fs::native )).file_string();
+
+//ALWAYS USE file_string instead of string, because this way it will convert it to the native OS format
+
     cout<<"saving file: "<<image.pgmfilename<<endl;
 
     // printf("the step size is %d \n",image.step);
@@ -433,12 +438,18 @@ int findSIFTfeatures( HRImage& image)
     //if pca then reproject
     if (SIFTPCA)
     {
-
 #ifdef OS_WIN
-        printf("this does not exist for windows yet, skipping\n");
+  string command_run=string("utils\\recalckeys.exe utils\\gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > NULL");
 #else
 
-        string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
+    string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
+#endif
+
+
+
+
+
+
         if (DEBUGLVL>0) cout<<"Executing command ..."<<command_run<<endl;
 
         fs::path p4( siftpcaname, fs::native );
@@ -453,7 +464,7 @@ int findSIFTfeatures( HRImage& image)
 
 
         image.siftkeyfilename=siftpcaname;   //now i made it so that the feature point refers to the pca one, so form now on pca will be used
-#endif
+
     }
 
 //now read the key file into the feature list

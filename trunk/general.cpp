@@ -157,7 +157,7 @@ int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int
     fs::path tempath( TEMPDIR, fs::native );
     string fname=combineFnames(im1.filename,im2.filename,string(stringify(indexname)+".jpg"));
     tempath/=fname;
-    fname=tempath.string();
+    fname=tempath.file_string();
 
 
 
@@ -179,9 +179,9 @@ string findSeedDirName(const vector<string>& oArray)
     pb.remove_leaf();
     path pathname(pb.leaf());
 
-    if (pathname.string()!="reduced")
+    if (pathname.file_string()!="reduced")
     {
-        return pathname.string();
+        return pathname.file_string();
 
     }
 

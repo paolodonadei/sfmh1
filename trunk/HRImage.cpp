@@ -443,7 +443,7 @@ int HRImage::writeFeatures()
 
     tempfilename=fs::basename(p)+"features.txt";
 
-    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).string();
+    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
 
 
     fstream fp_out;
@@ -513,7 +513,7 @@ int  HRImage::writeImageFeatures()
 
     tempfilename=fs::basename(p)+"features.png";
 
-    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).string();
+    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
 
 
     if ( checkTempPath()==false)
@@ -742,7 +742,7 @@ void HRImageSet::showOneByOne()
 void HRImageSet::showOneByOneFeatureMotions()
 {
 
-    string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw"), fs::native )).string();
+    string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw"), fs::native )).file_string();
     if ( !fs::exists( funddrawname ) )
     {
         cout << "funddraw for matching is unavailable\n";
@@ -837,10 +837,10 @@ int  HRImageSet::open(string directoryName, string TEMPdirectoryName)
                             || fs::extension(dir_itr->path())==".ppm" || fs::extension(dir_itr->path())==".png")
                     {
                         ++file_count;
-                        cout << "currently loading file: "<<dir_itr->path().string()<<endl ;
+                        cout << "currently loading file: "<<dir_itr->path().file_string()<<endl ;
 
-                        HRImagePtr hr_iptr( new HRImage( dir_itr->path().string()) );
-                        fnameArray.push_back( dir_itr->path().string() );
+                        HRImagePtr hr_iptr( new HRImage( dir_itr->path().file_string()) );
+                        fnameArray.push_back( dir_itr->path().file_string() );
 
                         imageCollection.push_back( hr_iptr );
 
@@ -884,7 +884,7 @@ int  HRImageSet::open(string directoryName, string TEMPdirectoryName)
     }
 
 
-    temporaryDir=temp_path.string();
+    temporaryDir=temp_path.file_string();
     TEMPDIR=temporaryDir.c_str();
     return file_count;
 }
@@ -1067,7 +1067,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
         if (SINGLEMATCHPRINT==1)
         {
 
-            string  fname=(fs::path( TEMPDIR, fs::native )/fs::path( fname, fs::native )).string();
+            string  fname=(fs::path( TEMPDIR, fs::native )/fs::path( fname, fs::native )).file_string();
 
 
 
@@ -1082,7 +1082,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
     fs::path tempath( TEMPDIR, fs::native );
     string fname=filname;
     tempath/=fname;
-    fname=tempath.string();
+    fname=tempath.file_string();
 
 
 
@@ -1359,7 +1359,7 @@ void FeatureTrack::writeTrackMatrix(string fname)
 
     fs::path tempath( TEMPDIR, fs::native );
     tempath/=fname;
-    string newfname=tempath.string();
+    string newfname=tempath.file_string();
 
     int i,j,k,l;
 
