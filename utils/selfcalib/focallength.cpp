@@ -343,16 +343,70 @@ int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int w
 }
 int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q)
 {
+    int i,j;
     //the visual is the modified pollefey method outlined in his visual modelling paoer
     CvMat* U = cvCreateMat(3,3, CV_64F);
     CvMat* V = cvCreateMat(3,3, CV_64F);
     CvMat* W = cvCreateMat(3,3, CV_64F);
     CvMat* AC;
+    CvMat* C = cvCreateMat(10,1, CV_64F);
 
     AC=cvCloneMat(pA);
 
+    double omg=((double)1.00);
+
+    double coeff=0;
+
+    for(i=0; i<10; i++)
+    {
+        if((i+0)%6==0 || (i+1)%6==0)
+        {
+            coeff=1.00/(9.0*omg);
+        }
+        if((i+2)%6==0 )
+        {
+            coeff=1.00/(0.2*omg);
+        }
+        if((i+3)%6==0 || (i+4)%6==0)
+        {
+            coeff=1.00/(0.1*omg);
+        }
+        if((i+5)%6==0 )
+        {
+            coeff=1.00/(0.01*omg);
+        }
+        for(j=0; j<10; j++)
+        {
+
+            cvmSet(AC,i,j,cvmGet(pA,0,j)*coeff);
+            z++;
+        }
+    }
+
+
 
     cvSVD( AC, W,  U, V );  //change all of the below back to U
+
+//taking the solution out
+    for(i=0; i<10; i++)
+    {
+        cvmSet(C,i,0,cvmGet(V,i,9));
+
+    }
+//calculate new omega
+
+
+//putting C into Q
+    int z=0;
+    for(i=0; i<4; i++)
+    {
+        for(j=0; j<4; j++)
+        {
+            cvmSet(Q,i,j,cvmGet(C,z,0));
+            z++;
+        }
+    }
+
 
 
     cvReleaseMat(&U);
@@ -379,66 +433,66 @@ int absoluteQuadricfromAY(const CvMat* pA, CvMat* pY,CvMat* Q)
 int formAfromP1P2PollefeyVisual(const CvMat* pP1,const CvMat* pP2, CvMat* pA)
 {
 
-cvmSet(pA,0,0)= pow( cvmGet(pP1,0,0), 2) - pow( cvmGet(pP1,2,0), 2);
-cvmSet(pA,0,1)= -2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,1)+ 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,1);
-cvmSet(pA,0,2)= 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,2);
-cvmSet(pA,0,3)= 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,3)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,0);
-cvmSet(pA,0,4)= pow( cvmGet(pP1,0,1), 2) - pow( cvmGet(pP1,2,1), 2);
-cvmSet(pA,0,5)= 2 * cvmGet(pP1,0,1)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,1);
-cvmSet(pA,0,6)= 2 * cvmGet(pP1,0,3)* cvmGet(pP1,0,1)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,1);
-cvmSet(pA,0,7)= -pow( cvmGet(pP1,2,2), 2) + pow( cvmGet(pP1,0,2), 2);
-cvmSet(pA,0,8)= -2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,3)+ 2 * cvmGet(pP1,0,2)* cvmGet(pP1,0,3);
-cvmSet(pA,0,9)= pow( cvmGet(pP1,0,3), 2) - pow( cvmGet(pP1,2,3), 2);
-cvmSet(pA,1,0)= pow( cvmGet(pP1,1,0), 2) - pow( cvmGet(pP1,2,0), 2);
-cvmSet(pA,1,1)= -2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,1)+ 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,1);
-cvmSet(pA,1,2)= 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,2)- 2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,2);
-cvmSet(pA,1,3)= 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,3)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,0);
-cvmSet(pA,1,4)= pow( cvmGet(pP1,1,1), 2) - pow( cvmGet(pP1,2,1), 2);
-cvmSet(pA,1,5)= 2 * cvmGet(pP1,1,1)* cvmGet(pP1,1,2)- 2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,1);
-cvmSet(pA,1,6)= 2 * cvmGet(pP1,1,3)* cvmGet(pP1,1,1)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,1);
-cvmSet(pA,1,7)= -pow( cvmGet(pP1,2,2), 2) + pow( cvmGet(pP1,1,2), 2);
-cvmSet(pA,1,8)= -2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,3)+ 2 * cvmGet(pP1,1,2)* cvmGet(pP1,1,3);
-cvmSet(pA,1,9)= pow( cvmGet(pP1,1,3), 2) - pow( cvmGet(pP1,2,3), 2);
-cvmSet(pA,2,0)= pow( cvmGet(pP1,0,0), 2) - pow( cvmGet(pP1,1,0), 2);
-cvmSet(pA,2,1)= -2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,1)+ 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,1);
-cvmSet(pA,2,2)= 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,2);
-cvmSet(pA,2,3)= 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,3)- 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,3);
-cvmSet(pA,2,4)= pow( cvmGet(pP1,0,1), 2) - pow( cvmGet(pP1,1,1), 2);
-cvmSet(pA,2,5)= 2 * cvmGet(pP1,0,1)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,1,1)* cvmGet(pP1,1,2);
-cvmSet(pA,2,6)= 2 * cvmGet(pP1,0,3)* cvmGet(pP1,0,1)- 2 * cvmGet(pP1,1,3)* cvmGet(pP1,1,1);
-cvmSet(pA,2,7)= -pow( cvmGet(pP1,1,2), 2) + pow( cvmGet(pP1,0,2), 2);
-cvmSet(pA,2,8)= -2 * cvmGet(pP1,1,2)* cvmGet(pP1,1,3)+ 2 * cvmGet(pP1,0,2)* cvmGet(pP1,0,3);
-cvmSet(pA,2,9)= pow( cvmGet(pP1,0,3), 2) - pow( cvmGet(pP1,1,3), 2);
-cvmSet(pA,3,0)= cvmGet(pP1,1,0)* cvmGet(pP1,0,0);
-cvmSet(pA,3,1)= cvmGet(pP1,1,1)* cvmGet(pP1,0,0)+ cvmGet(pP1,1,0)* cvmGet(pP1,0,1);
-cvmSet(pA,3,2)= cvmGet(pP1,1,0)* cvmGet(pP1,0,2)+ cvmGet(pP1,1,2)* cvmGet(pP1,0,0);
-cvmSet(pA,3,3)= cvmGet(pP1,1,0)* cvmGet(pP1,0,3)+ cvmGet(pP1,1,3)* cvmGet(pP1,0,0);
-cvmSet(pA,3,4)= cvmGet(pP1,1,1)* cvmGet(pP1,0,1);
-cvmSet(pA,3,5)= cvmGet(pP1,1,2)* cvmGet(pP1,0,1)+ cvmGet(pP1,1,1)* cvmGet(pP1,0,2);
-cvmSet(pA,3,6)= cvmGet(pP1,1,3)* cvmGet(pP1,0,1)+ cvmGet(pP1,1,1)* cvmGet(pP1,0,3);
-cvmSet(pA,3,7)= cvmGet(pP1,1,2)* cvmGet(pP1,0,2);
-cvmSet(pA,3,8)= cvmGet(pP1,1,3)* cvmGet(pP1,0,2)+ cvmGet(pP1,1,2)* cvmGet(pP1,0,3);
-cvmSet(pA,3,9)= cvmGet(pP1,1,3)* cvmGet(pP1,0,3);
-cvmSet(pA,4,0)= cvmGet(pP1,2,0)* cvmGet(pP1,1,0);
-cvmSet(pA,4,1)= cvmGet(pP1,2,1)* cvmGet(pP1,1,0)+ cvmGet(pP1,2,0)* cvmGet(pP1,1,1);
-cvmSet(pA,4,2)= cvmGet(pP1,2,0)* cvmGet(pP1,1,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,1,0);
-cvmSet(pA,4,3)= cvmGet(pP1,2,0)* cvmGet(pP1,1,3)+ cvmGet(pP1,2,3)* cvmGet(pP1,1,0);
-cvmSet(pA,4,4)= cvmGet(pP1,2,1)* cvmGet(pP1,1,1);
-cvmSet(pA,4,5)= cvmGet(pP1,2,2)* cvmGet(pP1,1,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,1,2);
-cvmSet(pA,4,6)= cvmGet(pP1,2,3)* cvmGet(pP1,1,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,1,3);
-cvmSet(pA,4,7)= cvmGet(pP1,2,2)* cvmGet(pP1,1,2);
-cvmSet(pA,4,8)= cvmGet(pP1,2,3)* cvmGet(pP1,1,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,1,3);
-cvmSet(pA,4,9)= cvmGet(pP1,2,3)* cvmGet(pP1,1,3);
-cvmSet(pA,5,0)= cvmGet(pP1,2,0)* cvmGet(pP1,0,0);
-cvmSet(pA,5,1)= cvmGet(pP1,2,1)* cvmGet(pP1,0,0)+ cvmGet(pP1,2,0)* cvmGet(pP1,0,1);
-cvmSet(pA,5,2)= cvmGet(pP1,2,0)* cvmGet(pP1,0,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,0,0);
-cvmSet(pA,5,3)= cvmGet(pP1,2,0)* cvmGet(pP1,0,3)+ cvmGet(pP1,2,3)* cvmGet(pP1,0,0);
-cvmSet(pA,5,4)= cvmGet(pP1,2,1)* cvmGet(pP1,0,1);
-cvmSet(pA,5,5)= cvmGet(pP1,2,2)* cvmGet(pP1,0,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,0,2);
-cvmSet(pA,5,6)= cvmGet(pP1,2,3)* cvmGet(pP1,0,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,0,3);
-cvmSet(pA,5,7)= cvmGet(pP1,2,2)* cvmGet(pP1,0,2);
-cvmSet(pA,5,8)= cvmGet(pP1,2,3)* cvmGet(pP1,0,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,0,3);
-cvmSet(pA,5,9)= cvmGet(pP1,2,3)* cvmGet(pP1,0,3);
+    cvmSet(pA,0,0, pow( cvmGet(pP1,0,0), 2) - pow( cvmGet(pP1,2,0), 2));
+    cvmSet(pA,0,1, -2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,1)+ 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,1));
+    cvmSet(pA,0,2, 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,2));
+    cvmSet(pA,0,3, 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,3)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,0));
+    cvmSet(pA,0,4, pow( cvmGet(pP1,0,1), 2) - pow( cvmGet(pP1,2,1), 2));
+    cvmSet(pA,0,5, 2 * cvmGet(pP1,0,1)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,1));
+    cvmSet(pA,0,6, 2 * cvmGet(pP1,0,3)* cvmGet(pP1,0,1)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,1));
+    cvmSet(pA,0,7, -pow( cvmGet(pP1,2,2), 2) + pow( cvmGet(pP1,0,2), 2));
+    cvmSet(pA,0,8, -2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,3)+ 2 * cvmGet(pP1,0,2)* cvmGet(pP1,0,3));
+    cvmSet(pA,0,9, pow( cvmGet(pP1,0,3), 2) - pow( cvmGet(pP1,2,3), 2));
+    cvmSet(pA,1,0, pow( cvmGet(pP1,1,0), 2) - pow( cvmGet(pP1,2,0), 2));
+    cvmSet(pA,1,1, -2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,1)+ 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,1));
+    cvmSet(pA,1,2, 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,2)- 2 * cvmGet(pP1,2,0)* cvmGet(pP1,2,2));
+    cvmSet(pA,1,3, 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,3)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,0));
+    cvmSet(pA,1,4, pow( cvmGet(pP1,1,1), 2) - pow( cvmGet(pP1,2,1), 2));
+    cvmSet(pA,1,5, 2 * cvmGet(pP1,1,1)* cvmGet(pP1,1,2)- 2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,1));
+    cvmSet(pA,1,6, 2 * cvmGet(pP1,1,3)* cvmGet(pP1,1,1)- 2 * cvmGet(pP1,2,3)* cvmGet(pP1,2,1));
+    cvmSet(pA,1,7, -pow( cvmGet(pP1,2,2), 2) + pow( cvmGet(pP1,1,2), 2));
+    cvmSet(pA,1,8, -2 * cvmGet(pP1,2,2)* cvmGet(pP1,2,3)+ 2 * cvmGet(pP1,1,2)* cvmGet(pP1,1,3));
+    cvmSet(pA,1,9, pow( cvmGet(pP1,1,3), 2) - pow( cvmGet(pP1,2,3), 2));
+    cvmSet(pA,2,0, pow( cvmGet(pP1,0,0), 2) - pow( cvmGet(pP1,1,0), 2));
+    cvmSet(pA,2,1, -2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,1)+ 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,1));
+    cvmSet(pA,2,2, 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,2));
+    cvmSet(pA,2,3, 2 * cvmGet(pP1,0,0)* cvmGet(pP1,0,3)- 2 * cvmGet(pP1,1,0)* cvmGet(pP1,1,3));
+    cvmSet(pA,2,4, pow( cvmGet(pP1,0,1), 2) - pow( cvmGet(pP1,1,1), 2));
+    cvmSet(pA,2,5, 2 * cvmGet(pP1,0,1)* cvmGet(pP1,0,2)- 2 * cvmGet(pP1,1,1)* cvmGet(pP1,1,2));
+    cvmSet(pA,2,6, 2 * cvmGet(pP1,0,3)* cvmGet(pP1,0,1)- 2 * cvmGet(pP1,1,3)* cvmGet(pP1,1,1));
+    cvmSet(pA,2,7, -pow( cvmGet(pP1,1,2), 2) + pow( cvmGet(pP1,0,2), 2));
+    cvmSet(pA,2,8, -2 * cvmGet(pP1,1,2)* cvmGet(pP1,1,3)+ 2 * cvmGet(pP1,0,2)* cvmGet(pP1,0,3));
+    cvmSet(pA,2,9, pow( cvmGet(pP1,0,3), 2) - pow( cvmGet(pP1,1,3), 2));
+    cvmSet(pA,3,0, cvmGet(pP1,1,0)* cvmGet(pP1,0,0));
+    cvmSet(pA,3,1, cvmGet(pP1,1,1)* cvmGet(pP1,0,0)+ cvmGet(pP1,1,0)* cvmGet(pP1,0,1));
+    cvmSet(pA,3,2, cvmGet(pP1,1,0)* cvmGet(pP1,0,2)+ cvmGet(pP1,1,2)* cvmGet(pP1,0,0));
+    cvmSet(pA,3,3, cvmGet(pP1,1,0)* cvmGet(pP1,0,3)+ cvmGet(pP1,1,3)* cvmGet(pP1,0,0));
+    cvmSet(pA,3,4, cvmGet(pP1,1,1)* cvmGet(pP1,0,1));
+    cvmSet(pA,3,5, cvmGet(pP1,1,2)* cvmGet(pP1,0,1)+ cvmGet(pP1,1,1)* cvmGet(pP1,0,2));
+    cvmSet(pA,3,6, cvmGet(pP1,1,3)* cvmGet(pP1,0,1)+ cvmGet(pP1,1,1)* cvmGet(pP1,0,3));
+    cvmSet(pA,3,7, cvmGet(pP1,1,2)* cvmGet(pP1,0,2));
+    cvmSet(pA,3,8, cvmGet(pP1,1,3)* cvmGet(pP1,0,2)+ cvmGet(pP1,1,2)* cvmGet(pP1,0,3));
+    cvmSet(pA,3,9, cvmGet(pP1,1,3)* cvmGet(pP1,0,3));
+    cvmSet(pA,4,0, cvmGet(pP1,2,0)* cvmGet(pP1,1,0));
+    cvmSet(pA,4,1, cvmGet(pP1,2,1)* cvmGet(pP1,1,0)+ cvmGet(pP1,2,0)* cvmGet(pP1,1,1));
+    cvmSet(pA,4,2, cvmGet(pP1,2,0)* cvmGet(pP1,1,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,1,0));
+    cvmSet(pA,4,3, cvmGet(pP1,2,0)* cvmGet(pP1,1,3)+ cvmGet(pP1,2,3)* cvmGet(pP1,1,0));
+    cvmSet(pA,4,4, cvmGet(pP1,2,1)* cvmGet(pP1,1,1));
+    cvmSet(pA,4,5, cvmGet(pP1,2,2)* cvmGet(pP1,1,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,1,2));
+    cvmSet(pA,4,6, cvmGet(pP1,2,3)* cvmGet(pP1,1,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,1,3));
+    cvmSet(pA,4,7, cvmGet(pP1,2,2)* cvmGet(pP1,1,2));
+    cvmSet(pA,4,8, cvmGet(pP1,2,3)* cvmGet(pP1,1,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,1,3));
+    cvmSet(pA,4,9, cvmGet(pP1,2,3)* cvmGet(pP1,1,3));
+    cvmSet(pA,5,0, cvmGet(pP1,2,0)* cvmGet(pP1,0,0));
+    cvmSet(pA,5,1, cvmGet(pP1,2,1)* cvmGet(pP1,0,0)+ cvmGet(pP1,2,0)* cvmGet(pP1,0,1));
+    cvmSet(pA,5,2, cvmGet(pP1,2,0)* cvmGet(pP1,0,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,0,0));
+    cvmSet(pA,5,3, cvmGet(pP1,2,0)* cvmGet(pP1,0,3)+ cvmGet(pP1,2,3)* cvmGet(pP1,0,0));
+    cvmSet(pA,5,4, cvmGet(pP1,2,1)* cvmGet(pP1,0,1));
+    cvmSet(pA,5,5, cvmGet(pP1,2,2)* cvmGet(pP1,0,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,0,2));
+    cvmSet(pA,5,6, cvmGet(pP1,2,3)* cvmGet(pP1,0,1)+ cvmGet(pP1,2,1)* cvmGet(pP1,0,3));
+    cvmSet(pA,5,7, cvmGet(pP1,2,2)* cvmGet(pP1,0,2));
+    cvmSet(pA,5,8, cvmGet(pP1,2,3)* cvmGet(pP1,0,2)+ cvmGet(pP1,2,2)* cvmGet(pP1,0,3));
+    cvmSet(pA,5,9, cvmGet(pP1,2,3)* cvmGet(pP1,0,3));
 
 
 
@@ -446,66 +500,66 @@ cvmSet(pA,5,9)= cvmGet(pP1,2,3)* cvmGet(pP1,0,3);
 /// for the second P
 
 
-cvmSet(pA,6+0,0)= pow( cvmGet(pP2,0,0), 2) - pow( cvmGet(pP2,2,0), 2);
-cvmSet(pA,6+0,1)= -2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,1)+ 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,1);
-cvmSet(pA,6+0,2)= 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,2);
-cvmSet(pA,6+0,3)= 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,3)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,0);
-cvmSet(pA,6+0,4)= pow( cvmGet(pP2,0,1), 2) - pow( cvmGet(pP2,2,1), 2);
-cvmSet(pA,6+0,5)= 2 * cvmGet(pP2,0,1)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,1);
-cvmSet(pA,6+0,6)= 2 * cvmGet(pP2,0,3)* cvmGet(pP2,0,1)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,1);
-cvmSet(pA,6+0,7)= -pow( cvmGet(pP2,2,2), 2) + pow( cvmGet(pP2,0,2), 2);
-cvmSet(pA,6+0,8)= -2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,3)+ 2 * cvmGet(pP2,0,2)* cvmGet(pP2,0,3);
-cvmSet(pA,6+0,9)= pow( cvmGet(pP2,0,3), 2) - pow( cvmGet(pP2,2,3), 2);
-cvmSet(pA,6+1,0)= pow( cvmGet(pP2,1,0), 2) - pow( cvmGet(pP2,2,0), 2);
-cvmSet(pA,6+1,1)= -2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,1)+ 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,1);
-cvmSet(pA,6+1,2)= 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,2)- 2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,2);
-cvmSet(pA,6+1,3)= 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,3)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,0);
-cvmSet(pA,6+1,4)= pow( cvmGet(pP2,1,1), 2) - pow( cvmGet(pP2,2,1), 2);
-cvmSet(pA,6+1,5)= 2 * cvmGet(pP2,1,1)* cvmGet(pP2,1,2)- 2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,1);
-cvmSet(pA,6+1,6)= 2 * cvmGet(pP2,1,3)* cvmGet(pP2,1,1)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,1);
-cvmSet(pA,6+1,7)= -pow( cvmGet(pP2,2,2), 2) + pow( cvmGet(pP2,1,2), 2);
-cvmSet(pA,6+1,8)= -2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,3)+ 2 * cvmGet(pP2,1,2)* cvmGet(pP2,1,3);
-cvmSet(pA,6+1,9)= pow( cvmGet(pP2,1,3), 2) - pow( cvmGet(pP2,2,3), 2);
-cvmSet(pA,6+2,0)= pow( cvmGet(pP2,0,0), 2) - pow( cvmGet(pP2,1,0), 2);
-cvmSet(pA,6+2,1)= -2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,1)+ 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,1);
-cvmSet(pA,6+2,2)= 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,2);
-cvmSet(pA,6+2,3)= 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,3)- 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,3);
-cvmSet(pA,6+2,4)= pow( cvmGet(pP2,0,1), 2) - pow( cvmGet(pP2,1,1), 2);
-cvmSet(pA,6+2,5)= 2 * cvmGet(pP2,0,1)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,1,1)* cvmGet(pP2,1,2);
-cvmSet(pA,6+2,6)= 2 * cvmGet(pP2,0,3)* cvmGet(pP2,0,1)- 2 * cvmGet(pP2,1,3)* cvmGet(pP2,1,1);
-cvmSet(pA,6+2,7)= -pow( cvmGet(pP2,1,2), 2) + pow( cvmGet(pP2,0,2), 2);
-cvmSet(pA,6+2,8)= -2 * cvmGet(pP2,1,2)* cvmGet(pP2,1,3)+ 2 * cvmGet(pP2,0,2)* cvmGet(pP2,0,3);
-cvmSet(pA,6+2,9)= pow( cvmGet(pP2,0,3), 2) - pow( cvmGet(pP2,1,3), 2);
-cvmSet(pA,6+3,0)= cvmGet(pP2,1,0)* cvmGet(pP2,0,0);
-cvmSet(pA,6+3,1)= cvmGet(pP2,1,1)* cvmGet(pP2,0,0)+ cvmGet(pP2,1,0)* cvmGet(pP2,0,1);
-cvmSet(pA,6+3,2)= cvmGet(pP2,1,0)* cvmGet(pP2,0,2)+ cvmGet(pP2,1,2)* cvmGet(pP2,0,0);
-cvmSet(pA,6+3,3)= cvmGet(pP2,1,0)* cvmGet(pP2,0,3)+ cvmGet(pP2,1,3)* cvmGet(pP2,0,0);
-cvmSet(pA,6+3,4)= cvmGet(pP2,1,1)* cvmGet(pP2,0,1);
-cvmSet(pA,6+3,5)= cvmGet(pP2,1,2)* cvmGet(pP2,0,1)+ cvmGet(pP2,1,1)* cvmGet(pP2,0,2);
-cvmSet(pA,6+3,6)= cvmGet(pP2,1,3)* cvmGet(pP2,0,1)+ cvmGet(pP2,1,1)* cvmGet(pP2,0,3);
-cvmSet(pA,6+3,7)= cvmGet(pP2,1,2)* cvmGet(pP2,0,2);
-cvmSet(pA,6+3,8)= cvmGet(pP2,1,3)* cvmGet(pP2,0,2)+ cvmGet(pP2,1,2)* cvmGet(pP2,0,3);
-cvmSet(pA,6+3,9)= cvmGet(pP2,1,3)* cvmGet(pP2,0,3);
-cvmSet(pA,6+4,0)= cvmGet(pP2,2,0)* cvmGet(pP2,1,0);
-cvmSet(pA,6+4,1)= cvmGet(pP2,2,1)* cvmGet(pP2,1,0)+ cvmGet(pP2,2,0)* cvmGet(pP2,1,1);
-cvmSet(pA,6+4,2)= cvmGet(pP2,2,0)* cvmGet(pP2,1,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,1,0);
-cvmSet(pA,6+4,3)= cvmGet(pP2,2,0)* cvmGet(pP2,1,3)+ cvmGet(pP2,2,3)* cvmGet(pP2,1,0);
-cvmSet(pA,6+4,4)= cvmGet(pP2,2,1)* cvmGet(pP2,1,1);
-cvmSet(pA,6+4,5)= cvmGet(pP2,2,2)* cvmGet(pP2,1,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,1,2);
-cvmSet(pA,6+4,6)= cvmGet(pP2,2,3)* cvmGet(pP2,1,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,1,3);
-cvmSet(pA,6+4,7)= cvmGet(pP2,2,2)* cvmGet(pP2,1,2);
-cvmSet(pA,6+4,8)= cvmGet(pP2,2,3)* cvmGet(pP2,1,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,1,3);
-cvmSet(pA,6+4,9)= cvmGet(pP2,2,3)* cvmGet(pP2,1,3);
-cvmSet(pA,6+5,0)= cvmGet(pP2,2,0)* cvmGet(pP2,0,0);
-cvmSet(pA,6+5,1)= cvmGet(pP2,2,1)* cvmGet(pP2,0,0)+ cvmGet(pP2,2,0)* cvmGet(pP2,0,1);
-cvmSet(pA,6+5,2)= cvmGet(pP2,2,0)* cvmGet(pP2,0,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,0,0);
-cvmSet(pA,6+5,3)= cvmGet(pP2,2,0)* cvmGet(pP2,0,3)+ cvmGet(pP2,2,3)* cvmGet(pP2,0,0);
-cvmSet(pA,6+5,4)= cvmGet(pP2,2,1)* cvmGet(pP2,0,1);
-cvmSet(pA,6+5,5)= cvmGet(pP2,2,2)* cvmGet(pP2,0,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,0,2);
-cvmSet(pA,6+5,6)= cvmGet(pP2,2,3)* cvmGet(pP2,0,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,0,3);
-cvmSet(pA,6+5,7)= cvmGet(pP2,2,2)* cvmGet(pP2,0,2);
-cvmSet(pA,6+5,8)= cvmGet(pP2,2,3)* cvmGet(pP2,0,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,0,3);
-cvmSet(pA,6+5,9)= cvmGet(pP2,2,3)* cvmGet(pP2,0,3);
+    cvmSet(pA,6+0,0, pow( cvmGet(pP2,0,0), 2) - pow( cvmGet(pP2,2,0), 2));
+    cvmSet(pA,6+0,1, -2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,1)+ 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+0,2, 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,2));
+    cvmSet(pA,6+0,3, 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,3)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,0));
+    cvmSet(pA,6+0,4, pow( cvmGet(pP2,0,1), 2) - pow( cvmGet(pP2,2,1), 2));
+    cvmSet(pA,6+0,5, 2 * cvmGet(pP2,0,1)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,1));
+    cvmSet(pA,6+0,6, 2 * cvmGet(pP2,0,3)* cvmGet(pP2,0,1)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,1));
+    cvmSet(pA,6+0,7, -pow( cvmGet(pP2,2,2), 2) + pow( cvmGet(pP2,0,2), 2));
+    cvmSet(pA,6+0,8, -2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,3)+ 2 * cvmGet(pP2,0,2)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+0,9, pow( cvmGet(pP2,0,3), 2) - pow( cvmGet(pP2,2,3), 2));
+    cvmSet(pA,6+1,0, pow( cvmGet(pP2,1,0), 2) - pow( cvmGet(pP2,2,0), 2));
+    cvmSet(pA,6+1,1, -2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,1)+ 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,1));
+    cvmSet(pA,6+1,2, 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,2)- 2 * cvmGet(pP2,2,0)* cvmGet(pP2,2,2));
+    cvmSet(pA,6+1,3, 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,3)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,0));
+    cvmSet(pA,6+1,4, pow( cvmGet(pP2,1,1), 2) - pow( cvmGet(pP2,2,1), 2));
+    cvmSet(pA,6+1,5, 2 * cvmGet(pP2,1,1)* cvmGet(pP2,1,2)- 2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,1));
+    cvmSet(pA,6+1,6, 2 * cvmGet(pP2,1,3)* cvmGet(pP2,1,1)- 2 * cvmGet(pP2,2,3)* cvmGet(pP2,2,1));
+    cvmSet(pA,6+1,7, -pow( cvmGet(pP2,2,2), 2) + pow( cvmGet(pP2,1,2), 2));
+    cvmSet(pA,6+1,8, -2 * cvmGet(pP2,2,2)* cvmGet(pP2,2,3)+ 2 * cvmGet(pP2,1,2)* cvmGet(pP2,1,3));
+    cvmSet(pA,6+1,9, pow( cvmGet(pP2,1,3), 2) - pow( cvmGet(pP2,2,3), 2));
+    cvmSet(pA,6+2,0, pow( cvmGet(pP2,0,0), 2) - pow( cvmGet(pP2,1,0), 2));
+    cvmSet(pA,6+2,1, -2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,1)+ 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+2,2, 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,2));
+    cvmSet(pA,6+2,3, 2 * cvmGet(pP2,0,0)* cvmGet(pP2,0,3)- 2 * cvmGet(pP2,1,0)* cvmGet(pP2,1,3));
+    cvmSet(pA,6+2,4, pow( cvmGet(pP2,0,1), 2) - pow( cvmGet(pP2,1,1), 2));
+    cvmSet(pA,6+2,5, 2 * cvmGet(pP2,0,1)* cvmGet(pP2,0,2)- 2 * cvmGet(pP2,1,1)* cvmGet(pP2,1,2));
+    cvmSet(pA,6+2,6, 2 * cvmGet(pP2,0,3)* cvmGet(pP2,0,1)- 2 * cvmGet(pP2,1,3)* cvmGet(pP2,1,1));
+    cvmSet(pA,6+2,7, -pow( cvmGet(pP2,1,2), 2) + pow( cvmGet(pP2,0,2), 2));
+    cvmSet(pA,6+2,8, -2 * cvmGet(pP2,1,2)* cvmGet(pP2,1,3)+ 2 * cvmGet(pP2,0,2)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+2,9, pow( cvmGet(pP2,0,3), 2) - pow( cvmGet(pP2,1,3), 2));
+    cvmSet(pA,6+3,0, cvmGet(pP2,1,0)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+3,1, cvmGet(pP2,1,1)* cvmGet(pP2,0,0)+ cvmGet(pP2,1,0)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+3,2, cvmGet(pP2,1,0)* cvmGet(pP2,0,2)+ cvmGet(pP2,1,2)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+3,3, cvmGet(pP2,1,0)* cvmGet(pP2,0,3)+ cvmGet(pP2,1,3)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+3,4, cvmGet(pP2,1,1)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+3,5, cvmGet(pP2,1,2)* cvmGet(pP2,0,1)+ cvmGet(pP2,1,1)* cvmGet(pP2,0,2));
+    cvmSet(pA,6+3,6, cvmGet(pP2,1,3)* cvmGet(pP2,0,1)+ cvmGet(pP2,1,1)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+3,7, cvmGet(pP2,1,2)* cvmGet(pP2,0,2));
+    cvmSet(pA,6+3,8, cvmGet(pP2,1,3)* cvmGet(pP2,0,2)+ cvmGet(pP2,1,2)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+3,9, cvmGet(pP2,1,3)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+4,0, cvmGet(pP2,2,0)* cvmGet(pP2,1,0));
+    cvmSet(pA,6+4,1, cvmGet(pP2,2,1)* cvmGet(pP2,1,0)+ cvmGet(pP2,2,0)* cvmGet(pP2,1,1));
+    cvmSet(pA,6+4,2, cvmGet(pP2,2,0)* cvmGet(pP2,1,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,1,0));
+    cvmSet(pA,6+4,3, cvmGet(pP2,2,0)* cvmGet(pP2,1,3)+ cvmGet(pP2,2,3)* cvmGet(pP2,1,0));
+    cvmSet(pA,6+4,4, cvmGet(pP2,2,1)* cvmGet(pP2,1,1));
+    cvmSet(pA,6+4,5, cvmGet(pP2,2,2)* cvmGet(pP2,1,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,1,2));
+    cvmSet(pA,6+4,6, cvmGet(pP2,2,3)* cvmGet(pP2,1,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,1,3));
+    cvmSet(pA,6+4,7, cvmGet(pP2,2,2)* cvmGet(pP2,1,2));
+    cvmSet(pA,6+4,8, cvmGet(pP2,2,3)* cvmGet(pP2,1,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,1,3));
+    cvmSet(pA,6+4,9, cvmGet(pP2,2,3)* cvmGet(pP2,1,3));
+    cvmSet(pA,6+5,0, cvmGet(pP2,2,0)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+5,1, cvmGet(pP2,2,1)* cvmGet(pP2,0,0)+ cvmGet(pP2,2,0)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+5,2, cvmGet(pP2,2,0)* cvmGet(pP2,0,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+5,3, cvmGet(pP2,2,0)* cvmGet(pP2,0,3)+ cvmGet(pP2,2,3)* cvmGet(pP2,0,0));
+    cvmSet(pA,6+5,4, cvmGet(pP2,2,1)* cvmGet(pP2,0,1));
+    cvmSet(pA,6+5,5, cvmGet(pP2,2,2)* cvmGet(pP2,0,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,0,2));
+    cvmSet(pA,6+5,6, cvmGet(pP2,2,3)* cvmGet(pP2,0,1)+ cvmGet(pP2,2,1)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+5,7, cvmGet(pP2,2,2)* cvmGet(pP2,0,2));
+    cvmSet(pA,6+5,8, cvmGet(pP2,2,3)* cvmGet(pP2,0,2)+ cvmGet(pP2,2,2)* cvmGet(pP2,0,3));
+    cvmSet(pA,6+5,9, cvmGet(pP2,2,3)* cvmGet(pP2,0,3));
 
 
 }
