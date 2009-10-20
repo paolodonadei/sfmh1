@@ -22,7 +22,7 @@ enum SELFCALIBMETHOD {STRUM, POLLEFEY, HARTLEY,POLLEFEYVISUAL};
 
 
 using namespace std;
-int enforceRank3forQ(const CvMat* pQ);
+int enforceRank3forQ(CvMat* pQ);
 int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK);
 int normalizeProjectionMatrix(const CvMat* in, CvMat* inNormalized,int width, int height);
 int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3);

@@ -1,4 +1,4 @@
-CC=g++
+CC=g++ -g
 
 INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
 CFLAGS=$(INC) -c -g -Wall
