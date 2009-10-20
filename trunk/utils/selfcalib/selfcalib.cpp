@@ -75,14 +75,18 @@ int main(int argc, char *argv[])
 
     double foc;
     // estimateFocalLengthStrum(F,width,height,foc);
-
+    cvSetZero(K1);
+    cvSetZero(K2);
     HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,HARTLEY);
-
     cout<<" According to Hartley F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
 
+    cvSetZero(K1);
+    cvSetZero(K2);
     HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,STRUM);
     cout<<" According to STRUM F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
 
+    cvSetZero(K1);
+    cvSetZero(K2);
     HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,POLLEFEYVISUAL);
     cout<<" According to POLLEFEYVISUAL F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
 

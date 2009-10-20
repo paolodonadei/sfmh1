@@ -322,8 +322,30 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 }
 int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 {
-printf(" extract intrinsic matrix, dont forget that the projection matrices were initially normalized, so we have to do some kind of denormalization\n");
+
+    CvMat* IAC = cvCreateMat(3,3, CV_64F);
+    CvMat* inter1 = cvCreateMat(3,4, CV_64F);
+    CvMat* P_T= cvCreateMat(3,4, CV_64F);
+
+    cvTranspose(pPnormalized, P_T);
+
+    cvMatMult(pPnormalized,pQ,inter1);
+    cvMatMult(inter1,P_T,IAC);
+
+
+    printf(" extract intrinsic matrix, dont forget that the projection matrices were initially normalized, so we have to do some kind of denormalization\n");
+
+
+
+
+
+    cvReleaseMat(&IAC);
+    cvReleaseMat(&inter1);
+    cvReleaseMat(&P_T);
 }
+
+
+
 int normalizeProjectionMatrix(const CvMat* in, CvMat* inNormalized,int width, int height)
 {
 //this normalization is taken from the paper:Visual modeling with a hand-held camera
@@ -342,7 +364,10 @@ int normalizeProjectionMatrix(const CvMat* in, CvMat* inNormalized,int width, in
     cvmSet(Knorm,2,1, 0);
     cvmSet(Knorm,2,2, 1);
 
-    cvMul(Knorm, in, inNormalized);      // Ma.*Mb  -> Mc
+
+//printf("A*B=C, (%d X %d ) X (%d X %d ) =(%d X %d ) \n",Knorm->height,Knorm->width,in->height,in->width,inNormalized->height,inNormalized->width);
+
+    cvMatMul(Knorm, in, inNormalized);      // Ma.*Mb  -> Mc
 
 
     cvReleaseMat(&Knorm);
@@ -385,14 +410,14 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
     double omg;
     double coeff;
     //the visual is the modified pollefey method outlined in his visual modelling paoer
-    CvMat* U = cvCreateMat(3,3, CV_64F);
-    CvMat* V = cvCreateMat(3,3, CV_64F);
-    CvMat* W = cvCreateMat(3,3, CV_64F);
+    CvMat* U = cvCreateMat(pA->height,pA->height, CV_64F);
+    CvMat* V = cvCreateMat(pA->width,pA->width, CV_64F);
+    CvMat* W = cvCreateMat(pA->height,pA->width, CV_64F);
     CvMat* AC;
     CvMat* C = cvCreateMat(10,1, CV_64F);
     CvMat* P2R3_T= cvCreateMat(4,1, CV_64F);
     CvMat* P2Q_intermediate= cvCreateMat(1,4, CV_64F);
-    CvMat* omegaMat= cvCreateMat(1,4, CV_64F);
+    CvMat* omegaMat= cvCreateMat(1,1, CV_64F);
     int count=0;
 
     cvTranspose(P2R3, P2R3_T);
@@ -446,27 +471,33 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
         int z=0;
         for(i=0; i<4; i++)
         {
-            for(j=0; j<4; j++)
+            for(j=i; j<4; j++)
             {
+
+                cvmSet(Q,j,i,cvmGet(C,z,0));
                 cvmSet(Q,i,j,cvmGet(C,z,0));
+                // printf(" i is %d and j is %d and z is %d and C is  %f  \n",i,j,z,cvmGet(C,z,0));
+
                 z++;
             }
         }
 
 //calculate new omega
 
-        cvMul(P2R3, Q, P2Q_intermediate);      // Ma.*Mb  -> Mc
-        cvMul(P2Q_intermediate, P2R3_T,omegaMat);      // Ma.*Mb  -> Mc
+        cvMatMul(P2R3, Q, P2Q_intermediate);      // Ma.*Mb  -> Mc
+
+        cvMatMul(P2Q_intermediate, P2R3_T,omegaMat);      // Ma.*Mb  -> Mc
 
         omg=cvmGet(omegaMat,0,0);
 
         printf("the new omega is %f\n",omg);
         count++;
+        cvReleaseMat(&AC);
     }
 
     enforceRank3forQ(Q);
 
-    cvReleaseMat(&AC);
+
     cvReleaseMat(&C);
     cvReleaseMat(&P2Q_intermediate);
     cvReleaseMat(&omegaMat);
@@ -483,10 +514,33 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
 
 }
 
-int enforceRank3forQ(const CvMat* pQ)
+int enforceRank3forQ( CvMat* pQ)
 {
-    printf("have not enforced rank 3 yet but do it, you can do it from the code for F\n");
+    CvMat* U = cvCreateMat(4,4, CV_64F);
+    CvMat* V = cvCreateMat(4,4, CV_64F);
+    CvMat* W = cvCreateMat(4,4, CV_64F);
+    CvMat* TF = cvCreateMat(4,4, CV_64F);
+    CvMat* QC;
 
+    QC=cvCloneMat(pQ);
+
+
+    cvSVD( QC, W,  U, V,CV_SVD_V_T );  //change all of the below back to U
+
+    cvmSet(W,3,3,0.0);//last svd to zero
+
+
+    // F0 <- U*diag([W(1), W(2), 0])*V'
+    cvGEMM( U, W, 1., 0, 0., TF );
+    cvGEMM( TF, V, 1., 0, 0., pQ, 0 );
+
+
+
+    printf("have not enforced rank 3 yet but do it, you can do it from the code for F\n");
+    cvReleaseMat(&TF);
+    cvReleaseMat(&U);
+    cvReleaseMat(&V);
+    cvReleaseMat(&W);
 
 }
 int absoluteQuadricfromAY(const CvMat* pA, CvMat* pY,CvMat* Q)
@@ -1151,3 +1205,5 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
     F2=  sqrt(f1)*typicalF;
     //printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
 }
+
+
