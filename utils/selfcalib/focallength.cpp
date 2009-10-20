@@ -112,26 +112,7 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
     if (method==POLLEFEYVISUAL)
     {
         double foc1,foc2;
-        estimateFocalLengthsPollefeyVisual(pF,width1,height1,width2,height2,foc1,foc2);
-
-//        //if one of them isnan then the other should be isnan
-//        if(isnan(foc1)) foc2=foc1;
-//        if(isnan(foc2)) foc1=foc2;
-
-        cvSetIdentity(K1);
-        cvSetIdentity(K2);
-
-        cvmSet(K1, 0, 0, foc1);
-        cvmSet(K1, 1, 1, foc1);
-        cvmSet(K1, 0, 2, ((double)(width1/2.00)));
-        cvmSet(K1, 1, 2, ((double)(height1/2.00)));
-
-        cvmSet(K2, 0, 0, foc2);
-        cvmSet(K2, 1, 1, foc2);
-        cvmSet(K2, 0, 2, ((double)(width2/2.00)));
-        cvmSet(K2, 1, 2, ((double)(height2/2.00)));
-
-
+        estimateFocalLengthsPollefeyVisual(pF,width1,height1,width2,height2,K1,K2);
 
     }
     if (method==HARTLEY)
@@ -277,37 +258,94 @@ int solveQuadratictwoUnknowns(const FLOAT coeff1[4], const FLOAT coeff2[4], FLOA
 
 
 }
-int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2)
+int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1,int width2, int height2,CvMat* K1,CvMat* K2)
 {
     //this is same as pollefey's method but this is a simpler version deriven from his visual modelling paper
 
     //estim
+    int i;
     CvMat* P1 = cvCreateMat(3,4, CV_64F);
     CvMat* P2 = cvCreateMat(3,4, CV_64F);
+
+    CvMat* P1_normalized = cvCreateMat(3,4, CV_64F);
+    CvMat* P2_normalized = cvCreateMat(3,4, CV_64F);
+
+    CvMat* A = cvCreateMat(12,10, CV_64F);
+    CvMat* Q = cvCreateMat(4,4, CV_64F);
+
+    CvMat* P2R3= cvCreateMat(1,4, CV_64F);
+
 
 
     ProjectiveMatFromF(pF, P1,P2);
 
 
-
-    CvMat* A = cvCreateMat(12,10, CV_64F);
-
-    CvMat* Q = cvCreateMat(4,4, CV_64F);
+    normalizeProjectionMatrix(P1,P1_normalized,width1,height1);
+    normalizeProjectionMatrix(P2,P2_normalized,width2,height2);
 
 
-    formAfromP1P2PollefeyVisual(P1,P2, A);
-    absoluteQuadricfromAVisual(A,Q);
+//take the 3rd row of P to pass it to the absolute quadric since it needs it to find omega
+// i think we need the normalized matrices
+    for(i=0; i<4; i++)
+    {
+        cvmSet(P2R3,0,i, cvmGet(P2_normalized,2,i));
+    }
 
-    cvReleaseMat(&A);
+
+    formAfromP1P2PollefeyVisual(P1_normalized,P2_normalized, A);
+    absoluteQuadricfromAVisual(A,Q,P2R3);
 
 
-    cvReleaseMat(&Q);
+    extractKfromQ(Q,P1_normalized,K1);
+    extractKfromQ(Q,P2_normalized,K2);
+
+//here print K and also denormalize it, if you remember we normalized the projection matrices
+
+
+
+
+    cvReleaseMat(&P2R3);
 
     cvReleaseMat(&P1);
     cvReleaseMat(&P2);
 
 
 
+    cvReleaseMat(&P1_normalized);
+    cvReleaseMat(&P2_normalized);
+
+    cvReleaseMat(&A);
+    cvReleaseMat(&Q);
+
+
+
+}
+int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
+{
+printf(" extract intrinsic matrix, dont forget that the projection matrices were initially normalized, so we have to do some kind of denormalization\n");
+}
+int normalizeProjectionMatrix(const CvMat* in, CvMat* inNormalized,int width, int height)
+{
+//this normalization is taken from the paper:Visual modeling with a hand-held camera
+    CvMat* Knorm = cvCreateMat(3,3, CV_64F);
+
+    cvSetIdentity(Knorm);
+
+
+    cvmSet(Knorm,0,0, 1.0 / (width + height));
+    cvmSet(Knorm,0,1, 0);
+    cvmSet(Knorm,0,2, -width / ((width + height) * 2.0));
+    cvmSet(Knorm,1,0, 0);
+    cvmSet(Knorm,1,1, 1.0 / (width + height));
+    cvmSet(Knorm,1,2, -height / ((width + height) * 2.0));
+    cvmSet(Knorm,2,0, 0);
+    cvmSet(Knorm,2,1, 0);
+    cvmSet(Knorm,2,2, 1);
+
+    cvMul(Knorm, in, inNormalized);      // Ma.*Mb  -> Mc
+
+
+    cvReleaseMat(&Knorm);
 
 
 }
@@ -341,77 +379,115 @@ int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int w
 
 
 }
-int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q)
+int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
 {
     int i,j;
+    double omg;
+    double coeff;
     //the visual is the modified pollefey method outlined in his visual modelling paoer
     CvMat* U = cvCreateMat(3,3, CV_64F);
     CvMat* V = cvCreateMat(3,3, CV_64F);
     CvMat* W = cvCreateMat(3,3, CV_64F);
     CvMat* AC;
     CvMat* C = cvCreateMat(10,1, CV_64F);
+    CvMat* P2R3_T= cvCreateMat(4,1, CV_64F);
+    CvMat* P2Q_intermediate= cvCreateMat(1,4, CV_64F);
+    CvMat* omegaMat= cvCreateMat(1,4, CV_64F);
+    int count=0;
 
-    AC=cvCloneMat(pA);
+    cvTranspose(P2R3, P2R3_T);
+    omg=((double)1.00);
 
-    double omg=((double)1.00);
-
-    double coeff=0;
-
-    for(i=0; i<10; i++)
+    while(count<6)
     {
-        if((i+0)%6==0 || (i+1)%6==0)
-        {
-            coeff=1.00/(9.0*omg);
-        }
-        if((i+2)%6==0 )
-        {
-            coeff=1.00/(0.2*omg);
-        }
-        if((i+3)%6==0 || (i+4)%6==0)
-        {
-            coeff=1.00/(0.1*omg);
-        }
-        if((i+5)%6==0 )
-        {
-            coeff=1.00/(0.01*omg);
-        }
-        for(j=0; j<10; j++)
-        {
-
-            cvmSet(AC,i,j,cvmGet(pA,0,j)*coeff);
-            z++;
-        }
-    }
 
 
+        AC=cvCloneMat(pA);
 
-    cvSVD( AC, W,  U, V );  //change all of the below back to U
+
+        coeff=0;
+
+        for(i=0; i<10; i++)
+        {
+            if((i+0)%6==0 || (i+1)%6==0)
+            {
+                coeff=1.00/(9.0*omg);
+            }
+            if((i+2)%6==0 )
+            {
+                coeff=1.00/(0.2*omg);
+            }
+            if((i+3)%6==0 || (i+4)%6==0)
+            {
+                coeff=1.00/(0.1*omg);
+            }
+            if((i+5)%6==0 )
+            {
+                coeff=1.00/(0.01*omg);
+            }
+            for(j=0; j<10; j++)
+            {
+
+                cvmSet(AC,i,j,cvmGet(pA,0,j)*coeff);
+
+            }
+        }
+
+        cvSVD( AC, W,  U, V );
 
 //taking the solution out
-    for(i=0; i<10; i++)
-    {
-        cvmSet(C,i,0,cvmGet(V,i,9));
+        for(i=0; i<10; i++)
+        {
+            cvmSet(C,i,0,cvmGet(V,i,9));
 
-    }
-//calculate new omega
-
+        }
 
 //putting C into Q
-    int z=0;
-    for(i=0; i<4; i++)
-    {
-        for(j=0; j<4; j++)
+        int z=0;
+        for(i=0; i<4; i++)
         {
-            cvmSet(Q,i,j,cvmGet(C,z,0));
-            z++;
+            for(j=0; j<4; j++)
+            {
+                cvmSet(Q,i,j,cvmGet(C,z,0));
+                z++;
+            }
         }
+
+//calculate new omega
+
+        cvMul(P2R3, Q, P2Q_intermediate);      // Ma.*Mb  -> Mc
+        cvMul(P2Q_intermediate, P2R3_T,omegaMat);      // Ma.*Mb  -> Mc
+
+        omg=cvmGet(omegaMat,0,0);
+
+        printf("the new omega is %f\n",omg);
+        count++;
     }
 
+    enforceRank3forQ(Q);
 
+    cvReleaseMat(&AC);
+    cvReleaseMat(&C);
+    cvReleaseMat(&P2Q_intermediate);
+    cvReleaseMat(&omegaMat);
 
     cvReleaseMat(&U);
     cvReleaseMat(&V);
     cvReleaseMat(&W);
+
+
+    cvReleaseMat(&P2R3_T);
+
+
+
+
+}
+
+int enforceRank3forQ(const CvMat* pQ)
+{
+    printf("have not enforced rank 3 yet but do it, you can do it from the code for F\n");
+
+
 }
 int absoluteQuadricfromAY(const CvMat* pA, CvMat* pY,CvMat* Q)
 {
@@ -425,6 +501,7 @@ int absoluteQuadricfromAY(const CvMat* pA, CvMat* pY,CvMat* Q)
 
     cvSVD( AC, W,  U, V );  //change all of the below back to U
 
+    enforceRank3forQ(Q);
 
     cvReleaseMat(&U);
     cvReleaseMat(&V);
