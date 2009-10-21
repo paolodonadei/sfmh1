@@ -286,7 +286,7 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 
 //take the 3rd row of P to pass it to the absolute quadric since it needs it to find omega
 // i think we need the normalized matrices
-    for(i=0; i<4; i++)
+    for (i=0; i<4; i++)
     {
         cvmSet(P2R3,0,i, cvmGet(P2_normalized,2,i));
     }
@@ -297,14 +297,14 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 
 
     extractKfromQ(Q,P1_normalized,K1);
-    extractKfromQ(Q,P2_normalized,K2);
+   // extractKfromQ(Q,P2_normalized,K2);
 
 //here print K and also denormalize it, if you remember we normalized the projection matrices
 
 
     //this is because we normalized he projection matrix
     denormalizeK(K1);
-    denormalizeK(K2);
+  //  denormalizeK(K2);
 
 
     cvReleaseMat(&P2R3);
@@ -331,8 +331,19 @@ int denormalizeK(CvMat*  K)
 
 
 }
+
+
+void h_handler (const char * reason,const char * file,int line, int gsl_errno)
+{
+    printf("gsl error because of: %s at file %s in line %d with error number %d\n",reason, file, line, gsl_errno);
+
+
+}
+
 int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 {
+    gsl_error_handler_t * old_handler = gsl_set_error_handler (&h_handler);
+
 
     CvMat* IAC = cvCreateMat(3,3, CV_64F);
     CvMat* inter1 = cvCreateMat(3,4, CV_64F);
@@ -348,9 +359,9 @@ int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 
 
     int z=0;
-    for(int i=0; i<3; i++)
+    for (int i=0; i<3; i++)
     {
-        for(int j=0; j<3; j++)
+        for (int j=0; j<3; j++)
         {
             tempIAC[z]=cvmGet(IAC,i,j);
             z++;
@@ -364,18 +375,18 @@ int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 
     int retVal=gsl_linalg_cholesky_decomp (&m.matrix);
 
-    if(retVal==GSL_EDOM)
+    if (retVal==GSL_EDOM)
     {
 
-    printf("the matrix was not positive definite, degenerate config\n");
+        printf("the matrix was not positive definite, degenerate config\n");
 
     }
 
 
     z=0;
-    for(int i=0; i<3; i++)
+    for (int i=0; i<3; i++)
     {
-        for(int j=0; j<3; j++)
+        for (int j=0; j<3; j++)
         {
             cvmSet(pK,i,j,tempIAC[z] );
             z++;
@@ -392,6 +403,7 @@ int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
     cout<<"pK:" <<endl;
     writeCVMatrix(cout,pK );
 
+    gsl_set_error_handler (old_handler);
 
     delete[] tempIAC;
     cvReleaseMat(&IAC);
@@ -478,7 +490,7 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
     cvTranspose(P2R3, P2R3_T);
     omg=((double)1.00);
 
-    while(count<6)
+    while (count<16)
     {
 
 
@@ -487,25 +499,25 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
 
         coeff=0;
 
-        for(i=0; i<10; i++)
+        for (i=0; i<10; i++)
         {
-            if((i+0)%6==0 || (i+1)%6==0)
+            if ((i+0)%6==0 || (i+1)%6==0)
             {
                 coeff=1.00/(9.0*omg);
             }
-            if((i+2)%6==0 )
+            if ((i+2)%6==0 )
             {
                 coeff=1.00/(0.2*omg);
             }
-            if((i+3)%6==0 || (i+4)%6==0)
+            if ((i+3)%6==0 || (i+4)%6==0)
             {
                 coeff=1.00/(0.1*omg);
             }
-            if((i+5)%6==0 )
+            if ((i+5)%6==0 )
             {
                 coeff=1.00/(0.01*omg);
             }
-            for(j=0; j<10; j++)
+            for (j=0; j<10; j++)
             {
 
                 cvmSet(AC,i,j,cvmGet(pA,0,j)*coeff);
@@ -516,7 +528,7 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
         cvSVD( AC, W,  U, V );
 
 //taking the solution out
-        for(i=0; i<10; i++)
+        for (i=0; i<10; i++)
         {
             cvmSet(C,i,0,cvmGet(V,i,9));
 
@@ -524,9 +536,9 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
 
 //putting C into Q
         int z=0;
-        for(i=0; i<4; i++)
+        for (i=0; i<4; i++)
         {
-            for(j=i; j<4; j++)
+            for (j=i; j<4; j++)
             {
 
                 cvmSet(Q,j,i,cvmGet(C,z,0));
@@ -1259,39 +1271,4 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
     F1=  sqrt(fo)*typicalF;
     F2=  sqrt(f1)*typicalF;
     //printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
-}
-
-int lala()
-{
-
-    double a_data[] = { 0.18, 0.60, 0.57, 0.96,
-                        0.41, 0.24, 0.99, 0.58,
-                        0.14, 0.30, 0.97, 0.66,
-                        0.51, 0.13, 0.19, 0.85
-                      };
-
-    double b_data[] = { 1.0, 2.0, 3.0, 4.0 };
-
-    gsl_matrix_view m
-    = gsl_matrix_view_array (a_data, 4, 4);
-
-    gsl_vector_view b
-    = gsl_vector_view_array (b_data, 4);
-
-    gsl_vector *x = gsl_vector_alloc (4);
-
-    int s;
-
-    gsl_permutation * p = gsl_permutation_alloc (4);
-
-    gsl_linalg_LU_decomp (&m.matrix, p, &s);
-
-    gsl_linalg_LU_solve (&m.matrix, p, &b.vector, x);
-
-    printf ("x = \n");
-    gsl_vector_fprintf (stdout, x, "%g");
-
-    gsl_permutation_free (p);
-    gsl_vector_free (x);
-
 }
