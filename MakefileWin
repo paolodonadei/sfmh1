@@ -8,7 +8,7 @@ SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.c
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a
-SUBDIRS = "utils/fundutils" "utils/decompose" "utils/selfcalib"
+
 
 all:  $(PROJECT) $(EXECUTABLE)
 

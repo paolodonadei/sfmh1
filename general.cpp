@@ -1,4 +1,3 @@
-
 #include <fstream>
 #include <iomanip>
 #include <sstream>
@@ -386,5 +385,4 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
     }
 
 }
-
 
