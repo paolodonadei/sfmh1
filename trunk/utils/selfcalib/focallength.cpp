@@ -18,8 +18,8 @@
 #include <sstream>
 #include <math.h>
 #include <stddef.h>
-
-
+#include <gsl/gsl_linalg.h>
+#include "general.h"
 
 #include "focallength.h"
 #include "visiongen.h"
@@ -302,6 +302,9 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 //here print K and also denormalize it, if you remember we normalized the projection matrices
 
 
+    //this is because we normalized he projection matrix
+    denormalizeK(K1);
+    denormalizeK(K2);
 
 
     cvReleaseMat(&P2R3);
@@ -320,25 +323,77 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 
 
 }
+
+int denormalizeK(CvMat*  K)
+{
+
+    printf("here we denormalize the intrinsic matrixces cuz we nrmalized the projection matrice\n");
+
+
+}
 int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 {
 
     CvMat* IAC = cvCreateMat(3,3, CV_64F);
     CvMat* inter1 = cvCreateMat(3,4, CV_64F);
-    CvMat* P_T= cvCreateMat(3,4, CV_64F);
+    CvMat* P_T= cvCreateMat(4,3, CV_64F);
 
     cvTranspose(pPnormalized, P_T);
 
-    cvMatMult(pPnormalized,pQ,inter1);
-    cvMatMult(inter1,P_T,IAC);
+    cvMatMul(pPnormalized,pQ,inter1);
+    cvMatMul(inter1,P_T,IAC);
+
+//cholesky decomposition using GSL
+    double* tempIAC=new double[9];
 
 
-    printf(" extract intrinsic matrix, dont forget that the projection matrices were initially normalized, so we have to do some kind of denormalization\n");
+    int z=0;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            tempIAC[z]=cvmGet(IAC,i,j);
+            z++;
+        }
+
+    }
+
+//cholesky
+//http://www.gnu.org/software/gsl/manual/html_node/Cholesky-Decomposition.html
+    gsl_matrix_view m = gsl_matrix_view_array (tempIAC, 3, 3);
+
+    int retVal=gsl_linalg_cholesky_decomp (&m.matrix);
+
+    if(retVal==GSL_EDOM)
+    {
+
+    printf("the matrix was not positive definite, degenerate config\n");
+
+    }
 
 
+    z=0;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            cvmSet(pK,i,j,tempIAC[z] );
+            z++;
+        }
+
+    }
+
+    cout<<"Q:" <<endl;
+    writeCVMatrix(cout,pQ);
+
+    cout<<"IAC:" <<endl;
+    writeCVMatrix(cout,IAC);
+
+    cout<<"pK:" <<endl;
+    writeCVMatrix(cout,pK );
 
 
-
+    delete[] tempIAC;
     cvReleaseMat(&IAC);
     cvReleaseMat(&inter1);
     cvReleaseMat(&P_T);
@@ -536,7 +591,7 @@ int enforceRank3forQ( CvMat* pQ)
 
 
 
-    printf("have not enforced rank 3 yet but do it, you can do it from the code for F\n");
+
     cvReleaseMat(&TF);
     cvReleaseMat(&U);
     cvReleaseMat(&V);
@@ -1206,4 +1261,37 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
     //printf("Houman: f1 was %f and f2 was %f \n ",F1,F2 );
 }
 
+int lala()
+{
 
+    double a_data[] = { 0.18, 0.60, 0.57, 0.96,
+                        0.41, 0.24, 0.99, 0.58,
+                        0.14, 0.30, 0.97, 0.66,
+                        0.51, 0.13, 0.19, 0.85
+                      };
+
+    double b_data[] = { 1.0, 2.0, 3.0, 4.0 };
+
+    gsl_matrix_view m
+    = gsl_matrix_view_array (a_data, 4, 4);
+
+    gsl_vector_view b
+    = gsl_vector_view_array (b_data, 4);
+
+    gsl_vector *x = gsl_vector_alloc (4);
+
+    int s;
+
+    gsl_permutation * p = gsl_permutation_alloc (4);
+
+    gsl_linalg_LU_decomp (&m.matrix, p, &s);
+
+    gsl_linalg_LU_solve (&m.matrix, p, &b.vector, x);
+
+    printf ("x = \n");
+    gsl_vector_fprintf (stdout, x, "%g");
+
+    gsl_permutation_free (p);
+    gsl_vector_free (x);
+
+}
