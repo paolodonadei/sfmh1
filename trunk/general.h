@@ -61,7 +61,7 @@ int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int
 void writeCVMatrix(ostream &stream,const CvMat* M);
 string findSeedDirName(const vector<string>& oArray);
 void readCvMatFfromfile(CvMat** tmodel,const string& mfname);
-
+void writeCVMatrix(char* fname,const CvMat* M);
 
 
 

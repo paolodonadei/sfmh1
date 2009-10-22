@@ -280,8 +280,10 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
     ProjectiveMatFromF(pF, P1,P2);
 
 
+
     normalizeProjectionMatrix(P1,P1_normalized,width1,height1);
     normalizeProjectionMatrix(P2,P2_normalized,width2,height2);
+
 
 
 //take the 3rd row of P to pass it to the absolute quadric since it needs it to find omega
@@ -297,15 +299,24 @@ int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1
 
 
     extractKfromQ(Q,P1_normalized,K1);
-   // extractKfromQ(Q,P2_normalized,K2);
+    // extractKfromQ(Q,P2_normalized,K2);
 
 //here print K and also denormalize it, if you remember we normalized the projection matrices
 
 
     //this is because we normalized he projection matrix
     denormalizeK(K1);
-  //  denormalizeK(K2);
+    //  denormalizeK(K2);
 
+    {
+        writeCVMatrix("fund.txt",pF );
+        writeCVMatrix("p1.txt",P1 );
+        writeCVMatrix("p2.txt",P2 );
+        writeCVMatrix("p1_normalized.txt",P1_normalized );
+        writeCVMatrix("p2_normalized.txt",P2_normalized );
+        writeCVMatrix("AQ.txt",Q );
+        writeCVMatrix("K1.txt",K1 );
+    }
 
     cvReleaseMat(&P2R3);
 
@@ -395,13 +406,13 @@ int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
     }
 
     cout<<"Q:" <<endl;
-    writeCVMatrix(cout,pQ);
+    writeCVMatrix("Qf.txt",pQ);
 
     cout<<"IAC:" <<endl;
-    writeCVMatrix(cout,IAC);
+    writeCVMatrix("IAC.txt",IAC);
 
     cout<<"pK:" <<endl;
-    writeCVMatrix(cout,pK );
+    writeCVMatrix("pKfromIAC.txt",pK );
 
     gsl_set_error_handler (old_handler);
 
@@ -490,50 +501,63 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
     cvTranspose(P2R3, P2R3_T);
     omg=((double)1.00);
 
-    while (count<16)
+    writeCVMatrix("A.txt",pA );
+
+    while (count<1)
     {
 
+        cvSetZero(U);
+        cvSetZero(V);
+        cvSetZero(W);
 
         AC=cvCloneMat(pA);
 
 
         coeff=0;
 
-        for (i=0; i<10; i++)
+        for (i=0; i<AC->height; i++)
         {
-            if ((i+0)%6==0 || (i+1)%6==0)
+            if (i%6==0 || i%6==1)
             {
+
                 coeff=1.00/(9.0*omg);
             }
-            if ((i+2)%6==0 )
+            if (i%6==2 )
             {
+
                 coeff=1.00/(0.2*omg);
             }
-            if ((i+3)%6==0 || (i+4)%6==0)
+            if (i%6==3  || i%6==4 )
             {
+
                 coeff=1.00/(0.1*omg);
             }
-            if ((i+5)%6==0 )
+            if (i%6==5  )
             {
+
                 coeff=1.00/(0.01*omg);
             }
             for (j=0; j<10; j++)
             {
 
-                cvmSet(AC,i,j,cvmGet(pA,0,j)*coeff);
+                cvmSet(AC,i,j,cvmGet(pA,i,j)*coeff);
 
             }
         }
 
+        writeCVMatrix((char*)(string(string("A") + string(stringify(count)) + string(".txt")).c_str()),AC );
         cvSVD( AC, W,  U, V );
 
+        writeCVMatrix((char*)(string(string("U") + string(stringify(count)) + string(".txt")).c_str()),U );
+        writeCVMatrix((char*)(string(string("V") + string(stringify(count)) + string(".txt")).c_str()),V );
+        writeCVMatrix((char*)(string(string("W") + string(stringify(count)) + string(".txt")).c_str()),W );
 //taking the solution out
         for (i=0; i<10; i++)
         {
             cvmSet(C,i,0,cvmGet(V,i,9));
 
         }
-
+        writeCVMatrix((char*)(string(string("C") + string(stringify(count)) + string(".txt")).c_str()),C );
 //putting C into Q
         int z=0;
         for (i=0; i<4; i++)
@@ -548,7 +572,7 @@ int absoluteQuadricfromAVisual(const CvMat* pA, CvMat* Q,CvMat* P2R3)
                 z++;
             }
         }
-
+        writeCVMatrix((char*)(string(string("Q_est") + string(stringify(count)) + string(".txt")).c_str()),Q );
 //calculate new omega
 
         cvMatMul(P2R3, Q, P2Q_intermediate);      // Ma.*Mb  -> Mc

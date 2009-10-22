@@ -15,6 +15,8 @@ using namespace boost;
 using namespace std;
 
 
+
+
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img )
 {
     cvLine( img, cvPoint( center.x - d, center.y - d ),
@@ -251,7 +253,16 @@ string findSeedDirName(const vector<string>& oArray)
     return dirname;
 }
 
+void writeCVMatrix(char* fname,const CvMat* M)
+{
 
+        fstream file_cmin(fname ,ios::out);
+        writeCVMatrix(file_cmin,M );
+
+        file_cmin.close();
+
+
+}
 
 void writeCVMatrix(ostream &stream,const CvMat* M)
 {
@@ -274,7 +285,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
     int n_cols = M->cols;
 
 
-    printf("\nnumber of rows is %d and number of cols is %d \n",n_rows,n_cols);
+   stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
 
 
 
@@ -286,7 +297,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
         {
 
 
-            stream<< cvmGet( M,i,j ) << "\t";
+            stream<< setw(17)<<setprecision(10)<<cvmGet( M,i,j ) << "     ";
         }
         stream << "\n";
 
@@ -294,6 +305,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
 
 
 }
+
 //
 //
 //bool FileExists(string strFilename)

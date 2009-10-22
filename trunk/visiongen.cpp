@@ -418,7 +418,12 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 //        printf("estimated F was: \nF:\n");
 //        writeCVMatrix(cout,FDebug );
 //        cvReleaseMat(&FDebug);
+
    }
+
+
+
+
     cvReleaseMat(&e1);
     cvReleaseMat(&e2);
     cvReleaseMat(&e2s);
