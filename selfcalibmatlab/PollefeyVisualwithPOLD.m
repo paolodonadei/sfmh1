@@ -101,7 +101,7 @@ end
 
 % take Q out of the svd
 [U,S,V] = svd(A);
-disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(A))]);
+    disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(AC)) ' and the rank is ' rank(A)] );
 Q=findQfromV(V);
 
 

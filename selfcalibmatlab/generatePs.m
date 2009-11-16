@@ -1,10 +1,10 @@
-function [ ps ] = generatePs( fdiff, skew, ar,centerdeviation, numps )
+function [ ps ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective )
 %if fdiff is 1 then all Fs will be different, if 0 otehrwise,
 %skew is just the max skew allowed, if its zero them all skews is zero
 %ar is the aspect ratio
 % centerdeviation is how much the center will deviate from the image center
 %numps is the number of the projection matrices
-
+projective=1
 format long g;
 
 rand('state', sum(100*clock));

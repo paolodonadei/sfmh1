@@ -131,7 +131,7 @@ for j=1:numIterations
     
     [U,S,V] = svd(AC);
  
-    disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(AC))]);
+    disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(AC)) ' and the rank is ' rank(AC)] );
     Q=findQfromV(V);
 
 
