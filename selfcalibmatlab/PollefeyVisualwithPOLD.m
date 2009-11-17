@@ -101,7 +101,7 @@ end
 
 % take Q out of the svd
 [U,S,V] = svd(A);
-    disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(AC)) ' and the rank is ' rank(A)] );
+    disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(A)) ' and the rank is ' num2str(rank(A))] );
 Q=findQfromV(V);
 
 
@@ -110,7 +110,7 @@ Q=findQfromV(V);
 
 for i=1:numFrames
     K=findKfromPQ(K_norm,P_in{1,i},Q);
-    disp([' the focal length is ' num2str(K(1,1)) ' or ' num2str(K(2,2))]);
+    disp([' the focal length is (K[0][0]) ' num2str(K(1,1)) ' or (K[1][1])' num2str(K(2,2))]);
 end
 
 

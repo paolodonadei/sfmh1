@@ -4,7 +4,7 @@ function [ ps ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective 
 %ar is the aspect ratio
 % centerdeviation is how much the center will deviate from the image center
 %numps is the number of the projection matrices
-projective=1
+projective=1;
 format long g;
 
 rand('state', sum(100*clock));
@@ -50,7 +50,7 @@ for i=1:numps
     P=K*[R -R*T];
     ps{1,i}=P;
     
-     disp(['forcal length ' num2str(i) ' is equal to: ' num2str(curentF)]);
+     disp(['forcal length ' num2str(i) ' is equal to: K[0][0] ' num2str(K(1,1)) ' or K[1][1] ' num2str(K(2,2))]);
     %now write all this to file
     save([dirname '/K' num2str(i) '.txt'], 'K','-ascii', '-double');
     save([dirname '/R' num2str(i) '.txt'], 'R','-ascii', '-double');
