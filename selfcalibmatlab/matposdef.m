@@ -1,0 +1,17 @@
+function [ isposdef ] = matposdef( M )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+lemma= eig(M);
+isposdef=true;
+for i=1:size(lemma,1)
+    
+    if(abs(lemma(i))>0.00005 && lemma(i)<0)
+        isposdef=false;
+        break;
+    end
+    
+
+
+end
+

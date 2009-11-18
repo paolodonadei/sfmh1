@@ -141,7 +141,7 @@ for j=1:numIterations
 
     for i=1:numFrames
         K=findKfromPQ(K_norm,P_in{1,i},Q);
-        disp([' the focal length is ' num2str(K(1,1)) ' or ' num2str(K(2,2))]);
+        disp([' frame : ' num2str(i) ' the focal length is ' num2str(K(1,1)) ' or ' num2str(K(2,2))]);
     end
 end
 

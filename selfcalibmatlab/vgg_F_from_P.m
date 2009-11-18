@@ -24,5 +24,9 @@ Y3 = P2([1 2],:);
 F = [det([X1; Y1]) det([X2; Y1]) det([X3; Y1])
      det([X1; Y2]) det([X2; Y2]) det([X3; Y2])
      det([X1; Y3]) det([X2; Y3]) det([X3; Y3])];
+ 
+ %normalizing F, done by Houman
+ 
+ F=F/F(3,3);
 
 return
