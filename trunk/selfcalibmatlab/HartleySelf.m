@@ -34,22 +34,22 @@ cg1 = -(-a ^ 2 * u31 ^ 2 * u22 * u21 * v31 ^ 2 - a ^ 2 * u31 ^ 2 * u12 * u11 * v
 
 
 if(cg0>0)
-    
-f1=sqrt(cg0);
-f1=f1*typicalF;
+
+    f1=sqrt(cg0);
+    f1=f1*typicalF;
 
 end
 
 
 
 if(cg1>0)
-    
-f2=sqrt(cg1);
-f2=f2*typicalF;
+
+    f2=sqrt(cg1);
+    f2=f2*typicalF;
 
 end;
 
-x=[f1 f2];
+x=[f2 f1];
 
 end
 

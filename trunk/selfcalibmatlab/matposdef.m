@@ -5,12 +5,17 @@ function [ isposdef ] = matposdef( M )
 lemma= eig(M);
 isposdef=true;
 for i=1:size(lemma,1)
-    
-    if(abs(lemma(i))>0.00005 && lemma(i)<0)
+
+    if(abs(lemma(i))>0.000005 && lemma(i)<0)
         isposdef=false;
         break;
     end
-    
+    if(isreal(lemma(i))~=1)
+        isposdef=false;
+        break;
+    end
+
+
 
 
 end
