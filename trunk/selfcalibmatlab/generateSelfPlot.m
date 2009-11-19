@@ -1,4 +1,6 @@
-function [ t,means,medians,  variances  ] = generateSelfPlot(paramcheck,repeat )
+function [ t,means,medians,  variances  ] = generateSelfPlot(paramcheck,repeat,pfdiff,pskew,par,pcenterdev )
+
+
 
 numPoints=30;
 styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vo' ,'-..c'};
@@ -18,10 +20,10 @@ variances=zeros(numalgs,numPoints);
 
 
 %arg paramters
-fdiff=zeros(1,numPoints);
-skew=zeros(1,numPoints);
-aspect=ones(1,numPoints);
-centerdev=zeros(1,numPoints);
+fdiff=ones(1,numPoints)*pfdiff;
+skew=ones(1,numPoints)*pskew;
+aspect=ones(1,numPoints)*par;
+centerdev=ones(1,numPoints)*pcenterdev;
 
 
 %depending on what we are varying we are gonna change the parameters
