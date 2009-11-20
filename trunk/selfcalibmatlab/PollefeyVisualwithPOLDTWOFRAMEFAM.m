@@ -144,7 +144,11 @@ for k=1:4
         K2=findKfromPQ(K_norm,P_in{1,2},M);
        % disp([' frame : ' num2str(1) ' the focal length is (K[0][0]) ' num2str(K1(1,1)) ' or (K[1][1])' num2str(K1(2,2))]);
        % disp([' frame : ' num2str(2) ' the focal length is (K[0][0]) ' num2str(K2(1,1)) ' or (K[1][1])' num2str(K2(2,2))]);
-
+%     P_in{1,1}
+%     M
+%     p=planeInfFromQ(M)
+%     K1
+%     K2
         f1=K1(1,1);
         f2=K2(1,1);
         break;
