@@ -1,4 +1,4 @@
-function [ ps ,ks ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective )
+function [ ps ,ks ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective,silent )
 %if fdiff is 1 then all Fs will be different, if 0 otehrwise,
 %skew is just the max skew allowed, if its zero them all skews is zero
 %ar is the aspect ratio
@@ -62,7 +62,7 @@ for i=1:numps
    
     %now write all this to file
 
-    if(numps~=2)
+    if(silent~=1)
          disp(['forcal length ' num2str(i) ' is equal to: K[0][0] ' num2str(K(1,1)) ' or K[1][1] ' num2str(K(2,2))]);
         dirname=['projFolder' num2str(sum(round(100*clock)))];
         mkdir(dirname);
