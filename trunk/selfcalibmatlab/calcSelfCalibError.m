@@ -1,4 +1,4 @@
-function [err  ] = calcSelfCalibError(answer,ks)
+ function [err  ] = calcSelfCalibError(answer,ks)
 
 K1=ks{1,1};
 K2=ks{1,2};
