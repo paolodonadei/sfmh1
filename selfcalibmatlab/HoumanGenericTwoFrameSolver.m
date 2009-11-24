@@ -1,46 +1,25 @@
-function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,w,h )
-%code conforms to the marr prize paper but with full parametrization of the
-%Q so we solve for the 10 variables
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-%http://www.robots.ox.ac.uk/~vgg/hzbook/code/
-%http://www.csse.uwa.edu.au/~pk/research/matlabfns/
-% data:   http://www.robots.ox.ac.uk/~vgg/data/data-mview.html
-f1=0;
-f2=0;
-x=[0 0];
+function [ K1,K2,Q ] = HoumanGenericTwoFrameSolver( F,K,functionFormA )
 
 P=PsfromF( F );
-[m n ]=size(P);
-numFrames=n;
+
+ K_norm=K;
+ K_norm_inv= inv(K);
 
 
-P_in=P;
 
 
-
-if(m>1)
-    disp([ 'the size of the input cell is wrong']);
-end
-
-
-%create the normalizing matrix
-[ K_norm, K_norm_inv ] = findNormalizingK(w,h);
-
-% K_norm=eye(3,3);
-% K_norm_inv=K_norm;
-
-%perform normalization
 for i=1:numFrames
     P_in{1,i}=K_norm_inv*P_in{1,i};
-    %   P_in{1,i}=P_in{1,i}/norm(P_in{1,i},'fro');
+    P_in{1,i}=P_in{1,i}(3,4);
 end
 
+P_in{1,1}
+P_in{1,2}
 
-%now form A
+A=functionFormA(P_in);
 
- [A,b]  = formAunknownF( P_in );
 
+[Q1, Q2]=QsfromAb(A,b);
 
 % take Q out of the svd
 [U,S,V] = svd(A);
@@ -82,19 +61,15 @@ for k=1:4
 %     p=planeInfFromQ(M)
 %     K1
 %     K2
-        f1=K1(1,1);
-        f2=K2(1,1);
+        disp(['try number ' num2str(k)]);
+        K1
+        K2
         break;
     end
 
 end
 
 
-x=[f1   f2];
+
 
 end
-
-
-
-
-

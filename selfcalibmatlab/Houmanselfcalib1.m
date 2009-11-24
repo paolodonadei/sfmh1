@@ -1,159 +1,66 @@
 function [ x ] = Houmanselfcalib1( F,w,h )
-%this one right here would estimate first assuming that only focal length
-%is unknown and then it would proceeed to estimate skew and AR and camera
-%center and then hopefully a non linear optimization at the end
-f1=0;
-f2=0;
-x=[0 0];
 
-P=PsfromF( F );
-[m n ]=size(P);
-numFrames=n;
-numRowsperFrame=4; %this is how many equatiosn we get per frame, or how many linear constraints per picture
-%copy the Ps to new P
-P_in=P;
+
+%first estimate the F assuming known other parameters
+ux1=w/2;
+vy1=h/2;
+
+ux2=w/2;
+vy2=h/2;
+
+[ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,ux*2,vy*2 );
 
 
 
-if(m>1)
-    disp([ 'the size of the input cell is wrong']);
-end
+disp(['f1 is ' num2str(x(1,1)) ' and f2 is ' num2str(x(1,2)) ' and ux1 is ' num2str(ux1)  ' and ux2 is ' num2str(ux2) ' vy1 is'  num2str(vy)  ' vy2 is'  num2str(vy) ]);
+%now estimate x center using the known F
+
+[K1_1 K2_1] = estimateUXfromFandVY( F,x,vy1,vy2 );
+
+% big problem here is that the x belongs to one camera not two, so i have
+% to estimate to uxs but for now lets assume the camera centers have moved
+% the same
 
 
-%create the normalizing matrix
-[ K_norm, K_norm_inv ] = findNormalizingK(w,h);
+ux1=K1_1(1,3);
+vy1=K1_1(2,3);
+
+ux2=K2_1(1,3);
+vy2=K2_1(2,3);
 
 
-%perform normalization
-for i=1:numFrames
-    P_in{1,i}=K_norm_inv*P_in{1,i};
-    %   P_in{1,i}=P_in{1,i}/norm(P_in{1,i},'fro');
-end
+x(1,1)=K1_1(1,1);
+x(1,2)=K2_1(1,1);
+
+disp(['f1 is ' num2str(x(1,1)) ' and f2 is ' num2str(x(1,2)) ' and ux1 is ' num2str(ux1)  ' and ux2 is ' num2str(ux2) ' vy1 is'  num2str(vy)  ' vy2 is'  num2str(vy) ]);
+
+%now estimate y center using the known F and new ux and the new F (I wonder
+%if the new F will be different)
 
 
-%now form A
+[K1_2 K2_2] = estimateVYfromFandUX( F,x,ux );
 
+%now reestimate the F
+ux1=K1_2(1,3);
+vy1=K1_2(2,3);
 
-A=zeros(numFrames*numRowsperFrame,10);
+ux2=K2_2(1,3);
+vy2=K2_2(2,3);
 
-for i=1:numFrames
-    m=   P_in{1,i};% to make it simpler we assign it
+x(1,1)=K1_2(1,1);
+x(1,2)=K2_2(1,1);
 
+disp(['f1 is ' num2str(x(1,1)) ' and f2 is ' num2str(x(1,2)) ' and ux1 is ' num2str(ux1)  ' and ux2 is ' num2str(ux2) ' vy1 is'  num2str(vy)  ' vy2 is'  num2str(vy) ]);
 
-    A(1+((i-1)*numRowsperFrame), 1)  =  (Pow(m(1 , 1), 2.0) - Pow(m(2 , 1), 2.0));
-    A(1+((i-1)*numRowsperFrame) , 2) =  (-2.0 * m(2 , 1) * m(2 , 2) + 2.0 * m(1 , 1) * m(1 , 2));
-    A(1+((i-1)*numRowsperFrame), 3)  =  (2.0 * m(1 , 1) * m(1 , 3) - 2.0 * m(2 , 1) * m(2 , 3));
-    A(1+((i-1)*numRowsperFrame) , 4) =  (2.0 * m(1 , 1) * m(1 , 4) - 2.0 * m(2 , 1) * m(2 , 4));
-    A(1+((i-1)*numRowsperFrame) , 5) =  (Pow(m(1 , 2), 2.0) - Pow(m(2 , 2), 2.0));
-    A(1+((i-1)*numRowsperFrame) , 6) =  (2.0 * m(1 , 2) * m(1 , 3) - 2.0 * m(2 , 2) * m(2 , 3));
-    A(1+((i-1)*numRowsperFrame), 7)  =  (2.0 * m(1 , 4) * m(1 , 2) - 2.0 * m(2 , 4) * m(2 , 2));
-    A(1+((i-1)*numRowsperFrame) , 8) =  (-Pow(m(2 , 3), 2.0) + Pow(m(1 , 3), 2.0));
-    A(1+((i-1)*numRowsperFrame) , 9) =  (-2.0 * m(2 , 3) * m(2 , 4) + 2.0 * m(1 , 3) * m(1 , 4));
-    A(1+((i-1)*numRowsperFrame) , 10)= (Pow(m(1 , 4), 2.0) - Pow(m(2 , 4), 2.0));
+[ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,ux*2,vy*2 );
 
-    A(2+((i-1)*numRowsperFrame) , 1) =  m(2 , 1) * m(1 , 1);
-    A(2+((i-1)*numRowsperFrame), 2)  =  (m(2 , 2) * m(1 , 1) + m(2 , 1) * m(1 , 2));
-    A(2+((i-1)*numRowsperFrame) , 3) =  (m(2 , 1) * m(1 , 3) + m(2 , 3) * m(1 , 1));
-    A(2+((i-1)*numRowsperFrame), 4)  =  (m(2 , 1) * m(1 , 4) + m(2 , 4) * m(1 , 1));
-    A(2+((i-1)*numRowsperFrame) , 5) =   m(2 , 2) * m(1 , 2);
-    A(2+((i-1)*numRowsperFrame) , 6) =  (m(2 , 3) * m(1 , 2) + m(2 , 2) * m(1 , 3));
-    A(2+((i-1)*numRowsperFrame) , 7) =  (m(2 , 4) * m(1 , 2) + m(2 , 2) * m(1 , 4));
-    A(2+((i-1)*numRowsperFrame) , 8) =   m(2 , 3) * m(1 , 3);
-    A(2+((i-1)*numRowsperFrame) , 9) =  (m(2 , 4) * m(1 , 3) + m(2 , 3) * m(1 , 4));
-    A(2+((i-1)*numRowsperFrame), 10) =  m(2 , 4) * m(1 , 4);
-
-    A(3+((i-1)*numRowsperFrame) , 1) =   m(3 , 1) * m(1 , 1);
-    A(3+((i-1)*numRowsperFrame) , 2) =  (m(3 , 2) * m(1 , 1) + m(3 , 1) * m(1 , 2));
-    A(3+((i-1)*numRowsperFrame), 3)  =  (m(3 , 1) * m(1 , 3) + m(3 , 3) * m(1 , 1));
-    A(3+((i-1)*numRowsperFrame), 4)  =  (m(3 , 1) * m(1 , 4) + m(3 , 4) * m(1 , 1));
-    A(3+((i-1)*numRowsperFrame) , 5) =   m(3 , 2) * m(1 , 2);
-    A(3 +((i-1)*numRowsperFrame), 6) =  (m(3 , 3) * m(1 , 2) + m(3 , 2) * m(1 , 3));
-    A(3+((i-1)*numRowsperFrame) , 7) =  (m(3 , 4) * m(1 , 2) + m(3 , 2) * m(1 , 4));
-    A(3+((i-1)*numRowsperFrame) , 8) =   m(3 , 3) * m(1 , 3);
-    A(3+((i-1)*numRowsperFrame), 9)  =  (m(3 , 4) * m(1 , 3) + m(3 , 3) * m(1 , 4));
-    A(3+((i-1)*numRowsperFrame) , 10)=  m(3 , 4) * m(1 , 4);
-
-    A(4+((i-1)*numRowsperFrame), 1)  =   m(3 , 1) * m(2 , 1);
-    A(4+((i-1)*numRowsperFrame), 2)  =  (m(3 , 2) * m(2 , 1) + m(3 , 1) * m(2 , 2));
-    A(4+((i-1)*numRowsperFrame) , 3) =  (m(3 , 1) * m(2 , 3) + m(3 , 3) * m(2 , 1));
-    A(4+((i-1)*numRowsperFrame) , 4) =  (m(3 , 1) * m(2 , 4) + m(3 , 4) * m(2 , 1));
-    A(4+((i-1)*numRowsperFrame) , 5) =  m(3 , 2) * m(2 , 2);
-    A(4+((i-1)*numRowsperFrame) , 6) =  (m(3 , 3) * m(2 , 2) + m(3 , 2) * m(2 , 3));
-    A(4+((i-1)*numRowsperFrame), 7)  =  (m(3 , 4) * m(2 , 2) + m(3 , 2) * m(2 , 4));
-    A(4+((i-1)*numRowsperFrame), 8)  =  m(3 , 3) * m(2 , 3);
-    A(4+((i-1)*numRowsperFrame) , 9) =  (m(3 , 4) * m(2 , 3) + m(3 , 3) * m(2 , 4));
-    A(4+((i-1)*numRowsperFrame) , 10)=  m(3 , 4) * m(2 , 4);
-
-end
-
-%now augmenting the rows with zeros, this is necessary because we have to
-%pass a matrix whose number of rows is bigger or equal to the columns to
-%svd, so we have to add enough rows of zero to make the matrix square
-while(size(A,1)<size(A,2))
-
-    A(end+1,:)=zeros(1,size(A,2));
-
-end
-
-%multiplying the rows
-
-for i=1:numFrames
-    A(1+((i-1)*numRowsperFrame),:)=A(1+((i-1)*numRowsperFrame),:);
-    A(2+((i-1)*numRowsperFrame),:)=A(2+((i-1)*numRowsperFrame),:)*(2);
-    A(3+((i-1)*numRowsperFrame),:)=A(3+((i-1)*numRowsperFrame),:)*(2);
-    A(4+((i-1)*numRowsperFrame),:)=A(4+((i-1)*numRowsperFrame),:)*(2);%changed this, i think paper is wrong
-end
-
-
-% take Q out of the svd
-[U,S,V] = svd(A);
-%disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(A)) ' and the rank is ' num2str(rank(A))] );
-
-
-Q1=myFormatvectoQ(V(:,10));
-Q2=myFormatvectoQ(V(:,9));
-
-S=findSolsfromQ(Q1,Q2);
-
-QH_1=normalizeSetRank(Q1+ S(1)*Q2);
-QH_2=normalizeSetRank(Q1+ S(2)*Q2);
-QH_3=normalizeSetRank(Q1+ S(3)*Q2);
-QH_4=normalizeSetRank(Q1+ S(4)*Q2);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-QS={QH_1 QH_2 QH_3 QH_4};
+disp(['f1 is ' num2str(x(1,1)) ' and f2 is ' num2str(x(1,2)) ' and ux1 is ' num2str(ux1)  ' and ux2 is ' num2str(ux2) ' vy1 is'  num2str(vy)  ' vy2 is'  num2str(vy) ]);
 
 
 
 
-for k=1:4
-    M=QS{1,k};
-    ST=S(k);
-    isposdef = matposdef( M);
-   % Q= eig(M)
-
-    if(isposdef==1)
-        % disp([' the alpha was ' num2str(ST) ' number 1']);
 
 
-        K1=findKfromPQ(K_norm,P_in{1,1},M);
-        K2=findKfromPQ(K_norm,P_in{1,2},M);
-       % disp([' frame : ' num2str(1) ' the focal length is (K[0][0]) ' num2str(K1(1,1)) ' or (K[1][1])' num2str(K1(2,2))]);
-       % disp([' frame : ' num2str(2) ' the focal length is (K[0][0]) ' num2str(K2(1,1)) ' or (K[1][1])' num2str(K2(2,2))]);
-%     P_in{1,1}
-%     M
-%     p=planeInfFromQ(M)
-%     K1
-%     K2
-        f1=K1(1,1);
-        f2=K2(1,1);
-        break;
-    end
-
-end
-
-
-x=[f1   f2];
 
 end
 
