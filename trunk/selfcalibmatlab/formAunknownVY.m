@@ -26,6 +26,7 @@ for i=1:numFrames
       A(((i-1)*numRowsperFrame)+1,8) = m(1,3) ^ 2;
       A(((i-1)*numRowsperFrame)+1,9) = 2 * m(1,3) * m(1,4);
       A(((i-1)*numRowsperFrame)+1,10) = m(1,4) ^ 2;
+      
       A(((i-1)*numRowsperFrame)+2,1) = m(2,1) ^ 2;
       A(((i-1)*numRowsperFrame)+2,2) = 2 * m(2,1) * m(2,2);
       A(((i-1)*numRowsperFrame)+2,3) = 2 * m(2,1) * m(2,3);
@@ -36,6 +37,7 @@ for i=1:numFrames
       A(((i-1)*numRowsperFrame)+2,8) = m(2,3) ^ 2;
       A(((i-1)*numRowsperFrame)+2,9) = 2 * m(2,3) * m(2,4);
       A(((i-1)*numRowsperFrame)+2,10) = m(2,4) ^ 2;
+      
       A(((i-1)*numRowsperFrame)+3,1) = 2 * m(2,1) * m(1,1);
       A(((i-1)*numRowsperFrame)+3,2) = 2 * m(2,2) * m(1,1) + 2 * m(2,1) * m(1,2);
       A(((i-1)*numRowsperFrame)+3,3) = 2 * m(2,1) * m(1,3) + 2 * m(2,3) * m(1,1);
@@ -46,6 +48,7 @@ for i=1:numFrames
       A(((i-1)*numRowsperFrame)+3,8) = 2 * m(2,3) * m(1,3);
       A(((i-1)*numRowsperFrame)+3,9) = 2 * m(2,4) * m(1,3) + 2 * m(2,3) * m(1,4);
       A(((i-1)*numRowsperFrame)+3,10) = 2 * m(2,4) * m(1,4);
+      
       A(((i-1)*numRowsperFrame)+4,1) = 2 * m(3,1) * m(1,1);
       A(((i-1)*numRowsperFrame)+4,2) = 2 * m(3,2) * m(1,1) + 2 * m(3,1) * m(1,2);
       A(((i-1)*numRowsperFrame)+4,3) = 2 * m(3,1) * m(1,3) + 2 * m(3,3) * m(1,1);
