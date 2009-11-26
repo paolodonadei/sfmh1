@@ -16,6 +16,15 @@ zcc = -2 * m(1,3) * m(2,4) * m(2,3) * m(1,4) - 2 * m(1,2) * m(2,3) * m(3,4) * m(
 
 coeffs=[ z4c z3c z2c z1c zcc ];
 
-s = roots(coeffs);
+v = roots(coeffs);
+v
 
+j=1;
+for i=1:size(v,1)
+    if(imag(v(i,1))==0)
+    s(j,1)=v(i,1);
+    j=j+1;
+    end
+end
 
+s

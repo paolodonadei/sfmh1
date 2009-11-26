@@ -12,6 +12,7 @@ biszeros=1;
 
 [m n]=size(b);
 
+
 for i=1:m
     if(b(i,1)>0)
         biszeros=0;
@@ -34,20 +35,19 @@ else
     r=rank(A);
     
     for i=1:r
-        y(i,1)=bp(i,1)/S(i,i);  
+        y(i,1)=bp(i,1)/S(i,i);
     end
     X=V*y;
-    Q1=X; zaza i waz here xxxx zzzzz
-    Q2=myFormatvectoQ(V(:,9));
+    Q1=myFormatvectoQ(X);
+    Q2=myFormatvectoQ(V(:,10)); %im not sure if this is right, i took this from page 590 of multiple view book and also from a pdf on the net called sabes.pdf that contains tutorial info on svd
+    
 end
 
 
 
 
-end
 
-
-disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(A)) ' and the rank is ' num2str(rank(A))] );
+%disp([ 'last svd is ' num2str(S(10,10)) ' and the condition number is (it should be near 1) ' num2str(cond(A)) ' and the rank is ' num2str(rank(A))] );
 
 
 
