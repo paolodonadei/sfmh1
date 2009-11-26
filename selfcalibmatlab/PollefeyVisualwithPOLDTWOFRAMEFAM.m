@@ -46,7 +46,7 @@ end
 
 S=findSolsfromQ(Q1,Q2);
 
-S=findSolsfromQ(Q1,Q2);
+
 
 for i=1:size(S,1)
   QS{1,i}=normalizeSetRank(Q1+ S(1)*Q2);  
@@ -64,6 +64,7 @@ K2=findKfromPQ(K_norm,P_in{1,2},M);
 f1=K1(1,1);
 f2=K2(1,1);
 
+M
 
 x=[f1   f2];
 
