@@ -62,14 +62,22 @@ P_in{1,2}=K_norm_inv2*P_in{1,2};
 [A,b]  = formAunknownUX( P_in );
 
 
-[Q1, Q2]=QsfromAb(A,b);
+[QZ]=QsfromAb(A,b);
 
 
 
-S=findSolsfromQ(Q1,Q2);
+S=findSolsfromQ(QZ);
+
+if(size(QZ,2)>1)
+    Q1=QZ{1,1};
+    Q2=QZ{1,2};
+else
+    Q1=QZ{1,1};
+    Q2=zeros(4,4);
+end
 
 for i=1:size(S,1)
-  QS{1,i}=normalizeSetRank(Q1+ S(1)*Q2);  
+    QS{1,i}=normalizeSetRank(Q1+ S(i,1)*Q2);
 end
 
 
@@ -78,10 +86,10 @@ end
 
 
 M=chooseFinalQ(QS);
-      
+
 K1=findKfromPQ(K_norm1,P_in{1,1},M);
 K2=findKfromPQ(K_norm2,P_in{1,2},M);
-      
+
 x=[f1   f2];
 
 
