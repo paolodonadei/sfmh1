@@ -33,7 +33,7 @@ end
 %perform normalization
 for i=1:numFrames
     P_in{1,i}
-  %  P_in{1,i}=K_norm_inv*P_in{1,i};
+  P_in{1,i}=K_norm_inv*P_in{1,i};
     P_in{1,i}
     %   P_in{1,i}=P_in{1,i}/norm(P_in{1,i},'fro');
 end
@@ -69,6 +69,10 @@ M=chooseFinalQ(QS);
 
 M
 
+w1=P_in{1,1}*M*(P_in{1,1}');
+w2=P_in{1,2}*M*(P_in{1,2}');
+w1=w1/w1(3,3)
+w2=w2/w2(3,3)
 
 K1=findKfromPQ(K_norm,P_in{1,1},M);
 K2=findKfromPQ(K_norm,P_in{1,2},M);
