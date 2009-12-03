@@ -10,7 +10,13 @@ f1=0;
 f2=0;
 x=[0 0];
 
-P=PsfromF( F );
+%remove this 
+typicalF=1;
+G=normalizeFSturm(F,w,h,typicalF);
+
+K_norm=eye(3,3);
+
+P=PsfromF( G );
 [m n ]=size(P);
 numFrames=n;
 
@@ -21,21 +27,6 @@ P_in=P;
 
 if(m>1)
     disp([ 'the size of the input cell is wrong']);
-end
-
-
-%create the normalizing matrix
-[ K_norm, K_norm_inv ] = findNormalizingK(w,h);
-
-% K_norm=eye(3,3);
-% K_norm_inv=K_norm;
-
-%perform normalization
-for i=1:numFrames
-    P_in{1,i}
-  P_in{1,i}=K_norm_inv*P_in{1,i};
-    P_in{1,i}
-    %   P_in{1,i}=P_in{1,i}/norm(P_in{1,i},'fro');
 end
 
 
@@ -77,8 +68,8 @@ w2=w2/w2(3,3)
 K1=findKfromPQ(K_norm,P_in{1,1},M);
 K2=findKfromPQ(K_norm,P_in{1,2},M);
 
-f1=K1(1,1);
-f2=K2(1,1);
+f1=K1(1,1)*typicalF;
+f2=K2(1,1)*typicalF;
 
 
 
