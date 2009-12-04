@@ -43,6 +43,8 @@ if(r<9)
             y(i,1)=bp(i,1)/S(i,i);
         end
         X=V*y;
+        X
+        V(:,10)
         Q1=myFormatvectoQ(X);
         Q2=myFormatvectoQ(V(:,10)); %im not sure if this is right, i took this from page 590 of multiple view book and also from a pdf on the net called sabes.pdf that contains tutorial info on svd
         
