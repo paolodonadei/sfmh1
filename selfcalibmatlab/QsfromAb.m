@@ -29,7 +29,8 @@ r=rank(A);
 
 if(r<9)
     if(biszeros==1)
-        
+        V(:,10)
+        V(:,9)
         
         Q1=myFormatvectoQ(V(:,10));
         Q2=myFormatvectoQ(V(:,9));
@@ -66,7 +67,7 @@ else
         for i=1:r
             y(i,1)=bp(i,1)/S(i,i);
         end
-        X=V*y;
+        X=V*y
         Q1=myFormatvectoQ(X);
       
     end
