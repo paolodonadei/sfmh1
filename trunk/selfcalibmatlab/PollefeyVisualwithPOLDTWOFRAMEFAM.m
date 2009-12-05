@@ -16,6 +16,7 @@ G=normalizeFSturm(F,w,h,typicalF);
 
 K_norm=eye(3,3);
 
+G
 P=PsfromF( G );
 [m n ]=size(P);
 numFrames=n;
@@ -50,8 +51,9 @@ end
 
 for i=1:size(S,1)
     QS{1,i}=normalizeSetRank(Q1+ S(i,1)*Q2);
+ 
 end
-
+S
 
 %%%%%%%%%%%%%%%%%%%%%
 
