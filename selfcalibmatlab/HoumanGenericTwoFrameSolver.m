@@ -29,6 +29,8 @@ if(normF~=1)
 end
 
 
+
+
 [ A,b ]=functionFormA(P_in);
 
 

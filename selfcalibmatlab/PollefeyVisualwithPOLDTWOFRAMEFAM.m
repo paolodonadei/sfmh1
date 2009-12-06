@@ -11,7 +11,7 @@ f2=0;
 x=[0 0];
 
 %remove this 
-typicalF=1;
+typicalF=1010.57;
 G=normalizeFSturm(F,w,h,typicalF);
 
 K_norm=eye(3,3);
