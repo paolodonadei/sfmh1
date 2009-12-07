@@ -13,7 +13,7 @@ function [ x, K1,K2,Q ] = HoumanGenericTwoFrameSolver( F,f1guess,f2guess,ux1,vy1
 if(normF==1)
     F = normalizeFSturmTwoFrame( F,ux1,vy1,ux2,vy2,f1guess,f2guess );
 end
-F
+
 P=PsfromF( F );
 P_in=P;
 

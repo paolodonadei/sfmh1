@@ -12,7 +12,7 @@ for k=1:size(QS,1)
     % Q= eig(M)
     
     if(isposdef==1)
-        M=QM;
+        M=QM
         disp(['chose S with index ' num2str(k)]);
         flagfound=1;
         break;

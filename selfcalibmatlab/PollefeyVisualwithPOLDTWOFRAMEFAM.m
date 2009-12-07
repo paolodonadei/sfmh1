@@ -11,12 +11,12 @@ f2=0;
 x=[0 0];
 
 %remove this 
-typicalF=1010.57;
+typicalF=481.155854926577;
 G=normalizeFSturm(F,w,h,typicalF);
 
 K_norm=eye(3,3);
 
-G
+
 P=PsfromF( G );
 [m n ]=size(P);
 numFrames=n;
