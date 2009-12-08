@@ -10,8 +10,8 @@ f1=0;
 f2=0;
 x=[0 0];
 
-%remove this 
-typicalF=481.155854926577;
+%remove this
+typicalF=w+h;
 G=normalizeFSturm(F,w,h,typicalF);
 
 K_norm=eye(3,3);
@@ -51,21 +51,23 @@ end
 
 for i=1:size(S,1)
     QS{1,i}=normalizeSetRank(Q1+ S(i,1)*Q2);
- 
+    
 end
-S
+%S
 
 %%%%%%%%%%%%%%%%%%%%%
 
 
-M=chooseFinalQ(QS);
+MS=chooseFinalQ(QS);
 
-M
+k=1
+
+M=MS{1,k};
 
 w1=P_in{1,1}*M*(P_in{1,1}');
 w2=P_in{1,2}*M*(P_in{1,2}');
-w1=w1/w1(3,3)
-w2=w2/w2(3,3)
+w1=w1/w1(3,3);
+w2=w2/w2(3,3);
 
 K1=findKfromPQ(K_norm,P_in{1,1},M);
 K2=findKfromPQ(K_norm,P_in{1,2},M);
@@ -75,7 +77,9 @@ f2=K2(1,1)*typicalF;
 
 
 
-x=[f1   f2];
+x=[f1   f2]
+
+
 
 end
 

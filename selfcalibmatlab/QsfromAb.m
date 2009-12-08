@@ -27,10 +27,10 @@ end
 r=rank(A);
 
 
-if(r<9)
+if(r<10)
     if(biszeros==1)
-        V(:,10)
-        V(:,9)
+        V(:,10);
+        V(:,9);
         
         Q1=myFormatvectoQ(V(:,10));
         Q2=myFormatvectoQ(V(:,9));
