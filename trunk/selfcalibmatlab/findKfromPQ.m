@@ -2,7 +2,7 @@ function [ K ] = findKfromPQ(K_norm,P,Q)
 
 w=P*Q*(P');
 w=w/w(3,3); %should i do this here?
- w
+ %w
 %d= eig(w)
 
 k=chol(w);

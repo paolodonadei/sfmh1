@@ -83,7 +83,11 @@ for i=1:numFrames
     A(((i-1)*numRowsperFrame)+j,10) = m(3,4) * m(2,4);
     
     j=j+1;
+    while(size(A,1)<size(A,2))
     
+    A(end+1,:)=zeros(1,size(A,2));
+    
+end
     A(((i-1)*numRowsperFrame)+j,1) = m(3,1) * m(1,1);
     A(((i-1)*numRowsperFrame)+j,2) = m(3,2) * m(1,1) + m(3,1) * m(1,2);
     A(((i-1)*numRowsperFrame)+j,3) = m(3,1) * m(1,3) + m(3,3) * m(1,1);
@@ -102,7 +106,7 @@ end
 %svd, so we have to add enough rows of zero to make the matrix square
 while(size(A,1)<size(A,2))
     
-    A(end+j,:)=zeros(1,size(A,2));
+    A(end+1,:)=zeros(1,size(A,2));
     
 end
 

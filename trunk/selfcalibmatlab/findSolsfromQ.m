@@ -22,14 +22,22 @@ if(size(Q,2)>1)
     
     
     j=1;
+    ji=1;
+    
     for i=1:size(v,1)
         if(imag(v(i,1))==0)
             s(j,1)=v(i,1);
             j=j+1;
+        else
+            sim(ji,1)=real(v(ji,1));
+            ji=ji+1;
         end
+        
     end
     
-    
+    if(j==1)  % if all of our ss were complex then return the real part of the imaginary ss
+        s=sim;
+    end
 else
     
     s(1,1)=0;

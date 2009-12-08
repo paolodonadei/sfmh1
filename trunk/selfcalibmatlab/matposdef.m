@@ -6,7 +6,7 @@ lemma= eig(M);
 isposdef=true;
 for i=1:size(lemma,1)
 
-    if(abs(lemma(i))>0.000005 && lemma(i)<0)
+    if((abs(lemma(i)))>0.0000005 && lemma(i)<0)
         isposdef=false;
         break;
     end

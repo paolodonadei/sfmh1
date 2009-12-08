@@ -31,6 +31,7 @@ end
 
 
 
+
 [ A,b ]=functionFormA(P_in);
 
 
@@ -38,7 +39,7 @@ end
 
 
 
-S=findSolsfromQ(QZ);
+SL=findSolsfromQ(QZ);
 
 if(size(QZ,2)>1)
     Q1=QZ{1,1};
@@ -48,22 +49,29 @@ else
     Q2=zeros(4,4);
 end
 
-for i=1:size(S,1)
-    QS{1,i}=normalizeSetRank(Q1+ S(i,1)*Q2);
+for i=1:size(SL,1)
+    QS{1,i}=normalizeSetRank(Q1+ SL(i,1)*Q2);
 end
 
+%SL
 
 %%%%%%%%%%%%%%%%%%%%%
 
+MS=chooseFinalQ(QS);
 
-M=chooseFinalQ(QS);
+if(size(MS,2)==0)
+    error('no M found');
+end
 
-M
+
+k=1
+
+M=MS{1,k};
 
 w1=P_in{1,1}*M*(P_in{1,1}');
 w2=P_in{1,2}*M*(P_in{1,2}');
-w1=w1/w1(3,3)
-w2=w2/w2(3,3)
+w1=w1/w1(3,3);
+w2=w2/w2(3,3);
 
 K1=findKfromPQ(K_norm1,P_in{1,1},M);
 K2=findKfromPQ(K_norm2,P_in{1,2},M);
@@ -73,7 +81,10 @@ f2=K2(1,1);
 
 
 Q=M;
-x=[f1   f2]
+x=[f1   f2];
+K1
+K2
+
 
 
 end
