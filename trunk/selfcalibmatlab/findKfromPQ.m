@@ -11,6 +11,7 @@ catch ME
     disp(['we couldnt get the chol decomposition of w']);
     w
     Q
+    k=eye(3,3);
 end
 
 k=k/k(3,3);
