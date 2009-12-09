@@ -9,8 +9,8 @@ label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={'Sturm', 'Hartley', 'Pollefey2Frame', 'PollefeyIter', 'Houman2Fr'};
-AlgFuncs={@PeterSturmSelf,@HartleySelf,@PollefeyVisualwithPOLDTWOFRAMEFAM,@PollefeyVisualwithPOLDTWOFRAMEFAMiter, @HoumanminimalTwoFrameSolver };
+AlgNames={'Sturm', 'Hartley', 'Pollefey2Frame', 'PollefeyIter', 'Houman2Fr','Houman6eqn'};
+AlgFuncs={@PeterSturmSelf,@HartleySelf,@PollefeyVisualwithPOLDTWOFRAMEFAM,@PollefeyVisualwithPOLDTWOFRAMEFAMiter, @HoumanminimalTwoFrameSolver ,@HoumanminimalTwoFrameSolver6eqn};
 numalgs=size(AlgFuncs,2);
 
 %outputs
