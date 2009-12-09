@@ -3,14 +3,14 @@ function [ t,means,medians,  variances  ] = generateSelfPlot(paramcheck,repeat,p
 
 
 numPoints=30;
-styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vo' ,'-..c'};
+styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c'};
 t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={'Sturm', 'Hartley', 'Pollefey2Frame'};
-AlgFuncs={@PeterSturmSelf,@HartleySelf,@PollefeyVisualwithPOLDTWOFRAMEFAM};
+AlgNames={'Sturm', 'Hartley', 'Pollefey2Frame', 'PollefeyIter', 'Houman2Fr'};
+AlgFuncs={@PeterSturmSelf,@HartleySelf,@PollefeyVisualwithPOLDTWOFRAMEFAM,@PollefeyVisualwithPOLDTWOFRAMEFAMiter, @HoumanminimalTwoFrameSolver };
 numalgs=size(AlgFuncs,2);
 
 %outputs
@@ -61,34 +61,34 @@ numTotalIterations=numPoints*repeat;
 currIteration=0;
 
 for i=1:numPoints
-
+    
     current_errors=zeros(numalgs,repeat);
-
+    
     for j=1:repeat
         currIteration=currIteration+1;
-        [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i) );
-
+        [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1 );
+        
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ')'] );
-
+        
         for k=1:numalgs
             answer=AlgFuncs{k}(F,512,512);
             current_errors(k,j)=calcSelfCalibError(answer,ks);
             disp(['algorithm: ' AlgNames{k} ' had error ' num2str(current_errors(k,j))]);
-
+            
         end
-
+        
     end
     %now calculate the stat for the current run
     for k=1:numalgs
         means(k,i)=mean(current_errors(k,:));
         medians(k,i)=median(current_errors(k,:));
         variances(k,i)=var(current_errors(k,:));
-
+        
     end
-
-
-
-
+    
+    
+    
+    
 end
 
 data={means, medians, variances};
@@ -100,7 +100,7 @@ for i=1:sizeDataCats
     figure;
     hold;
     for k=1:numalgs
-
+        
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x (' label ')']);       %  add axis labels and plot title
@@ -111,7 +111,7 @@ for i=1:sizeDataCats
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     hold
-
+    
 end
 
 end

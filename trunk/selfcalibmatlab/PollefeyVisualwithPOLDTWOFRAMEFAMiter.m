@@ -9,7 +9,7 @@ function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAMiter( F,w,h )
 f1=0;
 f2=0;
 x=[0 0];
-
+numFrames=2;
 
 ux2=w/2;
 ux1=w/2;
@@ -18,36 +18,31 @@ vy1=h/2;
 vy2=h/2;
 f1guess=w+h;
 f2guess=w+h;
-
-while 1
-    clear G P P_in A b QZ S SL Q1 Q2 QS MS M K1 K2 w1 w2 ;
+x=[0 0];
+absdiff= 500000000;
+diffprev=5000000000;
+count=0;
+M=eye(4,4);
+while absdiff>0.000005 && count<400 &&  (diffprev-absdiff)>0
+    
+    count=count+1;
+    clear G P P_in A b QZ S SL Q1 Q2 QS MS  K1 K2 w1 w2 ;
     G = normalizeFSturmTwoFrame( F,ux1,vy1,ux2,vy2,f1guess,f2guess );
-    [ K_norm1, K_norm1_inverse ] = findNormalizingK(ux1,vy1,f1guess);
-    [ K_norm2, K_norm2_inverse ] = findNormalizingK(ux2,vy2,f2guess);
-    G
-    P=PsfromF( G );
-    [m n ]=size(P);
-    numFrames=n;
     
     
-    P_in=P;
-    
-    
-    
-    if(m>1)
-        disp([ 'the size of the input cell is wrong']);
-    end
-    
-    
-    %now form A
+    P_in=PsfromF( G );
     
     [A,b]  = formAunknownF( P_in );
+    
+    [Ua,Sa,Va] = svd(A);
+    rank(A);
+    Sa(8,8);
     
     [QZ]=QsfromAb(A,b);
     
     
     
-    S=findSolsfromQ(QZ);
+    SL=findSolsfromQ(QZ);
     
     if(size(QZ,2)>1)
         Q1=QZ{1,1};
@@ -57,56 +52,83 @@ while 1
         Q2=zeros(4,4);
     end
     
-    for i=1:size(S,1)
-        QS{1,i}=normalizeSetRank(Q1+ S(i,1)*Q2);
+    for i=1:size(SL,1)
+        QS{1,i}=normalizeSetRank(Q1+ SL(i,1)*Q2);
         
     end
-   % S
+    
     
     %%%%%%%%%%%%%%%%%%%%%
     
-    
     MS=chooseFinalQ(QS);
+    
     if(size(MS,2)==0)
-        break;
+        % i think i ought to add gaussian noise just to the first camera
+        % maybeor the secondd
+        f1guess=f1guess+0.2*randn();
+        f2guess=f1guess+0.2*randn();
+        %         ux1=ux1+2*randn() ;
+        %         vy1=vy1 +2*randn();
+        %         ux2= ux2+2*randn();
+        %         vy2=vy2 +2*randn();
+        
+       
+    else
+        
+        
+        M=MS{1,1};
+        
+        
+        [ K_norm2, K_norm2_inverse ] = findNormalizingK(ux2,vy2,f2guess);
+        [ K_norm1, K_norm1_inverse ] = findNormalizingK(ux1,vy1,f1guess);
+        
+        K2=findKfromPQ(K_norm2,P_in{1,2},M);
+        K1=findKfromPQ(K_norm1,P_in{1,1},M);
+        
+        % we just update camera 2
+        f2=K2(1,1);
+        f1=K1(1,1);
+        
+        %     ux2= K2(1,3); %this is not working well
+        %     vy2=K2(2,3) ;
+        
+        
+        diffprev=absdiff;
+        fdiff=abs(f2guess-f2)+abs(f1guess-f1);
+        absdiff=fdiff;
+        
+        %   disp(['difference is ' num2str(absdiff)]);
+        
+        
+        f2guess=K2(1,1);
+        f1guess=K1(1,1);
     end
-    k=1
     
-    M=MS{1,k};
+    %swap
+    F=F';
     
-    w1=P_in{1,1}*M*(P_in{1,1}');
-    w2=P_in{1,2}*M*(P_in{1,2}');
-    w1=w1/w1(3,3);
-    w2=w2/w2(3,3);
-    
-    K1=findKfromPQ(K_norm1,P_in{1,1},M);
-    K2=findKfromPQ(K_norm2,P_in{1,2},M);
-    
-    f1=K1(1,1);
-    f2=K2(1,1);
+    %     uxtemp=ux1;
+    %     ux1=ux2;
+    %     ux2=uxtemp;
+    %
+    %     vytemp=vy1;
+    %     vy1=vy2;
+    %     vy2=vytemp;
     
     
+    fguesstemp=f1guess;
+    f1guess=f2guess;
+    f2guess=fguesstemp;
+    
+    ftemp=f1;
+    f1=f2;
+    f2=ftemp;
     
     
-    
-    ux1=K1(1,3);
-    vy1=K1(2,3);
-    f1guess=K1(1,1);
-    
-    ux2=K2(1,3);
-    vy2=K2(2,3);
-    f2guess=K2(1,1);
-    
-    
-    
-    x=[f1   f2]
-    
+    x=[f1   f2];
+    Q=M;
     
 end
+x=[f1   f2];
 
 end
-
-
-
-
-
