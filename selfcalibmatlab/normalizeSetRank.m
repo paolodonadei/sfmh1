@@ -8,4 +8,7 @@ SQ(4,4)=0;
 Q = UQ*SQ*(VQ');
 
 % im gonna normalize Q so it wont make my omega oscilate
-Q=Q/Q(3,3); % i think teh paper mentioned Q(3,3) is 1
+
+if(Q(3,3)>0.000000000000005)
+    Q=Q/Q(3,3); % i think teh paper mentioned Q(3,3) is 1
+end

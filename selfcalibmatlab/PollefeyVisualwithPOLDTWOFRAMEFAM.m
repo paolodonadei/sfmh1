@@ -60,14 +60,15 @@ end
 
 MS=chooseFinalQ(QS);
 
-k=1
 
-M=MS{1,k};
-
-w1=P_in{1,1}*M*(P_in{1,1}');
-w2=P_in{1,2}*M*(P_in{1,2}');
-w1=w1/w1(3,3);
-w2=w2/w2(3,3);
+if(size(MS,2)==0)
+    M=eye(4,4);
+    
+else
+    
+    M=MS{1,1};
+    
+end
 
 K1=findKfromPQ(K_norm,P_in{1,1},M);
 K2=findKfromPQ(K_norm,P_in{1,2},M);
@@ -77,7 +78,7 @@ f2=K2(1,1)*typicalF;
 
 
 
-x=[f1   f2]
+x=[f1   f2];
 
 
 
