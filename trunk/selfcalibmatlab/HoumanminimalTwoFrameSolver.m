@@ -1,4 +1,4 @@
-function [ x] = HoumanminimalTwoFrameSolver( F,w,h )
+function [m1,m2,r, x] = HoumanminimalTwoFrameSolver( F,w,h )
 
 %normFORP , if this is set to 1, we normalize F and then we get the Ps in
 %the canonic position, if its zero we normalize the Ps in which case they
@@ -29,10 +29,16 @@ Q=eye(4,4);
 M=eye(4,4);
 l=[0; 0 ; 0 ] ; %plane at infinity
 %while absdiff>0.000005 && count<400 &&  diffprev>absdiff
-    while  count<600 
+f1sol=0;
+f2sol=0;
+
+while  count<1100
+    
     
     
     count=count+1;
+    
+    
     
     %    disp(['count is ' num2str(count)]);
     
@@ -122,6 +128,9 @@ l=[0; 0 ; 0 ] ; %plane at infinity
         % we just update camera 2
         f2=K2(1,1);
         f1=K1(1,1);
+        f1sol=f1;
+        f2sol=f2;
+        
         
         %     ux2= K2(1,3); %this is not working well
         %     vy2=K2(2,3) ;
@@ -137,6 +146,7 @@ l=[0; 0 ; 0 ] ; %plane at infinity
         f1guess=K1(1,1);
         
     end
+    
     
     %swap
     F=F';
@@ -161,10 +171,24 @@ l=[0; 0 ; 0 ] ; %plane at infinity
     
     x=[f1   f2];
     
+    zaazaa what is going on here
     
+    
+    if( mod(count,2)~=1)
+        ftemp=f1sol;
+        f1=f2sol;
+        f2sol=ftemp;
+        
+    end
+    
+    %remove this
+    m1(count)=absdiff;
+    m2(count)=S(4,4);
+    r(count)=abs(f1sol-1169.0882 ) + abs(f2sol-1219.0882 );
 end
 
-x=[f1   f2];
-count
+
+x=[f1sol   f2sol];
+
 
 end
