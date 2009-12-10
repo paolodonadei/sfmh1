@@ -28,9 +28,9 @@ K2=eye(3,3);
 Q=eye(4,4);
 M=eye(4,4);
 l=[0; 0 ; 0 ] ; %plane at infinity
-%while absdiff>0.000005 && count<400 &&  diffprev>absdiff
-    while  count<600 
+while absdiff>0.000005 && count<400 &&  diffprev>absdiff
     
+
     
     count=count+1;
     
@@ -40,8 +40,8 @@ l=[0; 0 ; 0 ] ; %plane at infinity
     G = normalizeFSturmTwoFrame( F,ux1,vy1,ux2,vy2,f1guess,f2guess );
     
     
-    P_in=PsfromF( G );
-    %  P_in = updatePLINF(G, Q );
+  %  P_in=PsfromF( G );
+    P_in = updatePLINF(G, Q );
     
     
     n=P_in{1,2};
@@ -101,12 +101,14 @@ l=[0; 0 ; 0 ] ; %plane at infinity
     if(size(MS,2)==0)
         % i think i ought to add gaussian noise just to the first camera
         % maybeor the secondd
+        f1guess=f1guess+0.2*randn();
+        f2guess=f1guess+0.2*randn();
+        %         ux1=ux1+2*randn() ;
+        %         vy1=vy1 +2*randn();
+        %         ux2= ux2+2*randn();
+        %         vy2=vy2 +2*randn();
         
-        f2guess=f2guess+0.1*randn();
-        ux2= ux2+0.1*randn();
-        vy2=vy2 +0.1*randn();
-        
-        
+      
     else
         
         
@@ -165,6 +167,6 @@ l=[0; 0 ; 0 ] ; %plane at infinity
 end
 
 x=[f1   f2];
-count
+
 
 end

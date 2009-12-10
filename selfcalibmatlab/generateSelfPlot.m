@@ -1,5 +1,6 @@
 function [ t,means,medians,  variances  ] = generateSelfPlot(paramcheck,repeat,pfdiff,pskew,par,pcenterdev )
 
+fid = fopen('exp.txt', 'w');
 
 
 numPoints=30;
@@ -9,8 +10,10 @@ label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={'Sturm', 'Hartley', 'Pollefey2Frame', 'PollefeyIter', 'Houman2Fr','Houman6eqn'};
-AlgFuncs={@PeterSturmSelf,@HartleySelf,@PollefeyVisualwithPOLDTWOFRAMEFAM,@PollefeyVisualwithPOLDTWOFRAMEFAMiter, @HoumanminimalTwoFrameSolver ,@HoumanminimalTwoFrameSolver6eqn};
+AlgNames={ 'Houman2Fr','Houman2FrPINF','Pollefey2Frame'};
+AlgFuncs={ @HoumanminimalTwoFrameSolver ,@HoumanminimalTwoFrameSolverpinf,@PollefeyVisualwithPOLDTWOFRAMEFAM};
+
+
 numalgs=size(AlgFuncs,2);
 
 %outputs
@@ -74,7 +77,8 @@ for i=1:numPoints
             answer=AlgFuncs{k}(F,512,512);
             current_errors(k,j)=calcSelfCalibError(answer,ks);
             disp(['algorithm: ' AlgNames{k} ' had error ' num2str(current_errors(k,j))]);
-            
+            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answer(1,1),answer(1,2),current_errors(k,j)  );
+
         end
         
     end
@@ -113,5 +117,8 @@ for i=1:sizeDataCats
     hold
     
 end
+
+
+fclose(fid);
 
 end
