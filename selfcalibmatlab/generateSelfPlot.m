@@ -10,8 +10,8 @@ label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={ 'Houman2Fr','Houman2FrPINF','Pollefey2Frame'};
-AlgFuncs={ @HoumanminimalTwoFrameSolver ,@HoumanminimalTwoFrameSolverpinf,@PollefeyVisualwithPOLDTWOFRAMEFAM};
+AlgNames={ 'Houman2Fr','Pollefey2Frame','hartley','Houman6eq'};
+AlgFuncs={ @HoumanminimalTwoFrameSolver ,@PollefeyVisualwithPOLDTWOFRAMEFAM,@HartleySelf,@HoumanminimalTwoFrameSolver6eqn};
 
 
 numalgs=size(AlgFuncs,2);
@@ -44,7 +44,7 @@ end
 
 
 if(paramcheck=='c')
-    centerdev=0:2:200;
+    centerdev=0:3:300;
     t=centerdev(1,1:numPoints);
     label='deviation from camera center';
 end

@@ -1,4 +1,4 @@
-function [m1,m2,r, x] = HoumanminimalTwoFrameSolver( F,w,h )
+function [ x] = HoumanminimalTwoFrameSolver( F,w,h )
 
 %normFORP , if this is set to 1, we normalize F and then we get the Ps in
 %the canonic position, if its zero we normalize the Ps in which case they
@@ -28,11 +28,11 @@ K2=eye(3,3);
 Q=eye(4,4);
 M=eye(4,4);
 l=[0; 0 ; 0 ] ; %plane at infinity
-%while absdiff>0.000005 && count<400 &&  diffprev>absdiff
+
 f1sol=0;
 f2sol=0;
-
-while  count<1100
+%while absdiff>0.0000005 && count<400 &&  diffprev>absdiff
+while count<30
     
     
     
@@ -77,8 +77,15 @@ while  count<1100
     
     
     % Q(3,3) is c1
-    Q1 = [c(1,1) 0 0 c(2,1); 0 c(1,1) 0 c(3,1); 0 0 c(1,1) c(4,1); c(2,1) c(3,1) c(4,1) c(5,1);];
-    Q2 = [d(1,1) 0 0 d(2,1); 0 d(1,1) 0 d(3,1); 0 0 d(1,1) d(4,1); d(2,1) d(3,1) d(4,1) d(5,1);];
+    Q1 = [c(1,1)      0       0     c(2,1); 
+             0     c(1,1)     0     c(3,1);
+             0        0    c(1,1)   c(4,1); 
+          c(2,1)   c(3,1)  c(4,1)   c(5,1);];
+      
+    Q2 = [d(1,1)      0       0     d(2,1); 
+             0     d(1,1)     0     d(3,1); 
+             0        0    d(1,1)   d(4,1); 
+          d(2,1)   d(3,1)  d(4,1)   d(5,1);];
     
     
     %full Q
@@ -109,12 +116,12 @@ while  count<1100
         % maybeor the secondd
         
         f2guess=f2guess+0.1*randn();
-        ux2= ux2+0.1*randn();
-        vy2=vy2 +0.1*randn();
+%         ux2= ux2+0.1*randn();
+%         vy2=vy2 +0.1*randn();
         
-        
+        %failures(count)=1;
     else
-        
+        %    failures(count)=0;
         
         M=MS{1,1};
         Q=M;
@@ -140,7 +147,7 @@ while  count<1100
         absdiff=fdiff;
         
         %   disp(['difference is ' num2str(absdiff)]);
-        
+      
         
         f2guess=K2(1,1);
         f1guess=K1(1,1);
@@ -171,23 +178,27 @@ while  count<1100
     
     x=[f1   f2];
     
-    zaazaa what is going on here
     
     
-    if( mod(count,2)~=1)
-        ftemp=f1sol;
-        f1=f2sol;
-        f2sol=ftemp;
-        
+    
+    
+    if( mod(count,2)==1)
+        f1sol=f2;
+        f2sol=f1;
+    else
+        f1sol=f1;
+        f2sol=f2;
     end
     
-    %remove this
-    m1(count)=absdiff;
-    m2(count)=S(4,4);
-    r(count)=abs(f1sol-1169.0882 ) + abs(f2sol-1219.0882 );
+% %     %remove this
+%     m1(count)=absdiff;
+%     m2(count)=S(4,4);
+%     r(count)=abs(f1sol-906.0394) + abs(f2sol-1006.0394 );
+%     fz1(count)=(f1sol );
+%     fz2(count)=(f2sol );
 end
 
-
+%count
 x=[f1sol   f2sol];
 
 

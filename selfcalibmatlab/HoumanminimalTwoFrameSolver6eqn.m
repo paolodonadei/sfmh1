@@ -16,7 +16,7 @@ vy2=h/2;
 f1guess=w+h;
 f2guess=w+h;
 
-r=0;
+rb=0;
 count=0;
 absdiff= 500000000;
 diffprev=5000000000;
@@ -28,9 +28,9 @@ K2=eye(3,3);
 Q=eye(4,4);
 M=eye(4,4);
 l=[0; 0 ; 0 ] ; %plane at infinity
-while absdiff>0.000005 && count<400 &&  diffprev>absdiff
+%while absdiff>0.005 && count<400 
+while count<30
     
-
     
     count=count+1;
     
@@ -50,7 +50,8 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
     %A = [-n(2,1) ^ 2 - n(2,2) ^ 2 - n(2,3) ^ 2 + n(1,3) ^ 2 + n(1,1) ^ 2 + n(1,2) ^ 2 2 * n(1,1) * n(1,4) - 2 * n(2,4) * n(2,1) 2 * n(1,4) * n(1,2) - 2 * n(2,4) * n(2,2) -2 * n(2,3) * n(2,4) + 2 * n(1,3) * n(1,4) n(1,4) ^ 2 - n(2,4) ^ 2; n(2,1) * n(1,1) + n(2,3) * n(1,3) + n(2,2) * n(1,2) n(2,1) * n(1,4) + n(2,4) * n(1,1) n(2,4) * n(1,2) + n(2,2) * n(1,4) n(2,4) * n(1,3) + n(2,3) * n(1,4) n(2,4) * n(1,4); n(3,1) * n(2,1) + n(3,3) * n(2,3) + n(3,2) * n(2,2) n(3,1) * n(2,4) + n(3,4) * n(2,1) n(3,4) * n(2,2) + n(3,2) * n(2,4) n(3,4) * n(2,3) + n(3,3) * n(2,4) n(3,4) * n(2,4); n(3,1) * n(1,1) + n(3,3) * n(1,3) + n(3,2) * n(1,2) n(3,1) * n(1,4) + n(3,4) * n(1,1) n(3,4) * n(1,2) + n(3,2) * n(1,4) n(3,4) * n(1,3) + n(3,3) * n(1,4) n(3,4) * n(1,4);];;
     
     %with 6 equations
-    alpha=1/(abs(r*10)+1);
+    
+    alpha=1/(abs(rb*10)+1);
     
     A = [-(n(2,1) ^ 2) - (n(2,2) ^ 2) - (n(2,3) ^ 2) + (n(1,3) ^ 2) + (n(1,1) ^ 2) + (n(1,2) ^ 2) 2 * n(1,1) * n(1,4) - 2 * n(2,4) * n(2,1) 2 * n(1,4) * n(1,2) - 2 * n(2,4) * n(2,2) -2 * n(2,3) * n(2,4) + 2 * n(1,3) * n(1,4) n(1,4) ^ 2 - n(2,4) ^ 2; alpha * (-n(3,1) ^ 2 - n(3,2) ^ 2 - n(3,3) ^ 2 + n(2,3) ^ 2 + n(2,1) ^ 2 + n(2,2) ^ 2) alpha * (-2 * n(3,1) * n(3,4) + 2 * n(2,4) * n(2,1)) alpha * (-2 * n(3,2) * n(3,4) + 2 * n(2,4) * n(2,2)) alpha * (2 * n(2,3) * n(2,4) - 2 * n(3,3) * n(3,4)) alpha * (n(2,4) ^ 2 - n(3,4) ^ 2); alpha * (-n(1,1) ^ 2 - n(1,2) ^ 2 - n(1,3) ^ 2 + n(3,3) ^ 2 + n(3,1) ^ 2 + n(3,2) ^ 2) alpha * (-2 * n(1,1) * n(1,4) + 2 * n(3,1) * n(3,4)) alpha * (-2 * n(1,4) * n(1,2) + 2 * n(3,2) * n(3,4)) alpha * (2 * n(3,3) * n(3,4) - 2 * n(1,3) * n(1,4)) alpha * (n(3,4) ^ 2 - n(1,4) ^ 2); n(2,1) * n(1,1) + n(2,3) * n(1,3) + n(2,2) * n(1,2) n(2,1) * n(1,4) + n(2,4) * n(1,1) n(2,4) * n(1,2) + n(2,2) * n(1,4) n(2,4) * n(1,3) + n(2,3) * n(1,4) n(2,4) * n(1,4); n(3,1) * n(2,1) + n(3,3) * n(2,3) + n(3,2) * n(2,2) n(3,1) * n(2,4) + n(3,4) * n(2,1) n(3,4) * n(2,2) + n(3,2) * n(2,4) n(3,4) * n(2,3) + n(3,3) * n(2,4) n(3,4) * n(2,4); n(3,1) * n(1,1) + n(3,3) * n(1,3) + n(3,2) * n(1,2) n(3,1) * n(1,4) + n(3,4) * n(1,1) n(3,4) * n(1,2) + n(3,2) * n(1,4) n(3,4) * n(1,3) + n(3,3) * n(1,4) n(3,4) * n(1,4);];
     
@@ -60,7 +61,7 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
     
     
     [U,S,V] = svd(A);
-    r=S(4,4);
+    rb=S(4,4);
     
     
     
@@ -106,19 +107,17 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
     if(size(MS,2)==0)
         % i think i ought to add gaussian noise just to the first camera
         % maybeor the secondd
-        f1guess=f1guess+0.1*randn();
-        %f2guess=f1guess+0.2*randn();
-        %         ux1=ux1+2*randn() ;
-        %         vy1=vy1 +2*randn();
-        %         ux2= ux2+2*randn();
-        %         vy2=vy2 +2*randn();
         
-      
+        f2guess=f2guess+0.1*randn();
+        %         ux2= ux2+0.1*randn();
+        %         vy2=vy2 +0.1*randn();
+        
+        %failures(count)=1;
     else
-        
+        %    failures(count)=0;
         
         M=MS{1,1};
-        
+        Q=M;
         
         [ K_norm2, K_norm2_inverse ] = findNormalizingK(ux2,vy2,f2guess);
         [ K_norm1, K_norm1_inverse ] = findNormalizingK(ux1,vy1,f1guess);
@@ -129,6 +128,9 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
         % we just update camera 2
         f2=K2(1,1);
         f1=K1(1,1);
+        f1sol=f1;
+        f2sol=f2;
+        
         
         %     ux2= K2(1,3); %this is not working well
         %     vy2=K2(2,3) ;
@@ -144,6 +146,7 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
         f1guess=K1(1,1);
         
     end
+    
     
     %swap
     F=F';
@@ -167,9 +170,29 @@ while absdiff>0.000005 && count<400 &&  diffprev>absdiff
     
     
     x=[f1   f2];
-    Q=M;
     
+    
+    
+    
+    
+    if( mod(count,2)==1)
+        f1sol=f2;
+        f2sol=f1;
+    else
+        f1sol=f1;
+        f2sol=f2;
+    end
+    
+%     % %     %remove this
+%     m1(count)=absdiff;
+%     m2(count)=S(4,4);
+%     r(count)=abs(f1sol-1172.5024) + abs(f2sol-1272.5024 );
+%     fz1(count)=(f1sol );
+%     fz2(count)=(f2sol );
 end
-x=[f1   f2];
+
+%count
+x=[f1sol   f2sol];
+
 
 end
