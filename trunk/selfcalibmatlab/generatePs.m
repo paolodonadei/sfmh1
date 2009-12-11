@@ -64,12 +64,12 @@ for i=1:numps
 
     if(silent~=1)
          disp(['forcal length ' num2str(i) ' is equal to: K[0][0] ' num2str(K(1,1)) ' or K[1][1] ' num2str(K(2,2))]);
-        dirname=['projFolder' num2str(sum(round(100*clock)))];
-        mkdir(dirname);
-        save([dirname '/K' num2str(i) '.txt'], 'K','-ascii', '-double');
-        save([dirname '/R' num2str(i) '.txt'], 'R','-ascii', '-double');
-        save([dirname '/T' num2str(i) '.txt'], 'T','-ascii', '-double');
-        save([dirname '/P' num2str(i) '.txt'], 'P','-ascii', '-double');
+%         dirname=['projFolder' num2str(sum(round(100*clock)))];
+%         mkdir(dirname);
+%         save([dirname '/K' num2str(i) '.txt'], 'K','-ascii', '-double');
+%         save([dirname '/R' num2str(i) '.txt'], 'R','-ascii', '-double');
+%         save([dirname '/T' num2str(i) '.txt'], 'T','-ascii', '-double');
+%         save([dirname '/P' num2str(i) '.txt'], 'P','-ascii', '-double');
     end
 
 
