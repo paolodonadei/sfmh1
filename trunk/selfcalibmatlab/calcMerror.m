@@ -2,8 +2,10 @@ function [ err ] = calcMerror( M,P_in )
 %calculate the error of the abs quadric
 
 err=0;
+M=M/norm(M,'fro');
+
 for i=1:size(P_in,2)
-    P=P_in{1,i};
+    P=P_in{1,i}/norm(P_in{1,i},'fro');
     
     err1=P(1,:) * M * (P(1,:)') - P(2,:) * M * (P(2,:)') ;
     err2=P(1,:) * M * (P(1,:)') - P(3,:) * M * (P(3,:)') ;
