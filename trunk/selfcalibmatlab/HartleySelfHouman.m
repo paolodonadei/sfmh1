@@ -1,4 +1,4 @@
-fzzunction [ x ] = HartleySelfHouman( F,w,h )
+function [ x ] = HartleySelfHouman( F,w,h )
 
 
 ux2=w/2;
@@ -31,7 +31,7 @@ count=count+1;
     
     a=S(1,1);
     b=S(2,2);
-    
+    c=S(3,3);
     
     u31=U(3,1);
     u32=U(3,2);
