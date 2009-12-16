@@ -1,4 +1,4 @@
-function [ G ] = normalizeFSturmTwoFrame( F,ux1,vy1,ux2,vy2,F1guess,F2guess )
+function [ G,K_norm1, K_norm2] = normalizeFSturmTwoFrame( F,ux1,vy1,ux2,vy2,F1guess,F2guess )
 
 
 K_norm1=zeros(3,3);

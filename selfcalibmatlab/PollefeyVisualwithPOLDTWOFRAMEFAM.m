@@ -1,4 +1,4 @@
-function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,w,h )
+function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,w,h ,ks,pes)
 %code conforms to the marr prize paper but with full parametrization of the
 %Q so we solve for the 10 variables
 %UNTITLED Summary of this function goes here
@@ -12,7 +12,8 @@ x=[0 0];
 
 %remove this
 typicalF=w+h;
-G=normalizeFSturm(F,w,h,typicalF);
+
+[ G,Kk_norm1, Kk_norm2] = normalizeFSturmTwoFrame( F,w/2,h/2,w/2,h/2,typicalF,typicalF );
 
 K_norm=eye(3,3);
 
@@ -80,8 +81,8 @@ f2=K2(1,1)*typicalF;
 
 x=[f1   f2];
 
-
-
+[UQ,SQ,VQ] = svd(M);
+HH=VQ(:,4)/VQ(4,4)
 end
 
 
