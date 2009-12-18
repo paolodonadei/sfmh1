@@ -1,5 +1,5 @@
 function [myerr ] = EvalErrorParams1(F,f1,f2,x1,y1,x2,y2 )
-
+myerr=0;
 K_norm1=zeros(3,3);
 K_norm2=zeros(3,3);
 
@@ -20,7 +20,7 @@ K_norm2(3,2)= y2;
 
 
 G=(K_norm2)*F*K_norm1;
-
+G=G/G(3,3);
 
 S = svd(G);
 
@@ -28,7 +28,10 @@ S = svd(G);
 
 myerr =abs(S(1,1)-S(2,1))+abs(S(3,1));
 
-%RR=2*G*(G')*G- trace(G*(G'))*G;
+RR=2*G*(G')*G- trace(G*(G'))*G;
+%RR
+myerr=myerr+sum(sum(abs(RR)));
 
+%myerr
 end
 
