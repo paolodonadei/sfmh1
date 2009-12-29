@@ -1,4 +1,4 @@
-function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,w,h ,ks,pes)
+function [ x ] = PollefeyVisualwithPOLDTWOFRAMEFAM( F,w,h )
 %code conforms to the marr prize paper but with full parametrization of the
 %Q so we solve for the 10 variables
 %UNTITLED Summary of this function goes here
@@ -81,8 +81,8 @@ f2=K2(1,1)*typicalF;
 
 x=[f1   f2];
 
-[UQ,SQ,VQ] = svd(M);
-HH=VQ(:,4)/VQ(4,4)
+% [UQ,SQ,VQ] = svd(M);
+% HH=VQ(:,4)/VQ(4,4)
 end
 
 
