@@ -7,7 +7,13 @@ G1=K*F*KT;
 FF=[ typicalF 0 0 ; 0 typicalF 0 ; 0 0 1];
 
 G2=FF*G1*FF;
-G=G2/G2(3,3);
+
+if( abs(G2(3,3))>0.00000001)
+ G=G2/G2(3,3);
+else
+ G=G2;   
+end
+
 
 % K_norm=zeros(3,3);
 % K_norm(1,1)=  typicalF;

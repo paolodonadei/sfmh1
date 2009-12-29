@@ -1,8 +1,21 @@
 function [ x ] = PeterSturmSelf( F,w,h )
 typicalF=5000;
 G=normalizeFSturm(F,w,h,typicalF);
-[U,S,V] = svd(G);
+flagerr=0;
 
+try
+[U,S,V] = svd(G);
+catch 
+    disp(['we couldnt get the svd decomposition of w']);
+    x=[0 0];
+    S=zeros(3,3);
+    U=zeros(3,3);
+    V=zeros(3,3);
+    flagerr=1;
+end
+
+if(flagerr==0)
+    
 a=S(1,1);
 b=S(2,2);
 
@@ -64,6 +77,8 @@ if(C2>0)
 end
 
 x=[f1 f2];
+
+end
 
 end
 

@@ -29,7 +29,12 @@ for i=1:numps
 
     if(i~=1)
         T= a + (b-a) * rand(3,1);
+        
         R= rotationmat3D((-pi + (pi*2) * rand()),[(rand()*2-1) (rand()*2-1) (rand()*2-1)]);
+    
+        %degeneracy maker
+        R=eye(3);
+       
     end
 
     K=eye(3);
