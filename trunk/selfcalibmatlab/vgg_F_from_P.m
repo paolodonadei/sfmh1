@@ -26,7 +26,8 @@ F = [det([X1; Y1]) det([X2; Y1]) det([X3; Y1])
      det([X1; Y3]) det([X2; Y3]) det([X3; Y3])];
  
  %normalizing F, done by Houman
- 
+if( abs(F(3,3))>0.00000001)
  F=F/F(3,3);
+end
 
 return

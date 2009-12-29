@@ -276,3 +276,55 @@ clc
 clc
 clear all
 [ t,means,medians,  variances  ] = generateSelfPlot('c',30,0,0,1,0 )
+
+
+>> syms f11 f12 f13 f21 f22 f23 f31 f32 f33 fc ux vy real
+>> K_norm=[fc 0 ux ; 0 fc vy ; 0 0 1]
+ 
+K_norm =
+ 
+[ fc,  0, ux]
+[  0, fc, vy]
+[  0,  0,  1]
+ 
+ 
+>> G=(K_norm')*F*K_norm;
+??? Undefined function or variable 'F'.
+
+>> F=[f11 f12 f13 ; f21 f22 f23; f31 f32 f33 ]
+ 
+F =
+ 
+[ f11, f12, f13]
+[ f21, f22, f23]
+[ f31, f32, f33]
+ 
+ 
+>> G=(K_norm')*F*K_norm;
+>> G
+ 
+G =
+ 
+[                                                        fc^2*f11,                                                        fc^2*f12,                                      fc*f11*ux+fc*f12*vy+fc*f13]
+[                                                        fc^2*f21,                                                        fc^2*f22,                                      fc*f21*ux+fc*f22*vy+fc*f23]
+[                                          (ux*f11+vy*f21+f31)*fc,                                          (ux*f12+vy*f22+f32)*fc, (ux*f11+vy*f21+f31)*ux+(ux*f12+vy*f22+f32)*vy+ux*f13+vy*f23+f33]
+ 
+ 
+>> d=det(G)
+ 
+d =
+ 
+fc^4*f11*f22*f33-fc^4*f11*f23*f32-fc^4*f21*f12*f33+fc^4*f21*f13*f32+f31*fc^4*f12*f23-f31*fc^4*f22*f13
+ 
+ 
+>> J = jacobian(fc^4*f11*f22*f33-fc^4*f11*f23*f32-fc^4*f21*f12*f33+fc^4*f21*f13*f32+f31*fc^4*f12*f23-f31*fc^4*f22*f13, [fc ux vy])
+ 
+J =
+ 
+[ 4*fc^3*f11*f22*f33-4*fc^3*f11*f23*f32-4*fc^3*f21*f12*f33+4*fc^3*f21*f13*f32+4*f31*fc^3*f12*f23-4*f31*fc^3*f22*f13,                                                                                                                 0,                                                                                                                 0]
+ 
+ 
+>> [x2,resnorm2,residual2,exitflag2,output2] = lsqnonlin(f ,[1000;256;256],[300; 200; 200],[2000; 400; 400],options);
+??? Undefined function or variable 'f'.
+
+>> clea

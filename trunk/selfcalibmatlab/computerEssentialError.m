@@ -9,7 +9,7 @@ F = computerEssentialErrorVector(x,MYF);
 
 
 if nargout > 1   % Two output arguments
-   % k=88
+ 
     J= computerEssentialJacobian(x,MYF);
 end
 
