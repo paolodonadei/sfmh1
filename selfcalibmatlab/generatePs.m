@@ -33,7 +33,7 @@ for i=1:numps
         R= rotationmat3D((-pi + (pi*2) * rand()),[(rand()*2-1) (rand()*2-1) (rand()*2-1)]);
     
         %degeneracy maker
-        R=eye(3);
+       % R=eye(3);
        
     end
 
