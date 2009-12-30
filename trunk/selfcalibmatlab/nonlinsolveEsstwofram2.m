@@ -1,17 +1,12 @@
-function [fcl, centerloc] = nonlinsolveEsstwofram(TF)
+function [fcl, centerloc] = nonlinsolveEsstwofram2(TF)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 
-
-
-
 fcl=[0 0];
-
 xcen=0;
 ycen =0;
 centerloc=[xcen ycen];
-
-x = PeterSturmSelf( TF);
+x = PeterSturmSelf( TF );
 
 if(x(1,1)>200 && x(1,1)<1600)
     finit=x(1,1);
@@ -22,7 +17,7 @@ xinit=256;
 yinit=256;
 numtries=20;
 
-f = @(x)computerEssentialError(x,TF);
+f = @(x)computerEssentialErrorSquared(x,TF);
 
 ffinals=zeros(numtries,1);
 xfinals=zeros(numtries,1);
@@ -97,9 +92,6 @@ end
 % display(['mean of y was ' num2str(mean(yfinals)) ' median of y was ' num2str(median(yfinals)) ' variance of y was ' num2str(var(yfinals))]);
 % display(['best f is ' num2str(bestf) ' and best x is ' num2str(bestx) ' and best y is ' num2str(besty)]);
 % 
-% 
-% 
-
 fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;

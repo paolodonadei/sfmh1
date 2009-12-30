@@ -1,5 +1,10 @@
-function [ t,means,medians,  variances  ] = generateSelfPlot(paramcheck,repeat,pfdiff,pskew,par,pcenterdev )
+function [ t,means_F,medians_F,  variances_F ,means_xy,medians_xy,  variances_xy ] =     generateSelfPlot(paramcheck,repeat,pfdiff,pskew,par,pcenterdev )
 
+    %paramcheck would be the parmameter we are varying in characters, so
+    %'c' for camera center
+    %repeat is for how many times we will try this
+    %rest is the constant camera params
+    
 fid = fopen('exp.txt', 'w');
 
 
@@ -10,17 +15,20 @@ label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={ 'Houman2Fr','Pollefey2Frame','hartley','Houman6eq'};
-AlgFuncs={ @HoumanminimalTwoFrameSolver ,@PollefeyVisualwithPOLDTWOFRAMEFAM,@HartleySelf,@HoumanminimalTwoFrameSolver6eqn};
+AlgNames={ 'PeterSturmSelf','nonlinsolveEsstwofram2','nonlinsolveEsstwofram'};
+AlgFuncs={ @PeterSturmSelf ,@nonlinsolveEsstwofram2,@nonlinsolveEsstwofram};
 
 
 numalgs=size(AlgFuncs,2);
 
 %outputs
-means=zeros(numalgs,numPoints);
-medians=zeros(numalgs,numPoints);
-variances=zeros(numalgs,numPoints);
+means_F=zeros(numalgs,numPoints);
+medians_F=zeros(numalgs,numPoints);
+variances_F=zeros(numalgs,numPoints);
 
+means_xy=zeros(numalgs,numPoints);
+medians_xy=zeros(numalgs,numPoints);
+variances_xy=zeros(numalgs,numPoints);
 
 %arg paramters
 fdiff=ones(1,numPoints)*pfdiff;
@@ -65,7 +73,8 @@ currIteration=0;
 
 for i=1:numPoints
     
-    current_errors=zeros(numalgs,repeat);
+    current_errors_F=zeros(numalgs,repeat);
+    current_errors_XY=zeros(numalgs,repeat);
     
     for j=1:repeat
         currIteration=currIteration+1;
@@ -74,20 +83,25 @@ for i=1:numPoints
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ')'] );
         
         for k=1:numalgs
-            answer=AlgFuncs{k}(F,512,512);
-            current_errors(k,j)=calcSelfCalibError(answer,ks);
-            disp(['algorithm: ' AlgNames{k} ' had error ' num2str(current_errors(k,j))]);
-            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answer(1,1),answer(1,2),current_errors(k,j)  );
-
+            [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
+            current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
+            current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
+            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy' num2str(current_errors_XY(k,j))]);
+            
+            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j)  );
+            
         end
         
     end
     %now calculate the stat for the current run
     for k=1:numalgs
-        means(k,i)=mean(current_errors(k,:));
-        medians(k,i)=median(current_errors(k,:));
-        variances(k,i)=var(current_errors(k,:));
+        means_F(k,i)=mean(current_errors_F(k,:));
+        medians_F(k,i)=median(current_errors_F(k,:));
+        variances_F(k,i)=var(current_errors_F(k,:));
         
+        means_XY(k,i)=mean(current_errors_XY(k,:));
+        medians_XY(k,i)=median(current_errors_XY(k,:));
+        variances_XY(k,i)=var(current_errors_XY(k,:));
     end
     
     
@@ -95,8 +109,9 @@ for i=1:numPoints
     
 end
 
-data={means, medians, variances};
-dataNames={'means', 'medians', 'variances'};
+% for focal length
+data={means_F, medians_F, variances_F};
+dataNames={'means_F', 'medians_F', 'variances_F'};
 sizeDataCats=size(data,2);
 
 for i=1:sizeDataCats
@@ -113,10 +128,35 @@ for i=1:sizeDataCats
     legend(AlgNames);
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-    saveas(gcf,['param_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     hold
     
 end
+
+% for camera center
+data={means_XY, medians_XY, variances_XY};
+dataNames={'means_XY', 'medians_XY', 'variances_XY'};
+sizeDataCats=size(data,2);
+
+for i=1:sizeDataCats
+    % the mean stuff
+    figure;
+    hold;
+    for k=1:numalgs
+        
+        plot(t,data{i}(k,:),styles{k});
+    end
+    xlabel(['x (' label ')']);       %  add axis labels and plot title
+    ylabel('y (error in camera center in pixels)');
+    title([dataNames{i} ' plot of ' label ' versus error in camera center estimation']);
+    legend(AlgNames);
+    %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
+    %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
+    saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    hold
+    
+end
+
 
 
 fclose(fid);
