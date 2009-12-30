@@ -13,9 +13,9 @@ for k=1:z
         for j=1:n
             if(M(k,i,j)<minpt)
                 minpt=M(k,i,j);
-                xindex=i;
-                yindex=j;
-                zindex=k;
+                xindex=k;
+                yindex=i;
+                zindex=j;
             end
         end
     end
