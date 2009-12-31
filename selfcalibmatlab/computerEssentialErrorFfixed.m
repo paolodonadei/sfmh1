@@ -1,4 +1,4 @@
-function [F,J] = computerEssentialErrorFfixed(x,MYF)
+function [F,J] = computerEssentialErrorFfixed(x,MYF,fc)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 
@@ -13,9 +13,9 @@ f31=MYF(3,1);
 f32=MYF(3,2);
 f33=MYF(3,3);
 
-fc=x(1,1);
-ux=x(2,1);
-vy=x(3,1);
+
+ux=x(1,1);
+vy=x(2,1);
 
 F =[
  

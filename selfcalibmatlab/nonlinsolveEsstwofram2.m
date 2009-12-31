@@ -15,7 +15,7 @@ else
 end
 xinit=256;
 yinit=256;
-numtries=20;
+numtries=200;
 
 f = @(x)computerEssentialErrorSquared(x,TF);
 
@@ -29,7 +29,7 @@ besty=0;
 bestscore=10000;
 curscore=0;
 
-options  =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt');
+options  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt');
 
 for i=1:numtries
     x0=[ randn()*50+finit ; randn()*50+xinit ; randn()*50+yinit ];
