@@ -1,4 +1,4 @@
-function [fcl, centerloc] = nonlinsolveEsstwofram(TF)
+function [fcl, centerloc] = nonlinsolveEsstwoframDiffFrames(TF)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
@@ -7,21 +7,27 @@ function [fcl, centerloc] = nonlinsolveEsstwofram(TF)
 
 fcl=[0 0];
 
-xcen=0;
-ycen =0;
-centerloc=[xcen ycen];
+xcen1=0;
+ycen1 =0;
+xcen2=0;
+ycen2 =0;
+centerloc=[xcen1 ycen1 xcen2 ycen2];
 
-x = PeterSturmSelf( TF);
+[x, useles]= HartleySelf(TF);
 
-if(x(1,1)>200 && x(1,1)<1600)
-    finit=x(1,1);
+if(x(1,1)>200 && x(1,1)<1600 && x(1,2)>200 && x(1,2)<1600)
+    finit1=x(1,1);
+     finit2=x(1,2);
 else
-    finit=512; %w+h
+    finit1=512+512; %w+h
+    finit2=512+512; %w+h
 end
 
 
-xinit=256;
-yinit=256;
+xinit1=256;
+yinit1=256;
+xinit2=256;
+yinit2=256;
 numtries=100;
 
 fvari=50;
@@ -29,16 +35,24 @@ xvari=50;
 yvari=50;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
-f = @(x)computerEssentialError(x,TF);
+f = @(x)computerEssentialErrorDiffFrames(x,TF);
 
-ffinals=zeros(numtries,1);
-xfinals=zeros(numtries,1);
-yfinals=zeros(numtries,1);
+ffinals1=zeros(numtries,1);
+xfinals1=zeros(numtries,1);
+yfinals1=zeros(numtries,1);
+
+ffinals2=zeros(numtries,1);
+xfinals2=zeros(numtries,1);
+yfinals2=zeros(numtries,1);
+
 scorearray=zeros(numtries,1);
 
-bestf=0;
-bestx=0;
-besty=0;
+bestf1=0;
+bestx1=0;
+besty1=0;
+bestf2=0;
+bestx2=0;
+besty2=0;
 bestscore=2000;
 curscore=0;
 
@@ -48,19 +62,23 @@ optionslsqnonlin  =optimset('Display','off','Jacobian','on');
 
 
 for i=1:numtries
-    x0=[ (randn()*fvari)+finit ; (randn()*xvari)+xinit ; (randn()*yvari)+yinit ];
+    x0=[ (randn()*fvari)+finit1 ; (randn()*xvari)+xinit1 ; (randn()*yvari)+yinit1 ;  (randn()*fvari)+finit2 ; (randn()*xvari)+xinit2 ; (randn()*yvari)+yinit2  ];
     
     
    % [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-150; 190; 190],[finit+150; 350; 350],optionslsqnonlin);
-    ffinals(i,1)=x(1);
-    xfinals(i,1)=x(2);
-    yfinals(i,1)=x(3);
+     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit1-150; 190; 190 ; finit2-150; 190; 190],[finit1+150; 350; 350 ; finit2+150; 350; 350],optionslsqnonlin);
+    
+     ffinals1(i,1)=x(1);
+    xfinals1(i,1)=x(2);
+    yfinals1(i,1)=x(3);
+    ffinals2(i,1)=x(4);
+    xfinals2(i,1)=x(5);
+    yfinals2(i,1)=x(6);
     
     curscore=sum(abs(fval));
     
-   %  [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
-%     curscore=detScore;   
+     [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(4),x(2),x(3),x(5),x(6) );
+%     curscore=detScore;
     
        
    
@@ -69,10 +87,13 @@ for i=1:numtries
     if(curscore<bestscore)
         bestscore=curscore;
         %  disp(['iteration ' num2str(i)]);
-        bestf=x(1);
-        bestx=x(2);
-        besty=x(3);
-     %   disp(['iteration ' num2str(i) ' best f is ' num2str(bestf) ' and best x = ' num2str(bestx) ' and best y is ' num2str(besty) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+        bestf1=x(1);
+        bestx1=x(2);
+        besty1=x(3);
+        bestf2=x(4);
+        bestx2=x(5);
+        besty2=x(6);
+        disp(['iteration ' num2str(i) ' best f1 is ' num2str(bestf1) ' and best x1 is ' num2str(bestx1) ' and best y1 is ' num2str(besty1) ' best f2 is ' num2str(bestf2) ' and best x2 = ' num2str(bestx2) ' and best y2 is ' num2str(besty2) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
         
     end
@@ -186,10 +207,14 @@ end
 %
 %toc
 
-fcl=[ bestf bestf];
-xcen=bestx;
-ycen=besty;
-centerloc=[xcen ycen];
+fcl=[ bestf1 bestf2];
+
+xcen1=bestx1;
+ycen1=besty1;
+xcen2=bestx2;
+ycen2=besty2;
+
+centerloc=[xcen1 ycen1 xcen2 ycen2];
 
 end
 

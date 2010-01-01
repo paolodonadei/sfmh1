@@ -328,3 +328,11 @@ J =
 ??? Undefined function or variable 'f'.
 
 >> clea
+
+
+G = simplify(G);
+RR=2*G*(G')*G- trace(G*(G'))*G;
+RR = simplify(RR);
+MYRR2=RR;
+AllErrs = [  MYRR2(1,1) ; MYRR2(1,2) ; MYRR2(1,3) ; MYRR2(2,1) ; MYRR2(2,2) ; MYRR2(2,3) ; MYRR2(3,1) ; MYRR2(3,2) ; MYRR2(3,3) ; ]
+J = jacobian(AllErrs, [fc])

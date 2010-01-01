@@ -1,4 +1,7 @@
-function [ x ] = HartleySelf( F,w,h )
+function [ x ,  centerloc] = HartleySelf( F )
+w=512;
+h=512;
+centerloc=[256 256 256 256];
 typicalF=5000;
 G=normalizeFSturm(F,w,h,typicalF);
 [U,S,V] = svd(G);

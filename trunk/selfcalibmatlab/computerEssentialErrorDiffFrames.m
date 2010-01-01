@@ -1,4 +1,4 @@
-function [F,J] = computerEssentialErrorSquared(x,MYF)
+function [F,J] = computerEssentialErrorDiffFrames(x,MYF)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 
@@ -13,9 +13,13 @@ f31=MYF(3,1);
 f32=MYF(3,2);
 f33=MYF(3,3);
 
-fc=x(1,1);
-ux=x(2,1);
-vy=x(3,1);
+fc1=x(1,1);
+ux1=x(2,1);
+vy1=x(3,1);
+
+fc2=x(4,1);
+ux2=x(5,1);
+vy2=x(6,1);
 
 F =[
  
