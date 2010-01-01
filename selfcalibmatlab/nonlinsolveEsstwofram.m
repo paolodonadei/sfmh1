@@ -99,7 +99,7 @@ ylabel('value of the energy function ');
 
 figure;
 
-scatter(ffinals, ln(scorearray));
+scatter(ffinals, log(scorearray));
 title(['log scale focal lengths versus energy']);
 xlabel('focal length');
 ylabel('value of the energy function ');
@@ -125,7 +125,22 @@ numclusts=10;
 X=[ ffinals  xfinals   yfinals];
 [idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
 
-scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled')
+scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
+title(['scatter plot of all the results found using my method and those found by sweeping the peter sturm algorithm']);
+hold
+count=0;
+for i=230:350
+for j=230:350
+    count=count+1;
+[ x, centerloc ] = PeterSturmSelfmoreparams( TF, i, j );
+XF(count,1)=x(1,1);
+XF(count,2)=i;
+XF(count,3)=j;
+end
+end
+scatter3(XF(:,1),XF(:,2),XF(:,3),100,'r','filled');
+hold
+
 
 maxnumclusts=0;
 maxnumclustsF=0;
