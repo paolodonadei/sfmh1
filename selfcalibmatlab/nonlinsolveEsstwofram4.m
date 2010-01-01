@@ -1,4 +1,4 @@
-function [fcl, centerloc] = nonlinsolveEsstwofram(TF)
+function [fcl, centerloc] = nonlinsolveEsstwofram4(TF)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
@@ -39,7 +39,7 @@ scorearray=zeros(numtries,1);
 bestf=0;
 bestx=0;
 besty=0;
-bestscore=2000;
+bestscore=1000;
 curscore=0;
 
 optionsfsolve  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
@@ -51,16 +51,16 @@ for i=1:numtries
     x0=[ (randn()*fvari)+finit ; (randn()*xvari)+xinit ; (randn()*yvari)+yinit ];
     
     
-   % [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-150; 190; 190],[finit+150; 350; 350],optionslsqnonlin);
+    [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
+    % [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-150; 190; 190],[finit+150; 350; 350],optionslsqnonlin);
     ffinals(i,1)=x(1);
     xfinals(i,1)=x(2);
     yfinals(i,1)=x(3);
     
     curscore=sum(abs(fval));
     
-   %  [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
-%     curscore=detScore;   
+     [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
+    curscore=EssScoreIA;   
     
        
    
@@ -72,15 +72,12 @@ for i=1:numtries
         bestf=x(1);
         bestx=x(2);
         besty=x(3);
-     %   disp(['iteration ' num2str(i) ' best f is ' num2str(bestf) ' and best x = ' num2str(bestx) ' and best y is ' num2str(besty) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+  %      disp(['iteration ' num2str(i) ' best f is ' num2str(bestf) ' and best x = ' num2str(bestx) ' and best y is ' num2str(besty) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
         
     end
 end
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
