@@ -3,7 +3,7 @@ function [fcl, centerloc] = nonlinsolveEsstwoframDiffFrames(TF)
 %matrix computes the error with respect to a fundamental matrix
 %tic
 
-
+should i add F=F*100? compre scored
 
 fcl=[0 0];
 
