@@ -3,7 +3,7 @@ function [fcl, centerloc] = nonlinsolveEsstwofram(TF)
 %matrix computes the error with respect to a fundamental matrix
 %tic
 
-
+TF=TF*10000;
 
 fcl=[0 0];
 
@@ -22,7 +22,7 @@ end
 
 xinit=256;
 yinit=256;
-numtries=100;
+numtries=50;
 
 fvari=50;
 xvari=50;
@@ -39,7 +39,7 @@ scorearray=zeros(numtries,1);
 bestf=0;
 bestx=0;
 besty=0;
-bestscore=2000;
+bestscore=1000;
 curscore=0;
 
 optionsfsolve  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
@@ -48,22 +48,22 @@ optionslsqnonlin  =optimset('Display','off','Jacobian','on');
 
 
 for i=1:numtries
-    x0=[ (randn()*fvari)+finit ; (randn()*xvari)+xinit ; (randn()*yvari)+yinit ];
+    x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
     
     
    % [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-150; 190; 190],[finit+150; 350; 350],optionslsqnonlin);
+     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-150 190 190],[finit+150 350 350],optionslsqnonlin);
     ffinals(i,1)=x(1);
     xfinals(i,1)=x(2);
     yfinals(i,1)=x(3);
     
     curscore=sum(abs(fval));
     
-   %  [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
+     [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
 %     curscore=detScore;   
     
-       
-   
+   % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);   
+  %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
        
        scorearray(i,1)=curscore;
     if(curscore<bestscore)
@@ -72,8 +72,8 @@ for i=1:numtries
         bestf=x(1);
         bestx=x(2);
         besty=x(3);
-     %   disp(['iteration ' num2str(i) ' best f is ' num2str(bestf) ' and best x = ' num2str(bestx) ' and best y is ' num2str(besty) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
-        
+    %   x,resnorm,fval,exitflag
+         disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
     end
 end
