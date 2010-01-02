@@ -1,9 +1,11 @@
-function [fcl, centerloc] = nonlinsolveEsstwoframDiffFrames(TF)
+function [fcl, centerloc] = nonlinsolveEsstwoframDiffFrames(TF,w,h)
+
+
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
 
-should i add F=F*100? compre scored
+%TF=TF*1000;
 
 fcl=[0 0];
 
@@ -13,24 +15,24 @@ xcen2=0;
 ycen2 =0;
 centerloc=[xcen1 ycen1 xcen2 ycen2];
 
-[x, useles]= HartleySelf(TF);
+[x, useles]=  PeterSturmSelf( TF,w,h);
 
 if(x(1,1)>200 && x(1,1)<1600 && x(1,2)>200 && x(1,2)<1600)
     finit1=x(1,1);
      finit2=x(1,2);
 else
-    finit1=512+512; %w+h
-    finit2=512+512; %w+h
+    finit1=w+h; %w+h
+    finit2=w+h; %w+h
 end
 
 
-xinit1=256;
-yinit1=256;
-xinit2=256;
-yinit2=256;
+xinit1=w/2;
+yinit1=h/2;
+xinit2=w/2;
+yinit2=h/2;
 numtries=100;
 
-fvari=50;
+fvari=50;%this should change according to the size of the image
 xvari=50;
 yvari=50;
 
@@ -66,7 +68,7 @@ for i=1:numtries
     
     
    % [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit1-150; 190; 190 ; finit2-150; 190; 190],[finit1+150; 350; 350 ; finit2+150; 350; 350],optionslsqnonlin);
+     [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit1-150; ((w/2)-60); ((h/2)-60) ; finit2-150; ((w/2)-60); ((h/2)-60) ],[finit1+150; ((w/2)+60); ((h/2)+60) ; finit2+150; ((w/2)+60); ((h/2)+60) ],optionslsqnonlin);
     
      ffinals1(i,1)=x(1);
     xfinals1(i,1)=x(2);

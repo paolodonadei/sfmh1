@@ -1,6 +1,5 @@
-function [ x, centerloc ] = PeterSturmSelf( F )
-w=512;
-h=512;
+function [ x, centerloc ] = PeterSturmSelf( F,w,h )
+
 xc=256;
 yc=256;
 centerloc=[xc yc];

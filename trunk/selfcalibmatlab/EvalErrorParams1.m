@@ -40,7 +40,7 @@ svScore =abs(S(1,1)-S(2,1))+abs(S(3,1));
 RR=2*G*(G')*G- trace(G*(G'))*G;
 %EssScoreIA=abs((2*(trace((G*(G')).^2)))-((trace(G*(G')))^2));
 EssScoreIA=abs((2*(trace((G*(G'))*(G*(G')))))-((trace(G*(G')))^2));
-RR
+
 %EssScore=(2*((S(1,1)^4) +(S(2,1)^4)+(S(3,1)^4))) -(((S(1,1)^2) +(S(2,1)^2)+(S(3,1)^2))^2);
 EssScore=sum(sum(abs(RR)));
 
