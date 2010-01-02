@@ -1,6 +1,6 @@
-function [] =runSelfCalibFindErrors( F , ks, funcName)
+function [] =runSelfCalibFindErrors( F , ks, funcName,w,h)
 
-[answerf, loca]=funcName(F)
+[answerf, loca]=funcName(F,w,h)
 
 errf1=abs(answerf(1,1)-ks{1}(1,1));
 errx1=abs(loca(1,1)-ks{1}(1,3));
