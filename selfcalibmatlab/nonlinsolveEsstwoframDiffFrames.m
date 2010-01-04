@@ -95,7 +95,7 @@ for i=1:numtries
         bestf2=x(4);
         bestx2=x(5);
         besty2=x(6);
-        disp(['iteration ' num2str(i) ' best f1 is ' num2str(bestf1) ' and best x1 is ' num2str(bestx1) ' and best y1 is ' num2str(besty1) ' best f2 is ' num2str(bestf2) ' and best x2 = ' num2str(bestx2) ' and best y2 is ' num2str(besty2) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+   %     disp(['iteration ' num2str(i) ' best f1 is ' num2str(bestf1) ' and best x1 is ' num2str(bestx1) ' and best y1 is ' num2str(besty1) ' best f2 is ' num2str(bestf2) ' and best x2 = ' num2str(bestx2) ' and best y2 is ' num2str(besty2) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
         
     end
