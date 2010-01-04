@@ -39,7 +39,7 @@ scorearray=zeros(numtries,1);
 bestf=0;
 bestx=0;
 besty=0;
-bestscore=1000000000000;
+bestscore=1000000000000000;
 curscore=0;
 
 optionsfsolve  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
@@ -66,7 +66,7 @@ for i=1:numtries
   %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
        
        scorearray(i,1)=curscore;
-    if(curscore<bestscore || i==1)
+    if(curscore<bestscore && abs(x(1)-finit)<200 ) % i added the second condition to make sure we dont deviate too much
         bestscore=curscore;
         %  disp(['iteration ' num2str(i)]);
         bestf=x(1);
@@ -126,7 +126,18 @@ end
 
 numclusts=10;
 X=[ ffinals  xfinals   yfinals];
-[idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
+
+try 
+    
+[idx,ctrs] = kmeans(X,numclusts);
+
+catch 
+    
+    ctrs=zeros(10,3);
+    idx=zeros(numtries);
+end
+
+
 % 
 % scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
 % title(['scatter plot of all the results found using my method and those found by sweeping the peter sturm algorithm']);
