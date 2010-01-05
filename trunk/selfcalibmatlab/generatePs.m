@@ -53,13 +53,13 @@ for i=1:numps
     K(1,1)=curentF;
     K(2,2)=K(1,1)*ar;
 
-    if(numps==2)  %this might not make sense, but for 2 frames i dont want the deviation from center to be a random variable
+%     if(numps==2)  %this might not make sense, but for 2 frames i dont want the deviation from center to be a random variable
         K(1,3)=(WIDTH/2)+centerdeviation+xcenterdevgauss;
         K(2,3)=(HEIGHT/2)+centerdeviation+ycenterdevgauss;
-    else
-        K(1,3)=(WIDTH/2)+rand()*centerdeviation;
-        K(2,3)=(HEIGHT/2)+rand()*centerdeviation;
-    end
+%     else
+%         K(1,3)=(WIDTH/2)+rand()*centerdeviation;
+%         K(2,3)=(HEIGHT/2)+rand()*centerdeviation;
+%     end
 
 
     P=K*[R -R*T];

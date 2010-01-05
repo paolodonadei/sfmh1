@@ -45,7 +45,7 @@ k
 end
 
 
-%%%%%%%%%%%%%%%% for two frames
+%%%%%%%%%%%%%%%% for two frames diff
 
 for k=1:100
     tic
@@ -101,6 +101,60 @@ errPS_90(k,1)
 errRH_90(k,1)
 errNL_90(k,1)
 errNLDIFF_90(k,1)
+
+
+toc
+k
+
+end
+
+%%%%%%for using three images
+
+
+for k=1:100
+    tic
+    w=512;
+    h=512;
+    
+[ F, ks ] = generateF( 0, 0, 1,(randn()*10)+40,0,3 );
+xp = (PeterSturmSelf( F{1},w,h)+PeterSturmSelf( F{2},w,h)+PeterSturmSelf( F{3},w,h))/3;
+[fcl1_40, centerloc1] =nonlinsolveEssNfram(F,w,h);
+
+errPS_40(k,1)=abs(xp(1,1)-ks{1}(1,1))+abs(xp(1,2)-ks{2}(1,1));
+errNL_40(k,1)=abs(fcl1_40(1,1)-ks{1}(1,1))+abs(fcl1_40(1,2)-ks{2}(1,1));
+
+
+xp
+fcl1_40
+
+display('errors 40');
+
+errPS_40(k,1)
+errNL_40(k,1)
+
+mean(errPS_40)
+mean(errNL_40)
+
+clear fcl1_40 fcl1_40Diff xp xh ks F
+
+[ F, ks ] = generateF( 5, 3, 1,(randn()*10)+80,0,3 );
+xp = (PeterSturmSelf( F{1},w,h)+PeterSturmSelf( F{2},w,h)+PeterSturmSelf( F{3},w,h))/3;
+[fcl1_90, centerloc1] =nonlinsolveEssNfram(F,w,h);
+
+errPS_90(k,1)=abs(xp(1,1)-ks{1}(1,1))+abs(xp(1,2)-ks{2}(1,1));
+errNL_90(k,1)=abs(fcl1_90(1,1)-ks{1}(1,1))+abs(fcl1_90(1,2)-ks{2}(1,1));
+
+
+xp
+fcl1_90
+
+display('errors 90');
+
+errPS_90(k,1)
+errNL_90(k,1)
+
+mean(errPS_90)
+mean(errNL_90)
 
 
 toc
