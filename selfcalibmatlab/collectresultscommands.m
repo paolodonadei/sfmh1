@@ -3,40 +3,47 @@ for k=1:100
     w=512;
     h=512;
     
-[ F, ks ] = generateF( 0, 0, 1,(randn()*10)+40,0 );
+[ F, ks ] = generateF( 0, 0, 1,(randn()*10)+40,0,2 );
 xp = PeterSturmSelf( F,w,h);
 [fcl1_40, centerloc1] = nonlinsolveEsstwofram(F,w,h);
 [fcl2_40, centerloc1] = nonlinsolveEsstwofram2(F,w,h);
-[fcl3_40, centerloc1] = nonlinsolveEsstwofram3(F,w,h);
-[fcl4_40, centerloc1] = nonlinsolveEsstwofram4(F,w,h);
+
+xp
+fcl1_40
+fcl2_40
+
 errPS_40(k,1)=abs(xp(1,1)-ks{1}(1,1));
 errNL1_40(k,1)=abs(fcl1_40(1,1)-ks{1}(1,1));
 errNL2_40(k,1)=abs(fcl2_40(1,1)-ks{1}(1,1));
-errNL3_40(k,1)=abs(fcl3_40(1,1)-ks{1}(1,1));
-errNL4_40(k,1)=abs(fcl4_40(1,1)-ks{1}(1,1));
+
 errPS_40(k,1)
 errNL1_40(k,1)
 errNL2_40(k,1)
-errNL3_40(k,1)
-errNL4_40(k,1)
 
-[ F9, ks9 ] = generateF( 0, 0, 1,(randn()*10)+90,0 );
-xp = PeterSturmSelf( F9,w,h);
+mean(errPS_40)
+mean(errNL1_40)
+mean(errNL2_40)
+
+[ F9, ks9 ] = generateF( abs((randn()*5)), abs((randn()*5)), 1,(randn()*10)+50,0,2 );
+xp9 = PeterSturmSelf( F9,w,h);
 [fcl1_90, centerloc1] = nonlinsolveEsstwofram(F9,w,h);
 [fcl2_90, centerloc1] = nonlinsolveEsstwofram2(F9,w,h);
-[fcl3_90, centerloc1] = nonlinsolveEsstwofram3(F9,w,h);
-[fcl4_90, centerloc1] = nonlinsolveEsstwofram4(F9,w,h);
-errPS_90(k,1)=abs(xp(1,1)-ks9{1}(1,1));
+
+errPS_90(k,1)=abs(xp9(1,1)-ks9{1}(1,1));
 errNL1_90(k,1)=abs(fcl1_90(1,1)-ks9{1}(1,1));
 errNL2_90(k,1)=abs(fcl2_90(1,1)-ks9{1}(1,1));
-errNL3_90(k,1)=abs(fcl3_90(1,1)-ks9{1}(1,1));
-errNL4_90(k,1)=abs(fcl4_90(1,1)-ks9{1}(1,1));
+
+xp9
+fcl1_90
+fcl2_90
+
 errPS_90(k,1)
 errNL1_90(k,1)
 errNL2_90(k,1)
-errNL3_90(k,1)
-errNL4_90(k,1)
 
+mean(errPS_90(k,1))
+mean(errNL1_90(k,1))
+mean(errNL2_90(k,1))
 
 
 toc

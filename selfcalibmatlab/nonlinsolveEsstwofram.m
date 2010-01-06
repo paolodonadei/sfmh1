@@ -22,7 +22,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=150;
+numtries=200;
 
 fvari=50;
 xvari=50;
@@ -59,14 +59,14 @@ for i=1:numtries
     
     curscore=sum(abs(fval));
     
-     [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
+    % [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
 %     curscore=detScore;   
     
    % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);   
   %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
        
        scorearray(i,1)=curscore;
-    if(curscore<bestscore || i==1)
+   if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
         bestscore=curscore;
         %  disp(['iteration ' num2str(i)]);
         bestf=x(1);
@@ -185,7 +185,11 @@ end
 
 
 %toc
-
+if(bestf>200 && bestf<1600 && imag(bestf)==0)
+    bestf=bestf;
+else
+    bestf=w+h;
+end
 fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;
