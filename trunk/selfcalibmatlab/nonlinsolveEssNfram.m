@@ -43,7 +43,7 @@ end
 
 if(finit>200 && finit<1600 && imag(finit)==0)
     finit=finit;
-    fvari=psstd;
+    fvari=150;
 else
     finit=w+h;
     fvari=(w+h)/2;
@@ -83,7 +83,7 @@ for i=1:numtries
     while(initbeginF<200 || initbeginF>1500)
         initbeginF=(randn()*fvari)+finit;
     end
-    
+
     
     x0=[ initbeginF  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
     
@@ -96,11 +96,11 @@ for i=1:numtries
     
     curscore=sum(abs(fval));
     
-   % [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
+    %[svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
     %          curscore=EssScore;
     
    % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);
-   % disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+  %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
     
     scorearray(i,1)=curscore;
     if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
@@ -111,7 +111,7 @@ for i=1:numtries
         bestx=x(2);
         besty=x(3);
         %   x,resnorm,fval,exitflag
-        % disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+      %   disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
     end
     

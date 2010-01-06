@@ -22,7 +22,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=150;
+numtries=200;
 
 fvari=50;
 xvari=50;
@@ -42,9 +42,9 @@ besty=0;
 bestscore=1000000000000;
 curscore=0;
 
-optionsfsolve  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+optionsfsolve  =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
-optionslsqnonlin  =optimset('Display','off','Jacobian','on');
+optionslsqnonlin  =optimset('Display','off','Jacobian','off');
 
 
 for i=1:numtries
@@ -59,21 +59,21 @@ for i=1:numtries
     
     curscore=sum(abs(fval));
     
-     [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
+    % [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF,x(1),x(1),x(2),x(3),x(2),x(3) );
 %     curscore=detScore;   
     
    % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);   
   %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
        
        scorearray(i,1)=curscore;
-    if(curscore<bestscore || i==1)
+   if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
         bestscore=curscore;
         %  disp(['iteration ' num2str(i)]);
         bestf=x(1);
         bestx=x(2);
         besty=x(3);
     %   x,resnorm,fval,exitflag
-      %   disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+     %    disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
         
     end
 end
@@ -185,8 +185,12 @@ end
 
 
 %toc
-
-fcl=[ mean(ffinals) mean(ffinals)];
+if(bestf>200 && bestf<1600 && imag(bestf)==0)
+    bestf=bestf;
+else
+    bestf=w+h;
+end
+fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;
 centerloc=[xcen ycen];
