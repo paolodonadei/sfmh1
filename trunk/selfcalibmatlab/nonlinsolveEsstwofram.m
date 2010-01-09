@@ -44,7 +44,7 @@ curscore=0;
 
 optionsfsolve  =optimset('Display','off','Jacobian','on','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
-optionslsqnonlin  =optimset('Display','off','Jacobian','on');
+optionslsqnonlin  =optimset('Display','off','Jacobian','on', 'PlotFcns',@optimplotresnorm);
 
 
 for i=1:numtries
