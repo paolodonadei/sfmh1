@@ -190,16 +190,16 @@ hold
 % figure
 %
 % %
-% hist(ffinals,numtries/2);
-% title(['focal length']);
-% figure
-%
-% hist(xfinals,numtries/2);
-% title(['xcomponent of camera center']);
-% figure
-%
-% hist(yfinals,numtries/2);
-% title(['ycomponent of camera center']);
+hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
+title(['focal length']);
+figure
+
+hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
+title(['xcomponent of camera center']);
+figure
+
+hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
+title(['ycomponent of camera center']);
 %
 % display(['mean of f was ' num2str(mean(ffinals)) ' median of f was ' num2str(median(ffinals)) ' variance of f was ' num2str(var(ffinals))]);
 % display(['mean of x was ' num2str(mean(xfinals)) ' median of x was ' num2str(median(xfinals)) ' variance of x was ' num2str(var(xfinals))]);
@@ -252,9 +252,19 @@ fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;
 centerloc=[xcen ycen];
-comments:
-
-use the camera center to generate consensus cuz it seems more stable
-see how you can extend this to teh case where the two frames are different, thats the interesting case
+% comments:
+% 
+% use the camera center to generate consensus cuz it seems more stable
+% see how you can extend this to teh case where the two frames are different, thats the interesting case
+% I still have not found a way to cluster the data, i was looking at pca
+% some of the ways we can do this is this:
+% 1) cluster the data of each algorithm and then only deal with the cluster
+% centers, 
+%2) just find the peak of the histogram for focal length and then find the
+%optical center using the points that belong to the peak of the focal
+%length
+%3) and this is the best method, if i could find an explicit representation
+%of this curve in space using properties of the essential mtrix as said in
+%the fusiello paper this could really help out
 end
 
