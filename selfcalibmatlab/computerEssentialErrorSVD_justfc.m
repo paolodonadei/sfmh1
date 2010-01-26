@@ -1,9 +1,8 @@
-function [F] = computerEssentialErrorSVD(x,MYF)
+function [F] = computerEssentialErrorSVD_justfc(x,MYF,ux,vy)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
-fc=x(1,1);
-ux=x(1,2);
-vy=x(1,3);
+fc=x;
+
 
 K_norm1=zeros(3,3);
 K_norm2=zeros(3,3);

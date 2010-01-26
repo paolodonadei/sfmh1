@@ -8,7 +8,7 @@ for i=1:n
     
 T = computerEssentialErrorSVD(x,MYF{1,i});
 
-F=F+(abs(T));
+F=F+T;
 end
 
 
