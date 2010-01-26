@@ -1,11 +1,10 @@
-function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h)
+function [fcl, centerloc] = S2nonlinsolveEsstwofram_justfc(TF,w,h)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
 
 %TF=TF*10000;
 
-maxfocal=2000;
 fcl=[0 0];
 
 xcen=0;
@@ -18,22 +17,21 @@ sizeFs=n;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=400;
+numtries=100;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
 scorearray=zeros(numtries,sizeFs);
 
-sturmfailed=0;
 
 for q=1:sizeFs
 
-    x = PeterSturmSelf( TF{q},w,h)
+    x = PeterSturmSelf( TF{q},w,h);
 
     if(x(1,1)>200 && x(1,1)<1600)
         finit=x(1,1);
     else
-        sturmfailed=1;
+        finit=w+h;
     end
 
 
@@ -41,9 +39,9 @@ for q=1:sizeFs
     yinit=h/2;
 
 
-    fvari=70;
-    xvari=70;
-    yvari=70;
+    fvari=50;
+    xvari=50;
+    yvari=50;
 
 
 
@@ -52,32 +50,22 @@ for q=1:sizeFs
     besty=0;
     bestscore=1000000000000;
     curscore=0;
-    f = @(x)computerEssentialErrorSVD(x,TF{q});
+    f = @(x)computerEssentialErrorSVD_justfc(x,TF{q},xinit,yinit);
     optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
 
 
 
 
     for i=1:numtries
-        if(sturmfailed==0)
-            x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-        else
-            x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-        end
+        x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
 
 
+        [v,fval,exitflag,output]  = fsolve(f ,x0(1,1),optionsfsolve);
 
-        [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-
-        if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
-            ffinals(i,q)=0;
-            xfinals(i,q)=0;
-            yfinals(i,q)=0;
-        else
-            ffinals(i,q)=x(1);
-            xfinals(i,q)=x(2);
-            yfinals(i,q)=x(3);
-        end;
+        x=[v xinit yinit];
+        ffinals(i,q)=x(1);
+        xfinals(i,q)=x(2);
+        yfinals(i,q)=x(3);
 
         curscore=sum(abs(fval));
 
@@ -95,7 +83,7 @@ for q=1:sizeFs
             bestx=x(2);
             besty=x(3);
             %   x,resnorm,fval,exitflag
-            % disp(['fund matrix: ' num2str(q) '**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+           % disp(['fund matrix: ' num2str(q) '**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
 
         end
     end
@@ -266,13 +254,13 @@ xcen=bestx;
 ycen=besty;
 centerloc=[xcen ycen];
 % comments:
-%
+% 
 % use the camera center to generate consensus cuz it seems more stable
 % see how you can extend this to teh case where the two frames are different, thats the interesting case
 % I still have not found a way to cluster the data, i was looking at pca
 % some of the ways we can do this is this:
 % 1) cluster the data of each algorithm and then only deal with the cluster
-% centers,
+% centers, 
 %2) just find the peak of the histogram for focal length and then find the
 %optical center using the points that belong to the peak of the focal
 %length
