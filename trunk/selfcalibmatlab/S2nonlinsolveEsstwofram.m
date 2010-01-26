@@ -18,7 +18,7 @@ sizeFs=n;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=400;
+numtries=200;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
@@ -53,8 +53,8 @@ for q=1:sizeFs
     bestscore=1000000000000;
     curscore=0;
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-
+%    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6); 
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6); 
 
 
 
@@ -73,6 +73,7 @@ for q=1:sizeFs
             ffinals(i,q)=0;
             xfinals(i,q)=0;
             yfinals(i,q)=0;
+            x
         else
             ffinals(i,q)=x(1);
             xfinals(i,q)=x(2);
@@ -148,61 +149,38 @@ hold
 %%%%%%%%%%%%%%%%%%%%%
 
 figure
-hold
 
-title(['all the local minima points']);
-xlabel('x coordinates of optical centers');
+numclusts=10;
+X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1)   reshape(yfinals,sizeFs*numtries,1)];
+[idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
+
+scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
+title(['scatter plot of all the results found using my method']);
+zlabel('x coordinates of optical centers');
 ylabel('y coordinates of optical centers');
-zlabel('value of focal length ');
+xlabel('value of focal length ');
 
-for q=1:sizeFs
-    plot3(xfinals(:,q),yfinals(:,q),ffinals(:,q),styles{mod(q,6)+1},'MarkerSize',12)
+maxnumclusts=0;
+maxnumclustsF=0;
+maxnumclustsX=0;
+maxnumclustsY=0;
+
+for i=1:numclusts
+    cursize=sum(idx==i);
+
+    if(cursize>maxnumclusts)
+        maxnumclusts=cursize;
+        maxnumclustsF=ctrs(i,1);
+        maxnumclustsX=ctrs(i,2);
+        maxnumclustsY=ctrs(i,3);
+    end
 end
-hold
 
-% figure
+
+figure
+
 %
-% numclusts=10;
-% X=[ ffinals  xfinals   yfinals];
-% [idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
-%
-% scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
-% title(['scatter plot of all the results found using my method and those found by sweeping the peter sturm algorithm']);
-% hold
-% count=0;
-% for i=230:350
-%     for j=230:350
-%         count=count+1;
-%         [ x, centerloc ] = PeterSturmSelfmoreparams( TF, i, j );
-%         XF(count,1)=x(1,1);
-%         XF(count,2)=i;
-%         XF(count,3)=j;
-%     end
-% end
-% scatter3(XF(:,1),XF(:,2),XF(:,3),100,'r','filled');
-% hold
-%
-%
-% maxnumclusts=0;
-% maxnumclustsF=0;
-% maxnumclustsX=0;
-% maxnumclustsY=0;
-%
-% for i=1:numclusts
-%     cursize=sum(idx==i);
-%
-%     if(cursize>maxnumclusts)
-%         maxnumclusts=cursize;
-%         maxnumclustsF=ctrs(i,1);
-%         maxnumclustsX=ctrs(i,2);
-%         maxnumclustsY=ctrs(i,3);
-%     end
-% end
-%
-%
-% figure
-%
-% %
+
 hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
 title(['focal length']);
 figure
@@ -214,47 +192,10 @@ figure
 hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
 title(['ycomponent of camera center']);
 %
-% display(['mean of f was ' num2str(mean(ffinals)) ' median of f was ' num2str(median(ffinals)) ' variance of f was ' num2str(var(ffinals))]);
-% display(['mean of x was ' num2str(mean(xfinals)) ' median of x was ' num2str(median(xfinals)) ' variance of x was ' num2str(var(xfinals))]);
-% display(['mean of y was ' num2str(mean(yfinals)) ' median of y was ' num2str(median(yfinals)) ' variance of y was ' num2str(var(yfinals))]);
-% display(['best f is ' num2str(bestf) ' and best x is ' num2str(bestx) ' and best y is ' num2str(besty)]);
-% display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
-%
-fedges=200:5:1600;
-fhists = histc(ffinals,fedges) ;
 
-[m,n]=size(fhists);
-for i=1:m
-    for j=1:n
-        if(fhists(i,j)>sizeFs)
-            fhists(i,j)=sizeFs;
-        end
-    end
-end
-[val,findex]=max(sum( fhists,2));
+display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
 
-myf=0;
-myx=0;
-myy=0;
 
-[m,n]=size(ffinals);
-count=0;
-for i=1:m
-    for j=1:n
-        if(ffinals(i,j)>fedges(findex) && ffinals(i,j)<fedges(findex+1))
-            count=count+1;
-            myf=myf+ffinals(i,j);
-            myx=myx+xfinals(i,j);
-            myy=myy+yfinals(i,j);
-        end
-    end
-end
-
-myf=myf/count;
-myx=myx/count;
-myy=myy/count;
-
-disp(['best found f is ' num2str(myf) ' and best x is ' num2str(myx) ' and best y is ' num2str(myy)]);
 %toc
 if(bestf>200 && bestf<1600 && imag(bestf)==0)
     bestf=bestf;
@@ -265,19 +206,7 @@ fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;
 centerloc=[xcen ycen];
-% comments:
-%
-% use the camera center to generate consensus cuz it seems more stable
-% see how you can extend this to teh case where the two frames are different, thats the interesting case
-% I still have not found a way to cluster the data, i was looking at pca
-% some of the ways we can do this is this:
-% 1) cluster the data of each algorithm and then only deal with the cluster
-% centers,
-%2) just find the peak of the histogram for focal length and then find the
-%optical center using the points that belong to the peak of the focal
-%length
-%3) and this is the best method, if i could find an explicit representation
-%of this curve in space using properties of the essential mtrix as said in
-%the fusiello paper this could really help out
+
+
 end
 
