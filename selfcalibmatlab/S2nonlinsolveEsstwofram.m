@@ -4,7 +4,7 @@ function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h)
 %tic
 
 %TF=TF*10000;
-
+plotting=0;
 maxfocal=2000;
 fcl=[0 0];
 
@@ -28,7 +28,7 @@ sturmfailed=0;
 
 for q=1:sizeFs
 
-    x = PeterSturmSelf( TF{q},w,h)
+    x = PeterSturmSelf( TF{q},w,h);
 
     if(x(1,1)>200 && x(1,1)<1600)
         finit=x(1,1);
@@ -53,8 +53,8 @@ for q=1:sizeFs
     bestscore=1000000000000;
     curscore=0;
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-%    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6); 
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6); 
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+    %   optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
 
@@ -63,6 +63,7 @@ for q=1:sizeFs
             x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
             x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+         
         end
 
 
@@ -73,7 +74,7 @@ for q=1:sizeFs
             ffinals(i,q)=0;
             xfinals(i,q)=0;
             yfinals(i,q)=0;
-            x
+            % x
         else
             ffinals(i,q)=x(1);
             xfinals(i,q)=x(2);
@@ -107,58 +108,65 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for q=1:sizeFs
-    sizearray=scorearray;
-    scoremedian(q)=median(scorearray(:,q));
-    for i=1:numtries
-        if(sizearray(i,q)>scoremedian(q))
-            sizearray(i,q)=1;
-        else
-            sizearray(i,q)=ceil(10+(sizearray(i,q)*(-9/scoremedian(q))));
+if(plotting==1)
+
+    for q=1:sizeFs
+        sizearray=scorearray;
+        scoremedian(q)=median(scorearray(:,q));
+        for i=1:numtries
+            if(sizearray(i,q)>scoremedian(q))
+                sizearray(i,q)=1;
+            else
+                sizearray(i,q)=ceil(10+(sizearray(i,q)*(-9/scoremedian(q))));
+            end
         end
     end
+
+
+    figure
+    hold
+    title(['focal lengths versus energy']);
+    xlabel('focal length');
+    ylabel('value of the energy function ');
+
+    for q=1:sizeFs
+        scatter(ffinals(:,q), scorearray(:,q));
+    end
+    hold
+
+    %%%%%%%%%%%%%%%%%%%%%
+    styles={'r' ,'g', 'b', 'y', 'r' ,'c'};
+    figure
+    hold
+    title(['all the local minima points scatter plot']);
+    xlabel('x coordinates of optical centers');
+    ylabel('y coordinates of optical centers');
+    zlabel('value of focal length ');
+
+    for q=1:sizeFs
+
+        scatter3(xfinals(:,q),yfinals(:,q),ffinals(:,q), 3 ,styles{mod(q,6)+1})
+    end
+    hold
+
+    %%%%%%%%%%%%%%%%%%%%%
+
+    figure
+
 end
 
-
-figure
-hold
-title(['focal lengths versus energy']);
-xlabel('focal length');
-ylabel('value of the energy function ');
-
-for q=1:sizeFs
-    scatter(ffinals(:,q), scorearray(:,q));
-end
-hold
-
-%%%%%%%%%%%%%%%%%%%%%
-styles={'r' ,'g', 'b', 'y', 'r' ,'c'};
-figure
-hold
-title(['all the local minima points scatter plot']);
-xlabel('x coordinates of optical centers');
-ylabel('y coordinates of optical centers');
-zlabel('value of focal length ');
-
-for q=1:sizeFs
-
-    scatter3(xfinals(:,q),yfinals(:,q),ffinals(:,q), 3 ,styles{mod(q,6)+1})
-end
-hold
-
-%%%%%%%%%%%%%%%%%%%%%
-
-figure
 
 numclusts=10;
 X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1)   reshape(yfinals,sizeFs*numtries,1)];
-[idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
+[idx,ctrs] = kmeans(X,numclusts,'Replicates',5,'EmptyAction','drop');
 
-scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
-title(['scatter plot of all the results found using my method']);
-zlabel('x coordinates of optical centers');
-ylabel('y coordinates of optical centers');
-xlabel('value of focal length ');
+if(plotting==1)
+    scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
+    title(['scatter plot of all the results found using my method']);
+    zlabel('x coordinates of optical centers');
+    ylabel('y coordinates of optical centers');
+    xlabel('value of focal length ');
+end
 
 maxnumclusts=0;
 maxnumclustsF=0;
@@ -177,23 +185,29 @@ for i=1:numclusts
 end
 
 
-figure
 
 %
+if(plotting==1)
 
-hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
-title(['focal length']);
-figure
+    figure
+    hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
+    title(['focal length']);
+    figure
 
-hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
-title(['xcomponent of camera center']);
-figure
+    hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
+    title(['xcomponent of camera center']);
+    figure
 
-hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
-title(['ycomponent of camera center']);
-%
+    hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
+    title(['ycomponent of camera center']);
+    %
+end
 
-display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
+bestf=maxnumclustsF;
+bestx=maxnumclustsX;
+besty=maxnumclustsY;
+
+%display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
 
 
 %toc

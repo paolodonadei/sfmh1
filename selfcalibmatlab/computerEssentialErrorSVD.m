@@ -26,8 +26,11 @@ K_norm2(3,2)= vy;
 
 G=(K_norm2)*MYF*K_norm1;
 
+try 
 S = svd(G);
-
+catch 
+S= [ 100 ;  10 ;  5];
+end
 
 
 F=[abs((S(1,1)-S(2,1))/S(2,1))];
