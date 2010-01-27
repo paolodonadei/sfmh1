@@ -33,11 +33,14 @@ for i=0:0.5:10
 end
 
 
-plot([errnfram errtwofram]);
+plot([errnfram' errtwofram']);
 title('focal length error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering');
 
 figure
-plot([errnframOC errtwoframOC]);
+plot([errnframOC' errtwoframOC']);
 title('optical center error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering');
+
+
+ok the noise is added in a bad way that it fuckes up th results
