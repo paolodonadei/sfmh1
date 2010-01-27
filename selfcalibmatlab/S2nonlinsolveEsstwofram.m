@@ -27,49 +27,49 @@ scorearray=zeros(numtries,sizeFs);
 sturmfailed=0;
 
 for q=1:sizeFs
-    
+
     x = PeterSturmSelf( TF{q},w,h);
-    
+
     if(x(1,1)>200 && x(1,1)<1600)
         finit=x(1,1);
     else
         sturmfailed=1;
     end
-    
-    
+
+
     xinit=w/2;
     yinit=h/2;
-    
-    
+
+
     fvari=70;
     xvari=70;
     yvari=70;
-    
-    
-    
+
+
+
     bestf=0;
     bestx=0;
     besty=0;
     bestscore=1000000000000;
     curscore=0;
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-    % optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
-    
-    
-    
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+    %    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+
+
+
     for i=1:numtries
         if(sturmfailed==0)
             x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
             x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-            
+
         end
-        
-        
-        
+
+
+
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-        
+
         if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
             ffinals(i,q)=0;
             xfinals(i,q)=0;
@@ -80,15 +80,15 @@ for q=1:sizeFs
             xfinals(i,q)=x(2);
             yfinals(i,q)=x(3);
         end;
-        
+
         curscore=sum(abs(fval));
-        
+
         [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{q},x(1),x(1),x(2),x(3),x(2),x(3) );
         curscore=detScore;
-        
+
         % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);
         %disp(['fund matrix: ' num2str(q) ' iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
-        
+
         scorearray(i,q)=curscore;
         if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
             bestscore=curscore;
@@ -98,10 +98,10 @@ for q=1:sizeFs
             besty=x(3);
             %   x,resnorm,fval,exitflag
             % disp(['fund matrix: ' num2str(q) '**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
-            
+
         end
     end
-    
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,7 +109,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(plotting==1)
-    
+
     for q=1:sizeFs
         sizearray=scorearray;
         scoremedian(q)=median(scorearray(:,q));
@@ -121,19 +121,19 @@ if(plotting==1)
             end
         end
     end
-    
-    
+
+
     figure
     hold
     title(['focal lengths versus energy']);
     xlabel('focal length');
     ylabel('value of the energy function ');
-    
+
     for q=1:sizeFs
         scatter(ffinals(:,q), scorearray(:,q));
     end
     hold
-    
+
     %%%%%%%%%%%%%%%%%%%%%
     styles={'r' ,'g', 'b', 'y', 'r' ,'c'};
     figure
@@ -142,34 +142,20 @@ if(plotting==1)
     xlabel('x coordinates of optical centers');
     ylabel('y coordinates of optical centers');
     zlabel('value of focal length ');
-    
+
     for q=1:sizeFs
-        
+
         scatter3(xfinals(:,q),yfinals(:,q),ffinals(:,q), 3 ,styles{mod(q,6)+1})
     end
     hold
-    
+
     %%%%%%%%%%%%%%%%%%%%%
-    
+
     figure
-    
+
 end
 
-%%%%%%%%%%%
-%creating an index of the memberships
-mcount=1;
-for q=1:sizeFs
-    for i=1:numtries
-        idx_membership(mcount)=q;
-        if(ffinals(i,q)<0 || ffinals(i,q)>maxfocal || xfinals(i,q)<0 || xfinals(i,q)>w || yfinals(i,q)<0 || yfinals(i,q)>h)
-            idx_membership(mcount)=0;
-        else
-            idx_membership(mcount)=q;
-        end
-        
-        mcount=mcount+1;
-    end
-end
+
 
 
 %%%%%%%%%%5
@@ -191,37 +177,62 @@ maxnumclustsX=0;
 maxnumclustsY=0;
 
 
- classscores=zeros(numclusts,sizeFs);
-for i=1:numclusts
-  
-    
-    for j=1:(sizeFs*numtries)
-        if(idx(j)==i && idx_membership(j)~=0)
-            classscores(i,idx_membership(j))=classscores(idx_membership(j)) +1;
+%%%%%%%%%%%
+%creating an index of the memberships
+mcount=1;
+for q=1:sizeFs
+    for i=1:numtries
+
+        if(ffinals(i,q)<0 || ffinals(i,q)>maxfocal || xfinals(i,q)<0 || xfinals(i,q)>w || yfinals(i,q)<0 || yfinals(i,q)>h)
+            idx_membership(mcount)=0;
+        else
+            idx_membership(mcount)=q;
         end
+
+        mcount=mcount+1;
     end
-    
-    
+end
+
+
+classscores=zeros(numclusts,sizeFs);
+
+for j=1:(sizeFs*numtries)
+    if(idx_membership(j)~=0)
+        classscores(idx(j),idx_membership(j))=classscores(idx(j),idx_membership(j))+1;
+    end
+end
+
+%  uncomment these bro, and your class scores thing is not working
+for i=1:numclusts
+    for q=1:sizeFs
+        if( classscores(i,q)>ceil(numtries/numclusts))
+            newval=ceil(numtries/numclusts)+log(classscores(i,q)-ceil(numtries/numclusts)+1);
+            classscores(i,q)=newval;
+        end
+
+    end
+end
+
+for i=1:numclusts
+
+
+
+
+
     %im capping here, but maybe a smooth functio would be a better idea,
     %basically the idea here is that we prevent one F from overtaking the
     %cluster scores, cuz this way one bad F that gets stuck in a local
     %minima will generate teh maximum consensus, but hopefully there is a
     %more elegant way of doing this, like a smooth decaying exponential or
     %something
-    
-    
-    
-    uncomment these bro, and your class scores thing is not working
-%     for q=1:sizeFs
-%         if( classscores(i,q)>ceil(numtries/10))
-%             classscores(i,q)=ceil(numtries/10);
-%         end
-%         
-%     end
-    
-   % cursize=sum(idx==i);
+
+
+
+
+
+    % cursize=sum(idx==i);
     cursize=sum( classscores(i,:));
-    
+
     if(cursize>maxnumclusts)
         maxnumclusts=cursize;
         maxnumclustsF=ctrs(i,1);
@@ -234,16 +245,16 @@ end
 
 %
 if(plotting==1)
-    
+
     figure
     hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
     title(['focal length']);
     figure
-    
+
     hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
     title(['xcomponent of camera center']);
     figure
-    
+
     hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
     title(['ycomponent of camera center']);
     %
