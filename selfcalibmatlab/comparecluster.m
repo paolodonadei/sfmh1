@@ -25,10 +25,10 @@ clc
 
 
 
-
+ count=1;
 
 for i=0:0.0002:0.003
-    count=1;
+   
     for k=1:10
         [ F, ks ]  = generateF( 0, 4, 1.05,70,0,3 );
         ks{1}
@@ -40,7 +40,7 @@ for i=0:0.0002:0.003
         gocx=  ks{1}(1,3);
         gocy=ks{1}(2,3)  ;
         G=F;
-        NMAT=((ones(3,3)-0.5)*i);
+        NMAT=((rand(3,3)-0.5)*i);
         NMAT(3,3)=0;
         
         G{1}=G{1} +NMAT ;
