@@ -4,7 +4,7 @@ function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h)
 %tic
 
 %TF=TF*10000;
-plotting=1;
+plotting=0;
 maxfocal=2000;
 fcl=[0 0];
 
@@ -53,8 +53,8 @@ for q=1:sizeFs
     bestscore=1000000000000;
     curscore=0;
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-    %    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+    %  optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+      optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
 
@@ -182,8 +182,8 @@ maxnumclustsY=0;
 mcount=1;
 for q=1:sizeFs
     for i=1:numtries
-
-        if(ffinals(i,q)<0 || ffinals(i,q)>maxfocal || xfinals(i,q)<0 || xfinals(i,q)>w || yfinals(i,q)<0 || yfinals(i,q)>h)
+% some ad hoc limits
+        if(ffinals(i,q)<50 || ffinals(i,q)>maxfocal || xfinals(i,q)<10 || xfinals(i,q)>=w || yfinals(i,q)<10 || yfinals(i,q)>h)
             idx_membership(mcount)=0;
         else
             idx_membership(mcount)=q;
