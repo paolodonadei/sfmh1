@@ -5,14 +5,11 @@ yc=256;
 centerloc=[xc yc];
 typicalF=5000;
 
-[m,n]=size(F);
 
-numFs=n;
 
-for i=1:numFs
-G{1,i}=    normalizeFSturm(F{1,i},w,h,typicalF);
+G=    normalizeFSturm(F,w,h,typicalF);
     
-end
+
 
 flagerr=0;
 
