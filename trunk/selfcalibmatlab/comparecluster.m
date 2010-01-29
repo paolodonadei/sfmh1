@@ -57,12 +57,12 @@ for i=0:0.0002:0.003
 end
 
 
-plot([sum(errnfram) sum(errtwofram)]);
+plot([sum(errnfram)' sum(errtwofram)']);
 title('focal length error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering');
 
 figure
-plot([sum(errnframOC) sum(errtwoframOC)]);
+plot([sum(errnframOC)' sum(errtwoframOC)']);
 title('optical center error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering');
 
