@@ -1,10 +1,19 @@
-function [ x, centerloc ] = PeterSturmSelf( F,w,h )
+function [ x, centerloc ] = PeterSturmSelfRobust( F,w,h )
 
 xc=256;
 yc=256;
 centerloc=[xc yc];
 typicalF=5000;
-G=normalizeFSturm(F,w,h,typicalF);
+
+[m,n]=size(F);
+
+numFs=n;
+
+for i=1:numFs
+G{1,i}=    normalizeFSturm(F{1,i},w,h,typicalF);
+    
+end
+
 flagerr=0;
 
 try
