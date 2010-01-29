@@ -1,7 +1,7 @@
 function [ F, ks,ps ] = generateF( fdiff, skew, ar,centerdeviation,silent,number )
 
 
-[ ps ,myks ] = generatePs( fdiff, skew, ar,centerdeviation, number,1,silent );
+[ ps ,myks ] = generatePs( fdiff, skew, ar,centerdeviation, number,1,silent,0 );
 
 P1=ps{1,1};
 P2=ps{1,2};
