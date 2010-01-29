@@ -2,7 +2,10 @@ function [fcl, centerloc] = S2nonlinsolveEssNfram(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
 %tic
-
+if (nargin == 1)
+    w=512;
+    h=512;
+end
 %TF=TF*10000;
 plotting=0;
 fcl=[0 0];
@@ -69,8 +72,8 @@ besty=0;
 bestscore=1000000000000;
 curscore=0;
 
-% optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+ optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+%optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
 

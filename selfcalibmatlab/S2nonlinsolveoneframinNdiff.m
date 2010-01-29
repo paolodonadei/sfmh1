@@ -1,13 +1,44 @@
-function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h)
+function [fcl, centerloc] = S2nonlinsolveoneframinNdiff(ps,w,h,pnum)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
 if (nargin == 1)
     w=512;
     h=512;
+    pnum=1;
 end
+if (nargin == 3)
+    pnum=1;
+end
+
+
+plotting=1;
+%finding the f matrices
+%always find the parameters of fgirst projection matrix
+
+[m,n]=size(ps);
+number=n;
+
+if(pnum>number)
+    disp(['p number is larger than the largest p number, this is incorrect']);
+end
+
+P1=ps{pnum};
+
+
+count=0;
+for i=1:number
+    if(i~=pnum)
+        count=count+1;
+        TF{count}=vgg_F_from_P(P1,ps{1,i});
+    end
+end
+count=0;
+
+
+
 %TF=TF*10000;
-plotting=0;
+
 maxfocal=2000;
 fcl=[0 0];
 
@@ -21,22 +52,24 @@ sizeFs=n;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=200;
+numtries=300;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
 scorearray=zeros(numtries,sizeFs);
 
-sturmfailed=0;
+hartleyfailed=0;
 
 for q=1:sizeFs
 
-    x = PeterSturmSelf( TF{q},w,h);
+    [ x ] = HartleySelf( TF{q},w,h );
 
-    if(x(1,1)>200 && x(1,1)<1600)
-        finit=x(1,1);
+
+    if(x(1,1)>200 && x(1,1)<1600 || x(1,2)>200 && x(1,2)<1600)
+        finit1=x(1,1);
+        finit2=x(1,2);
     else
-        sturmfailed=1;
+        hartleyfailed=1;
     end
 
 
@@ -44,7 +77,7 @@ for q=1:sizeFs
     yinit=h/2;
 
 
-    fvari=70;
+    fvari=110;
     xvari=70;
     yvari=70;
 
@@ -55,17 +88,18 @@ for q=1:sizeFs
     besty=0;
     bestscore=1000000000000;
     curscore=0;
-    f = @(x)computerEssentialErrorSVD(x,TF{q});
-    %  optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-      optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+    f = @(x)computerEssentialErrorSVDDIFF(x,TF{q});
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+    % optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
+%hartleyfailed=1;
 
     for i=1:numtries
-        if(sturmfailed==0)
-            x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+        if(hartleyfailed==0)
+            x0=[ (randn()*fvari)+finit1  (randn()*xvari)+xinit  (randn()*yvari)+yinit (randn()*fvari)+finit2  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
-            x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+            x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
 
         end
 
@@ -73,7 +107,7 @@ for q=1:sizeFs
 
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
 
-        if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
+        if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || x(4)<0 || x(4)>maxfocal || x(5)<0 || x(5)>w || x(6)<0 || x(6)>h)
             ffinals(i,q)=0;
             xfinals(i,q)=0;
             yfinals(i,q)=0;
@@ -82,11 +116,15 @@ for q=1:sizeFs
             ffinals(i,q)=x(1);
             xfinals(i,q)=x(2);
             yfinals(i,q)=x(3);
-        end;
+
+            ffinals_f2(i,q)=x(4);
+            xfinals_f2(i,q)=x(5);
+            yfinals_f2(i,q)=x(6);
+        end
 
         curscore=sum(abs(fval));
 
-        [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{q},x(1),x(1),x(2),x(3),x(2),x(3) );
+        [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{q},x(1),x(4),x(2),x(3),x(5),x(6) );
         curscore=detScore;
 
         % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);
@@ -185,7 +223,7 @@ maxnumclustsY=0;
 mcount=1;
 for q=1:sizeFs
     for i=1:numtries
-% some ad hoc limits
+        % some ad hoc limits
         if(ffinals(i,q)<50 || ffinals(i,q)>maxfocal || xfinals(i,q)<10 || xfinals(i,q)>=w || yfinals(i,q)<10 || yfinals(i,q)>h)
             idx_membership(mcount)=0;
         else
@@ -236,7 +274,7 @@ for i=1:numclusts
     % cursize=sum(idx==i);
     cursize=sum( classscores(i,:));
 
-    if(cursize>maxnumclusts)
+    if(cursize>maxnumclusts && ctrs(i,1) > 200 && ctrs(i,1) <maxfocal )
         maxnumclusts=cursize;
         maxnumclustsF=ctrs(i,1);
         maxnumclustsX=ctrs(i,2);
@@ -260,6 +298,18 @@ if(plotting==1)
 
     hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
     title(['ycomponent of camera center']);
+
+    figure
+    hist(reshape(ffinals_f2,sizeFs*numtries,1),numtries/2);
+    title(['focal length frame 2']);
+    figure
+
+    hist(reshape(xfinals_f2,sizeFs*numtries,1),numtries/2);
+    title(['xcomponent of camera center frame 2']);
+    figure
+
+    hist(reshape(yfinals_f2,sizeFs*numtries,1),numtries/2);
+    title(['ycomponent of camera center frame 2']);
     %
 end
 
