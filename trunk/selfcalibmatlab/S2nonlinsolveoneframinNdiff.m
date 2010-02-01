@@ -1,4 +1,5 @@
 function [fcl, centerloc] = S2nonlinsolveoneframinNdiff(ps,w,h,pnum)
+%this shows random sampling consensus
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
