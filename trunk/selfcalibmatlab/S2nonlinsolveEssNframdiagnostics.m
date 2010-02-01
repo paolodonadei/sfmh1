@@ -58,7 +58,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=200;
+numtries=100;
 
 
 
@@ -142,7 +142,9 @@ CF=TF;
 
 numcurrentFs=n;
 
-for m=1:9 %remove maximum half the Fs
+numdeletions=ceil(numcurrentFs/5);
+
+for m=1:numdeletions %remove maximum half the Fs
     markfordeletion=-1;
     [m,numcurrentFs]=size(CF);
     
@@ -164,8 +166,8 @@ for m=1:9 %remove maximum half the Fs
         
         f = @(x)computerEssentialErrorSVDNFrames(x,TFdeletion);
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-     %   disp(['when not using frame ' num2str(j) ' we get error ' num2str(sum(abs(fval)))  '  and best score was ' num2str(bestscore)]);
-    %    x
+        %   disp(['when not using frame ' num2str(j) ' we get error ' num2str(sum(abs(fval)))  '  and best score was ' num2str(bestscore)]);
+        %    x
         
         if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
             fundscores(1,j)=10000000;
@@ -191,7 +193,7 @@ for m=1:9 %remove maximum half the Fs
     clear CF;
     CF=CFNEW;
     clear CFNEW;
-   % disp(['**********deleted frame ' num2str(markfordeletion)]);
+    % disp(['**********deleted frame ' num2str(markfordeletion)]);
     
 end
 

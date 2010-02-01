@@ -21,7 +21,7 @@ sizeFs=n;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=200;
+numtries=100;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
