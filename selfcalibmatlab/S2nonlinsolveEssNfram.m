@@ -54,7 +54,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=200;
+numtries=100;
 
 
 
