@@ -6,11 +6,12 @@ function [F] = computerEssentialErrorSVDNFrames(x,MYF)
 F=zeros(9,1);
 for i=1:n
     
-T = computerEssentialErrorSVD(x,MYF{1,i});
-
-F=F+T;
+    T = computerEssentialErrorSVD(x,MYF{1,i});
+    
+    F=F+T;
 end
 
+F=F/n; %is this right? this is important
 
 
 
