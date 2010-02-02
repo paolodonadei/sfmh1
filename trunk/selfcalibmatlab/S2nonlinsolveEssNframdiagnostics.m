@@ -30,14 +30,14 @@ count=0;
 petexs=0;
 sturmfailed=0;
 for i=1:numFs
-    
+
     x = PeterSturmSelf( TF{1,i},w,h);
-    
+
     if(x(1,1)>200 && x(1,1)<1600)
         count=count+1;
         petexs(count)=x(1,1);
     end
-    
+
 end
 
 psstd=sqrt(var(petexs));
@@ -58,7 +58,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=100;
+numtries=10;
 
 
 
@@ -76,8 +76,8 @@ besty=0;
 bestscore=1000000000000;
 curscore=0;
 
-% optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+%optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
 
@@ -87,14 +87,14 @@ countnoupdate=0;
 
 for i=1:numtries
     countnoupdate=countnoupdate+1;
-    
+
     if(sturmfailed==0)
         x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
     else
         x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
     end
-    
-    
+
+
     %[x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
     [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
     if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
@@ -106,15 +106,14 @@ for i=1:numtries
         xfinals(i,1)=x(2);
         yfinals(i,1)=x(3);
     end;
-    
+
     curscore=sum(abs(fval));
-    
-    [svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
-    curscore=EssScore;
-    
+
+
+
     % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);
     %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
-    
+
     scorearray(i,1)=curscore;
     if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
         countnoupdate=0;
@@ -125,11 +124,11 @@ for i=1:numtries
         besty=x(3);
         %   x,resnorm,fval,exitflag
         %   disp(['**BEST: iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
-        
+
     end
-    
-    
-    
+
+
+
 end
 
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
@@ -137,76 +136,77 @@ end
 
 x0=[bestf  bestx  besty];
 
-CF=TF;
-[m,n]=size(CF);
+maxnumdeletions=ceil(numFs/5);
+scorediffs=zeros(numFs,1);
+numBadframes=0;
+allscorediffs=zeros(numFs,1);
+for j=1:numFs
+    clear TFdeletion;
 
-numcurrentFs=n;
-
-numdeletions=ceil(numcurrentFs/5);
-
-for m=1:numdeletions %remove maximum half the Fs
-    markfordeletion=-1;
-    [m,numcurrentFs]=size(CF);
-    
-    for j=1:numcurrentFs
-        clear TFdeletion;
-        
-        count=1;
-        for k=1:numcurrentFs
-            if(k~=j)
-                TFdeletion{1,count}=CF{1,k};
-                count=count+1;
-            end
-        end
-        
-        
-        
-        
-        
-        
-        f = @(x)computerEssentialErrorSVDNFrames(x,TFdeletion);
-        [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-        %   disp(['when not using frame ' num2str(j) ' we get error ' num2str(sum(abs(fval)))  '  and best score was ' num2str(bestscore)]);
-        %    x
-        
-        if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
-            fundscores(1,j)=10000000;
-        end
-        curscore=sum(abs(fval));
-        
-        if(curscore < bestscore)
-            bestscore=curscore ;
-            markfordeletion=j;
-        end
-        
-        
-    end
-    
     count=1;
-    for k=1:numcurrentFs
-        if(k~=markfordeletion)
-            CFNEW{1,count}=CF{1,k};
+    for k=1:numFs
+        if(k~=j)
+            TFdeletion{1,count}=TF{1,k};
             count=count+1;
         end
     end
-    
-    clear CF;
-    CF=CFNEW;
-    clear CFNEW;
-    % disp(['**********deleted frame ' num2str(markfordeletion)]);
-    
+
+
+    clear f;
+    f = @(x)computerEssentialErrorSVDNFrames(x,TFdeletion);
+    [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
+    %  disp(['when not using frame ' num2str(j) ' we get error ' num2str(sum(abs(fval)))  '  and best score was ' num2str(bestscore)]);
+    %  x
+
+    if(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
+        fundscores(1,j)=10000000;
+    end
+    curscore=sum(abs(fval));
+
+    allscorediffs(j,1)=bestscore-curscore;
+    if(curscore < bestscore)
+
+        scorediffs(j,1)=bestscore-curscore;
+        numBadframes=numBadframes+1;
+
+    end
+
+
+end
+
+
+
+numDeletion=min(numBadframes,maxnumdeletions);
+[B,IX] = sort(scorediffs,1,'descend');
+
+
+finalF=cell(1,numFs-numDeletion);
+
+
+
+for i=1:(numDeletion)
+   % disp([' removing frame ' num2str(IX(i))]);
+
+end
+
+count=1;
+for i=(numDeletion+1):numFs
+    finalF{1,count}=TF{1,IX(i)};
+    count=count+1;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%
 %final refitting
 
+x0=[bestf  bestx  besty];
 
-
-[m,numcurrentFs]=size(CF);
+[m,numcurrentFs]=size(finalF);
 
 %disp(['final fitting with ' num2str(numcurrentFs) ' frames']);
 
-f = @(x)computerEssentialErrorSVDNFrames(x,CF);
+clear f;
+f = @(x)computerEssentialErrorSVDNFrames(x,finalF);
+
 [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
 
 bestf=x(1);
