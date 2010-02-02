@@ -3,7 +3,7 @@ function [F] = computerEssentialErrorSVDNFrames(x,MYF)
 %matrix computes the error with respect to a fundamental matrix
 [m,n]=size(MYF);
 
-F=zeros(9,1);
+F=0;
 for i=1:n
     
     T = computerEssentialErrorSVD(x,MYF{1,i});
