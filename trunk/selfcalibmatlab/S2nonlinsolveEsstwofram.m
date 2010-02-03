@@ -29,6 +29,12 @@ scorearray=zeros(numtries,sizeFs);
 
 sturmfailed=0;
 
+if(strcmp(version('-release'),'14')==1)
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+else
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+end
+
 for q=1:sizeFs
 
     x = PeterSturmSelf( TF{q},w,h);
@@ -56,9 +62,6 @@ for q=1:sizeFs
     bestscore=1000000000000;
     curscore=0;
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-      optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-%      optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
-
 
 
     for i=1:numtries
@@ -86,7 +89,7 @@ for q=1:sizeFs
 
         curscore=sum(abs(fval));
 
-     
+
 
         % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);
         %disp(['fund matrix: ' num2str(q) ' iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
@@ -184,7 +187,7 @@ maxnumclustsY=0;
 mcount=1;
 for q=1:sizeFs
     for i=1:numtries
-% some ad hoc limits
+        % some ad hoc limits
         if(ffinals(i,q)<50 || ffinals(i,q)>maxfocal || xfinals(i,q)<10 || xfinals(i,q)>=w || yfinals(i,q)<10 || yfinals(i,q)>h)
             idx_membership(mcount)=0;
         else
