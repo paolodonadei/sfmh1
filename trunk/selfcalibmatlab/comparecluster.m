@@ -23,17 +23,22 @@ clc
 nowtime=num2str(sum(round(100*clock)));
 tic
 
-repeat=30;
+repeat=1;
 
 count=1;
 
-for i=0:0.0002:0.003
+for i=0:0.0001:0.003
 
     for k=1:repeat
-        [ F, ks ]  = generateF( 0, 4, 1.05,70,0,3 );
+        
+        
+        [ F, ks ]  = generateF( 0, 0, 1.00,rand()*80,0,(ceil(rand()*4))+2 );
         %         ks{1}
         %         ks{2}
         %         ks{3}
+        [nn, numfunds]=size(F);
+        fundflip=ceil((rand()*(numfunds)));
+        
         width=512;
         height=512;
         gfocal=(ks{1}(1,1)+ks{1}(2,2))/2;
@@ -43,7 +48,8 @@ for i=0:0.0002:0.003
         NMAT=((rand(3,3)-0.5)*i);
         NMAT(3,3)=0;
 
-        G{1}=G{1} +NMAT ;
+        G{fundflip}=G{fundflip} +NMAT ;
+        
         [fcln, centerlocn]      = S2nonlinsolveEssNfram(G,width,height)
         [fclt, centerloct]      = S2nonlinsolveEsstwofram(G,width,height)
         [fcld, centerlocdiag]   = S2nonlinsolveEssNframdiagnostics(G,width,height)
@@ -74,12 +80,15 @@ plot([sum(errnfram)' sum(errtwofram)' sum(errps)' sum(errdiagn)' sum(errM)']);
 title('focal length error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering' , 'error peter sturm', 'case deletion', 'M-estimator');
 saveas(gcf,['erroFlength_' nowtime '.png']);
-
+saveas(gcf,['erroFlength_' nowtime '.eps']);
 figure
 plot([sum(errnframOC)' sum(errtwoframOC)' sum(errdiagOC)'  sum(errMOC)']);
 title('optical center error comparison between N frame method and two frame clustering');
 legend('N frame', ' two frame clustering', ' case deletion', ' M-Estimator');
 saveas(gcf,['erroOC_' nowtime '.png']);
+saveas(gcf,['erroOC_' nowtime '.eps']);
+
+save( ['variables_' nowtime '.m'])
 
 toc
 %ok the noise is added in a bad way that it fuckes up th results

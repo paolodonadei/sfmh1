@@ -62,7 +62,7 @@ yinit=h/2;
 ainit=1;
 sinit=0;
 
-numtries=10;
+numtries=5;
 
 
 
