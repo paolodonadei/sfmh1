@@ -23,16 +23,16 @@ clc
 nowtime=num2str(sum(round(100*clock)));
 tic
 
-repeat=1;
+repeat=100;
 
 count=1;
 
-for i=0:0.0001:0.003
+for i=0:0.05:1
 
     for k=1:repeat
         
         
-        [ F, ks ]  = generateF( 0, 0, 1.00,rand()*80,0,(ceil(rand()*4))+2 );
+        [ F, ks ]  = generateF( 0, 0, 1.00,rand()*80,0,5 );
         %         ks{1}
         %         ks{2}
         %         ks{3}
@@ -41,14 +41,14 @@ for i=0:0.0001:0.003
         
         width=512;
         height=512;
-        gfocal=(ks{1}(1,1)+ks{1}(2,2))/2;
-        gocx=  ks{1}(1,3);
-        gocy=ks{1}(2,3)  ;
+        gfocal=(ks{1,1}(1,1)+ks{1,1}(2,2))/2;
+        gocx=  ks{1,1}(1,3);
+        gocy=ks{1,1}(2,3)  ;
         G=F;
-        NMAT=((rand(3,3)-0.5)*i);
+        NMAT=((rand(3,3)-0.5)*i*(abs(sum(sum((G{1,fundflip}))))));
         NMAT(3,3)=0;
 
-        G{fundflip}=G{fundflip} +NMAT ;
+        G{1,fundflip}=G{1,fundflip} +NMAT ;
         
         [fcln, centerlocn]      = S2nonlinsolveEssNfram(G,width,height)
         [fclt, centerloct]      = S2nonlinsolveEsstwofram(G,width,height)
@@ -56,13 +56,18 @@ for i=0:0.0001:0.003
         [fclm, centerlocM]      = S2nonlinsolveEssNframestimator(G,width,height)
         [ sln, centerloc ]      = PeterSturmSelfRobust( G,width,height )
 
-        errps(k,count)=abs(sln(1)-gfocal)
-        errnfram(k,count)=abs(fcln(1)-gfocal)
-        errtwofram(k,count)=abs(fclt(1)-gfocal)
-        errdiagn(k,count)=abs(fcld(1)-gfocal)
-        errM(k,count)=abs(fclm(1)-gfocal)
+        errps(k,count)=abs(sln(1)-gfocal);
+        errnfram(k,count)=abs(fcln(1)-gfocal);
+        errtwofram(k,count)=abs(fclt(1)-gfocal);
+        errdiagn(k,count)=abs(fcld(1)-gfocal);
+        errM(k,count)=abs(fclm(1)-gfocal);
 
 
+        sum( errps)
+        sum(errnfram)
+        sum(errtwofram)
+        sum( errdiagn)
+        sum(errM)
 
         errnframOC(k,count)=sqrt(((centerlocn(1)-gocx)^2)+((centerlocn(2)-gocy)^2));
         errtwoframOC(k,count)=sqrt(((centerloct(1)-gocx)^2)+((centerloct(2)-gocy)^2));
