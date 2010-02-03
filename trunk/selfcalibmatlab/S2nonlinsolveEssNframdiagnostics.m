@@ -326,11 +326,25 @@ besty=x(3);
 %
 %
 % %toc
-% if(bestf>200 && bestf<1600 && imag(bestf)==0)
-%     bestf=bestf;
-% else
-%     bestf=w+h;
-% end
+if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
+    bestf=bestf;
+else
+    bestf=w+h;
+end
+
+if(bestx<w && bestx>0 && imag(bestx)==0 && isnan(bestx)==0)
+    bestx=bestx;
+else
+    bestx=w/2;
+end
+
+if(besty<w && besty>0 && imag(besty)==0 && isnan(besty)==0)
+    besty=besty;
+else
+    besty=h/2;
+end
+
+
 %
 %
 fcl=[ bestf bestf];

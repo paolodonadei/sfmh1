@@ -101,11 +101,24 @@ for i=1:10
 
     end
 
-   curMedian=median(erFs);
-   MADN=median(abs(erFs-curMedian))/0.6745;
-   DISTS= abs((erFs-curMedian)/MADN);
-   
-   put the robust weighing here
+    curMedian=median(erFs);
+    MADN=median(abs(erFs-curMedian))/0.6745;
+    DISTS= abs((erFs-curMedian)/MADN);
+
+    for j=1:numFs
+        if(DISTS(j,1) <1)
+            WEIGHTS(j,1)=1;
+        elseif(DISTS(j,1) >=1 && DISTS(j,1) <3)
+            WEIGHTS(j,1)=1/DISTS(j,1) ;
+        else
+            WEIGHTS(j,1)=0;
+
+        end
+    end
+%     DISTS
+%     WEIGHTS
+%     %   put the robust weighing here
+%     x
 end
 
 
@@ -113,10 +126,22 @@ end
 
 
 %toc
-if(bestf>200 && bestf<1600 && imag(bestf)==0)
+if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
     bestf=bestf;
 else
     bestf=w+h;
+end
+
+if(bestx<w && bestx>0 && imag(bestx)==0 && isnan(bestx)==0)
+    bestx=bestx;
+else
+    bestx=w/2;
+end
+
+if(besty<w && besty>0 && imag(besty)==0 && isnan(besty)==0)
+    besty=besty;
+else
+    besty=h/2;
 end
 
 
