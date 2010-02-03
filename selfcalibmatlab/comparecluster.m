@@ -23,7 +23,7 @@ clc
 nowtime=num2str(sum(round(100*clock)));
 tic
 
-repeat=100;
+repeat=5;
 
 count=1;
 

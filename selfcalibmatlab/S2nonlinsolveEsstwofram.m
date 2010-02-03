@@ -208,15 +208,27 @@ for j=1:(sizeFs*numtries)
 end
 
 %  uncomment these bro, and your class scores thing is not working
+%ctrs
+
+%classscores
+
 for i=1:numclusts
     for q=1:sizeFs
-        if( classscores(i,q)>ceil(numtries/numclusts))
-            newval=ceil(numtries/numclusts)+log(classscores(i,q)-ceil(numtries/numclusts)+1);
-            classscores(i,q)=newval;
-        end
+                if( classscores(i,q)>ceil(numtries/numclusts))
+                    newval=ceil(numtries/numclusts)+log(classscores(i,q)-ceil(numtries/numclusts)+1);
+                    classscores(i,q)=newval;
+                end
+
+%         if( classscores(i,q)>0)
+%             classscores(i,q)=log( classscores(i,q));
+%         end
+
 
     end
 end
+
+%classscores
+
 
 for i=1:numclusts
 
