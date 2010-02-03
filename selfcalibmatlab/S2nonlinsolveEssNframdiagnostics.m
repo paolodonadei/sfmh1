@@ -75,10 +75,11 @@ bestx=0;
 besty=0;
 bestscore=1000000000000;
 curscore=0;
-
-optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-%optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
-
+if(strcmp(version('-release'),'14')==1)
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
+else
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+end
 
 
 updatelimit=ceil(numtries/5);
@@ -185,7 +186,7 @@ finalF=cell(1,numFs-numDeletion);
 
 
 for i=1:(numDeletion)
-   % disp([' removing frame ' num2str(IX(i))]);
+    % disp([' removing frame ' num2str(IX(i))]);
 
 end
 
