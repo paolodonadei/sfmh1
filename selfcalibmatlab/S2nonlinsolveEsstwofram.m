@@ -21,7 +21,7 @@ sizeFs=n;
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=100;
+numtries=50;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
@@ -266,15 +266,28 @@ bestf=maxnumclustsF;
 bestx=maxnumclustsX;
 besty=maxnumclustsY;
 
-display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
+%display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
 
 
 %toc
-if(bestf>200 && bestf<1600 && imag(bestf)==0)
+if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
     bestf=bestf;
 else
     bestf=w+h;
 end
+
+if(bestx<w && bestx>0 && imag(bestx)==0 && isnan(bestx)==0)
+    bestx=bestx;
+else
+    bestx=w/2;
+end
+
+if(besty<w && besty>0 && imag(besty)==0 && isnan(besty)==0)
+    besty=besty;
+else
+    besty=h/2;
+end
+
 fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;

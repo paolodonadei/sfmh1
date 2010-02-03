@@ -102,6 +102,17 @@ for i=1:numFs
 end
 
 sln=median(solvector);
+
+bestf=sln;
+
+if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
+    bestf=bestf;
+else
+    bestf=w+h;
+end
+
+sln=bestf;
+
 end
 
 
