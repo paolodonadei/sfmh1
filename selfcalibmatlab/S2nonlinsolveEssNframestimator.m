@@ -67,7 +67,7 @@ else
 end
 
 
-for i=1:10
+for i=1:5
 
     if(sturmfailed==0)
         x0=[ bestf  bestx    besty ];
