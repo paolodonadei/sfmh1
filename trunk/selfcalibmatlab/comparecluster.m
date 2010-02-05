@@ -30,7 +30,7 @@ count=1;
 for i=0:0.05:1
 
     for k=1:repeat
-        
+        change this to the new F generation
         
         [ F, ks ]  = generateF( 0, 0, 1.00,rand()*80,0,5 );
         %         ks{1}
