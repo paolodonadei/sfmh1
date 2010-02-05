@@ -116,10 +116,10 @@ for i=1:5
 
         end
     end
-    %     DISTS
-    %     WEIGHTS
+    % DISTS
+    % WEIGHTS
     %     %   put the robust weighing here
-    %     x
+    % x
 end
 
 
