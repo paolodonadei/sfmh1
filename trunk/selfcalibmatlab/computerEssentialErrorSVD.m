@@ -2,7 +2,7 @@ function [F] = computerEssentialErrorSVD(x,MYF)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 
-%shape of x is 
+%shape of x is
 % x(1,1) focal length
 % x(1,2) optical center x coordinate
 % x(1,3) optical center y coordinate
@@ -51,14 +51,17 @@ K_norm2(3,2)= vy;
 
 G=(K_norm2)*MYF*K_norm1;
 
-try 
-S = svd(G);
-catch 
-S= [ 100 ;  10 ;  5];
+try
+    S = svd(G);
+catch
+    S= [ 100 ;  10 ;  5];
 end
 
-
-F=(((S(1,1)-S(2,1))/S(2,1)))^2;
+if( S(2,1)>eps)
+    F=(((S(1,1)-S(2,1))/S(2,1)))^2;
+else
+    F=10;
+end
 
 end
 
