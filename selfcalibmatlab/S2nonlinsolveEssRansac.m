@@ -40,37 +40,39 @@ xvari=70;
 yvari=70;
 
 solutions=cell(numtries,sizeFs);
+x = PeterSturmSelfRobust( TF,w,h );
+
+
+
+if(x(1,1)>200 && x(1,1)<1600)
+    finit=x(1,1);
+else
+    sturmfailed=1;
+end
 
 
 for q=1:sizeFs
-
-    x = PeterSturmSelf( TF{q},w,h);
-
-    if(x(1,1)>200 && x(1,1)<1600)
-        finit=x(1,1);
-    else
-        sturmfailed=1;
-    end
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-
-
+    
+    
     for i=1:numtries
         if(sturmfailed==0)
             x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
             x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-
+            
         end
-
+        
         x=[-10 -10 -10];
-
-        badxMaxcount=50;
+        
+        badxMaxcount=10;
         while(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
             badxMaxcount=badxMaxcount-1;
             [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
@@ -79,16 +81,18 @@ for q=1:sizeFs
                 break;
             end
         end
-
+        
         ffinals=x(1);
         xfinals=x(2);
         yfinals=x(3);
-
-
+        
+        
         solutions{i,q}=[ffinals xfinals yfinals];
-
+               disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
+                x
+        
     end
-
+    
 end
 
 rawscores=zeros(sizeFs,sizeFs);
@@ -100,10 +104,10 @@ for q=1:sizeFs
         for i=1:numtries
             tempVect(i)=  computerEssentialErrorSVD( solutions{i,q},TF{m});
         end
-
+        
         rawscores(m,q)=median(tempVect(i));
-     
-
+        
+        
     end
 end
 
@@ -115,21 +119,44 @@ DISTS= abs(( rawscores-curMedian)/MADN);
 
 
 % robust score function
+
+threshold=3;
+
 for q=1:sizeFs
     
     for m=1:sizeFs
-        if(DISTS(q,m) finish this here
-        scoresfinal(q,m)
+        if(DISTS(q,m)<threshold)
+            scoresfinal(q,m)=DISTS(q,m);
+        else
+            scoresfinal(q,m)=threshold;
+        end
     end
 end
 
 
+[m,idx]=min(sum(scoresfinal));
 
 
+count=1;
 
-bestf =0 ;
-bestx=0;
-besty=0;
+FFinal{count}=TF{idx};
+disp(['using frame ' num2str(idx)]);
+for q=1:sizeFs
+    if(scoresfinal(q,idx)<threshold && q~=idx)
+        disp(['using frame ' num2str(q)]);
+        count=count+1;
+        FFinal{count}=TF{q};
+    end
+end
+
+ something not quite right here, check this out
+ 
+ 
+[x,fval,exitflag,output]  = fsolve(f ,[ finit  xinit  yinit ],optionsfsolve);
+
+bestf =x(1) ;
+bestx=x(2);
+besty=x(3);
 
 
 

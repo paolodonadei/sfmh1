@@ -29,23 +29,13 @@ fundscores=zeros(1,numFs);
 count=0;
 petexs=0;
 sturmfailed=0;
-for i=1:numFs
 
-    x = PeterSturmSelf( TF{1,i},w,h);
 
-    if(x(1,1)>200 && x(1,1)<1600)
-        count=count+1;
-        petexs(count)=x(1,1);
-    end
 
-end
 
-psstd=sqrt(var(petexs));
-finit=mean(petexs);
 
-if(psstd<150)
-    psstd=150;
-end
+x = PeterSturmSelfRobust( TF,w,h );
+finit=x(1,1);
 
 
 if(finit>200 && finit<1600 && imag(finit)==0)

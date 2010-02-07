@@ -68,24 +68,29 @@ for i=0:steps:finalr
         [fcld, centerlocdiag]   = S2nonlinsolveEssNframdiagnostics(G,width,height)
         [fclm, centerlocM]      = S2nonlinsolveEssNframestimator(G,width,height)
         [ sln, centerloc ]      = PeterSturmSelfRobust( G,width,height )
+        [ fclR, centerlocR ]      =  S2nonlinsolveEssRansac( G,width,height )
+        
+        
         
         errps(k,count)=abs(sln(1)-gfocal);
         errnfram(k,count)=abs(fcln(1)-gfocal);
         errtwofram(k,count)=abs(fclt(1)-gfocal);
         errdiagn(k,count)=abs(fcld(1)-gfocal);
         errM(k,count)=abs(fclm(1)-gfocal);
-        
+        errR(k,count)=abs(fclR(1)-gfocal);
         
         errpssum= sum( errps)
         errnframsum= sum(errnfram)
         errtwoframsum= sum(errtwofram)
         errdiagnsum= sum( errdiagn)
         errMsum= sum(errM)
+        errRsum= sum(errR)
         
         errnframOC(k,count)=sqrt(((centerlocn(1)-gocx)^2)+((centerlocn(2)-gocy)^2));
         errtwoframOC(k,count)=sqrt(((centerloct(1)-gocx)^2)+((centerloct(2)-gocy)^2));
         errdiagOC(k,count)=sqrt(((centerlocdiag(1)-gocx)^2)+((centerlocdiag(2)-gocy)^2));
         errMOC(k,count)=sqrt(((centerlocM(1)-gocx)^2)+((centerlocM(2)-gocy)^2));
+        errROC(k,count)=sqrt(((centerlocR(1)-gocx)^2)+((centerlocR(2)-gocy)^2));
         
         disp(['display iteration ' num2str(k+((count-1)*repeat))  ]);
     end
@@ -95,20 +100,20 @@ end
 
 xaxis=0:steps:finalr;
 
-plot(xaxis,(errnframsum/repeat)',xaxis, (errtwoframsum/repeat)',xaxis, (errpssum/repeat)',xaxis, (errdiagnsum/repeat)',xaxis, (errMsum/repeat)');
+plot(xaxis,(errnframsum/repeat)',xaxis, (errtwoframsum/repeat)',xaxis, (errpssum/repeat)',xaxis, (errdiagnsum/repeat)',xaxis, (errMsum/repeat)',xaxis, (errRsum/repeat)');
 
 title({'focal length error comparison between N frame method and two frame clustering';identi})
 
 
-legend('N frame', ' two frame clustering' , 'error peter sturm', 'case deletion', 'M-estimator');
+legend('N frame', ' two frame clustering' , 'error peter sturm', 'case deletion', 'M-estimator', 'RANSAC');
 saveas(gcf,['erroFlength_' nowtime '.png']);
 saveas(gcf,['erroFlength_' nowtime '.eps'],'epsc');
 figure
-plot(xaxis,(sum(errnframOC)/repeat)',xaxis, (sum(errtwoframOC)/repeat)',xaxis, (sum(errdiagOC)/repeat)',xaxis,  (sum(errMOC)/repeat)');
+plot(xaxis,(sum(errnframOC)/repeat)',xaxis, (sum(errtwoframOC)/repeat)',xaxis, (sum(errdiagOC)/repeat)',xaxis,  (sum(errMOC)/repeat)',xaxis,  (sum(errROC)/repeat)');
 
 title({'optical center error comparison between N frame method and two frame clustering';identi})
 
-legend('N frame', ' two frame clustering', ' case deletion', ' M-Estimator');
+legend('N frame', ' two frame clustering', ' case deletion', ' M-Estimator','RANSAC');
 saveas(gcf,['erroOC_' nowtime '.png']);
 saveas(gcf,['erroOC_' nowtime '.eps'],'epsc');
 

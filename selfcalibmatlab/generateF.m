@@ -64,12 +64,10 @@ else
                         x2(:,q)=ps{1,j}*X(:,q);
                         if(q<(numCorrs*noiselevel))
                             
-                            x2(1,q)=x2(1,q)/x2(3,q);
-                            x2(2,q)=x2(2,q)/x2(3,q);
-                            x2(3,q)=1;
                             
-                            x2(1,q)=x2(1,q)+((rand()-0.5)*512);%errors are half the image size max
-                            x2(2,q)=x2(2,q)+((rand()-0.5)*512);
+                            x2(1,q)=((rand()-0.5)*x2(1,q));%errors are half the image size max
+                            x2(2,q)=((rand()-0.5)*x2(2,q));
+                            x2(3,q)=((rand()-0.5)*x2(3,q));
                         end
                     end
                     
