@@ -23,20 +23,34 @@ clc
 nowtime=num2str(sum(round(100*clock)));
 tic
 
-repeat=20;
+repeat=2;
 
-count=1;
+
 
 width=512;
 height=512;
 
-for i=0:0.05:0.5
+numframes=3;
+centerdev=50;
+numBADFr=1;
+skew=0;
+framediff=0;
+AR=1;
+
+steps=0.05;
+finalr=1;
+
+count=1;
+
+identi=['numframes: ' num2str(numframes) ' AR: ' num2str(AR) ' framediff: ' num2str(framediff) ' skew : ' num2str(skew) ' bad frames: ' num2str(numBADFr) ' centerdev: ' num2str(centerdev)  ' repeat: ' num2str(repeat)];
+
+for i=0:steps:finalr
     
     for k=1:repeat
         %  change this to the new F generation
         clear G F ks;
         
-        [ F, ks ]  = generateF( 0, 0, 1.00,rand()*60,0,4,i,2 );
+        [ F, ks ]  = generateF( framediff, skew, AR,rand()*centerdev,0,numframes,i,numBADFr );
         %         ks{1}
         %         ks{2}
         %         ks{3}
@@ -79,15 +93,21 @@ for i=0:0.05:0.5
     
 end
 
+xaxis=0:steps:finalr;
 
-plot([(errnframsum/repeat)' (errtwoframsum/repeat)' (errpssum/repeat)' (errdiagnsum/repeat)' (errMsum/repeat)']);
-title('focal length error comparison between N frame method and two frame clustering');
+plot(xaxis,(errnframsum/repeat)',xaxis, (errtwoframsum/repeat)',xaxis, (errpssum/repeat)',xaxis, (errdiagnsum/repeat)',xaxis, (errMsum/repeat)');
+
+title({'focal length error comparison between N frame method and two frame clustering';identi})
+
+
 legend('N frame', ' two frame clustering' , 'error peter sturm', 'case deletion', 'M-estimator');
 saveas(gcf,['erroFlength_' nowtime '.png']);
 saveas(gcf,['erroFlength_' nowtime '.eps'],'epsc');
 figure
-plot([(sum(errnframOC)/repeat)' (sum(errtwoframOC)/repeat)' (sum(errdiagOC)/repeat)'  (sum(errMOC)/repeat)']);
-title('optical center error comparison between N frame method and two frame clustering');
+plot(xaxis,(sum(errnframOC)/repeat)',xaxis, (sum(errtwoframOC)/repeat)',xaxis, (sum(errdiagOC)/repeat)',xaxis,  (sum(errMOC)/repeat)');
+
+title({'optical center error comparison between N frame method and two frame clustering';identi})
+
 legend('N frame', ' two frame clustering', ' case deletion', ' M-Estimator');
 saveas(gcf,['erroOC_' nowtime '.png']);
 saveas(gcf,['erroOC_' nowtime '.eps'],'epsc');
