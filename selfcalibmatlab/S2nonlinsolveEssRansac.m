@@ -88,8 +88,8 @@ for q=1:sizeFs
 
 
         solutions{i,q}=[ffinals xfinals yfinals];
-        disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
-        x
+        %    disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
+        %     x
 
     end
 
@@ -112,22 +112,22 @@ for q=1:sizeFs
     end
 end
 
-
-
+%
+%
 curMedian=median(reshape(rawscores,sizeFs*sizeFs,1));
 MADN=median(abs(reshape(rawscores,sizeFs*sizeFs,1)-curMedian))/0.6745;
-DISTS= (( rawscores-curMedian)/MADN);
+% DISTS= (( rawscores-curMedian)/MADN);
 
 
 % robust score function
 
-threshold=3;
+threshold=min(0.1,MADN);
 
 for q=1:sizeFs
 
     for m=1:sizeFs
-        if(DISTS(q,m)<threshold)
-            scoresfinal(q,m)=DISTS(q,m);
+        if(rawscores(q,m)<threshold)
+            scoresfinal(q,m)=rawscores(q,m);
         else
             scoresfinal(q,m)=threshold;
         end
@@ -141,10 +141,10 @@ end
 count=1;
 
 FFinal{count}=TF{idx};
-disp(['using frame ' num2str(idx)]);
+ % disp(['using frame ' num2str(idx)]);
 for q=1:sizeFs
-    if(scoresfinal(q,idx)<threshold && q~=idx)
-        disp(['using frame ' num2str(q)]);
+    if(rawscores(q,idx)<threshold && q~=idx)
+    %    disp(['using frame ' num2str(q)]);
         count=count+1;
         FFinal{count}=TF{q};
     end
