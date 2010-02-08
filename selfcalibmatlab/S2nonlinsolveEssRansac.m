@@ -52,26 +52,26 @@ end
 
 
 for q=1:sizeFs
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     f = @(x)computerEssentialErrorSVD(x,TF{q});
-    
-    
+
+
     for i=1:numtries
         if(sturmfailed==0)
             x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
             x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-            
+
         end
-        
+
         x=[-10 -10 -10];
-        
+
         badxMaxcount=10;
         while(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
             badxMaxcount=badxMaxcount-1;
@@ -81,21 +81,22 @@ for q=1:sizeFs
                 break;
             end
         end
-        
+
         ffinals=x(1);
         xfinals=x(2);
         yfinals=x(3);
-        
-        
+
+
         solutions{i,q}=[ffinals xfinals yfinals];
-               disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
-                x
-        
+        disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
+        x
+
     end
-    
+
 end
 
 rawscores=zeros(sizeFs,sizeFs);
+rawscoresmean=zeros(sizeFs,sizeFs);
 scoresfinal=zeros(sizeFs,sizeFs);
 
 for q=1:sizeFs
@@ -104,10 +105,10 @@ for q=1:sizeFs
         for i=1:numtries
             tempVect(i)=  computerEssentialErrorSVD( solutions{i,q},TF{m});
         end
-        
+
         rawscores(m,q)=median(tempVect(i));
-        
-        
+        rawscoresmean(m,q)=mean(tempVect(i));
+
     end
 end
 
@@ -115,7 +116,7 @@ end
 
 curMedian=median(reshape(rawscores,sizeFs*sizeFs,1));
 MADN=median(abs(reshape(rawscores,sizeFs*sizeFs,1)-curMedian))/0.6745;
-DISTS= abs(( rawscores-curMedian)/MADN);
+DISTS= (( rawscores-curMedian)/MADN);
 
 
 % robust score function
@@ -123,7 +124,7 @@ DISTS= abs(( rawscores-curMedian)/MADN);
 threshold=3;
 
 for q=1:sizeFs
-    
+
     for m=1:sizeFs
         if(DISTS(q,m)<threshold)
             scoresfinal(q,m)=DISTS(q,m);
@@ -149,9 +150,9 @@ for q=1:sizeFs
     end
 end
 
- something not quite right here, check this out
- 
- 
+
+
+
 [x,fval,exitflag,output]  = fsolve(f ,[ finit  xinit  yinit ],optionsfsolve);
 
 bestf =x(1) ;
