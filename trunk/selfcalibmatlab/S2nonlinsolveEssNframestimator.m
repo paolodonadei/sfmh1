@@ -95,13 +95,14 @@ for i=1:5
 
     curMedian=median(erFs);
     MADN=median(abs(erFs-curMedian))/0.6745;
-    DISTS= abs((erFs-curMedian)/MADN);
+   
+    threshold=min(0.1,MADN);
 
     for j=1:numFs
-        if(DISTS(j,1) <1)
+        if(erFs(j,1) <threshold)
             WEIGHTS(j,1)=1;
-        elseif(DISTS(j,1) >=1 && DISTS(j,1) <3)
-            WEIGHTS(j,1)=1/DISTS(j,1) ;
+        elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
+            WEIGHTS(j,1)=1/erFs(j,1) ;
         else
             WEIGHTS(j,1)=0;
 
