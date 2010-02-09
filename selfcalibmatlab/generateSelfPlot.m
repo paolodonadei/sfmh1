@@ -31,14 +31,14 @@ medians_xy=zeros(numalgs,numPoints);
 variances_xy=zeros(numalgs,numPoints);
 
 %arg paramters
-numFbads=ones(1,numPoints)*numbadFs;
+
 noiselevels=ones(1,numPoints)*noiselevel;
 fdiff=ones(1,numPoints)*pfdiff;
 skew=ones(1,numPoints)*pskew;
 aspect=ones(1,numPoints)*par;
-centerdev=ones(1,numPoints)*pcenterdev;
+centerdev=(ones(1,numPoints)*pcenterdev); %+(randn(1,numPoints)*5); %gaussian noise, what what
 n=zeros(1,numPoints);
-b=ones(1,numPoints)*numFs;
+b=ones(1,numPoints)*numbadFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
@@ -101,6 +101,7 @@ for i=1:numPoints
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numFs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
 
         for k=1:numalgs
+      
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
             current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
             current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
