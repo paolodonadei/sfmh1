@@ -58,7 +58,7 @@ catch
 end
 
 if( S(2,1)>eps)
-    F=(((S(1,1)-S(2,1))/S(2,1)))^2;
+    F=(((S(1,1)-S(2,1))/S(2,1)))^2;  figure out whats best , should i square? should i divide?
 else
     F=10;
 end
