@@ -59,7 +59,7 @@ for i=1:5
     % DISTS
     WEIGHTS;
     %     %   put the robust weighing here
-    x
+    x;
 end
 
 fcl=[ bestF bestF];

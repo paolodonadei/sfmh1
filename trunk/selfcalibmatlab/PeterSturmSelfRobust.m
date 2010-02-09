@@ -117,7 +117,7 @@ else
     bestf=w+h;
 end
 
-sln=bestf;
+sln=[ bestf bestf];
 
 end
 

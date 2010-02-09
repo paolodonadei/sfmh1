@@ -117,7 +117,7 @@ end
 %%%%%%%%%%5
 numclusts=10;
 X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1)   reshape(yfinals,sizeFs*numtries,1)];
-[idx,ctrs] = kmeans(X,numclusts,'Replicates',5,'EmptyAction','drop');
+[idx,ctrs] = kmeans(X,numclusts,'Replicates',5,'EmptyAction','drop','display','off');
 
 if(plotting==1)
     scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');

@@ -14,14 +14,20 @@ end
 
 F=0;
 for i=1:n
-    
+
     T = computerEssentialErrorSVD(x,MYF{1,i});
-    
+
     F=F+(T*W(i,1));
 end
 
-F=F/sum(W); %make sure the sum of your weights is constant
+sumW=sum(W);
 
+if( sumW>eps)
+    F=F/sumW; %make sure the sum of your weights is constant
+else
+    F=10;
+    disp('sum of W is zero inside computerEssentialErrorSVDNFramesWeighted, this shouldnt happen');
+end
 
 
 end
