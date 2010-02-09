@@ -25,14 +25,14 @@ count=0;
 
 for i=1:5
 
- clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+    clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
     [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(10, TF, w,h,WEIGHTS );
 
     x=[bestF bestX  bestY  ];
     erFs=zeros(numFs,1);
     for j=1:numFs
         erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
-       
+
     end
 
     curMedian=median(erFs);
@@ -60,6 +60,17 @@ for i=1:5
     WEIGHTS;
     %     %   put the robust weighing here
     x;
+
+    if(sum(WEIGHTS<0))
+        disp('negative element in the weights function');
+        break;
+    end
+
+    if(sum(WEIGHTS)<eps)
+        break;
+    end
+
+
 end
 
 fcl=[ bestF bestF];
