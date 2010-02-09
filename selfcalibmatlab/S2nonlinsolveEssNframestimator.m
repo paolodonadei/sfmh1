@@ -25,7 +25,7 @@ count=0;
 
 for i=1:5
 
-
+ clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
     [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(10, TF, w,h,WEIGHTS );
 
     x=[bestF bestX  bestY  ];
@@ -63,9 +63,7 @@ for i=1:5
 end
 
 fcl=[ bestF bestF];
-xcen=bestX;
-ycen=bestY;
-centerloc=[xcen ycen];
+centerloc=[bestX bestY];
 
 end
 

@@ -6,40 +6,19 @@ if (nargin == 1)
     w=512;
     h=512;
 end
-%TF=TF*10000;
-plotting=0;
-maxfocal=2000;
+
 fcl=[0 0];
 
 xcen=0;
 ycen =0;
 centerloc=[xcen ycen];
 
-[m,n]=size(TF);
-
-sizeFs=n;
-
+[m,sizeFs]=size(TF);
 
 numtries=10;
 
-
-sturmfailed=0;
-
-if(strcmp(version('-release'),'14')==1)
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-else
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
-end
-
-xinit=w/2;
-yinit=h/2;
-
-
-fvari=70;
-xvari=70;
-yvari=70;
-
 solutions=cell(numtries,sizeFs);
+
 x = PeterSturmSelfRobust( TF,w,h );
 
 
@@ -47,50 +26,17 @@ x = PeterSturmSelfRobust( TF,w,h );
 if(x(1,1)>200 && x(1,1)<1600)
     finit=x(1,1);
 else
-    sturmfailed=1;
+    finit=w+h;
 end
-
 
 for q=1:sizeFs
 
 
-
-
-
-
-
-    f = @(x)computerEssentialErrorSVD(x,TF{q});
-
+    clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+    [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,50,50);
 
     for i=1:numtries
-        if(sturmfailed==0)
-            x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-        else
-            x0=[ (rand()*(maxfocal))  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
-
-        end
-
-        x=[-10 -10 -10];
-
-        badxMaxcount=10;
-        while(x(1)<0 || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h)
-            badxMaxcount=badxMaxcount-1;
-            [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-            if(badxMaxcount==0)
-                x=[0 0 0];
-                break;
-            end
-        end
-
-        ffinals=x(1);
-        xfinals=x(2);
-        yfinals=x(3);
-
-
-        solutions{i,q}=[ffinals xfinals yfinals];
-        %    disp([' solution at F number ' num2str(q) ' and numtries ' num2str(i) ' gives us:']);
-        %     x
-
+        solutions{i,q}=[focs(i,1) xcentrs(i,1) ycentrs(i,1)];
     end
 
 end
@@ -141,51 +87,21 @@ end
 count=1;
 
 FFinal{count}=TF{idx};
-  disp(['using frame ' num2str(idx)]);
+%disp(['using frame ' num2str(idx)]);
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
-        disp(['using frame ' num2str(q)]);
+ %       disp(['using frame ' num2str(q)]);
         count=count+1;
         FFinal{count}=TF{q};
     end
 end
 
+clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+[focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(3, FFinal, w,h);
 
 
-
-[x,fval,exitflag,output]  = fsolve(f ,[ finit  xinit  yinit ],optionsfsolve);
-
-bestf =x(1) ;
-bestx=x(2);
-besty=x(3);
-
-
-
-
-
-
-if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
-    bestf=bestf;
-else
-    bestf=w+h;
-end
-
-if(bestx<w && bestx>0 && imag(bestx)==0 && isnan(bestx)==0)
-    bestx=bestx;
-else
-    bestx=w/2;
-end
-
-if(besty<w && besty>0 && imag(besty)==0 && isnan(besty)==0)
-    besty=besty;
-else
-    besty=h/2;
-end
-
-fcl=[ bestf bestf];
-xcen=bestx;
-ycen=besty;
-centerloc=[xcen ycen];
+fcl=[ bestF bestF];
+centerloc=[bestX bestY];
 
 
 end

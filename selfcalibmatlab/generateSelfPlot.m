@@ -15,8 +15,8 @@ label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={ 'PeterSturmSelf','nonlinsolveEsstwofram2','nonlinsolveEsstwofram'};
-AlgFuncs={ @PeterSturmSelf ,@nonlinsolveEsstwofram2,@nonlinsolveEsstwofram};
+AlgNames={ 'Un-robust','Hough Transform','Case Deletion', 'M-estimator','Peter Sturm Median', 'RANSAC'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEsstwofram,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator , @PeterSturmSelfRobust , @S2nonlinsolveEssRansac};
 
 
 numalgs=size(AlgFuncs,2);
@@ -37,7 +37,8 @@ fdiff=ones(1,numPoints)*pfdiff;
 skew=ones(1,numPoints)*pskew;
 aspect=ones(1,numPoints)*par;
 centerdev=ones(1,numPoints)*pcenterdev;
-
+n=zeros(1,numPoints);
+b=ones(1,numPoints)*numFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
@@ -51,7 +52,7 @@ if(paramcheck=='b')
     step=numFs/numPoints;
     b=0:step:numFs;  %continue from here and find out why your method sucks
     b=floor(b(1,1:numPoints));
-    label='bad-F'; finish this 
+    label='number-bad-F';
 end
 
 
@@ -95,9 +96,9 @@ for i=1:numPoints
 
     for j=1:repeat
         currIteration=currIteration+1;
-        [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1 );
+        [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numFs,n(1,i),b(1,i)   );
 
-        disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ')'] );
+        disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numFs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
 
         for k=1:numalgs
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
@@ -146,6 +147,7 @@ for i=1:sizeDataCats
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
     hold
 
 end
@@ -170,11 +172,14 @@ for i=1:sizeDataCats
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
+
+
     hold
 
 end
 
-
+save( ['variables_GP' nowtime '.mat'])
 
 fclose(fid);
 

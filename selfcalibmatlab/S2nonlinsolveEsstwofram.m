@@ -48,7 +48,7 @@ yinit=h/2;
 for q=1:sizeFs
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    
+
     [focs, xcentrs, ycentrs, scrs, bestFfinal, bestXfinal, bestYfinal] = findBestsolsrepeat(numtries,{TF{q}}, w,h,ones(1,1),finit,w/2,h/2,fvari, xvari,yvari);
 
 
@@ -165,15 +165,15 @@ end
 
 for i=1:numclusts
     for q=1:sizeFs
-        if( classscores(i,q)>ceil(numtries/numclusts))
-            newval=ceil(numtries/numclusts)+log(classscores(i,q)-ceil(numtries/numclusts)+1);
-            classscores(i,q)=newval;
-        end
+        %         if( classscores(i,q)>ceil(numtries/numclusts))
+        %             newval=ceil(numtries/numclusts)+log(classscores(i,q)-ceil(numtries/numclusts)+1);
+        %             classscores(i,q)=newval;
+        %         end
 
         %         if( classscores(i,q)>0)
         %             classscores(i,q)=log( classscores(i,q));
         %         end
-
+        classscores(i,q)=log((1+classscores(i,q)^2));
 
     end
 end
@@ -255,9 +255,7 @@ else
 end
 
 fcl=[ bestf bestf];
-xcen=bestx;
-ycen=besty;
-centerloc=[xcen ycen];
+centerloc=[bestx  besty];
 
 
 end
