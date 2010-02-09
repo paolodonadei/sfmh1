@@ -1,7 +1,13 @@
 function [ sln, centerloc ] = PeterSturmSelfRobust( F,w,h )
 
-xc=256;
-yc=256;
+if (nargin == 1)
+    w=512;
+    h=512;
+end
+
+xc=w/2;
+yc=h/2;
+
 centerloc=[xc yc];
 typicalF=5000;
 

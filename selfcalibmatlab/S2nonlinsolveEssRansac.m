@@ -121,7 +121,7 @@ MADN=median(abs(reshape(rawscores,sizeFs*sizeFs,1)-curMedian))/0.6745;
 
 % robust score function
 
-threshold=min(0.1,MADN);
+threshold=0.1; % dont knwo about this
 
 for q=1:sizeFs
 
@@ -141,10 +141,10 @@ end
 count=1;
 
 FFinal{count}=TF{idx};
- % disp(['using frame ' num2str(idx)]);
+  disp(['using frame ' num2str(idx)]);
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
-    %    disp(['using frame ' num2str(q)]);
+        disp(['using frame ' num2str(q)]);
         count=count+1;
         FFinal{count}=TF{q};
     end
