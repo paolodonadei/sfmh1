@@ -3,10 +3,12 @@ function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepea
 [m,numFs]=size(TF);
 
 
+%tolx and tolf are very important, for the data collection part use these
+%values but later when you want more accuracy make them lower, like 10^-16
 if(strcmp(version('-release'),'14')==1)
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-16,'TolX',1e-16);
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-14,'TolX',1e-14);
 else
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-16,'TolX',1e-16);
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-14,'TolX',1e-14);
 end
 
 sturmfailed=0;
