@@ -26,9 +26,11 @@ means_F=zeros(numalgs,numPoints);
 medians_F=zeros(numalgs,numPoints);
 variances_F=zeros(numalgs,numPoints);
 
-means_xy=zeros(numalgs,numPoints);
-medians_xy=zeros(numalgs,numPoints);
-variances_xy=zeros(numalgs,numPoints);
+means_XY=zeros(numalgs,numPoints);
+medians_XY=zeros(numalgs,numPoints);
+variances_XY=zeros(numalgs,numPoints);
+
+
 
 %arg paramters
 
@@ -44,14 +46,16 @@ b=ones(1,numPoints)*numbadFs;
 if(paramcheck=='n')
     step=1/numPoints;
     n=0:step:1;  %continue from here and find out why your method sucks
-    n=n(1,1:numPoints);
+
+    t=n(1,1:numPoints);
     label='noise-level';
 end
 
 if(paramcheck=='b')
     step=numFs/numPoints;
     b=0:step:numFs;  %continue from here and find out why your method sucks
-    b=floor(b(1,1:numPoints));
+    t=b(1,1:numPoints);
+
     label='number-bad-F';
 end
 
@@ -101,11 +105,11 @@ for i=1:numPoints
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numFs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
 
         for k=1:numalgs
-      
+
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
             current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
             current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
-            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy' num2str(current_errors_XY(k,j))]);
+            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j))]);
 
             fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j)  );
 
