@@ -1,7 +1,7 @@
 function [fcl, centerloc] = S2nonlinsolveEssNfram(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
-%tic
+tic
 if (nargin == 1)
     w=512;
     h=512;
@@ -130,7 +130,7 @@ end
 
 
 
-%toc
+toc
 
 
 
