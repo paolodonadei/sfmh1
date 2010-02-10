@@ -1,4 +1,4 @@
-function [ t,means_F,medians_F,  variances_F ,means_xy,medians_xy,  variances_xy ] =     generateSelfPlot(numFs, paramcheck,repeat,pfdiff,pskew,par,pcenterdev,noiselevel, numbadFs )
+function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY ] =     generateSelfPlot(numFs, paramcheck,repeat,pfdiff,pskew,par,pcenterdev,noiselevel, numbadFs )
 
 %paramcheck would be the parmameter we are varying in characters, so
 %'c' for camera center
@@ -127,7 +127,7 @@ for i=1:numPoints
         variances_XY(k,i)=var(current_errors_XY(k,:));
     end
 
-
+nnjsf=6;
 
 
 end
