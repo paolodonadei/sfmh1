@@ -93,6 +93,8 @@ end
 numTotalIterations=numPoints*repeat;
 currIteration=0;
 
+allSolutions=cell(numPoints,repeat,numalgs);
+
 for i=1:numPoints
 
     current_errors_F=zeros(numalgs,repeat);
@@ -107,10 +109,13 @@ for i=1:numPoints
         for k=1:numalgs
 
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
+            allSolutions(i,j,k)=[answerf loca 
             current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
+            
             current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
             disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j))]);
 
+            allSolutions(i,j,k)=[answerf loca current_errors_F current_errors_XY];
             fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j)  );
 
         end

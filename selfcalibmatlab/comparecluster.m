@@ -30,12 +30,12 @@ repeat=50;
 width=512;
 height=512;
 
-numframes=3;
-centerdev=50;
-numBADFr=1;
-skew=0;
-framediff=0;
-AR=1;
+numframes=4;
+centerdev=100;
+numBADFr=2;
+skew=3;
+framediff=1;
+AR=1.01;
 
 steps=0.05;
 finalr=1;
