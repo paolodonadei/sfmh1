@@ -50,7 +50,7 @@ else
                 count=count+1;
                 
                 if(count<=numCorruptFs)
-                    clear x1 x2;
+                    clear x1 x2 X;
                     x1=zeros(3, numCorrs);
                     x2=zeros(3, numCorrs);
                     X=zeros(4, numCorrs);
@@ -75,6 +75,33 @@ else
                 else
                     F{count}=vgg_F_from_P(ps{1,i},ps{1,j});
                 end
+                
+                % measure noise
+                clear x1 x2 X;
+                x1=zeros(3, numCorrs);
+                x2=zeros(3, numCorrs);
+                X=zeros(4, numCorrs);
+                for q=1:numCorrs
+                    X(1,q)=rand()*1000 -500;
+                    X(2,q)=rand()*1000 -500;
+                    X(3,q)=rand()*1000 -500;
+                    X(4,q)=1;
+                    
+                    http://www.csse.uwa.edu.au/~pk/research/matlabfns/Robust/ransacfitfundmatrix.m
+                    report the errors, also check the peter sturm initialization, maybe thats why the plot of the nonrobust is not linearly increasing, i think its either
+                    the noise generation or its the initialization
+                    
+                    x1(:,q)=ps{1,i}*X(:,q);
+                    x2(:,q)=ps{1,j}*X(:,q);
+                    if(q<(numCorrs*noiselevel))
+                        
+                        
+                        x2(1,q)=((rand()-0.5)*x2(1,q));%errors are half the image size max
+                        x2(2,q)=((rand()-0.5)*x2(2,q));
+                        x2(3,q)=((rand()-0.5)*x2(3,q));
+                    end
+                end
+                
             end
         end
     end
