@@ -109,7 +109,7 @@ for i=1:numPoints
         for k=1:numalgs
 
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
-            allSolutions(i,j,k)=[answerf loca 
+           
             current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
             
             current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
