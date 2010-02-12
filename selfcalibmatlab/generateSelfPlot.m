@@ -44,8 +44,8 @@ b=ones(1,numPoints)*numbadFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
-    step=1/numPoints;
-    n=0:step:1;  %continue from here and find out why your method sucks
+    step=0.4/numPoints;
+    n=0:step:0.4;  %continue from here and find out why your method sucks
 
     t=n(1,1:numPoints);
     label='noise-level';
