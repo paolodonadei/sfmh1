@@ -7,16 +7,20 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 
 fid = fopen('exp.txt', 'w');
 
+if(paramcheck=='b')
+    numPoints=(numFs*(numFs-1))/2;
+else
+    numPoints=30;
+end
 
-numPoints=30;
 styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c'};
 t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
 
-AlgNames={ 'Un-robust'};
-AlgFuncs={ @S2nonlinsolveEssNfram};
+AlgNames={ 'Un-robust','Hough Transform','Case Deletion', 'M-estimator','Peter Sturm Median', 'RANSAC'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEsstwofram,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator , @PeterSturmSelfRobust , @S2nonlinsolveEssRansac};
 
 
 numalgs=size(AlgFuncs,2);
@@ -30,32 +34,32 @@ means_XY=zeros(numalgs,numPoints);
 medians_XY=zeros(numalgs,numPoints);
 variances_XY=zeros(numalgs,numPoints);
 
-
+numBadPoints=zeros(numalgs,numPoints);
 
 %arg paramters
 
-noiselevels=ones(1,numPoints)*noiselevel;
+n=ones(1,numPoints)*noiselevel;
 fdiff=ones(1,numPoints)*pfdiff;
 skew=ones(1,numPoints)*pskew;
 aspect=ones(1,numPoints)*par;
 centerdev=(ones(1,numPoints)*pcenterdev); %+(randn(1,numPoints)*5); %gaussian noise, what what
-n=zeros(1,numPoints);
+
 b=ones(1,numPoints)*numbadFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
-    step=0.4/numPoints;
-    n=0:step:0.4;  %continue from here and find out why your method sucks
-
+    step=1/numPoints;
+    n=0:step:1;  %continue from here and find out why your method sucks
+    
     t=n(1,1:numPoints);
     label='noise-level';
 end
 
 if(paramcheck=='b')
-    step=numFs/numPoints;
-    b=0:step:numFs;  %continue from here and find out why your method sucks
+    step=((numFs*(numFs-1))/2)/numPoints;
+    b=floor(0:step:((numFs*(numFs-1))/2));  %continue from here and find out why your method sucks
     t=b(1,1:numPoints);
-
+    
     label='number-bad-F';
 end
 
@@ -96,30 +100,36 @@ currIteration=0;
 allSolutions=cell(numPoints,repeat,numalgs);
 
 for i=1:numPoints
-
+    
     current_errors_F=zeros(numalgs,repeat);
     current_errors_XY=zeros(numalgs,repeat);
-
+    current_BADPTS=zeros(numalgs,repeat);
+    
     for j=1:repeat
         currIteration=currIteration+1;
         [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numFs,n(1,i),b(1,i)   );
-
+        
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numFs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
-
+        
         for k=1:numalgs
-
+            
             [answerf, loca]=AlgFuncs{k}(F); %assuming camera size is 512x512
-           
+            
             current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
             
             current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
             disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j))]);
-
-            allSolutions{i,j,k}=[answerf loca current_errors_F current_errors_XY];
+            
+            if(abs(current_errors_F(k,j))>50)
+                current_BADPTS(k,j)=current_BADPTS(k,j)+1;
+            end
+            
+            
+            allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
             fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j)  );
-
+            
         end
-
+        
     end
     disp('______________________________________________________');
     %now calculate the stat for the current run
@@ -127,15 +137,17 @@ for i=1:numPoints
         means_F(k,i)=mean(current_errors_F(k,:));
         medians_F(k,i)=median(current_errors_F(k,:));
         variances_F(k,i)=var(current_errors_F(k,:));
-
+        
         means_XY(k,i)=mean(current_errors_XY(k,:));
         medians_XY(k,i)=median(current_errors_XY(k,:));
         variances_XY(k,i)=var(current_errors_XY(k,:));
+        
+        numBadPoints(k,i)=mean(current_BADPTS(k,:));
     end
-
-nnjsf=6;
-
-
+    
+    nnjsf=6;
+    
+    
 end
 
 % for focal length
@@ -148,7 +160,7 @@ for i=1:sizeDataCats
     figure;
     hold;
     for k=1:numalgs
-
+        
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x (' label ')']);       %  add axis labels and plot title
@@ -160,7 +172,7 @@ for i=1:sizeDataCats
     saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
     hold
-
+    
 end
 
 % for camera center
@@ -173,7 +185,7 @@ for i=1:sizeDataCats
     figure;
     hold;
     for k=1:numalgs
-
+        
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x (' label ')']);       %  add axis labels and plot title
@@ -184,13 +196,33 @@ for i=1:sizeDataCats
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
-
-
+    
+    
     hold
-
+    
 end
 
 save( ['variables_GP' nowtime '.mat'])
+
+%%%%%%%%%%%%%%%%%%%%%%%% num bad points
+
+figure;
+hold;
+for k=1:numalgs
+    
+    plot(t,numBadPoints(k,:),styles{k});
+end
+xlabel(['x (' label ')']);       %  add axis labels and plot title
+ylabel('number of bad solutions');
+title(['plot of bad points versus parameter ']);
+legend(AlgNames);
+hold
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.jpg']);
+saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 
 fclose(fid);
 
