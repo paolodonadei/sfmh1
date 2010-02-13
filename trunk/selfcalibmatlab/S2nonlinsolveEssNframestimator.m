@@ -2,6 +2,8 @@ function [fcl, centerloc] =S2nonlinsolveEssNframestimator(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
 %tic
+threshold=0.05; % i dont know if this is the best thing to do
+
 if (nargin == 1)
     w=512;
     h=512;
@@ -38,7 +40,7 @@ for i=1:5
     curMedian=median(erFs);
     MADN=median(abs(erFs-curMedian))/0.6745;
 
-    threshold=0.1; % i dont know if this is the best thing to do
+
 
     for j=1:numFs
         %         if(erFs(j,1) <threshold)
