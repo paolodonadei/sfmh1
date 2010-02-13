@@ -7,6 +7,10 @@ if (nargin == 1)
     h=512;
 end
 
+% robust score function
+%threshold=1.96*MADN; 
+threshold=0.05; % dont knwo about this
+
 fcl=[0 0];
 
 xcen=0;
@@ -65,9 +69,7 @@ MADN=median(abs(reshape(rawscores,sizeFs*sizeFs,1)-curMedian))/0.6745;
 % DISTS= (( rawscores-curMedian)/MADN);
 
 
-% robust score function
 
-threshold=0.1; % dont knwo about this
 
 for q=1:sizeFs
 
