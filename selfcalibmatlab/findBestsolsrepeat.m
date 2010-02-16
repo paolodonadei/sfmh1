@@ -6,9 +6,9 @@ function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepea
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16
 if(strcmp(version('-release'),'14')==1)
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-8,'TolX',1e-8);
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-18,'TolX',1e-18);
 else
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-8,'TolX',1e-8);
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-18,'TolX',1e-18);
 end
 
 sturmfailed=0;
@@ -59,12 +59,14 @@ for i=1:numtries
     badxMaxcount=maxbaditerations;
     while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0)
         badxMaxcount=badxMaxcount-1;
-        if(sturmfailed==0 || fvari<200)
+        if(sturmfailed==0 && fvari<200)
             x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         else
             x0=[ (rand()*fvari)+minfocal  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         end
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
+   %     x0
+   %     x
         if(badxMaxcount==0)
             x=[0 0 0];
             break;

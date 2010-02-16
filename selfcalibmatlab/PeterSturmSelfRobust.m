@@ -19,6 +19,8 @@ solvector=zeros(numFs,1);
 
 for i=1:numFs
     clear G U S V x a b ;
+  
+
     G=    normalizeFSturm(F{1,i},w,h,typicalF);
 
 
@@ -114,7 +116,7 @@ bestf=sln;
 if(bestf>200 && bestf<1600 && imag(bestf)==0 && isnan(bestf)==0)
     bestf=bestf;
 else
-    bestf=w+h;
+    bestf=0;
 end
 
 sln=[ bestf bestf];

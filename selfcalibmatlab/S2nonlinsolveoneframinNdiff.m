@@ -1,4 +1,4 @@
-function [fcl, centerloc] = S2nonlinsolveoneframinNdiff(ps,w,h,pnum)
+function [fcl, centerloc] = S2nonlinsolveoneframinNdiff(TF,w,h,pnum)
 %this shows random sampling consensus
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
@@ -14,27 +14,7 @@ end
 
 
 plotting=1;
-%finding the f matrices
-%always find the parameters of fgirst projection matrix
 
-[m,n]=size(ps);
-number=n;
-
-if(pnum>number)
-    disp(['p number is larger than the largest p number, this is incorrect']);
-end
-
-P1=ps{pnum};
-
-
-count=0;
-for i=1:number
-    if(i~=pnum)
-        count=count+1;
-        TF{count}=vgg_F_from_P(P1,ps{1,i});
-    end
-end
-count=0;
 
 
 
@@ -89,9 +69,9 @@ for q=1:sizeFs
     besty=0;
     bestscore=1000000000000;
     curscore=0;
-    f = @(x)computerEssentialErrorSVDDIFF(x,TF{q});
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-6,'TolX',1e-6);
-    % optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
+    f = @(x)computerEssentialErrorSVDDIFF(x,TF{q});%
+   % optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-16,'TolX',1e-16);
+     optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-6,'TolX',1e-6);
 
 
 %hartleyfailed=1;
