@@ -6,9 +6,9 @@ function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepea
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16
 if(strcmp(version('-release'),'14')==1)
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-18,'TolX',1e-18);
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-12,'TolX',1e-12);
 else
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-18,'TolX',1e-18);
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-12,'TolX',1e-12);
 end
 
 sturmfailed=0;
