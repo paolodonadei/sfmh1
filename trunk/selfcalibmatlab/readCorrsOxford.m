@@ -1,5 +1,9 @@
 function [corrs, IMS, P,K, F] = readCorrsOxford(path, noiselevel, numbadf)
 
+if(path(size(path,2))~='\' && path(size(path,2))~='/' )
+    path=[path '/'] ;
+end
+
 % get the Ps
 psdir=dir([path '*.P']);
 [m,n]=size(psdir);
@@ -8,7 +12,9 @@ count=0;
 for i=1:m
     count=count+1;
     P{1,count}=load([path psdir(i,1).name]);
-    [K{1,count}, R, t] = vgg_KR_from_P(P{1,count});
+    [D, R, t] = vgg_KR_from_P(P{1,count});
+    K{1,count}=abs(D);
+    clear D;
 end
 
 
