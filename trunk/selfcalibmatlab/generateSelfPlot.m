@@ -6,8 +6,8 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %rest is the constant camera params
 
 %change this
-width=1024;
-height = 768;
+width=512;
+height = 512;
 
 fid = fopen('exp.txt', 'w');
 
@@ -52,8 +52,8 @@ b=ones(1,numPoints)*numbadFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
-    step=1/numPoints;
-    n=0:step:1;  %continue from here and find out why your method sucks
+    step=0.5/numPoints;
+    n=0:step:0.5;  %continue from here and find out why your method sucks
 
     t=n(1,1:numPoints);
     label='noise-level';
@@ -111,8 +111,8 @@ for i=1:numPoints
 
     for j=1:repeat
         currIteration=currIteration+1;
-        %     [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
-        [corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\wadham', n(1,i), b(1,i));
+             [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
+        % [corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\wadham', n(1,i), b(1,i));
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
 
         for k=1:numalgs
