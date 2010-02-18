@@ -6,9 +6,9 @@ function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepea
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16
 if(strcmp(version('-release'),'14')==1)
-    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-12,'TolX',1e-12);
+    optionsfsolve  =optimset('Display','off','Jacobian','off','NonlEqnAlgorithm','lm','TolFun',1e-18,'TolX',1e-18);
 else
-    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-12,'TolX',1e-12);
+    optionsfsolve    =optimset('Display','off','Jacobian','off','Algorithm','levenberg-marquardt','TolFun',1e-18,'TolX',1e-18);
 end
 
 sturmfailed=0;
@@ -49,6 +49,8 @@ if (nargin <6)
     yinit=h/2;
 end
 
+  sturmfailed=1;
+        fvari=(maxfocal-minfocal);
 
 f = @(x)computerEssentialErrorSVDNFramesWeighted(x,TF,Weights);
 
@@ -65,8 +67,8 @@ for i=1:numtries
             x0=[ (rand()*fvari)+minfocal  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         end
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-   %     x0
-   %     x
+       x0
+       x
         if(badxMaxcount==0)
             x=[0 0 0];
             break;
