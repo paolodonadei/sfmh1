@@ -48,7 +48,7 @@ clear all; clc; close all;
 clear all; clc; close all
 
 
-numtries=2000;
+numtries=1000;
 
 inliersvals=zeros(numtries,1);
 for i=1:numtries
