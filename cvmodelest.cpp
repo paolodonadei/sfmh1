@@ -326,11 +326,11 @@ bool CvModelEstimator2::runRANSAC( const CvMat* m1, const CvMat* m2, CvMat* mode
     return result;
 }
 
-void* cvAlignPtr( const void* ptr, int align CV_DEFAULT(32) )
-{
-    assert( (align & (align-1)) == 0 );
-    return (void*)( ((size_t)ptr + align - 1) & ~(size_t)(align-1) );
-}
+//void* cvAlignPtr( const void* ptr, int align CV_DEFAULT(32) )
+//{
+//    assert( (align & (align-1)) == 0 );
+//    return (void*)( ((size_t)ptr + align - 1) & ~(size_t)(align-1) );
+//}
 
 bool CvModelEstimator2::getSubset( const CvMat* m1, const CvMat* m2,
                                    CvMat* ms1, CvMat* ms2, int maxAttempts )

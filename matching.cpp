@@ -392,12 +392,23 @@ int findSIFTfeatures( HRImage& image)
 
 
 
-    if (!write_pgm_image((char*)image.pgmfilename.c_str(), dataptr, image.height,image.width, "Houman Rastgar",255))
-    {
+//here im saving the image using pgm utils but its not working
+//    if (!write_pgm_image((char*)image.pgmfilename.c_str(), dataptr, image.height,image.width, "Houman Rastgar",255))
+//    {
+//
+//        cout<<"image "<<image.pgmfilename <<" not saved\n"<<endl;
+//        return 0;
+//    }
+int zp[3];
 
-        cout<<"image "<<image.pgmfilename <<" not saved\n"<<endl;
-        return 0;
-    }
+    zp[0] = CV_IMWRITE_PXM_BINARY;
+    zp[1] = 1;
+    zp[2] = 0;
+
+
+        if (!cvSaveImage((char*)image.pgmfilename.c_str(),image.cv_img,zp)) printf("Could not save: %s\n",(char*)image.pgmfilename.c_str());
+
+
     fs::path p2( image.pgmfilename, fs::native );
     if ( !fs::exists( p2 ) )
     {
