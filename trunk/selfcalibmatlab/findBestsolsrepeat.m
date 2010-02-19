@@ -67,8 +67,8 @@ for i=1:numtries
             x0=[ (rand()*fvari)+minfocal  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
         end
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-       x0
-       x
+%        x0
+%        x
         if(badxMaxcount==0)
             x=[0 0 0];
             break;

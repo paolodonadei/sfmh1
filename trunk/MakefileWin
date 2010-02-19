@@ -1,5 +1,5 @@
 CC=g++
-VPATH = .:utils/selfcalib/
+VPATH = .:utils/selfcalib
 INC = -I../../ -I. -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl
@@ -26,7 +26,7 @@ $(PROJECT): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -f *.o core *.core $(EXECUTABLE).exe $(PROJECT) *~
+	del -f *.o core *.core $(EXECUTABLE).exe $(PROJECT) *~
 
 
 cleandirs: clean

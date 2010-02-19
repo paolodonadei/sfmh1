@@ -92,7 +92,7 @@ FFinal{count}=TF{idx};
 %disp(['using frame ' num2str(idx)]);
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
- %       disp(['using frame ' num2str(q)]);
+ %      disp(['using frame ' num2str(q)]);
         count=count+1;
         FFinal{count}=TF{q};
     end
