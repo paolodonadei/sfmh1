@@ -108,7 +108,7 @@ for i=1:numFs
 
     solvector(i,1)=x(1,1);
 end
-solvector
+%solvector
 sln=median(solvector);
 
 bestf=sln;
