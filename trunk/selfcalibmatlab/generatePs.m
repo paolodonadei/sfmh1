@@ -1,4 +1,4 @@
-function [ ps ,ks ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff )
+function [ ps ,ks ] = generatePsangl( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff )
 %if fdiff is 1 then all Fs will be different, if 0 otehrwise,
 %skew is just the max skew allowed, if its zero them all skews is zero
 %ar is the aspect ratio

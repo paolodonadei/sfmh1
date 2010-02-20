@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 %TF=TF*10000;
-plotting=0;
+plotting=1;
 maxfocal=2000;
 fcl=[0 0];
 
@@ -21,7 +21,7 @@ centerloc=[xcen ycen];
 
 %f = @(x)computerEssentialErrorSquared(x,TF); %squared
 %f = @(x)computerEssentialError(x,TF);
-numtries=50;
+numtries=150;
 ffinals=zeros(numtries,sizeFs);
 xfinals=zeros(numtries,sizeFs);
 yfinals=zeros(numtries,sizeFs);
