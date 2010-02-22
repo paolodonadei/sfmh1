@@ -2,7 +2,7 @@ function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepea
 
 [m,numFs]=size(TF);
 
-constantinitials=1;
+constantinitials=0;
 
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16

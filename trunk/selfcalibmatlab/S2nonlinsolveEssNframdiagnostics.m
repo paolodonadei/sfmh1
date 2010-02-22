@@ -56,7 +56,7 @@ for j=1:numFs
     curscore=mean(scrs);
 
     allscorediffs(j,1)=bestscore-curscore;
-    if(  bestscore-curscore>0.001) % this line is very vry important, i pulled this threshold out of air
+    if(  bestscore-curscore>0.0001) % this line is very vry important, i pulled this threshold out of air
 
         scorediffs(j,1)=bestscore-curscore;
         numBadframes=numBadframes+1;

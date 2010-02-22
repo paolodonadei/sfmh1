@@ -6,8 +6,8 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %rest is the constant camera params
 
 %change this
-width=512;
-height = 512;
+width=1024;
+height =768;
 
 
 
@@ -120,10 +120,10 @@ for i=1:numPoints
         currIteration=currIteration+1;
         %      [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         %     [ F, ks ] =  generateFangl( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
-        [corrs, IMS, P,ks, F] = readCorrsOxford('/home/houman/work/test_data/wadhamcollege', n(1,i), b(1,i));
+       % [corrs, IMS, P,ks, F] = readCorrsOxford('/home/houman/work/test_data/wadhamcollege', n(1,i), b(1,i));
   
-        %[corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\wadham', n(1,i), b(1,i));
-        %        width=1024; height=768;
+        [corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\wadham', n(1,i), b(1,i));
+                width=1024; height=768;
         
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
         

@@ -3,7 +3,7 @@ G=F;
 gfocal=(ks{1,1}(1,1)+ks{1,1}(2,2))/2;
 gocx=  ks{1,1}(1,3);
 gocy=ks{1,1}(2,3)  ;
-width=512; height=512;
+%width=512; height=512;
 width=1024; height=768;
 
 tic; 
