@@ -131,9 +131,10 @@ for i=1:numPoints
             
             [answerf, loca]=AlgFuncs{k}(F,width,height); %assuming camera size is 512x512
             
-            current_errors_F(k,j)=calcSelfCalibError(answerf,ks);
-            
-            current_errors_XY(k,j)=sqrt(((loca(1,1)-ks{1}(1,3))^2)+((loca(1,2)-ks{1}(2,3))^2));
+           
+            [current_errors_F(k,j), current_errors_XY(k,j)  ] = calcSelfCalibError(answerf, loca,ks);
+                
+
             disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j))]);
             
             if(abs(current_errors_F(k,j))>50)
