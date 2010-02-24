@@ -27,10 +27,13 @@ count=0;
 
 for i=1:5
 
-    clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(2, TF, w,h,WEIGHTS );
+    clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal bestAR;
+    [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, TF, w,h,WEIGHTS );
 
-    x=[bestF bestX  bestY  ];
+
+   
+    
+    x=[bestF bestX  bestY bestAR*bestF ];
     erFs=zeros(numFs,1);
     for j=1:numFs
         erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
@@ -58,6 +61,9 @@ for i=1:5
             disp(['what happened']);
         end
     end
+%     figure
+%     hist(erFs);
+    
     % DISTS
     WEIGHTS;
     %     %   put the robust weighing here
@@ -75,7 +81,7 @@ for i=1:5
 
 end
 
-fcl=[ bestF bestF];
+fcl=[ bestF bestF*bestAR];
 centerloc=[bestX bestY];
 
 end

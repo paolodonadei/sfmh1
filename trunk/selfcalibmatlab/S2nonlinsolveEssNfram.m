@@ -1,7 +1,7 @@
 function [fcl, centerloc] = S2nonlinsolveEssNfram(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
-tic
+%tic
 if (nargin == 1)
     w=512;
     h=512;
@@ -10,16 +10,16 @@ end
 plotting=0;
 numtries=10;
  clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-[focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(numtries, TF, w,h);
-
+ [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestARfinal] =  findBestsolsrepeatmore(numtries, TF, w,h);
 scorearray=scrs;
 ffinals=focs;
 xfinals=xcentrs;
 yfinals=ycentrs;
 
-bestf=bestF;
-bestx= bestX;
-besty= bestY;
+bestf=bestFfinal;
+bestx= bestXfinal;
+besty= bestYfinal;
+bestar=bestARfinal;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -130,13 +130,11 @@ end
 
 
 
-toc
+%toc
 
 
 
-
-
-fcl=[ bestf bestf];
+fcl=[ bestf bestf*bestar];
 centerloc=[bestx besty];
 
 

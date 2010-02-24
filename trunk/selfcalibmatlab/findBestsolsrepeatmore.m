@@ -1,4 +1,4 @@
-function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari)
+function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari,arinit)
 
 [m,numFs]=size(TF);
 
@@ -63,11 +63,12 @@ if (nargin <6)
     xinit=w/2;
     yinit=h/2;
     
-    
+    arinit=1;
+    arvari=0.02;
 end
 
-arinit=1;
-arvari=0.02;
+
+arvari=0.01;
 
 sturmfailed=1;
 fvari=(maxfocal-minfocal);
@@ -78,9 +79,11 @@ f = @(x)computerEssentialErrorSVDNFramesWeighted(x,TF,Weights);
 for i=1:numtries
     
     
-    x=[-10 -10 -10];
+    x=[-10 -10 -10 -10];
     badxMaxcount=maxbaditerations;
-    while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0 || x(4)<minfocal || x(4)>maxfocal  )
+    cur_ar=x(1)/x(4);
+    
+    while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0 || cur_ar<0.6 || cur_ar>1.4  )
         badxMaxcount=badxMaxcount-1;
         if(constantinitials==1)
             x0=[ w+h  w/2  h/2 w+h ];
@@ -88,18 +91,20 @@ for i=1:numtries
         else
             if(sturmfailed==0 && fvari<200)
                 frandcurrent=(randn()*fvari)+finit;
-                x0=[frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit frandcurrent];
+                x0=[frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit frandcurrent*((randn()*arvari)+ arinit)];
             else
                 frandcurrent=(rand()*fvari)+minfocal;
-                x0=[ frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit  frandcurrent];
+                x0=[ frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit  frandcurrent*((randn()*arvari)+ arinit)];
             end
         end
-        %        x0
+              %  x0
         
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
         
+        cur_ar=x(4)/x(1);
+        
         if(badxMaxcount==0)
-            x=[0 0 0 1];
+            x=[0 0 0 0];
             break;
         end
     end
@@ -125,7 +130,7 @@ for i=1:numtries
         if(x(1)>eps)
             bestAR=x(4)/x(1);
         else
-            bestAR=1;
+            bestAR=0;
         end
         
         

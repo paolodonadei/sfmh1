@@ -25,13 +25,13 @@ numtries=10;
 
 
 
+ [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries, TF, w,h);
 
-[focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(numtries, TF, w,h);
 
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
 
-x0=[bestF  bestX  bestY];
+x0=[bestFfinal  bestXfinal  bestYfinal bestAR];
 bestscore=min(scrs);
 maxnumdeletions=ceil(numFs/5);
 scorediffs=zeros(numFs,1);
@@ -50,8 +50,8 @@ for j=1:numFs
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
  
-    [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0 );
-    x=[bestF bestX bestY];
+    [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4) );
+    x=[bestF bestX bestY bestAR];
 
     curscore=mean(scrs);
 
@@ -75,11 +75,11 @@ numDeletion=min(numBadframes,maxnumdeletions);
 finalF=cell(1,numFs-numDeletion);
 
 
-% 
-% for i=1:(numDeletion)
+% % 
+%  for i=1:(numDeletion)
 %      disp([' removing frame ' num2str(IX(i))]);
-% 
-% end
+% % 
+%  end
 
 count=1;
 for i=(numDeletion+1):numFs
@@ -94,13 +94,13 @@ end
 
 
 [m,numFsfinal]=size(finalF);
-[focs, xcentrs, ycentrs, scrs, bestFfinal, bestXfinal, bestYfinal] = findBestsolsrepeat(10, finalF, w,h,ones(numFsfinal,1),x0(1,1),x0(1,2), x0(1,3),10, 10,10);
+[focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(10, finalF, w,h,ones(numFsfinal,1),x0(1,1),x0(1,2), x0(1,3),10, 10,10,x0(1,4));
 
 
 
 %
 %
-fcl=[ bestFfinal bestFfinal];
+fcl=[ bestFfinal bestFfinal*bestAR];
 centerloc=[bestXfinal bestYfinal];
 
 end

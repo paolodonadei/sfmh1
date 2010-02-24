@@ -37,10 +37,12 @@ for q=1:sizeFs
 
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,50,50);
+    [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,50,50,1);
 
+
+    
     for i=1:numtries
-        solutions{i,q}=[focs(i,1) xcentrs(i,1) ycentrs(i,1)];
+        solutions{i,q}=[focs(i,1) xcentrs(i,1) ycentrs(i,1) focs(i,1)*cars(i,1)];
     end
 
 end
@@ -89,7 +91,7 @@ end
 count=1;
 
 FFinal{count}=TF{idx};
-%disp(['using frame ' num2str(idx)]);
+% disp(['using frame ' num2str(idx)]);
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
  %      disp(['using frame ' num2str(q)]);
@@ -99,10 +101,10 @@ for q=1:sizeFs
 end
 
 clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-[focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(3, FFinal, w,h);
+[focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, FFinal, w,h);
 
 
-fcl=[ bestF bestF];
+fcl=[ bestF bestF*bestAR];
 centerloc=[bestX bestY];
 
 
