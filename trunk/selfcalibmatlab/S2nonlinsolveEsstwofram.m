@@ -19,7 +19,7 @@ centerloc=[xcen ycen];
 
 
 
-numtries=150;
+numtries=50;
 
 
 ffinals=zeros(numtries,sizeFs);
@@ -49,19 +49,19 @@ xinit=w/2;
 yinit=h/2;
 
 for q=1:sizeFs
-
+    
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-
+    
     [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries,{TF{q}}, w,h,ones(1,1),finit,w/2,h/2,fvari, xvari,yvari);
-
-
-
+    
+    %bestFfinal, bestXfinal, bestYfinal,bestAR
+    
     ffinals(:,q)=focs;
     xfinals(:,q)= xcentrs;
     yfinals(:,q)=ycentrs;
     arfinals(:,q)=ars;
     scorearray(:,q)=scrs;
-
+    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -74,10 +74,14 @@ end
 %%%%%%%%%%5
 numclusts=10;
 X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(arfinals,sizeFs*numtries,1)  ];
-XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1) reshape(yfinals,sizeFs*numtries,1) reshape(arfinals,sizeFs*numtries,1)  ];
-[idx,ctrs,sumd] = kmeans(X,numclusts,'Replicates',5,'emptyaction','drop','display','off','start','cluster');
 
-i was here fook this shit
+this not working, see how the diffferent fs colors contrbute to the ar
+scatter(ffinals,arfinals,1:sizeFs,'r','filled');
+figure
+XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1) reshape(yfinals,sizeFs*numtries,1) reshape(arfinals,sizeFs*numtries,1)  ];
+[idx,ctrs,sumd] = kmeans(X,numclusts,'Replicates',3,'emptyaction','drop','display','off');
+
+
 
 
 
@@ -88,12 +92,12 @@ mcount=1;
 
 for q=1:sizeFs
     for i=1:numtries
-        if(validSLFSolution(X(mcount,1),X(mcount,2),X(mcount,3),w,h)~=1)
+        if(validSLFSolution(XComplete(mcount,1),XComplete(mcount,2),XComplete(mcount,3),XComplete(mcount,4),w,h)~=1)
             idx_membership(mcount)=0;
         else
             idx_membership(mcount)=q;
         end
-
+        
         mcount=mcount+1;
     end
 end
@@ -109,7 +113,7 @@ objscores=zeros(numclusts,3);
 for j=1:(sizeFs*numtries)
     if(idx_membership(j)~=0)
         classscores(idx(j),idx_membership(j))=classscores(idx(j),idx_membership(j))+1;
-        objscores(idx(j),1)=objscores(idx(j),1)+ computerEssentialErrorSVDNFramesWeighted(X(j,:),TF);
+        objscores(idx(j),1)=objscores(idx(j),1)+ computerEssentialErrorSVDNFramesWeighted(XComplete(j,:),TF);
         objscores(idx(j),2)=objscores(idx(j),2)+1;
     end
 end
@@ -120,7 +124,7 @@ for i=1:numclusts
     else
         objscores(i,3)=objscores(i,1)/objscores(i,2);
     end
-
+    
 end
 objscores(:,4)=sumd;
 for i=1:numclusts
@@ -148,52 +152,71 @@ objscoresN(:,4)=normalizeVector(-objscores(:,4));
 
 [C,I] = max(sum(classscores_rbst,2));
 
+
+
+%% finding the x and y locations
+ccount=1;
+for k=1:sizeFs*numtries
+    if(idx(k)==I)
+        
+        xloc(ccount,1)=XComplete(k,2)  ;
+        yloc(ccount,1)=XComplete(k,3)  ;
+        ccount=ccount+1;
+    end
+end
+
+
 maxnumclusts=C;
 bestf=ctrs(I,1);
-bestx=ctrs(I,2);
-besty=ctrs(I,3);
-
+bestar=ctrs(I,2);
+bestx=median(xloc);
+besty=median(yloc);
 
 %
 if(plotting==1)
-
+    
     figure
     hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
     title(['focal length']);
     figure
-
+    
     hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
     title(['xcomponent of camera center']);
     figure
-
+    
     hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
     title(['ycomponent of camera center']);
+    
+    figure
+    
+    hist(reshape(arfinals,sizeFs*numtries,1),numtries/2);
+    title(['AR of camera center']);
     %
-
+    
     fff=zeros(sizeFs*numtries,3);
     for k=1:numclusts
         scolors{k}=rand(1,3);
     end
-
-%     for z=1:numclusts
-%         figure
-%         for k=1:sizeFs*numtries
-%             if(idx(k,1)~=z)
-%                 fff(k,:)=  scolors{idx(k,1)};
-%             else
-%                 fff(k,:)=  [0 0 0];
-%             end
-%         end
-% 
-% 
-% 
-%         scatter3(X(:,1),X(:,2),X(:,3),10,fff,'filled');
-%         title(['new scatter plot of all the results found using my method, cluster ' num2str(z) ' in black']);
-%         zlabel('x coordinates of optical centers');
-%         ylabel('y coordinates of optical centers');
-%         xlabel('value of focal length ');
-%     end
-
+    
+    %     for z=1:numclusts
+    %         figure
+    %         for k=1:sizeFs*numtries
+    %             if(idx(k,1)~=z)
+    %                 fff(k,:)=  scolors{idx(k,1)};
+    %             else
+    %                 fff(k,:)=  [0 0 0];
+    %             end
+    %         end
+    %
+    %
+    %
+    %         scatter3(X(:,1),X(:,2),X(:,3),10,fff,'filled');
+    %         title(['new scatter plot of all the results found using my method, cluster ' num2str(z) ' in black']);
+    %         zlabel('x coordinates of optical centers');
+    %         ylabel('y coordinates of optical centers');
+    %         xlabel('value of focal length ');
+    %     end
+    
     figure
     for k=1:sizeFs*numtries
         if(idx(k,1)~=I)
@@ -202,30 +225,30 @@ if(plotting==1)
             fff(k,:)=  [0 0 0];
         end
     end
-
-
-
-    scatter3(X(:,1),X(:,2),X(:,3),10,fff,'filled');
+    
+    
+    
+    scatter(X(:,1),X(:,2),10,fff,'filled');
     title(['new scatter plot of all the results found using my method, winning cluster in black']);
-    zlabel('x coordinates of optical centers');
-    ylabel('y coordinates of optical centers');
-    xlabel('value of focal length ');
-
-
-
+    zlabel('focal length');
+    ylabel('aspect ratio');
+    
+    
+    
+    
 end
 
 
 
 %toc
-if(validSLFSolution(bestf,bestx,besty,w,h)~=1)
+if(validSLFSolution(bestf,bestx,besty,bestar,w,h)~=1)
     bestf=w+h;
     bestx=w/2;
     besty=h/2;
 end
 
 
-fcl=[ bestf bestf];
+fcl=[ bestf bestf*bestar];
 centerloc=[bestx  besty];
 
 
