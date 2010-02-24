@@ -1,4 +1,4 @@
-function [focs, xcentrs, ycentrs, scrs, bestF, bestX, bestY] = findBestsolsrepeat(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari)
+function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari)
 
 [m,numFs]=size(TF);
 
@@ -28,14 +28,17 @@ maxfocal=2000;
 minfocal=200;
 maxbaditerations=10;
 bestscore=1000000000000;
+
 bestF=0;
 bestX=0;
 bestY=0;
+bestAR=0;
 
 
 focs=zeros(numtries,1);
 xcentrs=zeros(numtries,1);
 ycentrs=zeros(numtries,1);
+ars=zeros(numtries,1);
 scrs=zeros(numtries,1);
 
 if (nargin < 5)
@@ -59,7 +62,12 @@ if (nargin <6)
     end
     xinit=w/2;
     yinit=h/2;
+
+
 end
+
+arinit=1;
+arvari=0.02;
 
 sturmfailed=1;
 fvari=(maxfocal-minfocal);
@@ -72,23 +80,26 @@ for i=1:numtries
 
     x=[-10 -10 -10];
     badxMaxcount=maxbaditerations;
-    while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0)
+    while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0 || x(4)<minfocal || x(4)>maxfocal  )
         badxMaxcount=badxMaxcount-1;
         if(constantinitials==1)
-            x0=[ w+h  w/2  h/2 ];
+            x0=[ w+h  w/2  h/2 w+h ];
 
         else
             if(sturmfailed==0 && fvari<200)
-                x0=[ (randn()*fvari)+finit  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+                frandcurrent=(randn()*fvari)+finit;
+                x0=[frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit frandcurrent];
             else
-                x0=[ (rand()*fvari)+minfocal  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+                frandcurrent=(rand()*fvari)+minfocal;
+                x0=[ frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit  frandcurrent];
             end
         end
+        %        x0
+
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-        %                x0
-        %                x
+
         if(badxMaxcount==0)
-            x=[0 0 0];
+            x=[0 0 0 1];
             break;
         end
     end
@@ -96,6 +107,7 @@ for i=1:numtries
     focs(i,1)=x(1);
     xcentrs(i,1)=x(2);
     ycentrs(i,1)=x(3);
+    ars(i,1)=x(4)/x(1);
     scrs(i,1)=sum(abs(fval));
 
     if(scrs(i,1)<bestscore && imag(x(1))==0 && imag(x(2))==0 &&  imag(x(3))==0 )
@@ -105,6 +117,7 @@ for i=1:numtries
         bestF=x(1);
         bestX=x(2);
         bestY=x(3);
+        bestAR=x(4)/x(1);
 
     end
 
