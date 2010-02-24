@@ -3,6 +3,12 @@ function [F] = computerEssentialErrorSVDNFramesWeighted(x,MYF,W)
 %matrix computes the error with respect to a fundamental matrix
 
 [m,n]=size(MYF);
+
+
+if (nargin == 2)
+   W=ones(n,1);
+end
+
 [l,k]=size(W);
 
 if(k~=m || n~=l)
