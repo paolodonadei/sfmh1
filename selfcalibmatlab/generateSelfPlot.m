@@ -12,7 +12,7 @@ height =512;
 
 
 
-fid = fopen('exp.txt', 'w');
+
 
 if(paramcheck=='b')
     numPoints=(numPs*(numPs-1))/2;
@@ -20,7 +20,7 @@ else
     numPoints=30;
 end
 
-numPoints=10;
+
 
 
 styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c'};
@@ -28,6 +28,9 @@ t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
+fid = fopen(['exp' nowtime '.txt'], 'w');
+fidgraph = fopen(['graphdata' nowtime '.txt'], 'w');
+
 
 AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','TWOFRAM'};
 AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
@@ -82,7 +85,7 @@ if(paramcheck=='s')
 end
 
 if(paramcheck=='a')
-    aspect=1:0.01:2;
+    aspect=0.8:0.02:1.2;
     t=aspect(1,1:numPoints);
     label='aspect ratio';
 end
@@ -108,16 +111,29 @@ end
 numTotalIterations=numPoints*repeat;
 currIteration=0;
 
-allSolutions=cell(numPoints,repeat,numalgs);
+%allSolutions=cell(numPoints,repeat,numalgs);
+
+
+
+for k=1:numalgs
+    fprintf(fidgraph, [ AlgNames{1,k} '_meanF , ' AlgNames{1,k} '_medianF , ' AlgNames{1,k} '_meanXY , ' AlgNames{1,k} '_medianXY , ' AlgNames{1,k} '_bnadPTS , ']);
+end
+fprintf(fidgraph, '\n');
 
 for i=1:numPoints
 
+    clear  current_errors_F current_errors_XY current_BADPTS ;
     current_errors_F=zeros(numalgs,repeat);
     current_errors_XY=zeros(numalgs,repeat);
     current_BADPTS=zeros(numalgs,repeat);
 
     for j=1:repeat
-        currIteration=currIteration+1;
+        tStart=tic; 
+        currIteration=currIteration+1; 
+        
+        clear F ks totalAgltime;
+        totalAgltime=0;
+        
         [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         %     [ F, ks ] =  generateFangl( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         %   [corrs, IMS, P,ks, F] = readCorrsOxford('/home/houman/work/test_data/wadhamcollege', n(1,i), b(1,i));
@@ -129,26 +145,31 @@ for i=1:numPoints
 
         for k=1:numalgs
 
+            tic; 
             [answerf, loca]=AlgFuncs{k}(F,width,height); %assuming camera size is 512x512
-
-
+            PtElapsed=toc;
+            totalAgltime=totalAgltime+PtElapsed;
+            
             [current_errors_F(k,j), current_errors_XY(k,j)  ] = calcSelfCalibError(answerf, loca,ks);
 
 
-            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j))]);
+            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
 
             if(abs(current_errors_F(k,j))>50)
                 current_BADPTS(k,j)=current_BADPTS(k,j)+1;
             end
 
 
-            allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
-            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j)  );
+         %  allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
+            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f and time %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j),PtElapsed  );
 
         end
 
+        tElapsed=toc(tStart);
+        disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime)]);
     end
     disp('______________________________________________________');
+    fprintf(fidgraph, '%6.2f , ' ,t(i,1));
     %now calculate the stat for the current run
     for k=1:numalgs
         means_F(k,i)=mean(current_errors_F(k,:));
@@ -160,9 +181,11 @@ for i=1:numPoints
         variances_XY(k,i)=var(current_errors_XY(k,:));
 
         numBadPoints(k,i)=mean(current_BADPTS(k,:));
+
+        fprintf(fidgraph, ' %6.2f , %6.2f  , %6.2f ,  %6.2f , %6.2f ,' ,means_F(k,i), medians_F(k,i), means_XY(k,i),medians_XY(k,i),numBadPoints(k,i));
     end
 
-    nnjsf=6;
+    fprintf(fidgraph, ' \n');
 
 
 end
@@ -184,7 +207,7 @@ for i=1:sizeDataCats
     ylabel('y (error in focal length in pixels)');
     title([dataNames{i} ' plot of ' label ' versus error in focal length estimation']);
     legend(AlgNames);
-    
+
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
@@ -210,7 +233,7 @@ for i=1:sizeDataCats
     ylabel('y (error in camera center in pixels)');
     title([dataNames{i} ' plot of ' label ' versus error in camera center estimation']);
     legend(AlgNames);
-      saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
+    saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
     saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
     saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
@@ -243,5 +266,6 @@ saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.jpg']);
 saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 
 fclose(fid);
+fclose(fidgraph);
 
 end

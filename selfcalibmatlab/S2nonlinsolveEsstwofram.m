@@ -111,33 +111,32 @@ end
 mcount=1;
 ccounter=1;
 
-for q=1:sizeFs
-    for i=1:numtries
-        if(validSLFSolutionStrict(XComplete(mcount,:),w,h)~=1)
-            deletionVector(ccounter,1)=mcount;
-            ccounter=ccounter+1;
-
-        end
-
-        mcount=mcount+1;
-    end
-end
-
-
-
-for k=size(deletionVector,1):-1:1
-
-    idx_membership(deletionVector(k,1),:)=[];
-    XComplete(deletionVector(k,1),:)=[];
-
-end
+% this is the part that prunes bad solutions, i will leave it out
+% for q=1:sizeFs
+%     for i=1:numtries
+%         if(validSLFSolutionStrict(XComplete(mcount,:),w,h)~=1)
+%             deletionVector(ccounter,1)=mcount;
+%             ccounter=ccounter+1;
+% 
+%         end
+% 
+%         mcount=mcount+1;
+%     end
+% end
+% 
+% 
+% 
+% for k=size(deletionVector,1):-1:1
+% 
+%     idx_membership(deletionVector(k,1),:)=[];
+%     XComplete(deletionVector(k,1),:)=[];
+% 
+% end
 
 
 
 [newsizepts,n]=size(XComplete);
 
-mcount
-newsizepts
 
 [idx,ctrs,sumd] = kmeans(XComplete,numclusts,'Replicates',5,'emptyaction','drop','display','off');
 
