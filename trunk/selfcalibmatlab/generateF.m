@@ -69,10 +69,10 @@ else
 
                             x2(1,q)=x2(1,q)/x2(3,q);
                             x2(2,q)=x2(2,q)/x2(3,q);
-                            x2(3,q)=x2(3,q)/x2(3,q);
+                            x2(3,q)=1;
 
-                            x2(2,q)=x2(2,q)+(rand()-0.5)*50; % outlier generation, this is whack and important
-                            x2(3,q)=x2(3,q)+(rand()-0.5)*50;
+                            x2(1,q)=x2(1,q)+(rand()-0.5)*50; % outlier generation, this is whack and important
+                            x2(2,q)=x2(2,q)+(rand()-0.5)*50;
 
 
 
