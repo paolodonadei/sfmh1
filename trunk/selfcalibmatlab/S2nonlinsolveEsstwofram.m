@@ -19,7 +19,7 @@ centerloc=[xcen ycen];
 
 
 
-numtries=150;
+numtries=100;
 
 
 ffinals=zeros(numtries,sizeFs);
@@ -29,8 +29,8 @@ arfinals=zeros(numtries,sizeFs);
 scorearray=zeros(numtries,sizeFs);
 
 
-xvari=50;
-yvari=50;
+xvari=w*0.050;
+yvari=h*0.050;
 
 
 
@@ -72,7 +72,7 @@ end
 
 
 %%%%%%%%%%5
-numclusts=15;
+numclusts=10;
 X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(arfinals,sizeFs*numtries,1)  ];
 
 if(plotting==1)
@@ -84,6 +84,8 @@ if(plotting==1)
     zlabel('y coordinates of optical centers');
     ylabel('x coordinates of optical centers');
     xlabel('value of focal length ');
+
+
     figure
 
     scatter(ffinals(:),arfinals(:),10,Cl(:),'filled');
@@ -94,9 +96,49 @@ if(plotting==1)
 end
 
 
-
-
 XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1) reshape(yfinals,sizeFs*numtries,1) reshape(arfinals,sizeFs*numtries,1)  ];
+%%%%%%%%%%%
+%creating an index of the memberships
+mcount=1;
+
+for q=1:sizeFs
+    for i=1:numtries
+        idx_membership(mcount,1)=q;
+        mcount=mcount+1;
+    end
+end
+
+mcount=1;
+ccounter=1;
+
+for q=1:sizeFs
+    for i=1:numtries
+        if(validSLFSolutionStrict(XComplete(mcount,:),w,h)~=1)
+            deletionVector(ccounter,1)=mcount;
+            ccounter=ccounter+1;
+
+        end
+
+        mcount=mcount+1;
+    end
+end
+
+
+
+for k=size(deletionVector,1):-1:1
+
+    idx_membership(deletionVector(k,1),:)=[];
+    XComplete(deletionVector(k,1),:)=[];
+
+end
+
+
+
+[newsizepts,n]=size(XComplete);
+
+mcount
+newsizepts
+
 [idx,ctrs,sumd] = kmeans(XComplete,numclusts,'Replicates',5,'emptyaction','drop','display','off');
 
 
@@ -104,21 +146,7 @@ XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,
 
 
 
-%%%%%%%%%%%
-%creating an index of the memberships
-mcount=1;
 
-for q=1:sizeFs
-    for i=1:numtries
-        if(validSLFSolution(XComplete(mcount,1),XComplete(mcount,2),XComplete(mcount,3),XComplete(mcount,4),w,h)~=1)
-            idx_membership(mcount)=0;
-        else
-            idx_membership(mcount)=q;
-        end
-
-        mcount=mcount+1;
-    end
-end
 
 classscores=zeros(numclusts,sizeFs);
 
@@ -128,52 +156,32 @@ classscores=zeros(numclusts,sizeFs);
 objscores=zeros(numclusts,3);
 
 
-for j=1:(sizeFs*numtries)
+for j=1:newsizepts
     if(idx_membership(j)~=0)
         classscores(idx(j),idx_membership(j))=classscores(idx(j),idx_membership(j))+1;
-        objscores(idx(j),1)=objscores(idx(j),1)+ computerEssentialErrorSVDNFramesWeighted(XComplete(j,:),TF);
-        objscores(idx(j),2)=objscores(idx(j),2)+1;
-    end
-end
-
-for i=1:numclusts
-    if(objscores(i,2)==0)
-        objscores(i,3)=10;
-    else
-        objscores(i,3)=objscores(i,1)/objscores(i,2);
-    end
-
-end
-objscores(:,4)=sumd;
-for i=1:numclusts
-    if(objscores(i,2)==0)
-        objscores(i,4)=1000000;
-    else
-        objscores(i,4)=objscores(i,4)/objscores(i,2);
     end
 end
 
 
+numMaxima=2;
+Iold=2;
+I=1;
+numvotes=0;
+while(numMaxima~=1)
+    Iold=I;
+    numvotes=numvotes+1;
+    clear    objscores C;
+    objscores(:,1)= sum(classscores>numvotes,2)   ;
+    [C,I] = max(objscores);
+    numMaxima=sum(objscores==C,1) ;
+end
 
-%objscore column
-%1: robust score     2: number of elements per cluster    3: value of
-%objective function     4:average value of the distance of points to the
-%centroid
+if(numMaxima~=1)
+    I=Iold;
+end
 
 
 
-
-classscores_rbst=log((1+classscores.^2));
-
-objscores(:,1)=sum(classscores_rbst,2);
-
-objscoresN(:,1)=normalizeVector(objscores(:,1));
-objscoresN(:,2)=normalizeVector(objscores(:,2));
-objscoresN(:,3)=normalizeVector(-objscores(:,3));
-objscoresN(:,4)=normalizeVector(-objscores(:,4));
-
-
-[C,I] = max(sum(classscores_rbst,2));
 
 
 
@@ -203,32 +211,15 @@ if(plotting==1)
     title(['AR of camera center']);
     %
 
-    fff=zeros(sizeFs*numtries,3);
+    fff=zeros(newsizepts,3);
     for k=1:numclusts
         scolors{k}=rand(1,3);
     end
 
-    %     for z=1:numclusts
-    %         figure
-    %         for k=1:sizeFs*numtries
-    %             if(idx(k,1)~=z)
-    %                 fff(k,:)=  scolors{idx(k,1)};
-    %             else
-    %                 fff(k,:)=  [0 0 0];
-    %             end
-    %         end
-    %
-    %
-    %
-    %         scatter3(X(:,1),X(:,2),X(:,3),10,fff,'filled');
-    %         title(['new scatter plot of all the results found using my method, cluster ' num2str(z) ' in black']);
-    %         zlabel('x coordinates of optical centers');
-    %         ylabel('y coordinates of optical centers');
-    %         xlabel('value of focal length ');
-    %     end
+
 
     figure
-    for k=1:sizeFs*numtries
+    for k=1:newsizepts
         if(idx(k,1)~=I)
             fff(k,:)=  scolors{idx(k,1)};
         else
@@ -303,6 +294,47 @@ end
 
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function retVal = validSLFSolutionStrict( xa,w,h)
+f=xa(1,1);
+x=xa(1,2);
+y=xa(1,3);
+ar=xa(1,4);
+
+
+retVal=1;
+
+if(ar>1.3 || ar<0.7)
+    retVal=0;
+end
+
+oaxis_x_l=(w/2)-(w*0.1);
+oaxis_x_h=(w/2)+(w*0.1);
+
+
+oaxis_y_l=(h/2)-(h*0.1);
+oaxis_y_h=(h/2)+(h*0.1);
+
+
+if~(f>200 && f<1600 && imag(f)==0 && isnan(f)==0)
+    retVal=0;
+end
+
+if~(x<oaxis_x_h && x>oaxis_x_l && imag(x)==0 && isnan(x)==0)
+    retVal=0;
+end
+
+if~(y<oaxis_y_h && y>oaxis_y_l && imag(y)==0 && isnan(y)==0)
+    retVal=0;
+end
+
+% if(retVal==0)
+%     f,x,y,ar
+% end
+
+
+end
 function nrmVect = normalizeVector(v)
 
 [m,n]=size(v);

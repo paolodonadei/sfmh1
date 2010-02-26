@@ -23,10 +23,20 @@ fundscores=zeros(1,numFs);
 numtries=10;
 
 
+x= [0 0 0 0];
+badcounter=1;
+maxbad=20;
+while(sum(x)<eps && badcounter<maxbad)
+    if(badcounter==1)
+        WEIGHTS=ones( numFs,1);
+    else
 
-
- [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries, TF, w,h);
-
+        WEIGHTS=rand( numFs,1);
+    end
+    badcounter=badcounter+1;
+    [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries, TF, w,h,WEIGHTS);
+    x= [bestFfinal  bestXfinal  bestYfinal bestAR];
+end
 
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
@@ -49,7 +59,7 @@ for j=1:numFs
     end
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
- 
+
     [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4) );
     x=[bestF bestX bestY bestAR];
 
@@ -75,10 +85,10 @@ numDeletion=min(numBadframes,maxnumdeletions);
 finalF=cell(1,numFs-numDeletion);
 
 
-% % 
+% %
 %  for i=1:(numDeletion)
 %      disp([' removing frame ' num2str(IX(i))]);
-% % 
+% %
 %  end
 
 count=1;

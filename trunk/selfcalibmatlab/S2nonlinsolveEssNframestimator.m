@@ -23,51 +23,62 @@ centerloc=[xcen ycen];
 WEIGHTS=ones(numFs,1);
 
 count=0;
+maxiter=25;
+maxgooditer=7;
+allcounter=0;
+goodcounter=0;
 
-
-for i=1:5
+x=[ 0 0 0 0];
+while(allcounter<maxiter && goodcounter<maxgooditer)
+    allcounter=allcounter+1;
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal bestAR;
     [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, TF, w,h,WEIGHTS );
 
 
-   
-    
+
+
+
     x=[bestF bestX  bestY bestAR*bestF ];
-    erFs=zeros(numFs,1);
-    for j=1:numFs
-        erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
-
-    end
-
-    curMedian=median(erFs);
-    MADN=median(abs(erFs-curMedian))/0.6745;
 
 
+    if(sum(x)>eps)
+        
+        erFs=zeros(numFs,1);
+        for j=1:numFs
+            erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
 
-    for j=1:numFs
-        %         if(erFs(j,1) <threshold)
-        %             WEIGHTS(j,1)=1;
-        %         elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
-        %             WEIGHTS(j,1)=1/erFs(j,1) ;
-        %         else
-        %             WEIGHTS(j,1)=0;
-        %         end
-        if(erFs(j,1) <threshold)
-            WEIGHTS(j,1)=(1-((erFs(j,1)/threshold)^2))^2;
-        elseif(erFs(j,1) >=threshold )
-            WEIGHTS(j,1)=0 ;
-        else
-            disp(['what happened']);
         end
+
+        curMedian=median(erFs);
+        MADN=median(abs(erFs-curMedian))/0.6745;
+
+        %   disp(['good points']);
+        goodcounter=goodcounter+1;
+        for j=1:numFs
+            %         if(erFs(j,1) <threshold)
+            %             WEIGHTS(j,1)=1;
+            %         elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
+            %             WEIGHTS(j,1)=1/erFs(j,1) ;
+            %         else
+            %             WEIGHTS(j,1)=0;
+            %         end
+            if(erFs(j,1) <threshold)
+                WEIGHTS(j,1)=(1-((erFs(j,1)/threshold)^2))^2;
+            elseif(erFs(j,1) >=threshold )
+                WEIGHTS(j,1)=0 ;
+            else
+                disp(['what happened']);
+            end
+        end
+    else
+        WEIGHTS=rand( numFs,1);
+      
+        %  disp(['bad points']);
     end
-%     figure
-%     hist(erFs);
-    
-    % DISTS
-    WEIGHTS;
-    %     %   put the robust weighing here
-    x;
+    % x
+    % sum(erFs)
+
 
     if(sum(WEIGHTS<0))
         disp('negative element in the weights function');
