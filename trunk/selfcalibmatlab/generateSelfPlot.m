@@ -176,7 +176,7 @@ for i=startloc:endloc
         disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime)]);
     end
     disp('______________________________________________________');
-    fprintf(fidgraph, '%6.2f , ' ,t(1,t));
+    fprintf(fidgraph, '%6.2f , ' ,t(1,i));
     %now calculate the stat for the current run
     for k=1:numalgs
         means_F(k,i)=mean(current_errors_F(k,:));

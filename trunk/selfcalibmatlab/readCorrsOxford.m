@@ -95,8 +95,20 @@ for i=1:numcolum
 
             if(corcount<=numbadf )
                 for q=1:(count*noiselevel)
-                    x2(2,q)=x2(2,q)+(rand()-0.5)*50;
-                    x2(3,q)=x2(3,q)+(rand()-0.5)*50;
+           
+                    noise1=(rand()-0.5)*2*512;
+                    noise2=(rand()-0.5)*2*512;
+
+                    if(rand()<0.5)
+                        x2(1,q)=noise1; % outlier generation, this is whack and important
+                        x2(2,q)=noise2;
+
+                    else
+                        x1(1,q)=noise1; % outlier generation, this is whack and important
+                        x1(2,q)=noise2;
+                    end
+
+
                 end
             end
 
