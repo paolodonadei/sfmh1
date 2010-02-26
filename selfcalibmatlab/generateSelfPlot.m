@@ -1,4 +1,4 @@
-function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY ] =     generateSelfPlot(numPs, paramcheck,repeat,pfdiff,pskew,par,pcenterdev,noiselevel, numbadFs )
+function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY ] =     generateSelfPlot(numPs, paramcheck,repeat,pfdiff,pskew,par,pcenterdev,noiselevel, numbadFs, startp, endp )
 
 %paramcheck would be the parmameter we are varying in characters, so
 %'c' for camera center
@@ -10,7 +10,10 @@ width=512;
 height =512;
 
 
-
+if (nargin == 9)
+    startp=0;
+    endp=1;
+end
 
 
 
@@ -120,7 +123,11 @@ for k=1:numalgs
 end
 fprintf(fidgraph, '\n');
 
-for i=1:numPoints
+
+startloc=(startp*numPoints)+1;
+endloc=(endp*numPoints);
+
+for i=startloc:endloc
 
     clear  current_errors_F current_errors_XY current_BADPTS ;
     current_errors_F=zeros(numalgs,repeat);
@@ -169,7 +176,7 @@ for i=1:numPoints
         disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime)]);
     end
     disp('______________________________________________________');
-    fprintf(fidgraph, '%6.2f , ' ,t(i,1));
+    fprintf(fidgraph, '%6.2f , ' ,t(1,t));
     %now calculate the stat for the current run
     for k=1:numalgs
         means_F(k,i)=mean(current_errors_F(k,:));
