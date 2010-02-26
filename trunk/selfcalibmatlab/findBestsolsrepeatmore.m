@@ -26,7 +26,7 @@ end
 sturmfailed=0;
 maxfocal=1600;
 minfocal=200;
-maxbaditerations=10;
+maxbaditerations=5;
 bestscore=1000000000000;
 
 bestF=0;
