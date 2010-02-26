@@ -58,10 +58,22 @@ catch
 end
 
 if( S(2,1)>eps)
-    F=(((S(1,1)-S(2,1))/S(2,1)))^2; 
+    F=(((S(1,1)-S(2,1))/S(2,1)))^2;
 else
     F=10;
 end
+
+% 
+% threshold=0.05;
+% if(F <threshold)
+%     WEIGHT=(1-((F/threshold)^2))^2;
+% elseif(F >=threshold )
+%     WEIGHT=0 ;
+% else
+%     disp(['what happened']);
+% end
+% 
+% F=F*WEIGHT;
 
 end
 

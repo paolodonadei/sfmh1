@@ -33,11 +33,15 @@ else
     finit=w+h;
 end
 
+ xvari=w*0.050;
+ yvari=h*0.050;
+    
+    
 for q=1:sizeFs
 
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,50,50,1);
+    [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,xvari,yvari,1);
 
 
     
