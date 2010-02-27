@@ -19,7 +19,7 @@ centerloc=[xcen ycen];
 
 
 
-numtries=100;
+numtries=floor(500/sizeFs);  % we want to have 400 points in the end
 
 
 ffinals=zeros(numtries,sizeFs);

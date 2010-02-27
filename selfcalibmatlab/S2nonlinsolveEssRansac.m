@@ -19,7 +19,7 @@ centerloc=[xcen ycen];
 
 [m,sizeFs]=size(TF);
 
-numtries=10;
+numtries=5;
 
 solutions=cell(numtries,sizeFs);
 
