@@ -3,18 +3,20 @@ function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findB
 [m,numFs]=size(TF);
 
 constantinitials=0;
+lowsearchrange=1;
 
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16
 
-if(constantinitials==1)
+if(lowsearchrange==1)
 
-    tolx=1e-8;
-    tolf=1e-8;
+    tolx=1e-7;
+    tolf=1e-7;
 else
     tolx=1e-14;
     tolf=1e-14;
 end
+
 
 
 if(strcmp(version('-release'),'14')==1)
@@ -70,8 +72,6 @@ end
 
 arvari=0.01;
 
-sturmfailed=1;
-fvari=(maxfocal-minfocal);
 
 
 f = @(x)computerEssentialErrorSVDNFramesWeighted(x,TF,Weights);
@@ -86,7 +86,7 @@ for i=1:numtries
     while(x(1)<minfocal || x(1)>maxfocal || x(2)<0 || x(2)>w || x(3)<0 || x(3)>h || imag(x(1))~=0 || cur_ar<0.6 || cur_ar>1.4  )
         badxMaxcount=badxMaxcount-1;
         if(constantinitials==1)
-            x0=[ w+h  w/2  h/2 w+h ];
+            x0=[ w  w/2  h/2 w ];
 
         else
             if(sturmfailed==0 && fvari<200)
