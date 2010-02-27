@@ -119,7 +119,7 @@ currIteration=0;
 
 
 for k=1:numalgs
-    fprintf(fidgraph, [ AlgNames{1,k} '_meanF , ' AlgNames{1,k} '_medianF , ' AlgNames{1,k} '_meanXY , ' AlgNames{1,k} '_medianXY , ' AlgNames{1,k} '_bnadPTS , ']);
+    fprintf(fidgraph, [ '  , ' AlgNames{1,k} '_meanF , ' AlgNames{1,k} '_medianF , ' AlgNames{1,k} '_meanXY , ' AlgNames{1,k} '_medianXY , ' AlgNames{1,k} '_bnadPTS , ']);
 end
 fprintf(fidgraph, '\n');
 
