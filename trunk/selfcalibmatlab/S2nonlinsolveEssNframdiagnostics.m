@@ -20,12 +20,12 @@ centerloc=[xcen ycen];
 fundscores=zeros(1,numFs);
 
 
-numtries=10;
+numtries=1;
 
 
 x= [0 0 0 0];
 badcounter=1;
-maxbad=20;
+maxbad=10;
 while(sum(x)<eps && badcounter<maxbad)
     if(badcounter==1)
         WEIGHTS=ones( numFs,1);
@@ -40,8 +40,12 @@ end
 
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
-
+if(bestFfinal>eps)
 x0=[bestFfinal  bestXfinal  bestYfinal bestAR];
+else
+ x0=[w  w/2 h/2 1];
+end
+
 bestscore=min(scrs);
 maxnumdeletions=ceil(numFs/5);
 scorediffs=zeros(numFs,1);

@@ -42,40 +42,39 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     x=[bestF bestX  bestY bestAR*bestF ];
 
 
-    if(sum(x)>eps)
-        
-        erFs=zeros(numFs,1);
-        for j=1:numFs
-            erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
-
-        end
-
-        curMedian=median(erFs);
-        MADN=median(abs(erFs-curMedian))/0.6745;
-
-        %   disp(['good points']);
-        goodcounter=goodcounter+1;
-        for j=1:numFs
-            %         if(erFs(j,1) <threshold)
-            %             WEIGHTS(j,1)=1;
-            %         elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
-            %             WEIGHTS(j,1)=1/erFs(j,1) ;
-            %         else
-            %             WEIGHTS(j,1)=0;
-            %         end
-            if(erFs(j,1) <threshold)
-                WEIGHTS(j,1)=(1-((erFs(j,1)/threshold)^2))^2;
-            elseif(erFs(j,1) >=threshold )
-                WEIGHTS(j,1)=0 ;
-            else
-                disp(['what happened']);
-            end
-        end
-    else
-        WEIGHTS=rand( numFs,1);
-      
-        %  disp(['bad points']);
+    if(sum(x)<eps)
+        x=[w w/2 h/2 w ];
     end
+
+
+    erFs=zeros(numFs,1);
+    for j=1:numFs
+        erFs(j,1) = computerEssentialErrorSVD(x,TF{j});
+
+    end
+
+    curMedian=median(erFs);
+    MADN=median(abs(erFs-curMedian))/0.6745;
+
+    %   disp(['good points']);
+    goodcounter=goodcounter+1;
+    for j=1:numFs
+        %         if(erFs(j,1) <threshold)
+        %             WEIGHTS(j,1)=1;
+        %         elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
+        %             WEIGHTS(j,1)=1/erFs(j,1) ;
+        %         else
+        %             WEIGHTS(j,1)=0;
+        %         end
+        if(erFs(j,1) <threshold)
+            WEIGHTS(j,1)=(1-((erFs(j,1)/threshold)^2))^2;
+        elseif(erFs(j,1) >=threshold )
+            WEIGHTS(j,1)=0 ;
+        else
+            disp(['what happened']);
+        end
+    end
+
     % x
     % sum(erFs)
 
