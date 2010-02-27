@@ -90,10 +90,10 @@ finalF=cell(1,numFs-numDeletion);
 
 
 % %
-%  for i=1:(numDeletion)
-%      disp([' removing frame ' num2str(IX(i))]);
-% %
-%  end
+ for i=1:(numDeletion)
+     disp([' removing frame ' num2str(IX(i))]);
+%
+ end
 
 count=1;
 for i=(numDeletion+1):numFs
@@ -108,7 +108,7 @@ end
 
 
 [m,numFsfinal]=size(finalF);
-[focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(10, finalF, w,h,ones(numFsfinal,1),x0(1,1),x0(1,2), x0(1,3),10, 10,10,x0(1,4));
+[focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(10, finalF, w,h,ones(numFsfinal,1));
 
 
 
