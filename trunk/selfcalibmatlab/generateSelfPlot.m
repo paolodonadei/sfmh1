@@ -266,7 +266,7 @@ for i=1:sizeDataCats
 
 end
 
-save( ['variables_GP' nowtime '.mat'])
+
 
 %%%%%%%%%%%%%%%%%%%%%%%% num bad points
 
@@ -290,5 +290,6 @@ saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 
 fclose(fid);
 fclose(fidgraph);
+save( [curdirname '/variables_GP' nowtime '.mat'])
 
 end
