@@ -8,7 +8,7 @@ if (nargin == 1)
 end
 
 % robust score function
-%threshold=1.96*MADN; 
+%threshold=1.96*MADN;
 threshold=0.05; % dont knwo about this
 
 fcl=[0 0];
@@ -33,10 +33,10 @@ else
     finit=w+h;
 end
 
- xvari=w*0.050;
- yvari=h*0.050;
-    
-    
+xvari=w*0.050;
+yvari=h*0.050;
+
+
 for q=1:sizeFs
 
 
@@ -44,7 +44,7 @@ for q=1:sizeFs
     [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,xvari,yvari,1);
 
 
-    
+
     for i=1:numtries
         solutions{i,q}=[focs(i,1) xcentrs(i,1) ycentrs(i,1) focs(i,1)*cars(i,1)];
     end
@@ -95,16 +95,23 @@ end
 count=1;
 
 FFinal{count}=TF{idx};
+WEIGHTS(count,1)=rawscores(idx,idx);
 % disp(['using frame ' num2str(idx)]);
+
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
- %      disp(['using frame ' num2str(q)]);
+        
+        %      disp(['using frame ' num2str(q)]);
         count=count+1;
+        WEIGHTS(count,1)=rawscores(q,idx);
         FFinal{count}=TF{q};
     end
 end
 
+
 clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+
+
 [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, FFinal, w,h);
 
 
