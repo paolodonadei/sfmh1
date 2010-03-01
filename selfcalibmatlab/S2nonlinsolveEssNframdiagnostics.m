@@ -80,8 +80,8 @@ for j=1:numFs
 
 end
 
-modify this so that if a solution is not obtained it will iterztively remove more and more fundamental matrices, you should have a fail safe option in all algorithms
-in this case you might have to use allscorediff rather than score dioffs
+%modify this so that if a solution is not obtained it will iterztively remove more and more fundamental matrices, you should have a fail safe option in all algorithms
+%in this case you might have to use allscorediff rather than score dioffs
 
 numDeletion=min(numBadframes,maxnumdeletions);
 [B,IX] = sort(scorediffs,1,'descend');
