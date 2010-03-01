@@ -89,11 +89,11 @@ numDeletion=min(numBadframes,maxnumdeletions);
 finalF=cell(1,numFs-numDeletion);
 
 
+% % %
+%  for i=1:(numDeletion)
+%      disp([' removing frame ' num2str(IX(i))]);
 % %
- for i=1:(numDeletion)
-     disp([' removing frame ' num2str(IX(i))]);
-%
- end
+%  end
 
 count=1;
 for i=(numDeletion+1):numFs

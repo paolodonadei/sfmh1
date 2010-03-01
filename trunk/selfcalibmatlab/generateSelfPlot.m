@@ -16,11 +16,28 @@ if (nargin == 9)
 end
 
 
+savefoldername='datafilesd';
+direxists=1;
+dircount=0;
 
-if(paramcheck=='b')
+while(direxists==1)
+
+    dircount=dircount+1;
+
+    curdirname=[savefoldername '/subdir' num2str(dircount)];
+
+    if(exist(curdirname,'dir')==0)
+        mkdir(curdirname);
+        direxists=0;
+    end
+
+end
+
+if(paramcheck=='b' )
     numPoints=(numPs*(numPs-1))/2;
 else
-    numPoints=30;
+    %this is an important parameter, change it maybe
+    numPoints=10;
 end
 
 
@@ -31,8 +48,8 @@ t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
-fid = fopen(['exp' nowtime '.txt'], 'w');
-fidgraph = fopen(['graphdata' nowtime '.txt'], 'w');
+fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
+fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 
 
 AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','TWOFRAM'};
@@ -64,8 +81,8 @@ b=ones(1,numPoints)*numbadFs;
 
 %depending on what we are varying we are gonna change the parameters
 if(paramcheck=='n')
-    step=0.5/numPoints;
-    n=0:step:0.5;  %continue from here and find out why your method sucks
+    step=0.9/numPoints;
+    n=0:step:0.9;  %continue from here and find out why your method sucks
 
     t=n(1,1:numPoints);
     label='noise-level';
@@ -117,9 +134,9 @@ currIteration=0;
 %allSolutions=cell(numPoints,repeat,numalgs);
 
 
-
+fprintf(fidgraph, ' , ');
 for k=1:numalgs
-    fprintf(fidgraph, [ '  , ' AlgNames{1,k} '_meanF , ' AlgNames{1,k} '_medianF , ' AlgNames{1,k} '_meanXY , ' AlgNames{1,k} '_medianXY , ' AlgNames{1,k} '_bnadPTS , ']);
+    fprintf(fidgraph, [  AlgNames{1,k} '_meanF , ' AlgNames{1,k} '_medianF , ' AlgNames{1,k} '_meanXY , ' AlgNames{1,k} '_medianXY , ' AlgNames{1,k} '_bnadPTS , ']);
 end
 fprintf(fidgraph, '\n');
 
@@ -135,28 +152,28 @@ for i=startloc:endloc
     current_BADPTS=zeros(numalgs,repeat);
 
     for j=1:repeat
-        tStart=tic; 
-        currIteration=currIteration+1; 
-        
+        tStart=tic;
+        currIteration=currIteration+1;
+
         clear F ks totalAgltime;
         totalAgltime=0;
-        
-        [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
+
+        % [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         %     [ F, ks ] =  generateFangl( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         %   [corrs, IMS, P,ks, F] = readCorrsOxford('/home/houman/work/test_data/wadhamcollege', n(1,i), b(1,i));
 
-        %[corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\wadham', n(1,i), b(1,i));
-        %       width=1024; height=768;
+        [corrs, IMS, P,ks, F] = readCorrsOxford('C:\Documents and Settings\hrast019\Desktop\data\euclidean\build1', n(1,i), b(1,i));
+        width=1024; height=768;
 
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
 
         for k=1:numalgs
 
-            tic; 
+            tic;
             [answerf, loca]=AlgFuncs{k}(F,width,height); %assuming camera size is 512x512
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
-            
+
             [current_errors_F(k,j), current_errors_XY(k,j)  ] = calcSelfCalibError(answerf, loca,ks);
 
 
@@ -167,13 +184,13 @@ for i=startloc:endloc
             end
 
 
-         %  allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
+            %  allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
             fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f and time %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j),PtElapsed  );
 
         end
 
         tElapsed=toc(tStart);
-        disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime)]);
+        disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime) ' time remaining: ' ' out of ' num2str(tElapsed*(numTotalIterations-currIteration))]);
     end
     disp('______________________________________________________');
     fprintf(fidgraph, '%6.2f , ' ,t(1,i));
@@ -216,9 +233,9 @@ for i=1:sizeDataCats
     legend(AlgNames);
 
     %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-    saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
-    saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
-    saveas(gcf,['param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
+    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
+    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
     hold
 
 end
@@ -240,10 +257,9 @@ for i=1:sizeDataCats
     ylabel('y (error in camera center in pixels)');
     title([dataNames{i} ' plot of ' label ' versus error in camera center estimation']);
     legend(AlgNames);
-    saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.fig']);
-    %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-    saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
-    saveas(gcf,['param_center_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
+    saveas(gcf,[curdirname '/param' paramcheck '_' dataNames{i} nowtime '.fig']);
+    saveas(gcf,[curdirname '/param_center_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+    saveas(gcf,[curdirname '/param_center_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
 
 
     hold
@@ -268,9 +284,9 @@ hold
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.fig']);
-saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.jpg']);
-saveas(gcf,['BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
+saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.fig']);
+saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.jpg']);
+saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 
 fclose(fid);
 fclose(fidgraph);
