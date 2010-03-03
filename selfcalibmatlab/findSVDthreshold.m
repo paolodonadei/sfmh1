@@ -11,11 +11,11 @@ end
 %hist(obj,100)
 
 curMedian=median(obj);
-MADN=median(abs(obj-curMedian))/0.6745;
+MADN=1.96*(median(abs(obj-curMedian))/0.6745);
 
+MADN=1.96*prctile(obj,68.27);
 
-
-threshold=min(1.96*MADN,0.05);
+threshold=min(MADN,0.05);
 
 
 
