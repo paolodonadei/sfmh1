@@ -50,7 +50,7 @@ nowtime=num2str(sum(round(100*clock)));
 %Algs
 fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
-
+dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
 AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','TWOFRAM'};
 AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
@@ -166,7 +166,7 @@ for i=startloc:endloc
         width=1024; height=768;
 
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
-
+        fprintf(dispfid,['\n****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')']);
         for k=1:numalgs
 
             tic;
@@ -178,7 +178,7 @@ for i=startloc:endloc
 
 
             disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
-
+            fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
             if(abs(current_errors_F(k,j))>50)
                 current_BADPTS(k,j)=current_BADPTS(k,j)+1;
             end
@@ -191,8 +191,12 @@ for i=startloc:endloc
 
         tElapsed=toc(tStart);
         disp(['iteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime) ' time remaining: ' ' out of ' num2str(tElapsed*(numTotalIterations-currIteration))]);
+        fprintf(dispfid,['\niteration ' num2str(currIteration) ' took ' num2str(tElapsed) ' seconds' ' and total time spent in algs is ' num2str(totalAgltime) ' time remaining: ' ' out of ' num2str(tElapsed*(numTotalIterations-currIteration))]);
     end
+
     disp('______________________________________________________');
+    fprintf(dispfid,['\n______________________________________________________']);
+
     fprintf(fidgraph, '%6.2f , ' ,t(1,i));
     %now calculate the stat for the current run
     for k=1:numalgs
@@ -290,6 +294,7 @@ saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 
 fclose(fid);
 fclose(fidgraph);
+fclose(dispfid);
 save( [curdirname '/variables_GP' nowtime '.mat'])
 
 end

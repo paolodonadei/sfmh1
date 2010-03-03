@@ -6,6 +6,9 @@ if (nargin == 1)
     w=512;
     h=512;
 end
+
+threshold=0.05; % dont knwo about this
+
 %TF=TF*10000;
 plotting=0;
 fcl=[0 0];
@@ -41,12 +44,14 @@ end
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
 if(bestFfinal>eps)
-x0=[bestFfinal  bestXfinal  bestYfinal bestAR];
+    x0=[bestFfinal  bestXfinal  bestYfinal bestAR];
 else
- x0=[w  w/2 h/2 1];
+    x0=[w  w/2 h/2 w];
 end
 
-bestscore=min(scrs);
+bestscore=computerEssentialErrorSVDNFramesWeighted(x0,TF);
+
+
 maxnumdeletions=ceil(numFs/5);
 scorediffs=zeros(numFs,1);
 numBadframes=0;
@@ -65,57 +70,79 @@ for j=1:numFs
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
 
     [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4) );
-    x=[bestF bestX bestY bestAR];
 
-    curscore=mean(scrs);
+    if(bestF>eps)
+        x=[bestF bestX bestY bestAR*bestF];
+    else
+        x=[w  w/2 h/2 w];
+    end
+
+
+    curscore=computerEssentialErrorSVDNFramesWeighted(x,TFdeletion);
 
     allscorediffs(j,1)=bestscore-curscore;
-    if(  bestscore-curscore>0.0001) % this line is very vry important, i pulled this threshold out of air
 
-        scorediffs(j,1)=bestscore-curscore;
-        numBadframes=numBadframes+1;
-
-    end
 
 
 end
 
 %modify this so that if a solution is not obtained it will iterztively remove more and more fundamental matrices, you should have a fail safe option in all algorithms
 %in this case you might have to use allscorediff rather than score dioffs
+% count=1;
+% for i=(numDeletion+1):numFs
+%     finalF{1,count}=TF{1,IX(i)};
+%     count=count+1;
+% end
 
-numDeletion=min(numBadframes,maxnumdeletions);
-[B,IX] = sort(scorediffs,1,'descend');
+errorSVD=100;
+numFleft=numFs-1;
+countt=1;
+
+numPos=sum((allscorediffs>0));
+while(errorSVD>threshold && numFleft>2 && numPos>1)
+
+    [Y,I] = max(allscorediffs);
+    allscorediffs(I,1)=-10;
+    numPos=sum((allscorediffs>0));
+    
+    numFtobedeleted(countt,1)=I;
+
+this not working
+    finalF=TF;
+    for i=1:size(numFtobedeleted)
+        finalF(:,numFtobedeleted(i,1))=[];
+        disp(['deleting ' num2str(numFtobedeleted(i,1))]);
+    end
+    disp('____________________');
+    [m,numFleft]=size(finalF);
 
 
-finalF=cell(1,numFs-numDeletion);
+    [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(2, finalF, w,h);
+    solutionz{countt,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
 
+    errorSVD=computerEssentialErrorSVDNFramesWeighted(solutionz{countt,1},finalF);
+    scorearray(countt,1)=errorSVD;
+    countt=countt+1;
 
-% % %
-%  for i=1:(numDeletion)
-%      disp([' removing frame ' num2str(IX(i))]);
-% %
-%  end
-
-count=1;
-for i=(numDeletion+1):numFs
-    finalF{1,count}=TF{1,IX(i)};
-    count=count+1;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%
-%final refitting
 
+if(errorSVD>threshold)
+    [Y,I] = min(scorearray);
 
+else
+    I=countt-1;
+end
 
-
-[m,numFsfinal]=size(finalF);
-[focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(10, finalF, w,h,ones(numFsfinal,1));
-
+bestFfinal=  solutionz{I,1}(1,1) ;
+bestFfinal2= solutionz{I,1}(1,4) ;
+bestXfinal=  solutionz{I,1}(1,2) ;
+bestYfinal=  solutionz{I,1}(1,3) ;
 
 
 %
 %
-fcl=[ bestFfinal bestFfinal*bestAR];
+fcl=[ bestFfinal bestFfinal2];
 centerloc=[bestXfinal bestYfinal];
 
 end
