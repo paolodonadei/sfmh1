@@ -4,6 +4,12 @@ if(path(size(path,2))~='\' && path(size(path,2))~='/' )
     path=[path '/'] ;
 end
 
+if(noiselevel>1)
+    disp('noise level is higher than one');
+    noiselevel
+
+end
+
 % get the Ps
 psdir=dir([path '*.P']);
 [m,n]=size(psdir);
@@ -91,11 +97,12 @@ for i=1:numcolum
                 end
             end
 
-
+           
 
             if(corcount<=numbadf )
+               %  disp([' going to have ' num2str(count*noiselevel) ' outliers']);
                 for q=1:(count*noiselevel)
-           
+
                     noise1=(rand()-0.5)*2*512;
                     noise2=(rand()-0.5)*2*512;
 
