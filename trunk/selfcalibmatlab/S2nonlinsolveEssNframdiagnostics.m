@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 
-threshold=0.05; % dont knwo about this
+threshold=findSVDthreshold(TF,w,h); % dont knwo about this
 
 %TF=TF*10000;
 plotting=0;
@@ -99,15 +99,16 @@ numFleft=numFs-1;
 countt=1;
 
 numPos=sum((allscorediffs>0));
-while(errorSVD>threshold && numFleft>2 && numPos>1)
+while(errorSVD>threshold && numFleft>2 )
 
     [Y,I] = max(allscorediffs);
-    allscorediffs(I,1)=-10;
+    allscorediffs(I,1)=-100000;
     numPos=sum((allscorediffs>0));
     
     numFtobedeleted(countt,1)=I;
 
-this not working
+    numFtobedeleted=sort(numFtobedeleted,'descend');
+%this not working
     finalF=TF;
     for i=1:size(numFtobedeleted)
         finalF(:,numFtobedeleted(i,1))=[];

@@ -11,7 +11,7 @@ plotting=0;
 numtries=10;
  clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
  [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestARfinal] =  findBestsolsrepeatmore(numtries, TF, w,h);
- focs
+ 
 scorearray=scrs;
 ffinals=focs;
 xfinals=xcentrs;
