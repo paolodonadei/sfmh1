@@ -31,7 +31,7 @@ sumW=sum(W);
 if( sumW>eps)
     F=F/sumW; %make sure the sum of your weights is constant
 else
-    F=10;
+    F=100;
     disp('sum of W is zero inside computerEssentialErrorSVDNFramesWeighted, this shouldnt happen');
 end
 

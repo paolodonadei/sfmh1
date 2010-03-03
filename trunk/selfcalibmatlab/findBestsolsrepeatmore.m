@@ -13,8 +13,8 @@ if(lowsearchrange==1)
     tolx=1e-7;
     tolf=1e-7;
 else
-    tolx=1e-14;
-    tolf=1e-14;
+    tolx=1e-10;
+    tolf=1e-10;
 end
 
 
