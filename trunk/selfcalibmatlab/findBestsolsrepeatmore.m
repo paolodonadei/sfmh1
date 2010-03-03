@@ -47,7 +47,7 @@ if (nargin < 5)
     Weights=ones(numFs,1);
 end
 
-
+arvari=0.01;
 if (nargin <6)
 
     xvari=w*0.050;
@@ -70,7 +70,7 @@ if (nargin <6)
 end
 
 
-arvari=0.01;
+
 
 
 
@@ -97,7 +97,7 @@ for i=1:numtries
                 x0=[ frandcurrent  (randn()*xvari)+xinit  (randn()*yvari)+yinit  frandcurrent*((randn()*arvari)+ arinit)];
             end
         end
-       
+       %x0
         [x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
 
         cur_ar=x(4)/x(1);

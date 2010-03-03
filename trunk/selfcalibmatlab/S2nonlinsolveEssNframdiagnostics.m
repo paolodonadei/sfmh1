@@ -44,7 +44,7 @@ end
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
 if(bestFfinal>eps)
-    x0=[bestFfinal  bestXfinal  bestYfinal bestAR];
+    x0=[bestFfinal  bestXfinal  bestYfinal bestAR*bestFfinal];
 else
     x0=[w  w/2 h/2 w];
 end
@@ -69,7 +69,7 @@ for j=1:numFs
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
 
-    [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4) );
+    [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4)/x0(1,1) );
 
     if(bestF>eps)
         x=[bestF bestX bestY bestAR*bestF];
@@ -104,11 +104,11 @@ while(errorSVD>threshold && numFleft>2 )
     [Y,I] = max(allscorediffs);
     allscorediffs(I,1)=-100000;
     numPos=sum((allscorediffs>0));
-    
+
     numFtobedeleted(countt,1)=I;
 
     numFtobedeleted=sort(numFtobedeleted,'descend');
-%this not working
+    %this not working
     finalF=TF;
     for i=1:size(numFtobedeleted)
         finalF(:,numFtobedeleted(i,1))=[];
@@ -127,18 +127,27 @@ while(errorSVD>threshold && numFleft>2 )
 
 end
 
+if(countt>1)
 
-if(errorSVD>threshold)
-    [Y,I] = min(scorearray);
+    if(errorSVD>threshold)
+        [Y,I] = min(scorearray);
 
+    else
+        I=countt-1;
+    end
+    bestFfinal=  solutionz{I,1}(1,1) ;
+    bestFfinal2= solutionz{I,1}(1,4) ;
+    bestXfinal=  solutionz{I,1}(1,2) ;
+    bestYfinal=  solutionz{I,1}(1,3) ;
 else
-    I=countt-1;
+    bestFfinal=  x0(1,1) ;
+    bestFfinal2= x0(1,4) ;
+    bestXfinal=  x0(1,2) ;
+    bestYfinal=  x0(1,3) ;
 end
 
-bestFfinal=  solutionz{I,1}(1,1) ;
-bestFfinal2= solutionz{I,1}(1,4) ;
-bestXfinal=  solutionz{I,1}(1,2) ;
-bestYfinal=  solutionz{I,1}(1,3) ;
+
+
 
 
 %
