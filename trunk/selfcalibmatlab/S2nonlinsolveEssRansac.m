@@ -69,14 +69,6 @@ for q=1:sizeFs
     end
 end
 
-%
-%
-curMedian=median(reshape(rawscores,sizeFs*sizeFs,1));
-MADN=median(abs(reshape(rawscores,sizeFs*sizeFs,1)-curMedian))/0.6745;
-% DISTS= (( rawscores-curMedian)/MADN);
-
-
-
 
 for q=1:sizeFs
 
@@ -113,7 +105,7 @@ end
 clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
 
 
-[focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, FFinal, w,h);
+[focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(10, FFinal, w,h);
 
 
 fcl=[ bestF bestF*bestAR];

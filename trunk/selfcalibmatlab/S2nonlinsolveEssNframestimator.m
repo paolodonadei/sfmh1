@@ -33,7 +33,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     allcounter=allcounter+1;
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal bestAR;
-    [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(3, TF, w,h,WEIGHTS );
+    [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TF, w,h,WEIGHTS );
 
 
 
@@ -73,10 +73,10 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
             disp(['what happened']);
         end
     end
-WEIGHTS
-x
+%WEIGHTS
+%x
 
-    % x
+    
     % sum(erFs)
 
 
@@ -91,6 +91,8 @@ x
 
 
 end
+
+[focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(10, TF, w,h,WEIGHTS );
 
 fcl=[ bestF bestF*bestAR];
 centerloc=[bestX bestY];

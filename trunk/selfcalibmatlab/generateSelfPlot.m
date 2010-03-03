@@ -20,11 +20,13 @@ savefoldername='datafilesd';
 direxists=1;
 dircount=0;
 
+mtime=clock;
+subdirname=['subdir_m_' num2str(mtime(1,2)) '_d_' num2str(mtime(1,3)) '_h_' num2str(mtime(1,4)) '_s_' num2str(ceil(mtime(1,5))) '_v'];
 while(direxists==1)
 
     dircount=dircount+1;
 
-    curdirname=[savefoldername '/subdir' num2str(dircount)];
+    curdirname=[savefoldername '/' subdirname num2str(dircount)];
 
     if(exist(curdirname,'dir')==0)
         mkdir(curdirname);
