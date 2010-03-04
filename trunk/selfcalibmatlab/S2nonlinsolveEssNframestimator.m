@@ -3,7 +3,7 @@ function [fcl, centerloc] =S2nonlinsolveEssNframestimator(TF,w,h)
 %matrices computes the error with respect to a fundamental matrix
 %tic
 %threshold=0.05; % i dont know if this is the best thing to do
-threshold=findSVDthreshold(TF,w,h); 
+
 if (nargin == 1)
     w=512;
     h=512;
@@ -40,7 +40,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
 
 
     x=[bestF bestX  bestY bestAR*bestF ];
-
+    threshold=findSVDthreshold(TF,w,h);
 
     if(sum(x)<eps)
         x=[w w/2 h/2 w ];
@@ -53,7 +53,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
 
     end
 
-   
+
 
     %   disp(['good points']);
     goodcounter=goodcounter+1;
@@ -73,12 +73,15 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
             disp(['what happened']);
         end
     end
-%WEIGHTS
-%x
+    WEIGHTS
+    x
 
-    
+
     % sum(erFs)
+    if(sum(WEIGHTS)<eps)
+        disp('weights are zero');
 
+    end
 
     if(sum(WEIGHTS<0))
         disp('negative element in the weights function');
