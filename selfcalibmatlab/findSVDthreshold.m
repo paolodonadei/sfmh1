@@ -4,6 +4,11 @@ if (nargin == 3)
     x=[w w/2 h/2 w];
 end
 
+if(x(1,1)<eps)
+    x=[w w/2 h/2 w];
+end
+
+
 [m,numFs]=size(TF);
 
 for j=1:numFs

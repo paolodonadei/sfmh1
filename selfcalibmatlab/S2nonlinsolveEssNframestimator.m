@@ -40,12 +40,12 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
 
 
     x=[bestF bestX  bestY bestAR*bestF ];
-    threshold=findSVDthreshold(TF,w,h);
+
 
     if(sum(x)<eps)
         x=[w w/2 h/2 w ];
     end
-
+    threshold=findSVDthreshold(TF,w,h,x);
 
     erFs=zeros(numFs,1);
     for j=1:numFs
@@ -73,8 +73,8 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
             disp(['what happened']);
         end
     end
-    WEIGHTS
-    x
+    %     WEIGHTS
+    %     x
 
 
     % sum(erFs)
