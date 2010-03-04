@@ -179,7 +179,7 @@ for i=startloc:endloc
 
             disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
             fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
-            if(abs(current_errors_F(k,j))>50)
+            if(abs(current_errors_F(k,j))>10)
                 current_BADPTS(k,j)=current_BADPTS(k,j)+1;
             end
 
@@ -232,7 +232,7 @@ for i=1:sizeDataCats
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x (' label ')']);       %  add axis labels and plot title
-    ylabel('y (error in focal length in pixels)');
+    ylabel('y (percentage error in focal length)');
     title([dataNames{i} ' plot of ' label ' versus error in focal length estimation']);
     legend(AlgNames);
 
@@ -258,7 +258,7 @@ for i=1:sizeDataCats
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x (' label ')']);       %  add axis labels and plot title
-    ylabel('y (error in camera center in pixels)');
+    ylabel('y (percentage error in camera center in pixels)');
     title([dataNames{i} ' plot of ' label ' versus error in camera center estimation']);
     legend(AlgNames);
     saveas(gcf,[curdirname '/param' paramcheck '_' dataNames{i} nowtime '.fig']);
