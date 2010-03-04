@@ -12,7 +12,7 @@ end
 plotting=0;
 fcl=[0 0];
 maxfocal=2000;
-
+ threshold=findSVDthreshold(TF,w,h);
 
 xcen=0;
 ycen =0;
@@ -45,7 +45,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     if(sum(x)<eps)
         x=[w w/2 h/2 w ];
     end
-    threshold=findSVDthreshold(TF,w,h,x);
+   
 
     erFs=zeros(numFs,1);
     for j=1:numFs
