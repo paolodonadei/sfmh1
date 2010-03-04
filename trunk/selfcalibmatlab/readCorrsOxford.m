@@ -1,4 +1,21 @@
-function [corrs, IMS, P,K, F] = readCorrsOxford(path, noiselevel, numbadf)
+function [corrs, IMS, P,K, F] = readCorrsOxford(seq_name, noiselevel, numbadf)
+
+dirnames{1,1}='/home/houman/work/test_data/';
+dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
+
+[m,n]=size(dirnames);
+
+path='empty';
+for i=1:m
+     if(exist([dirnames{i,1} seq_name],'dir')~=0)
+         path=[dirnames{i,1} seq_name];
+     end
+end
+
+if(strcmp(path,'empty')==1)
+   disp('directory not found');
+   return;
+end
 
 if(path(size(path,2))~='\' && path(size(path,2))~='/' )
     path=[path '/'] ;
