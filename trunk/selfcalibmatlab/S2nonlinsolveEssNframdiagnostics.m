@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 
-threshold=findSVDthreshold(TF,w,h); % dont knwo about this
+threshold=findSVDthreshold(TF,w,h,[w  w/2 h/2 w]); % dont knwo about this
 
 %TF=TF*10000;
 plotting=0;
@@ -29,25 +29,13 @@ numtries=1;
 x= [0 0 0 0];
 badcounter=1;
 maxbad=10;
-while(sum(x)<eps && badcounter<maxbad)
-    if(badcounter==1)
-        WEIGHTS=ones( numFs,1);
-    else
 
-        WEIGHTS=rand( numFs,1);
-    end
-    badcounter=badcounter+1;
-    [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries, TF, w,h,WEIGHTS);
-    x= [bestFfinal  bestXfinal  bestYfinal bestAR];
-end
 
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
-if(bestFfinal>eps)
-    x0=[bestFfinal  bestXfinal  bestYfinal bestAR*bestFfinal];
-else
+
     x0=[w  w/2 h/2 w];
-end
+
 
 
 
@@ -69,17 +57,17 @@ for j=1:numFs
         end
     end
 
-    clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+    %     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+    %
+    %     [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4)/x0(1,1) );
+    %
+    %     if(bestF>eps)
+    %         x=[bestF bestX bestY bestAR*bestF];
+    %     else
+    %         x=[w  w/2 h/2 w];
+    %     end
 
-    [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4)/x0(1,1) );
-
-    if(bestF>eps)
-        x=[bestF bestX bestY bestAR*bestF];
-    else
-        x=[w  w/2 h/2 w];
-    end
-
-
+    x=[w  w/2 h/2 w];
     curscore=computerEssentialErrorSVDNFramesWeighted(x,TFdeletion);
 
     allscorediffs(j,1)=bestscore-curscore;
@@ -114,13 +102,13 @@ while(errorSVD>threshold && numFleft>2 )
     finalF=TF;
     for i=1:size(numFtobedeleted)
         finalF(:,numFtobedeleted(i,1))=[];
-        disp(['deleting ' num2str(numFtobedeleted(i,1))]);
+    %   disp(['deleting ' num2str(numFtobedeleted(i,1))]);
     end
-    disp('____________________');
+  %  disp('____________________');
     [m,numFleft]=size(finalF);
 
 
-    [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(2, finalF, w,h);
+    [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(3, finalF, w,h);
     solutionz{countt,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
 
     errorSVD=computerEssentialErrorSVDNFramesWeighted(solutionz{countt,1},finalF);

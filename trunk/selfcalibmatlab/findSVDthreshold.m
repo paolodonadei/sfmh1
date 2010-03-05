@@ -22,7 +22,7 @@ end
 
 MADN=1.96*prctile(obj,68.27);
 
-threshold=min(MADN,0.05);
+threshold=min(MADN,0.005);
 
 
 

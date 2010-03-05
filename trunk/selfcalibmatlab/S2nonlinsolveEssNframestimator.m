@@ -12,7 +12,7 @@ end
 plotting=0;
 fcl=[0 0];
 maxfocal=2000;
- threshold=findSVDthreshold(TF,w,h);
+threshold=findSVDthreshold(TF,w,h);
 
 xcen=0;
 ycen =0;
@@ -33,19 +33,9 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     allcounter=allcounter+1;
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal bestAR;
-    [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TF, w,h,WEIGHTS );
 
 
-
-
-
-    x=[bestF bestX  bestY bestAR*bestF ];
-
-
-    if(sum(x)<eps)
-        x=[w w/2 h/2 w ];
-    end
-   
+    x=[w w/2 h/2 w];
 
     erFs=zeros(numFs,1);
     for j=1:numFs
@@ -58,13 +48,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     %   disp(['good points']);
     goodcounter=goodcounter+1;
     for j=1:numFs
-        %         if(erFs(j,1) <threshold)
-        %             WEIGHTS(j,1)=1;
-        %         elseif(erFs(j,1) >=threshold && erFs(j,1) <(3*threshold))
-        %             WEIGHTS(j,1)=1/erFs(j,1) ;
-        %         else
-        %             WEIGHTS(j,1)=0;
-        %         end
+
         if(erFs(j,1) <threshold)
             WEIGHTS(j,1)=(1-((erFs(j,1)/threshold)^2))^2;
         elseif(erFs(j,1) >=threshold )
@@ -73,8 +57,8 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
             disp(['what happened']);
         end
     end
-    %     WEIGHTS
-    %     x
+    %          WEIGHTS
+    %          x
 
 
     % sum(erFs)
@@ -94,7 +78,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
 
 
 end
-
+%WEIGHTS
 [focs, xcentrs, ycentrs,  cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(10, TF, w,h,WEIGHTS );
 
 fcl=[ bestF bestF*bestAR];
