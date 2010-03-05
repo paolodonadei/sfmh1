@@ -5,10 +5,28 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-%change this
-width=512;
-height =512;
+seqname='merton1';
 
+if(strcmp(seqname,'synth')==1)
+    width=512;
+    height =512;
+else
+    width=1024;
+    height=768;
+end
+
+
+if(strcmp(seqname,'wadham')==1)
+    numPs=5;
+elseif(strcmp(seqname,'merton1')==1 || strcmp(seqname,'merton2')==1 )
+    numPs=3;
+end
+
+
+
+
+
+tStartprogram=tic;
 
 if (nargin == 9)
     startp=0;
@@ -54,8 +72,8 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC'};
-AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac};
+AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','twofram'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
 
 
 numalgs=size(AlgFuncs,2);
@@ -160,10 +178,12 @@ for i=startloc:endloc
         clear F ks totalAgltime;
         totalAgltime=0;
 
-        % [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
+        if(strcmp(seqname,'synth')==1)
+            [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
+        else
+            [corrs, IMS, P,ks, F] = readCorrsOxford(seqname, n(1,i), b(1,i));
+        end
 
-        [corrs, IMS, P,ks, F] = readCorrsOxford('merton1', n(1,i), b(1,i));
-        width=1024; height=768;
 
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')'] );
         fprintf(dispfid,['\n****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateF( ' num2str(fdiff(1,i)) ' , ' num2str(skew(1,i)) ' , '  num2str(aspect(1,i)) ' , ' num2str(centerdev(1,i)) ' , 1 , ' num2str(numPs) ' , ' num2str(n(1,i)) ' , ' num2str(b(1,i)) ')']);
@@ -295,6 +315,9 @@ saveas(gcf,[curdirname '/BADPOINTS_' paramcheck '_'  nowtime '.eps'],'epsc');
 fclose(fid);
 fclose(fidgraph);
 fclose(dispfid);
-save( [curdirname '/variables_GP' nowtime '.mat'])
+save( [curdirname '/variables_GP' nowtime '.mat']);
+
+tElapsedprogram=toc(tStartprogram);
+disp([' program took ' num2str(tElapsedprogram) ' seconds']);
 
 end

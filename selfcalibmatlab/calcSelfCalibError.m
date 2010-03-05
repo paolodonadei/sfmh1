@@ -28,8 +28,8 @@ trueY=trueY/n;
 f1err=(abs(answerF(1,1)-trueF1)/trueF1);
 f2err=(abs(answerF(1,2)-trueF2)/trueF2);
 
-xerror=(abs(trueX-answerloc(1,1))/trueX;
-yerror=(abs(trueY-answerloc(1,2))/trueY;
+xerror=(abs(trueX-answerloc(1,1)))/trueX;
+yerror=(abs(trueY-answerloc(1,2)))/trueY;
 
 errf=((f1err+f2err)/2)*100;
 
