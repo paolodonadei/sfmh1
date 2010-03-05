@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 
-threshold=findSVDthreshold(TF,w,h,[w  w/2 h/2 w]); % dont knwo about this
+threshold=findSVDthreshold(TF,w,h); % dont knwo about this
 
 %TF=TF*10000;
 plotting=0;
