@@ -19,6 +19,7 @@ end
 
 % curMedian=median(obj);
 % MADN=1.96*(median(abs(obj-curMedian))/0.6745);
+% oh god help me what do i do
 
 MADN=1.96*prctile(obj,68.27);
 
