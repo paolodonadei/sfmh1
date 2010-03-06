@@ -34,14 +34,14 @@ maxbad=10;
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
 
-    x0=[w  w/2 h/2 w];
+x0=[w  w/2 h/2 w];
 
 
 
 
 bestscore=computerEssentialErrorSVDNFramesWeighted(x0,TF);
 
-
+    x=[w  w/2 h/2 w];
 maxnumdeletions=ceil(numFs/5);
 scorediffs=zeros(numFs,1);
 numBadframes=0;
@@ -57,17 +57,8 @@ for j=1:numFs
         end
     end
 
-    %     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    %
-    %     [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h,ones(numFs-1,1),x0(1,1),x0(1,2), x0(1,3),0,0,0,x0(1,4)/x0(1,1) );
-    %
-    %     if(bestF>eps)
-    %         x=[bestF bestX bestY bestAR*bestF];
-    %     else
-    %         x=[w  w/2 h/2 w];
-    %     end
 
-    x=[w  w/2 h/2 w];
+
     curscore=computerEssentialErrorSVDNFramesWeighted(x,TFdeletion);
 
     allscorediffs(j,1)=bestscore-curscore;
@@ -85,56 +76,53 @@ end
 % end
 
 errorSVD=100;
-numFleft=numFs-1;
-countt=1;
+numFleft=numFs;
+
 
 numPos=sum((allscorediffs>0));
-while(errorSVD>threshold && numFleft>2 )
 
-    [Y,I] = max(allscorediffs);
-    allscorediffs(I,1)=-100000;
-    numPos=sum((allscorediffs>0));
+[B,IX] = sort(allscorediffs,'descend');
 
-    numFtobedeleted(countt,1)=I;
-
-    numFtobedeleted=sort(numFtobedeleted,'descend');
-    %this not working
+for i=0:(numFs-1)
     finalF=TF;
-    for i=1:size(numFtobedeleted)
-        finalF(:,numFtobedeleted(i,1))=[];
-    %   disp(['deleting ' num2str(numFtobedeleted(i,1))]);
-    end
-  %  disp('____________________');
-    [m,numFleft]=size(finalF);
 
+    IXsorted=IX(1:i,:);
+    IXsorted=sort(IXsorted,'descend');
+    for k=1:i
+        finalF(:,IXsorted(k,1))=[];
+        disp(['deleting ' num2str(IXsorted(k,1))]);
+    end
+    disp('____________________');
 
     [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(3, finalF, w,h);
-    solutionz{countt,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
+    solutionz{i+1,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
 
-    errorSVD=computerEssentialErrorSVDNFramesWeighted(solutionz{countt,1},finalF);
-    scorearray(countt,1)=errorSVD;
-    countt=countt+1;
+    errorSVD=computerEssentialErrorSVDNFramesWeighted(solutionz{i+1,1},finalF);
+    scorearray(i+1,1)=errorSVD;
 
-end
-
-if(countt>1)
-
-    if(errorSVD>threshold)
-        [Y,I] = min(scorearray);
-
-    else
-        I=countt-1;
+    if(errorSVD<threshold)
+        break;
     end
-    bestFfinal=  solutionz{I,1}(1,1) ;
-    bestFfinal2= solutionz{I,1}(1,4) ;
-    bestXfinal=  solutionz{I,1}(1,2) ;
-    bestYfinal=  solutionz{I,1}(1,3) ;
-else
-    bestFfinal=  x0(1,1) ;
-    bestFfinal2= x0(1,4) ;
-    bestXfinal=  x0(1,2) ;
-    bestYfinal=  x0(1,3) ;
+
+
 end
+
+
+
+
+if(errorSVD>threshold)
+    [Y,I] = min(scorearray);
+
+else
+    I=i+1;
+end
+
+bestFfinal=  solutionz{I,1}(1,1) ;
+bestFfinal2= solutionz{I,1}(1,4) ;
+bestXfinal=  solutionz{I,1}(1,2) ;
+bestYfinal=  solutionz{I,1}(1,3) ;
+
+
 
 
 
