@@ -89,12 +89,12 @@ count=1;
 
 FFinal{count}=TF{idx};
 WEIGHTS(count,1)=rawscores(idx,idx);
- disp(['using frame ' num2str(idx)]);
+% disp(['using frame ' num2str(idx)]);
 
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
         
-        disp(['using frame ' num2str(q)]);
+ %       disp(['using frame ' num2str(q)]);
         count=count+1;
         WEIGHTS(count,1)=rawscores(q,idx);
         FFinal{count}=TF{q};
