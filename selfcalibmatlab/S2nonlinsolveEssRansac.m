@@ -39,17 +39,17 @@ yvari=h*0.050;
 
 
 for q=1:sizeFs
-
-
+    
+    
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-    [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,xvari,yvari,1);
-
-
-
+    [focs, xcentrs, ycentrs, cars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, {TF{q}}, w,h,[1],finit,w/2,h/2,30,xvari,yvari,1,0.02);
+    
+    
+    
     for i=1:numtries
         solutions{i,q}=[focs(i,1) xcentrs(i,1) ycentrs(i,1) focs(i,1)*cars(i,1)];
     end
-
+    
 end
 
 rawscores=zeros(sizeFs,sizeFs);
@@ -62,16 +62,16 @@ for q=1:sizeFs
         for i=1:numtries
             tempVect(i)=  computerEssentialErrorSVD( solutions{i,q},TF{m});
         end
-
+        
         rawscores(m,q)=median(tempVect(i));
         rawscoresmean(m,q)=mean(tempVect(i));
-
+        
     end
 end
 
 
 for q=1:sizeFs
-
+    
     for m=1:sizeFs
         if(rawscores(q,m)<threshold)
             scoresfinal(q,m)=rawscores(q,m);
@@ -89,12 +89,12 @@ count=1;
 
 FFinal{count}=TF{idx};
 WEIGHTS(count,1)=rawscores(idx,idx);
-% disp(['using frame ' num2str(idx)]);
+%disp(['using frame ' num2str(idx)]);
 
 for q=1:sizeFs
     if(rawscores(q,idx)<threshold && q~=idx)
         
- %       disp(['using frame ' num2str(q)]);
+   %     disp(['using frame ' num2str(q)]);
         count=count+1;
         WEIGHTS(count,1)=rawscores(q,idx);
         FFinal{count}=TF{q};

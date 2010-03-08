@@ -5,7 +5,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-seqname='merton1';
+seqname='synth';
 
 if(strcmp(seqname,'synth')==1)
     width=512;
@@ -72,8 +72,11 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','twofram'};
-AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
+% AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','twofram'};
+% AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
+
+AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac};
 
 
 numalgs=size(AlgFuncs,2);

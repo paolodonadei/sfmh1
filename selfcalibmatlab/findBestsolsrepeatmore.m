@@ -1,4 +1,4 @@
-function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari,arinit)
+function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari,arinit,arvari)
 
 [m,numFs]=size(TF);
 
@@ -47,7 +47,7 @@ if (nargin < 5)
     Weights=ones(numFs,1);
 end
 
-arvari=0.01;
+
 if (nargin <6)
 
     xvari=w*0.050;
