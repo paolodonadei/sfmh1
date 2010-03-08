@@ -1,7 +1,14 @@
-G=F;
+function [t] = runall(G,ks,width,height)
+% 
+% G=F;
+% 
+% %width=512; height=512;
+% width=1024; height=768;
 
-%width=512; height=512;
-width=1024; height=768;
+if (nargin == 2)
+    w=512;
+    h=512;
+end
 
 tic; 
 [fcln, centerlocn]        = S2nonlinsolveEssNfram(G,width,height);
@@ -48,3 +55,7 @@ disp(['peter sturm algorithm had error in f of ' num2str(errps) ' and in optical
 disp(['ransac algorithm had error in f of ' num2str(errR) ' and in optical center of ' num2str(errROC)    ' with time ' num2str(RtElapsed)]);
 disp(['diagnostics algorithm had error in f of ' num2str(errdiagn) ' and in optical center of ' num2str(errdiagOC)   ' with time ' num2str(DtElapsed) ]);
 disp(['m-estimator algorithm had error in f of ' num2str(errM) ' and in optical center of ' num2str(errMOC)   ' with time ' num2str(MtElapsed) ]);
+
+t=1;
+
+end

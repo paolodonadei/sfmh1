@@ -34,21 +34,17 @@ maxbad=10;
 %%%%%%%%%%%%%%%%%%%%% now we go through the results and remove the F one by
 %%%%%%%%%%%%%%%%%%%%% one seeing whcih ones ought to be deleted
 
-x0=[w  w/2 h/2 w];
 
 
+x=[w  w/2 h/2 w];
 
-
-bestscore=computerEssentialErrorSVDNFramesWeighted(x0,TF);
-
-    x=[w  w/2 h/2 w];
 maxnumdeletions=ceil(numFs/5);
 scorediffs=zeros(numFs,1);
 numBadframes=0;
 allscorediffs=zeros(numFs,1);
 for j=1:numFs
     clear TFdeletion;
-
+    
     count=1;
     for k=1:numFs
         if(k~=j)
@@ -56,15 +52,23 @@ for j=1:numFs
             count=count+1;
         end
     end
-
-
-
+    
+        clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
+    
+        [focs, xcentrs, ycentrs,cars, scrs, bestF, bestX, bestY, bestAR] = findBestsolsrepeatmore(1, TFdeletion, w,h );
+    
+        if(bestF>eps)
+            x=[bestF bestX bestY bestAR*bestF];
+        else
+            x=[w  w/2 h/2 w];
+        end
+    
     curscore=computerEssentialErrorSVDNFramesWeighted(x,TFdeletion);
-
-    allscorediffs(j,1)=bestscore-curscore;
-
-
-
+    
+    allscorediffs(j,1)=-curscore;
+    
+    
+    
 end
 
 %modify this so that if a solution is not obtained it will iterztively remove more and more fundamental matrices, you should have a fail safe option in all algorithms
@@ -85,26 +89,26 @@ numPos=sum((allscorediffs>0));
 
 for i=0:(numFs-1)
     finalF=TF;
-
+    
     IXsorted=IX(1:i,:);
     IXsorted=sort(IXsorted,'descend');
     for k=1:i
         finalF(:,IXsorted(k,1))=[];
-   %     disp(['deleting ' num2str(IXsorted(k,1))]);
+        disp(['deleting ' num2str(IXsorted(k,1))]);
     end
-  %  disp('____________________');
-
+    disp('____________________');
+    
     [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(3, finalF, w,h);
     solutionz{i+1,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
-
+    
     errorSVD=computerEssentialErrorSVDNFramesWeighted(solutionz{i+1,1},finalF);
     scorearray(i+1,1)=errorSVD;
-
+    
     if(errorSVD<threshold)
         break;
     end
-
-
+    
+    
 end
 
 
@@ -112,7 +116,7 @@ end
 
 if(errorSVD>threshold)
     [Y,I] = min(scorearray);
-
+    
 else
     I=i+1;
 end

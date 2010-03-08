@@ -52,7 +52,7 @@ for q=1:sizeFs
 
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
 
-    [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries,{TF{q}}, w,h,ones(1,1),finit,w/2,h/2,fvari, xvari,yvari,1);
+    [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries,{TF{q}}, w,h,ones(1,1),finit,w/2,h/2,fvari, xvari,yvari,1,0.02);
 
     %bestFfinal, bestXfinal, bestYfinal,bestAR
 
