@@ -5,7 +5,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-seqname='wadham';
+seqname='synth';
 
 if(strcmp(seqname,'synth')==1)
     width=512;
