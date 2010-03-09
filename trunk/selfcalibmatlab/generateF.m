@@ -78,8 +78,8 @@ else
                         if(q<(numCorrs*noiselevel))
 
 
-                            noise1=(rand()-0.5)*2*512;
-                            noise2=(rand()-0.5)*2*512;
+                            noise1=(rand()*512);
+                            noise2=(rand()*512);
 
                             if(rand()<0.5)
                                 x2(1,q)=noise1; % outlier generation, this is whack and important

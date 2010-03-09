@@ -120,8 +120,8 @@ for i=1:numcolum
                %  disp([' going to have ' num2str(count*noiselevel) ' outliers']);
                 for q=1:(count*noiselevel)
 
-                    noise1=(rand()-0.5)*2*512;
-                    noise2=(rand()-0.5)*2*512;
+                    noise1=(rand()*1024);
+                    noise2=(rand()*768);
 
                     if(rand()<0.5)
                         x2(1,q)=noise1; % outlier generation, this is whack and important

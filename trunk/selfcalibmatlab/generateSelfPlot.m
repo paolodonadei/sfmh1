@@ -5,7 +5,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-seqname='synth';
+seqname='wadham';
 
 if(strcmp(seqname,'synth')==1)
     width=512;
@@ -322,5 +322,5 @@ save( [curdirname '/variables_GP' nowtime '.mat']);
 
 tElapsedprogram=toc(tStartprogram);
 disp([' program took ' num2str(tElapsedprogram) ' seconds']);
-
+copyfile('*.m',[curdirname '\matlabfiles']);
 end
