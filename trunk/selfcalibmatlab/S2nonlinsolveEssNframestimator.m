@@ -40,6 +40,13 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
     
     
     x=[bestF bestX bestY bestF*bestAR];
+
+
+    % keep this here, otherwise you will get zero weights when the solution
+    % is not obtained
+    if(x(1,1)<eps)
+        x=[w w/2 h/2 w];
+    end
     
     erFs=zeros(numFs,1);
     for j=1:numFs
