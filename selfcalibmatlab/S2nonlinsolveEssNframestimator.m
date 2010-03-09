@@ -62,7 +62,7 @@ while(allcounter<maxiter && goodcounter<maxgooditer)
         end
     end
              
-    
+ 
     
     % sum(erFs)
     if(sum(WEIGHTS)<eps)

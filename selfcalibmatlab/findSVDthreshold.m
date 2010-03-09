@@ -21,12 +21,12 @@ end
 % MADN=1.96*(median(abs(obj-curMedian))/0.6745);
 % oh god help me what do i do
 
-MADN=1.96*prctile(obj,68.27);
+MADN=3*prctile(obj,68.27);
 
-threshold=min(MADN,0.005);
+threshold=min(MADN,0.0817060256336);
 
 
-
+%threshold=0.0817060256336;
 
 
 end
