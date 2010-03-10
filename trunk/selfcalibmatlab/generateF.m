@@ -73,40 +73,53 @@ else
                         x1(1,q)=x1(1,q)/x1(3,q);
                         x1(2,q)=x1(2,q)/x1(3,q);
                         x1(3,q)=1;
+                    end
 
-
-                        if(q<(numCorrs*noiselevel))
-
-
-                            noise1=(rand()*512);
-                            noise2=(rand()*512);
-
-                            if(rand()<0.5)
-                                x2(1,q)=noise1; % outlier generation, this is whack and important
-                                x2(2,q)=noise2;
-                           
-                            else
-                                x1(1,q)=noise1; % outlier generation, this is whack and important
-                              
-                                x1(2,q)=noise2;
-                            end
+                    maxx=max([max(x1(1,:)) max(x2(1,:))]);
+                    maxy=max([max(x1(2,:)) max(x2(2,:))]);
+                    
+                    minx=min([min(x1(1,:)) min(x2(1,:))]);
+                    miny=min([min(x1(2,:)) min(x2(2,:))]);
+                    
+                    xrange=maxx-minx;
+                    yrange=maxy-miny;
+                    %now making the outliers
+                    for q=1:numCorrs*noiselevel
 
 
 
+                        %the reason why we have to do this is because our
+                        %image features are not confined to the image size,
+                        %so if we just made outliers within the image its
+                        %not going to work since the outliers will not be
+                        %the same magnitude as inliers
+                        noisex=(rand()*xrange)+minx;
+                        noisey=(rand()*yrange)+miny;
 
+                        if(rand()<0.5)
+                            x2(1,q)=noisex; % outlier generation, this is whack and important
+                            x2(2,q)=noisey;
 
+                        else
+                            x1(1,q)=noisex; % outlier generation, this is whack and important
+                            x1(2,q)=noisey;
                         end
+
+
+
+
+
                     end
 
                     [F{count}, e1, e2] = fundmatrix(x1, x2);
 
-%                     xbad = PeterSturmSelf(F{count},512,512);
-%                     Fgood=vgg_F_from_P(ps{1,i},ps{1,j});
-%                     xgood = PeterSturmSelf(Fgood,512,512);
-% 
-%                     xbad
-%                     xgood
-%                     myks{1,1}(1,1)
+                    %                     xbad = PeterSturmSelf(F{count},512,512);
+                    %                     Fgood=vgg_F_from_P(ps{1,i},ps{1,j});
+                    %                     xgood = PeterSturmSelf(Fgood,512,512);
+                    %
+                    %                     xbad
+                    %                     xgood
+                    %                     myks{1,1}(1,1)
 
                 else
                     F{count}=vgg_F_from_P(ps{1,i},ps{1,j});
