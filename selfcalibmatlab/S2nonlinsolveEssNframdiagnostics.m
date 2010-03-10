@@ -1,4 +1,4 @@
-function [fcl, centerloc] = S2nonlinsolveEssNframdiagnostics(TF,w,h,threshold)
+function [fcl, centerloc] = S2nonlinsolveEssNframdiagnostics(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
 %tic
@@ -23,6 +23,7 @@ fundscores=zeros(1,numFs);
 
 numtries=1;
 
+threshold=findSVDthreshold(TF,w,h);
 
 x= [0 0 0 0];
 badcounter=1;

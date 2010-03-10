@@ -2,33 +2,29 @@ clear all
 close all
 clc
 
-numtries=100;
-numts=10;
-initialT= 0.0001 ;
-tstep= 0.001 ;
+numtries=1000;
 
-errorvals=zeros(numtries,numts);
-current_errors_XY=zeros(numtries,numts);
+
+errorinlier=zeros(numtries,1);
+erroroutlier=zeros(numtries,1);
 
 
 
-for i=1:numts
-    currentT=initialT + ((i-1)*tstep);
-    t(1,i)=currentT;
-    for j=1:numtries
 
-        [ F, ks ] = generateF( 0,0,1.01,50, 1 ,5,0.1,5);
-        [fcl, centerloc] = S2nonlinsolveEssNframdiagnostics(F,512,512,currentT) ;
-        [errorvals(j,i), current_errors_XY(j,i)  ] = calcSelfCalibError(fcl, centerloc,ks);
-        disp([' i is ' num2str(i) ' and j is ' num2str(j)]);
-    end
+for j=1:numtries
+    numbad=ceil(rand()*7);
+    numnoise=rand()*0.6;
+    [ F, ks ] = generateF( 0,0,1.01,50, 1 ,5, numnoise,numbad);
+    disp([' j is ' num2str(j) ]);
+
+    solution=[ks{1,1}(1,1)+(randn()*50) ks{1,1}(1,3)+(randn()*20) ks{1,1}(2,3)+(randn()*20) ks{1,1}(2,2)+(randn()*50)];
 
 
+
+    erroroutlier(j,1)=computerEssentialErrorSVDNFramesWeighted(solution,F(1:numbad));
+    errorinlier(j,1)=computerEssentialErrorSVDNFramesWeighted(solution,F(numbad+1:10));
 
 end
 
-plot(t,mean(errorvals));
 
-figure
 
-plot(t,mean(current_errors_XY));
