@@ -58,7 +58,7 @@ catch
 end
 
 if( S(2,1)>eps)
-    F=(((S(1,1)-S(2,1))/S(2,1)))^2;
+    F=(((S(1,1)-S(2,1))/S(2,1)))^2; % should not be squared but all my thresholds are based on this being squared
     
 else
     

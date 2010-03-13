@@ -1,4 +1,4 @@
-function [ F, ks,ps , badpoints ] = generateFangl( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs )
+function [ F, ks,ps , badpoints ] = generateFangl( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs,angel )
 
 %using parameter skew as angular difference
 numCorrs=200;
@@ -6,7 +6,7 @@ numCorrs=200;
 badpoints=zeros(numCorrs,((number*(number-1))/2) );
 
 
-[ ps ,myks ] = generatePsangl( fdiff, skew, ar,centerdeviation, number,1,silent,0 );
+[ ps ,myks ] = generatePsangl( fdiff, skew, ar,centerdeviation, number,1,silent,0,angel );
 
 if (nargin <7)
 
