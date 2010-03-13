@@ -1,12 +1,10 @@
-function [ ps ,ks ] = generatePsangl( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff )
+function [ ps ,ks ] = generatePsangl( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff,angel )
 %if fdiff is 1 then all Fs will be different, if 0 otehrwise,
 %skew is just the max skew allowed, if its zero them all skews is zero
 %ar is the aspect ratio
 % centerdeviation is how much the center will deviate from the image center
 %numps is the number of the projection matrices
 %cdev_diff indicates tht the camera centers are different
-
-
 projective=1;
 format long g;
 
@@ -20,7 +18,7 @@ a = -40; b = 40;
 ps = cell(1,numps) ;
 ks = cell(1,numps) ;
 
-overallF=300+(rand()*900); % if fdiff is 0 then they are all set to this
+overallF=1000; % if fdiff is 0 then they are all set to this
 curentF=0;
 
 T=zeros(3,1);
@@ -30,42 +28,29 @@ prevF=overallF;
 deviatevar=centerdeviation/20;
 xcenterdevgauss=(randn()*deviatevar);
 ycenterdevgauss=(randn()*deviatevar);
-prevangel=[0 0 0];
 for i=1:numps
+    thisangel=0;
+    if(i <=2)
+        axis=[1 0 0];
 
-    if(i==1)
-        prevangel=[(rand()*2-1) (rand()*2-1) (rand()*2-1)];
-        raxis=(-pi + (pi*2) * rand());
     end
 
-    if(i==2)
-        prevangel=prevangel+[((rand()-0.5)*skew) ((rand()-0.5)*skew) ((rand()-0.5)*skew)];
-      
-    end
-
-    if(i==3)
-        prevangel=[(rand()*2-1) (rand()*2-1) (rand()*2-1)];
-        raxis=(-pi + (pi*2) * rand());
-    end
-
-    if(i==4)
-               prevangel=prevangel+[((rand()-0.5)*skew) ((rand()-0.5)*skew) ((rand()-0.5)*skew)];
-      
-    end
-% raxis
-% prevangel
-
-    if(i~=1)
-
-
+    if(i ==2)
+        axis=[1 0 0];
         T= a + (b-a) * rand(3,1);
-
-        R= rotationmat3D(raxis,prevangel);
-
-        %degeneracy maker
-        % R=eye(3);
-
+       %T=zeros(3,1);
+        thisangel=angel;
     end
+
+    if(i>2)
+        T= a + (b-a) * rand(3,1);
+        axis= [(rand()*2-1) (rand()*2-1) (rand()*2-1)];
+        thisangel=(-pi + (pi*2) * rand());
+    end
+
+
+    R= rotationmat3D(thisangel,axis);
+
 
     K=eye(3);
     K(1,2)=skew;
@@ -90,7 +75,10 @@ for i=1:numps
         K(1,3)=(WIDTH/2)+rand()*centerdeviation;
         K(2,3)=(HEIGHT/2)+rand()*centerdeviation;
     end
-
+    thisangel
+    axis
+    R
+    T
 
     P=K*[R -R*T];
 

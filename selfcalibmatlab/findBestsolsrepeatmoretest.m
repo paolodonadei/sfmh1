@@ -1,4 +1,4 @@
-function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmore(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari,arinit,arvari)
+function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findBestsolsrepeatmoretest(numtries, TF, w,h,Weights,finit,xinit,yinit,fvari, xvari, yvari,arinit,arvari)
 
 [m,numFs]=size(TF);
 
@@ -74,7 +74,7 @@ end
 
 
 
-f = @(x)computerEssentialErrorSVDNFramesWeighted(x,TF,Weights);
+f = @(x)computerEssentialErrorSVDNFramesWeightedreweighted(x,TF,Weights);
 
 for i=1:numtries
 

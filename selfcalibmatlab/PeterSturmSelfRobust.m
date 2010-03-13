@@ -1,4 +1,4 @@
-function [ sln, centerloc ] = PeterSturmSelfRobust( F,w,h )
+function [ sln, centerloc,solvector ] = PeterSturmSelfRobust( F,w,h )
 
 if (nargin == 1)
     w=512;
@@ -19,7 +19,7 @@ solvector=zeros(numFs,1);
 
 for i=1:numFs
     clear G U S V x a b ;
-  
+
 
     G=    normalizeFSturm(F{1,i},w,h,typicalF);
 
@@ -60,9 +60,16 @@ for i=1:numFs
 
         s = roots(r);
 
-        r1=s(1,1);
-        r2=s(2,1);
+        [ms,ns]=size(s);
 
+        if(ms~=0)
+
+            r1=s(1,1);
+            r2=s(2,1);
+        else
+            r1=0;
+            r2=0;
+        end
 
         f1=0;
         f2=0;
@@ -108,7 +115,7 @@ for i=1:numFs
 
     solvector(i,1)=x(1,1);
 end
-%solvector
+
 sln=median(solvector);
 
 bestf=sln;
