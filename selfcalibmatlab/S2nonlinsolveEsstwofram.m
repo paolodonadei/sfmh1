@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 %TF=TF*10000;
-plotting=0;
+plotting=1;
 maxfocal=2000;
 fcl=[0 0];
 
@@ -19,7 +19,7 @@ centerloc=[xcen ycen];
 
 
 
-numtries=floor(500/sizeFs);  % we want to have 400 points in the end
+numtries=floor(1000/sizeFs);  % we want to have 400 points in the end
 
 
 ffinals=zeros(numtries,sizeFs);
@@ -49,19 +49,19 @@ xinit=w/2;
 yinit=h/2;
 
 for q=1:sizeFs
-
+    
     clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
-
+    
     [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestAR] =  findBestsolsrepeatmore(numtries,{TF{q}}, w,h,ones(1,1),finit,w/2,h/2,fvari, xvari,yvari,1,0.02);
-
+    
     %bestFfinal, bestXfinal, bestYfinal,bestAR
-
+    
     ffinals(:,q)=focs;
     xfinals(:,q)= xcentrs;
     yfinals(:,q)=ycentrs;
     arfinals(:,q)=ars;
     scorearray(:,q)=scrs;
-
+    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,28 +75,48 @@ end
 numclusts=10;
 X=[ reshape(ffinals,sizeFs*numtries,1)  reshape(arfinals,sizeFs*numtries,1)  ];
 
+XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1) reshape(yfinals,sizeFs*numtries,1) reshape(arfinals,sizeFs*numtries,1)  ];
 if(plotting==1)
-
-    Cl = repmat(1:sizeFs,numtries,1);
-
-    scatter3(ffinals(:),xfinals(:),yfinals(:),10,Cl(:),'filled');
-    title('graph of focal lengths and optical axis, color coded based on individual F votes');
-    zlabel('y coordinates of optical centers');
-    ylabel('x coordinates of optical centers');
-    xlabel('value of focal length ');
-
-
-    figure
-
-    scatter(ffinals(:),arfinals(:),10,Cl(:),'filled');
-    title('graph of focal lengths and aspect ratios, color coded based on individual F votes');
+    [newsizepts,n]=size(XComplete);
+    fff=zeros(newsizepts,3);
+    
+    for k=1:sizeFs
+        scolors{k}=rand(1,3);
+    end
+    
+    %remove this later
+    scolors{1}=[0.9 0.0 0.0];
+    scolors{2}=[0.0 0.9 0.0];
+    scolors{3}=[0.0 0.0 0.9];
+    
+    
+    count=1;
+    for k=1:sizeFs
+        for m=1:numtries
+            
+            fff2(count,:)=  scolors{k};
+            
+            count=count+1;
+        end
+    end
+    
+    
+    
+    scatter(XComplete(:,1),XComplete(:,4),10,fff2,'filled');
+    title(['scatter plot of all the solution points']);
+    zlabel('focal length');
     ylabel('aspect ratio');
-    xlabel('value of focal length ');
+    
     figure
+    
+    scatter3(XComplete(:,1),XComplete(:,2),XComplete(:,3),10,fff2,'filled');
+    title(['scatter plot of all the solution points']);
+    zlabel('x coordinates of optical centers');
+    ylabel('y coordinates of optical centers');
+    xlabel('value of focal length ');
 end
 
 
-XComplete=[ reshape(ffinals,sizeFs*numtries,1)  reshape(xfinals,sizeFs*numtries,1) reshape(yfinals,sizeFs*numtries,1) reshape(arfinals,sizeFs*numtries,1)  ];
 %%%%%%%%%%%
 %creating an index of the memberships
 mcount=1;
@@ -117,20 +137,20 @@ ccounter=1;
 %         if(validSLFSolutionStrict(XComplete(mcount,:),w,h)~=1)
 %             deletionVector(ccounter,1)=mcount;
 %             ccounter=ccounter+1;
-% 
+%
 %         end
-% 
+%
 %         mcount=mcount+1;
 %     end
 % end
-% 
-% 
-% 
+%
+%
+%
 % for k=size(deletionVector,1):-1:1
-% 
+%
 %     idx_membership(deletionVector(k,1),:)=[];
 %     XComplete(deletionVector(k,1),:)=[];
-% 
+%
 % end
 
 
@@ -191,32 +211,32 @@ besty  = ctrs(I,3);
 bestar = ctrs(I,4);
 %
 if(plotting==1)
-
+    
     figure
     hist(reshape(ffinals,sizeFs*numtries,1),numtries/2);
     title(['focal length']);
     figure
-
+    
     hist(reshape(xfinals,sizeFs*numtries,1),numtries/2);
     title(['xcomponent of camera center']);
     figure
-
+    
     hist(reshape(yfinals,sizeFs*numtries,1),numtries/2);
     title(['ycomponent of camera center']);
-
+    
     figure
-
+    
     hist(reshape(arfinals,sizeFs*numtries,1),numtries/2);
     title(['AR of camera center']);
     %
-
+    
     fff=zeros(newsizepts,3);
     for k=1:numclusts
         scolors{k}=rand(1,3);
     end
-
-
-
+    
+    
+    
     figure
     for k=1:newsizepts
         if(idx(k,1)~=I)
@@ -225,24 +245,36 @@ if(plotting==1)
             fff(k,:)=  [0 0 0];
         end
     end
-
-
-
+    
+    
+    
     scatter(XComplete(:,1),XComplete(:,4),10,fff,'filled');
     title(['new scatter plot of all the results found using my method, winning cluster in black']);
     zlabel('focal length');
     ylabel('aspect ratio');
-
+    
     figure
-
+    
     scatter3(XComplete(:,1),XComplete(:,2),XComplete(:,3),10,fff,'filled');
     title(['new scatter plot of all the results found using my method, winning cluster, ' num2str(I) ' in black']);
     zlabel('x coordinates of optical centers');
     ylabel('y coordinates of optical centers');
     xlabel('value of focal length ');
-
-
-
+    
+    
+    subplot(1,2,1)
+    scatter3(XComplete(:,1),XComplete(:,2),XComplete(:,3),10,fff2,'filled');
+    title(['scatter plot of all the solution points']);
+    zlabel('x coordinates of optical centers');
+    ylabel('y coordinates of optical centers');
+    xlabel('value of focal length ');
+    subplot(1,2,2)
+    scatter3(XComplete(:,1),XComplete(:,2),XComplete(:,3),10,fff,'filled');
+    title(['new scatter plot of all the results found using my method, winning cluster, ' num2str(I) ' in black']);
+    zlabel('x coordinates of optical centers');
+    ylabel('y coordinates of optical centers');
+    xlabel('value of focal length ');
+    
 end
 
 
