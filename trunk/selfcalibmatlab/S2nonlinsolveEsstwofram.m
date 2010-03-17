@@ -7,7 +7,7 @@ if (nargin == 1)
     h=512;
 end
 %TF=TF*10000;
-plotting=1;
+plotting=0;
 maxfocal=2000;
 fcl=[0 0];
 

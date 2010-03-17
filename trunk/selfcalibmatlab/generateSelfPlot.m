@@ -72,11 +72,9 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-%AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','twofram'};
-%AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram};
+AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','Hough Transform','Weighted'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram,@S2nonlinsolveEssNframGeometric};
 
- AlgNames={ 'reweighted M-estimator', 'M-estimator'};
- AlgFuncs={ @S2nonlinsolveEssNframreweightedmestimator, @S2nonlinsolveEssNframestimator };
 
 
 numalgs=size(AlgFuncs,2);

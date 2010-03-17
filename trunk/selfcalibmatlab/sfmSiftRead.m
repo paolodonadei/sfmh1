@@ -5,7 +5,7 @@ clc
 
 
 
-seqname='build1';
+seqname='merton1';
 
 
 width=1024;
