@@ -24,6 +24,7 @@ for i=1:n
     T = computerEssentialErrorSVD(x,MYF{1,i});
 
     F=F+(T*W(i,1));
+    Z(i)=T;
 end
 
 sumW=sum(W);
@@ -35,6 +36,11 @@ else
     disp('sum of W is zero inside computerEssentialErrorSVDNFramesWeighted, this shouldnt happen');
 end
 
+% D=W';
+% Z
+% D
+% c = D.*Z;
+% c
 
 end
 

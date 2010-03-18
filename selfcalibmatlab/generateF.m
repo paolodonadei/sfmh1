@@ -113,6 +113,7 @@ else
 
                     [F{count}, e1, e2] = fundmatrix(x1, x2);
 
+
                     %                     xbad = PeterSturmSelf(F{count},512,512);
                     %                     Fgood=vgg_F_from_P(ps{1,i},ps{1,j});
                     %                     xgood = PeterSturmSelf(Fgood,512,512);

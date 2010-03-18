@@ -1,4 +1,4 @@
-function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h)
+function [fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h,corrs)
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
 %tic
