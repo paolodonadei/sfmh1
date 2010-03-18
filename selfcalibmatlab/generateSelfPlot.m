@@ -5,7 +5,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-seqname='merton1';
+seqname='synth';
 
 if(strcmp(seqname,'synth')==1)
     width=512;
@@ -72,8 +72,8 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','Hough Transform','Weighted'};
-AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEsstwofram,@S2nonlinsolveEssNframGeometric};
+AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','Weighted'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEssNframGeometric};
 
 
 
@@ -187,7 +187,7 @@ for i=startloc:endloc
         totalAgltime=0;
 
         if(strcmp(seqname,'synth')==1)
-            [ F, ks ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
+            [F, ks,ps , badpoints,corrs ] = generateF( fdiff(1,i), skew(1,i), aspect(1,i),centerdev(1,i),1,numPs,n(1,i),b(1,i)   );
         else
             [corrs, IMS, P,ks, F] = readCorrsOxford(seqname, n(1,i), b(1,i));
         end
