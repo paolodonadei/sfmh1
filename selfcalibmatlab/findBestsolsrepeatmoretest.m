@@ -3,7 +3,7 @@ function [focs, xcentrs, ycentrs, ars, scrs, bestF, bestX, bestY,bestAR] = findB
 [m,numFs]=size(TF);
 
 constantinitials=0;
-lowsearchrange=0;
+lowsearchrange=1;
 
 %tolx and tolf are very important, for the data collection part use these
 %values but later when you want more accuracy make them lower, like 10^-16
