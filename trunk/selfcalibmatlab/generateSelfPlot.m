@@ -5,7 +5,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 %repeat is for how many times we will try this
 %rest is the constant camera params
 
-seqname='synth';
+seqname='merton1';
 
 if(strcmp(seqname,'synth')==1)
     width=512;
@@ -191,7 +191,7 @@ for i=startloc:endloc
         for k=1:numalgs
 
             tic;
-            [answerf, loca]=AlgFuncs{k}(F,width,height); %assuming camera size is 512x512
+            [answerf, loca]=AlgFuncs{k}(F,width,height,corrs); %assuming camera size is 512x512
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
 

@@ -1,6 +1,6 @@
 
 
-function [fcl, centerloc] = S2nonlinsolveEssNframreweightedmestimator(TF,w,h)
+function [fcl, centerloc] = S2nonlinsolveEssNframreweightedmestimator(TF,w,h,corrs)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
 %tic
