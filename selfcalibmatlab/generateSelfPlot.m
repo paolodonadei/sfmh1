@@ -166,13 +166,20 @@ startloc=(startp*numPoints)+1;
 endloc=(endp*numPoints);
 
 for i=startloc:endloc
+    comletesolsf= fopen([curdirname '/sols' num2str(i) '_nowtime_.txt'], 'w');
+    fprintf(comletesolsf, ' , ');
+    for k=1:numalgs
+        fprintf(comletesolsf, [  AlgNames{1,k} '_focal1 , ' AlgNames{1,k} '_focal2 , ' AlgNames{1,k} '_xcenter , ' AlgNames{1,k} '_ycenter , ' AlgNames{1,k} '_errF , ' AlgNames{1,k} '_errXY , ']);
+    end
+
 
     clear  current_errors_F current_errors_XY current_BADPTS ;
-    current_errors_F=zeros(numalgs,repeat);
-    current_errors_XY=zeros(numalgs,repeat);
-    current_BADPTS=zeros(numalgs,repeat);
+    current_errors_F{i}=zeros(numalgs,repeat);
+    current_errors_XY{i}=zeros(numalgs,repeat);
+    current_BADPTS{i}=zeros(numalgs,repeat);
 
     for j=1:repeat
+          fprintf(comletesolsf, [' \n ' num2str(j) ' , '] );
         tStart=tic;
         currIteration=currIteration+1;
 
@@ -195,18 +202,19 @@ for i=startloc:endloc
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
 
-            [current_errors_F(k,j), current_errors_XY(k,j)  ] = calcSelfCalibError(answerf, loca,ks);
+            [current_errors_F{i}(k,j), current_errors_XY{i}(k,j)  ] = calcSelfCalibError(answerf, loca,ks);
+           
+            fprintf(comletesolsf, [  num2str(answerf(1,1)) ' , ' num2str(answerf(1,2)) ' , ' num2str(loca(1,1)) ' , '  num2str(loca(1,2)) ' , '  num2str(current_errors_F{i}(k,j))  ' , '  num2str(current_errors_XY{i}(k,j)) ' , ']);
 
-
-            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
-            fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F(k,j)) ' and error xy: ' num2str(current_errors_XY(k,j)) ' time: ' num2str(PtElapsed)]);
-            if(abs(current_errors_F(k,j))>10)
-                current_BADPTS(k,j)=current_BADPTS(k,j)+1;
+            disp(['algorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F{i}(k,j)) ' and error xy: ' num2str(current_errors_XY{i}(k,j)) ' time: ' num2str(PtElapsed)]);
+            fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had error in F ' num2str(current_errors_F{i}(k,j)) ' and error xy: ' num2str(current_errors_XY{i}(k,j)) ' time: ' num2str(PtElapsed)]);
+            if(abs(current_errors_F{i}(k,j))>10)
+                current_BADPTS{i}(k,j)=current_BADPTS{i}(k,j)+1;
             end
 
 
-            %  allSolutions{i,j,k}=[answerf loca current_errors_F(k,j) current_errors_XY(k,j)];
-            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f and time %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY(k,j),PtElapsed  );
+            %  allSolutions{i,j,k}=[answerf loca current_errors_F{i}(k,j) current_errors_XY{i}(k,j)];
+            fprintf(fid, 'algorithm %s correct answers: %6.2f and %6.2f obtained answers %6.2f and %6.2f error: %6.2f AND true X=%6.2f and true Y=%6.2f and estimated X=%6.2f and true Y=%6.2f with error %6.2f and time %6.2f\n',AlgNames{k},ks{1}(1,1),ks{2}(1,1),answerf(1,1),answerf(1,2),current_errors_F{i}(k,j),ks{1}(1,3),ks{1}(2,3),loca(1,1),loca(1,2),current_errors_XY{i}(k,j),PtElapsed  );
 
         end
 
@@ -221,21 +229,21 @@ for i=startloc:endloc
     fprintf(fidgraph, '%6.2f , ' ,t(1,i));
     %now calculate the stat for the current run
     for k=1:numalgs
-        means_F(k,i)=mean(current_errors_F(k,:));
-        medians_F(k,i)=median(current_errors_F(k,:));
-        variances_F(k,i)=var(current_errors_F(k,:));
+        means_F(k,i)=mean(current_errors_F{i}(k,:));
+        medians_F(k,i)=median(current_errors_F{i}(k,:));
+        variances_F(k,i)=var(current_errors_F{i}(k,:));
 
-        means_XY(k,i)=mean(current_errors_XY(k,:));
-        medians_XY(k,i)=median(current_errors_XY(k,:));
-        variances_XY(k,i)=var(current_errors_XY(k,:));
+        means_XY(k,i)=mean(current_errors_XY{i}(k,:));
+        medians_XY(k,i)=median(current_errors_XY{i}(k,:));
+        variances_XY(k,i)=var(current_errors_XY{i}(k,:));
 
-        numBadPoints(k,i)=mean(current_BADPTS(k,:));
+        numBadPoints(k,i)=mean(current_BADPTS{i}(k,:));
 
         fprintf(fidgraph, ' %6.2f , %6.2f  , %6.2f ,  %6.2f , %6.2f ,' ,means_F(k,i), medians_F(k,i), means_XY(k,i),medians_XY(k,i),numBadPoints(k,i));
     end
 
     fprintf(fidgraph, ' \n');
-
+    fclose(comletesolsf);
 
 end
 

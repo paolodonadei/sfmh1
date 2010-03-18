@@ -93,9 +93,9 @@ for i=0:(numFs-1)
     IXsorted=sort(IXsorted,'descend');
     for k=1:i
         finalF(:,IXsorted(k,1))=[];
-        disp(['deleting ' num2str(IXsorted(k,1))]);
+    %    disp(['deleting ' num2str(IXsorted(k,1))]);
     end
-    disp('____________________');
+   % disp('____________________');
     
     [focs, xcentrs, ycentrs, cars, scrs, bestFfinal, bestXfinal, bestYfinal, bestAR] = findBestsolsrepeatmore(3, finalF, w,h);
     solutionz{i+1,1}=[bestFfinal bestXfinal bestYfinal bestAR*bestFfinal];
