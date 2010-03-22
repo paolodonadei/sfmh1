@@ -1,4 +1,4 @@
-function [ F, ks,ps , badpoints ] = generateFangl( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs,angel )
+function [ F, ks,ps , badpoints,corrs ] = generateFangl( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs,angel )
 
 %using parameter skew as angular difference
 numCorrs=200;

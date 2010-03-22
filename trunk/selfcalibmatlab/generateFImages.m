@@ -1,9 +1,9 @@
-function [ MF,corrs,ks ] = generateFImages( seqname,noiselevel, numCorruptFs )
+function [ MF,corrs,ks,height,width ] = generateFImages( seqname,noiselevel, numCorruptFs )
 tic
 % a lot of the things here are taken from peter kovesi
 %http://www.csse.uwa.edu.au/~pk/research/matlabfns/Robust/example/index.html
 
-matchtech=2; % 1 for haris with correlation, 2 for sift
+matchtech=1; % 1 for haris with correlation, 2 for sift
 thresh = 500;   % Harris corner threshold
 nonmaxrad = 3;  % Non-maximal suppression radius
 w = 7;    % Window size for correlation matching
@@ -13,7 +13,7 @@ count=0;
 
 
 
-
+maxfunds=11;
 
 
 
@@ -32,10 +32,11 @@ end
 
 for i=1:numimages
     
-  IMS{1,i}=imread(  [realFold  '' IMFiles(i,1).name ]);
- 
+    IMS{1,i}=imread(  [realFold  '' IMFiles(i,1).name ]);
+    
 end
 
+[height,width]=size(IMS{1,1});
 
 [m,numIs]=size(IMS);
 
@@ -49,7 +50,7 @@ if(m~=0)
     for i=1:m
         
         P{1,i}=load( [realFold PFiles(i,1).name]);
-        [ks{1,i}, R, t] = vgg_KR_from_P(P{1,i});
+        [ks{1,i}, rrrrr, tttt] = vgg_KR_from_P(P{1,i});
         
     end
     
@@ -63,19 +64,26 @@ end
 for i=1:numIs
     for j=1:i
         if(i~=j)
+     
+          
             count=count+1;
+            disp(['fundamental matrix number ' num2str(count) ' between frame ' num2str(i) ' with ' num2str(j)]);
             clear cim1 r1 c1 cim2 r2 c2 m1 m2 F  inliers im1 im2 m1 m2 x1 x2 I1 I2 frames1 descriptors1 frames2 descriptors2;
             
-            [vm,vn,vj]=size(IMS{1,i});
+            [vm1,vn1,vj1]=size(IMS{1,i});
+            [vm2,vn2,vj2]=size(IMS{1,j});
             
-            if(vj>1)
+            
+            if(vj1>1 )
                 im1 = 	rgb2gray(IMS{1,i});
-                im2 = 	rgb2gray(IMS{1,j});
             else
                 im1 = 	(IMS{1,i});
+            end
+            if(vj2>1 )
+                im2 = 	rgb2gray(IMS{1,j});
+            else
                 im2 = 	(IMS{1,j});
             end
-            
             
             if(matchtech==1)
                 [cim1, r1, c1] = harris(im1, 1, thresh, 3);
@@ -97,6 +105,7 @@ for i=1:numIs
                 matches=siftmatch( descriptors1, descriptors2 ) ;
                 
                 [sm,sn]=size(matches);
+                disp(['number of matches was: ' num2str(sn)]);
                 
                 x1=zeros(3,sn);
                 x2=zeros(3,sn);
