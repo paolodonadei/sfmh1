@@ -29,32 +29,32 @@ deviatevar=centerdeviation/20;
 xcenterdevgauss=(randn()*deviatevar);
 ycenterdevgauss=(randn()*deviatevar);
 for i=1:numps
-    thisangel=0;
+    
     if(i <=2)
         axis=[1 0 0];
-
+        thisangel=0;
     end
-
+    
     if(i ==2)
         axis=[1 0 0];
         T= a + (b-a) * rand(3,1);
-       %T=zeros(3,1);
+        %T=zeros(3,1);
         thisangel=angel;
     end
-
-    if(i>2)
+    
+    if(i==3)
         T= a + (b-a) * rand(3,1);
         axis= [(rand()*2-1) (rand()*2-1) (rand()*2-1)];
         thisangel=(-pi + (pi*2) * rand());
     end
-
-
+    
+    
     R= rotationmat3D(thisangel,axis);
-
-
+    
+    
     K=eye(3);
     K(1,2)=skew;
-
+    
     if(numps==2)  %this might not make sense, but for 2 frames i dont want the focal length difference to be a random variable
         curentF=abs(prevF+(fdiff));
     else
@@ -63,11 +63,11 @@ for i=1:numps
             curentF=abs(prevF+((rand()*fdiff)-(fdiff/2)));
         end
     end
-
-
+    
+    
     K(1,1)=curentF;
     K(2,2)=K(1,1)*ar;
-
+    
     if(cdev_diff==0)
         K(1,3)=(WIDTH/2)+centerdeviation+xcenterdevgauss;
         K(2,3)=(HEIGHT/2)+centerdeviation+ycenterdevgauss;
@@ -79,15 +79,15 @@ for i=1:numps
     axis
     R
     T
-
+    
     P=K*[R -R*T];
-
+    
     ps{1,i}=P;
     ks{1,i}=K;
-
-
+    
+    
     %now write all this to file
-
+    
     if(silent~=1)
         disp(['forcal length ' num2str(i) ' is equal to: K[0][0] ' num2str(K(1,1)) ' or K[1][1] ' num2str(K(2,2))]);
         %         dirname=['projFolder' num2str(sum(round(100*clock)))];
@@ -97,8 +97,8 @@ for i=1:numps
         %         save([dirname '/T' num2str(i) '.txt'], 'T','-ascii', '-double');
         %         save([dirname '/P' num2str(i) '.txt'], 'P','-ascii', '-double');
     end
-
-
+    
+    
 end
 
 
