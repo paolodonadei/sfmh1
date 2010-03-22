@@ -35,7 +35,7 @@ else
     F=100;
     disp('sum of W is zero inside computerEssentialErrorSVDNFramesWeighted, this shouldnt happen');
 end
-
+% 
 % D=W';
 % Z
 % D

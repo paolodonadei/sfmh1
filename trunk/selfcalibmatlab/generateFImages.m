@@ -1,5 +1,5 @@
-function [ MF ] = generateFImages( IMS,noiselevel, numCorruptFs )
-
+function [ MF,corrs,ks ] = generateFImages( seqname,noiselevel, numCorruptFs )
+tic
 % a lot of the things here are taken from peter kovesi
 %http://www.csse.uwa.edu.au/~pk/research/matlabfns/Robust/example/index.html
 
@@ -11,7 +11,54 @@ t = .001;  % Distance threshold for deciding outliers
 showgraphs=0;
 count=0;
 
+
+
+
+
+
+
+dirname='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
+realFold=[dirname seqname '/'];
+imgformats={'pgm','jpg','png','tif'};
+numimages=0;
+
+formatnum=1;
+while(numimages==0)
+    
+    IMFiles=dir([realFold '*.' imgformats{1,formatnum}]);
+    numimages=size(IMFiles,1);
+    formatnum=formatnum+1;
+end
+
+for i=1:numimages
+    
+  IMS{1,i}=imread(  [realFold  '' IMFiles(i,1).name ]);
+ 
+end
+
+
 [m,numIs]=size(IMS);
+
+
+
+PFiles=dir([realFold '*.P']);
+[m,n]=size(PFiles);
+
+if(m~=0)
+    
+    for i=1:m
+        
+        P{1,i}=load( [realFold PFiles(i,1).name]);
+        [ks{1,i}, R, t] = vgg_KR_from_P(P{1,i});
+        
+    end
+    
+else
+    
+    ks{1,1}=zeros(3,3);
+end
+
+
 
 for i=1:numIs
     for j=1:i
@@ -70,7 +117,8 @@ for i=1:numIs
             
             
             [F, inliers] = ransacfitfundmatrix(x1, x2, t);
-            
+            corrs{1,count}=x1;
+            corrs{2,count}=x2;
             
             
             l2 = F*x1;    % Epipolar lines in image2
@@ -114,5 +162,5 @@ for i=1:numIs
     end
 end
 
-
+toc
 end

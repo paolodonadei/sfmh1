@@ -1,4 +1,4 @@
-function [t] = runall(G,ks,width,height)
+function [t] = runall(G,ks,width,height,corrs)
 % 
 % G=F;
 % 
@@ -34,6 +34,9 @@ tic;
 [ fclR, centerlocR ]      =  S2nonlinsolveEssRansac( G,width,height );
 RtElapsed=toc;
 
+tic; 
+[ fclG, centerlocG ]      =  S2nonlinsolveEssNframGeometric( G,width,height,corrs );
+GElapsed=toc;
 
 [errps, errOCps  ] = calcSelfCalibError(sln, centerloc,ks);
 
@@ -47,7 +50,7 @@ RtElapsed=toc;
 
 [errR, errROC ] = calcSelfCalibError(fclR, centerlocR,ks);
 
-
+[errG, errGOC ] = calcSelfCalibError(fclG, centerlocG,ks);
 
 disp(['hough algorithm had error in f of ' num2str(errtwofram) ' and in optical center of ' num2str(errtwoframOC) ' with time ' num2str(TtElapsed)   ]);
 disp(['nonrobust algorithm had error in f of ' num2str(errnfram) ' and in optical center of ' num2str(errnframOC)   ' with time ' num2str(NtElapsed) ]);
@@ -55,6 +58,7 @@ disp(['peter sturm algorithm had error in f of ' num2str(errps) ' and in optical
 disp(['ransac algorithm had error in f of ' num2str(errR) ' and in optical center of ' num2str(errROC)    ' with time ' num2str(RtElapsed)]);
 disp(['diagnostics algorithm had error in f of ' num2str(errdiagn) ' and in optical center of ' num2str(errdiagOC)   ' with time ' num2str(DtElapsed) ]);
 disp(['m-estimator algorithm had error in f of ' num2str(errM) ' and in optical center of ' num2str(errMOC)   ' with time ' num2str(MtElapsed) ]);
+disp(['weighted algorithm had error in f of ' num2str(errG) ' and in optical center of ' num2str(errGOC)   ' with time ' num2str(GElapsed) ]);
 
 t=1;
 

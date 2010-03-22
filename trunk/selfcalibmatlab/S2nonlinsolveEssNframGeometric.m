@@ -16,7 +16,7 @@ numtries=10;
  for i=1:numFs
      clear b;
      [b] = funddist(TF{1,i}, [corrs{1,i} ; corrs{2,i}]);
-     d(i)=mean(b);
+     d(i)=mean((b));
       Weights(i)=1/d(i);
      
  end
