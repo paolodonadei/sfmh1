@@ -3,7 +3,7 @@ tic
 % a lot of the things here are taken from peter kovesi
 %http://www.csse.uwa.edu.au/~pk/research/matlabfns/Robust/example/index.html
 
-matchtech=1; % 1 for haris with correlation, 2 for sift
+matchtech=2; % 1 for haris with correlation, 2 for sift
 thresh = 500;   % Harris corner threshold
 nonmaxrad = 3;  % Non-maximal suppression radius
 w = 7;    % Window size for correlation matching
@@ -16,8 +16,8 @@ count=0;
 maxfunds=11;
 
 
-
 dirname='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
+dirname='/home/houman/work/test_data/';
 realFold=[dirname seqname '/'];
 imgformats={'pgm','jpg','png','tif'};
 numimages=0;
