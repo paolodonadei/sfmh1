@@ -1,4 +1,4 @@
-function [ ps ,ks ] = generatePs( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff )
+function [ ps ,ks ] = generatePsunequal( fdiff, skew, ar,centerdeviation, numps,projective,silent,cdev_diff )
 %if fdiff is 1 then all Fs will be different, if 0 otehrwise,
 %skew is just the max skew allowed, if its zero them all skews is zero
 %ar is the aspect ratio
@@ -29,21 +29,21 @@ deviatevar=centerdeviation/20;
 xcenterdevgauss=(randn()*deviatevar);
 ycenterdevgauss=(randn()*deviatevar);
 for i=1:numps
-
-
+    
+    
     if(i~=1)
         T= a + (b-a) * rand(3,1);
-
+        
         R= rotationmat3D((-pi + (pi*2) * rand()),[(rand()*2-1) (rand()*2-1) (rand()*2-1)]);
-
+        
         %degeneracy maker
         % R=eye(3);
-
+        
     end
-
+    
     K=eye(3);
     K(1,2)=skew;
-
+    
     if(numps==2)  %this might not make sense, but for 2 frames i dont want the focal length difference to be a random variable
         curentF=abs(prevF+(fdiff));
     else
@@ -52,11 +52,11 @@ for i=1:numps
             curentF=abs(prevF+((rand()*fdiff)-(fdiff/2)));
         end
     end
-
-
+    
+    
     K(1,1)=curentF;
     K(2,2)=K(1,1)*ar;
-
+    
     if(cdev_diff==0)
         K(1,3)=(WIDTH/2)+centerdeviation+xcenterdevgauss;
         K(2,3)=(HEIGHT/2)+centerdeviation+ycenterdevgauss;
@@ -64,16 +64,24 @@ for i=1:numps
         K(1,3)=(WIDTH/2)+rand()*centerdeviation;
         K(2,3)=(HEIGHT/2)+rand()*centerdeviation;
     end
-
-
+    
+    if(i==1 || i==2 )
+        K(1,2)=3;
+        K(1,1)=500;
+        K(2,2)=K(1,1)*ar;
+        K(1,3)=230;
+        K(2,3)=270;
+    end
+    
+    
     P=K*[R -R*T];
-
+    
     ps{1,i}=P;
     ks{1,i}=K;
-
-
+    
+    
     %now write all this to file
-
+    
     if(silent~=1)
         disp(['forcal length ' num2str(i) ' is equal to: K[0][0] ' num2str(K(1,1)) ' or K[1][1] ' num2str(K(2,2))]);
         %         dirname=['projFolder' num2str(sum(round(100*clock)))];
@@ -83,8 +91,8 @@ for i=1:numps
         %         save([dirname '/T' num2str(i) '.txt'], 'T','-ascii', '-double');
         %         save([dirname '/P' num2str(i) '.txt'], 'P','-ascii', '-double');
     end
-
-
+    
+    
 end
 
 
