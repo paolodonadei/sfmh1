@@ -8,7 +8,7 @@ thresh = 500;   % Harris corner threshold
 nonmaxrad = 3;  % Non-maximal suppression radius
 w = 7;    % Window size for correlation matching
 t = .001;  % Distance threshold for deciding outliers
-showgraphs=0;
+showgraphs=1;
 countF=0;
 
 
@@ -145,6 +145,7 @@ for i=1:numIs
             
             [im,in]=size(inliers);
             
+                  disp(['number of inliers is: ' num2str(in)]);
          
             for k=1:in
                 xin1(:,k)= x1(:,inliers(1,k));
