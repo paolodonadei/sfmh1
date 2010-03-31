@@ -1,6 +1,6 @@
 CC=g++
 
-INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include\opencv'
+INC = -I../../ -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm   -lhighgui -lcxcore -lcv
 LDFLAGS=-L'$(OPENCV_HOME)\lib'

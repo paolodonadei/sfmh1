@@ -47,14 +47,14 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     if (!RECREATEFILES && fs::exists( p1 ) )
     {
-       count= hr_correspond.readMatches(fname);
+        count= hr_correspond.readMatches(fname);
         return count;
     }
 
 
 
 
-    for (int i=0;i<im1.HR2DVector.size();i++)
+    for (int i=0; i<im1.HR2DVector.size(); i++)
     {
 
         CheckForMatch(im1.HR2DVector[i], im2.HR2DVector,index,score);
@@ -93,7 +93,7 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
     int x0,y0,x1,y1;
     int inlier;
 
-    for (int i=0;i<hr_correspond.imIndices.size();i++)
+    for (int i=0; i<hr_correspond.imIndices.size(); i++)
     {
 
         x0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.x;
@@ -133,6 +133,57 @@ int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 }
 
 
+int drawMatchesSingle(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
+{
+
+    IplImage* imgTemp = cvCreateImage(cvGetSize(im1.cv_img), IPL_DEPTH_8U, 3);//png doesnt support alpha channel in opencv
+    cvCvtColor(im1.cv_img, imgTemp, CV_GRAY2BGR);
+
+printf("the number of matches isTTTTTTTTTTTTTTTTTT  %d\n",hr_correspond.imIndices.size());
+
+    int x0,y0,x1,y1;
+    int inlier;
+
+    for (int i=0; i<hr_correspond.imIndices.size(); i++)
+    {
+
+        x0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.x;
+        y0=im1.HR2DVector[hr_correspond.imIndices[i].imindex1]->location.y;
+        x1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.x;
+        y1=im2.HR2DVector[hr_correspond.imIndices[i].imindex2]->location.y;
+
+        inlier=hr_correspond.imIndices[i].inlier;
+
+        cvLine(imgTemp, cvPoint(x0,y0),cvPoint(x1,y1), (inlier)?cvScalar(0,255,0):cvScalar(0,0,255), 1);
+
+        //print correspondences 1 to 1
+        if (1==0) printLine(im1, im2, cvPoint(x0,y0), cvPoint(x1,y1), i);
+    }
+
+
+
+
+
+    if ( checkTempPath()==false)
+        return 0;
+
+    fs::path tempath( TEMPDIR, fs::native );
+    string fname=combineFnames(im1.filename,im2.filename,"single.png");
+    tempath/=fname;
+    fname=tempath.file_string();
+
+    if (!cvSaveImage(fname.c_str(),imgTemp)) printf("Could not save: %s\n",fname.c_str());
+
+    // HRImage tempimage(fname);
+    // tempimage.displayImage();
+    cvReleaseImage( &imgTemp );
+
+
+
+    return 0;
+}
+
+
 int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2Dfeatures, int& winKey, double& score)
 {
     int dsq, distsq1 = 100000000, distsq2 = 100000000;
@@ -142,7 +193,7 @@ int CheckForMatch(const HRPointFeatures& key, const vector<HRPointFeatures>& HR2
     /* Find the two closest matches, and put their squared distances in
        distsq1 and distsq2.
     */
-    for (int i=0;i<HR2Dfeatures.size();i++)
+    for (int i=0; i<HR2Dfeatures.size(); i++)
     {
         dsq = Dist(key, HR2Dfeatures[i]);
 
@@ -328,10 +379,10 @@ int findSIFTfeatures( HRImage& image)
 {
 
 #ifdef OS_WIN
- string siftexec="utils\\siftWin32.exe";
+    string siftexec="utils\\siftWin32.exe";
 
 #else
-   string siftexec="utils/sift";
+    string siftexec="utils/sift";
 #endif
 
     string siftpcaname="";
@@ -380,9 +431,9 @@ int findSIFTfeatures( HRImage& image)
     // invert the image
     int z=0;
 
-    for (int i=0;i<image.height;i++)
+    for (int i=0; i<image.height; i++)
     {
-        for (int j=0;j<image.width;j++)
+        for (int j=0; j<image.width; j++)
         {
             //   printf(" i=%d and j=%d and z=%d\n",i,j,z);
             dataptr[z]= image.data[i*image.step+j];
@@ -399,14 +450,14 @@ int findSIFTfeatures( HRImage& image)
 //        cout<<"image "<<image.pgmfilename <<" not saved\n"<<endl;
 //        return 0;
 //    }
-int zp[3];
+    int zp[3];
 
     zp[0] = CV_IMWRITE_PXM_BINARY;
     zp[1] = 1;
     zp[2] = 0;
 
 
-        if (!cvSaveImage((char*)image.pgmfilename.c_str(),image.cv_img,zp)) printf("Could not save: %s\n",(char*)image.pgmfilename.c_str());
+    if (!cvSaveImage((char*)image.pgmfilename.c_str(),image.cv_img,zp)) printf("Could not save: %s\n",(char*)image.pgmfilename.c_str());
 
 
     fs::path p2( image.pgmfilename, fs::native );
@@ -430,7 +481,7 @@ int zp[3];
 
 
 
- string command_run=string(siftexec)+string(" <")+image.pgmfilename+string("> ")+image.siftkeyfilename;
+    string command_run=string(siftexec)+string(" <")+image.pgmfilename+string("> ")+image.siftkeyfilename;
 
 
 
@@ -450,10 +501,10 @@ int zp[3];
     if (SIFTPCA)
     {
 #ifdef OS_WIN
-  string command_run=string("utils\\recalckeys.exe utils\\gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > NULL");
+        string command_run=string("utils\\recalckeys.exe utils\\gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > NULL");
 #else
 
-    string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
+        string command_run=string("utils/recalckeys utils/gpcavects.txt ")+image.pgmfilename+string(" ")+image.siftkeyfilename+string(" ")+siftpcaname+string("  > /dev/null");
 #endif
 
 

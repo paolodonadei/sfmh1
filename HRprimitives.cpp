@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include "argproc.h"
-#include "_cvmodelest.h"
+
 #include "utils/selfcalib/focallength.h"
 extern const char* TEMPDIR;
 
@@ -543,7 +543,7 @@ int MotionGeometry::findHMatrix(const vector<HRPointFeatures>&  hr1vec,const vec
     double error=0;
     // int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
 
-    cvFindHomography2(	points1,points2,MotionModel_H,0,	1.5,(CvMat*)NULL);
+    cvFindHomography(	points1,points2,MotionModel_H,0,	1.5,(CvMat*)NULL);
 
     int numinliers=0;
     error= computeReprojErrorH( points1,points2, MotionModel_H, err_array ,1.5,&numinliers);
