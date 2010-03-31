@@ -1,11 +1,11 @@
 CC=g++
 VPATH = .:utils/selfcalib
-INC = -I../../ -I. -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I'$(OPENCV_HOME)\cxcore\include' -I'$(OPENCV_HOME)\otherlibs\highgui' -I'$(BOOST_HOME)\include'
+INC = -I../../ -I. -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl
-LDFLAGS= -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
-SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp visiongen.cpp focallength.cpp
-OBJECTS=$(SOURCES:.cpp=.o)
+LDFLAGS= -L'$(MINGW)\lib'
+SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp
+OBJECTS=$(SOURCES:.cpp=.o) utils/selfcalib/focallength.o
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a
 

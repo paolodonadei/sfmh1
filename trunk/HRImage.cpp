@@ -16,6 +16,9 @@
 #include "argproc.h"
 #define DEBUGLVL 0
 
+#if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
+#define OS_WIN
+#endif
 
 const char* TEMPDIR;
 
@@ -573,6 +576,7 @@ int HRImage::displayImageFeatures()
 //    wait for a key
     cvWaitKey(0);
     cvReleaseImage(&tempImage );
+      cvDestroyWindow(filename.c_str());
     return 1;
 }
 
@@ -742,7 +746,14 @@ void HRImageSet::showOneByOne()
 void HRImageSet::showOneByOneFeatureMotions()
 {
 
+#ifdef OS_WIN
+  string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw.exe"), fs::native )).file_string();
+
+#else
     string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw"), fs::native )).file_string();
+#endif
+
+
     if ( !fs::exists( funddrawname ) )
     {
         cout << "funddraw for matching is unavailable\n";
@@ -765,14 +776,16 @@ void HRImageSet::showOneByOneFeatureMotions()
         for (j=0;j<i;j++)
         {
             {
-                string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filenameF+string(" 1");
+                string command_run=funddrawname+string(" \"")+(*imageCollection[i]).filename+string("\" \"")+(*imageCollection[j]).filename+string("\" \"")+correspondencesPairWise[i][j].motion.filenameF+string("\" 1 ");
                 cout<<command_run<<endl;
                 system (command_run.c_str());
+
             }
             {
-                string command_run=funddrawname+string(" ")+(*imageCollection[i]).filename+string(" ")+(*imageCollection[j]).filename+string(" ")+correspondencesPairWise[i][j].motion.filenameH+string(" 2");
+                string command_run=funddrawname+string(" \"")+(*imageCollection[i]).filename+string("\" \"")+(*imageCollection[j]).filename+string("\" \"")+correspondencesPairWise[i][j].motion.filenameH+string("\" 2 ");
                 cout<<command_run<<endl;
                 system (command_run.c_str());
+
             }
         }
     }
@@ -944,7 +957,7 @@ int HRImageSet::exhaustiveSIFTMatching()
             myFocals.insertF(i,j,f1,f2);
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
-
+  drawMatchesSingle((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
 
 
         }
