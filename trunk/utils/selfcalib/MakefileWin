@@ -3,7 +3,7 @@ INC = -I../../ -I'$(OPENCV_HOME)\cv\include' -I'$(OPENCV_HOME)\cvaux\include' -I
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm  -lhrlib -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system -lgsl
 LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib' -L'$(BOOST_HOME)\bin'
-SOURCES=selfcalib.cpp focallength.cpp
+SOURCES=selfcalib.cpp focallength.cpp nonlinSVDlvm.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
 
