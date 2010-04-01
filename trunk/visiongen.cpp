@@ -196,86 +196,8 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                                     CvMat *rotMatrX, CvMat *rotMatrY,
                                     CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
 {
-//    writeCVMatrix(cout,projMatr);
-    CvMat *tmpProjMatr = 0;
-    CvMat *tmpMatrixD = 0;
-    CvMat *tmpMatrixV = 0;
-    CvMat *tmpMatrixM = 0;
 
-    ///CV_FUNCNAME("cvDecomposeProjectionMatrixHR");
-
-
-    /* Validate parameters. */
-    if (projMatr == 0 || calibMatr == 0 || rotMatr == 0 || posVect == 0)
-        printf("Some of parameters is a NULL pointer!");
-
-    if (!CV_IS_MAT(projMatr) || !CV_IS_MAT(calibMatr) || !CV_IS_MAT(rotMatr) || !CV_IS_MAT(posVect))
-        printf("Input parameters must be a matrices!");
-
-    if (projMatr->cols != 4 || projMatr->rows != 3)
-        printf( "Size of projection matrix must be 3x4!");
-
-    if (calibMatr->cols != 3 || calibMatr->rows != 3 || rotMatr->cols != 3 || rotMatr->rows != 3)
-        printf( "Size of calibration and rotation matrices must be 3x3!");
-
-    if (posVect->cols != 1 || posVect->rows != 4)
-        printf( "Size of position vector must be 4x1!");
-
-    tmpProjMatr = cvCreateMat(4, 4, CV_64F);
-    tmpMatrixD = cvCreateMat(4, 4, CV_64F);
-    tmpMatrixV = cvCreateMat(4, 4, CV_64F);
-    tmpMatrixM = cvCreateMat(3, 3, CV_64F);
-
-    /* Compute position vector. */
-
-    cvSetZero(tmpProjMatr); // Add zero row to make matrix square.
-    int i, k;
-    for (i = 0; i < 3; i++)
-        for (k = 0; k < 4; k++)
-            cvmSet(tmpProjMatr, i, k, cvmGet(projMatr, i, k));
-
-    cvSVD(tmpProjMatr, tmpMatrixD, NULL, tmpMatrixV, CV_SVD_MODIFY_A + CV_SVD_V_T);
-
-    /* Save position vector. */
-
-
-
-
-    for (i = 0; i < 4; i++)
-        cvmSet(posVect, i, 0, cvmGet(tmpMatrixV, 3, i)); // Solution is last row of V.
-
-    /* Compute calibration and rotation matrices via RQ decomposition. */
-
-    cvGetCols(projMatr, tmpMatrixM, 0, 3); // M is first square matrix of P.
-
-
-
-
-
-
-    //  writeCVMatrix(cout,tmpMatrixM);
-    double d = cvDet(tmpMatrixM);
-
-
-//printf("\n\nthe determinent of M is %f\n",d);
-    assert(d != 0.0); // So far only finite cameras could be decomposed, so M has to be nonsingular [det(M) != 0].
-
-    cvRQDecomp3x3(tmpMatrixM, calibMatr, rotMatr, rotMatrX, rotMatrY, rotMatrZ, eulerAngles);
-
-    double lastel=cvmGet(calibMatr, 2, 2);
-    for (i = 0; i < 3; i++)
-        for (k = 0; k < 3; k++)
-            cvmSet(calibMatr, i, k, cvmGet(calibMatr, i, k)/lastel);
-
-//i dont knwo if this is right but im getting the absolute value of the focal lenghts because they shouldnt be negative xxx
-    for (i = 0; i < 3; i++)
-        cvmSet(calibMatr, i, i, fabs(cvmGet(calibMatr, i, i)));
-
-    normalizeMatrix(posVect);
-    cvReleaseMat(&tmpProjMatr);
-    cvReleaseMat(&tmpMatrixD);
-    cvReleaseMat(&tmpMatrixV);
-    cvReleaseMat(&tmpMatrixM);
+cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,posVect,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 }
 
 
