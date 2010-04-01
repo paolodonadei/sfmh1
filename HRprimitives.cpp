@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include "argproc.h"
-
+#include "general.h"
 #include "utils/selfcalib/focallength.h"
 extern const char* TEMPDIR;
 
@@ -98,7 +98,7 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
 
 
 
-    for (int i=0;i<ob.imIndices.size();i++)
+    for (int i=0; i<ob.imIndices.size(); i++)
     {
         x1=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.x;
         x2=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.y;
@@ -234,7 +234,7 @@ void HRCorrespond2N::writeIndices()
 
 
 
-    for (int i=0;i<imIndices.size();i++)
+    for (int i=0; i<imIndices.size(); i++)
     {
 
         fp_out <<i<<"\t\t"<<imIndices[i].imindex1<<"\t\t"<<imIndices[i].imindex2 <<"\t\t"<<setw(10)<<fixed<<setprecision(10)<< imIndices[i].score <<endl;
@@ -260,6 +260,8 @@ void HRCorrespond2N::WriteMatches()
     fp_out<<(*this);
     fp_out.close();
 
+
+
 }
 void HRCorrespond2N::WriteMotion()
 {
@@ -272,15 +274,34 @@ void HRCorrespond2N::WriteMotion()
         fp_out.open(motion.filenameF.c_str(), ios::out);
         motion.writeMatrix( fp_out, FUNDAMENTAL);
         fp_out.close();
+
+        string fname2=TEMPDIR+string("/")+string("F_")+string(INDEXFNAME);
+
+
+
+
+        fp_out.open(fname2.c_str(), ios::out |ios::app);
+        fp_out<< indexIm1 << "\t"  << indexIm2 <<"\t"  << combineFnames(hr1ptr->filename,hr2ptr->filename,"_FMotion.txt") << endl;
+        fp_out.close();
+
     }
     {
         string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_HMotion.txt");
 
         motion.filenameH=fname;
 
-        fstream fp_out;
+ fstream fp_out;
         fp_out.open(motion.filenameH.c_str(), ios::out);
         motion.writeMatrix(fp_out ,HOMOGRAPHY);
+        fp_out.close();
+
+        string fname2=TEMPDIR+string("/")+string("H_")+string(INDEXFNAME);
+
+
+
+
+        fp_out.open(fname2.c_str(), ios::out |ios::app);
+        fp_out<< indexIm1 << "\t"  << indexIm2 <<"\t"  << combineFnames(hr1ptr->filename,hr2ptr->filename,"_HMotion.txt") << endl;
         fp_out.close();
     }
 
@@ -292,7 +313,7 @@ int HRCorrespond2N::removeOutliers(const CvMat* tstatus)
 
     int numPoints = imIndices.size();
     std::vector<matchIndex>::iterator it;
-    for (int i=0;i<numPoints;i++)
+    for (int i=0; i<numPoints; i++)
     {
         if (tstatus->data.fl[i]==0) //outlier
         {
@@ -308,7 +329,7 @@ int HRCorrespond2N::findFocalLength(double &f1,double &f2 )
 
     //the code is really not able to handle 2 frames of different size, i dont know which ought to come first in the argument list of the below function
     HRSelfCalibtwoFrame(motion.MotionModel_F,hr1ptr->width,hr1ptr->height, hr2ptr->width,hr2ptr->height,f1, f2,STRUM);
-     printf("focal lengths between frames %s and %s were %f and %f width =%d and height = %d\n",hr1ptr->filename.c_str(),hr2ptr->filename.c_str(),f1,f2,hr1ptr->width,hr1ptr->height);
+    printf("focal lengths between frames %s and %s were %f and %f width =%d and height = %d\n",hr1ptr->filename.c_str(),hr2ptr->filename.c_str(),f1,f2,hr1ptr->width,hr1ptr->height);
 }
 int HRCorrespond2N::findGeomtry()
 {
@@ -527,7 +548,7 @@ int MotionGeometry::findHMatrix(const vector<HRPointFeatures>&  hr1vec,const vec
     status   = cvCreateMat(1,numPoints,CV_8UC1);
     err_array = cvCreateMat( 1, numPoints, CV_32FC1 );
 
-    for (int i=0;i<numPoints;i++)
+    for (int i=0; i<numPoints; i++)
     {
         points1->data.fl[i*2]=hr1vec[indices[i].imindex1]->location.x;
         points1->data.fl[i*2+1]=hr1vec[indices[i].imindex1]->location.y;
@@ -604,7 +625,7 @@ int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vect
     status   = cvCreateMat(1,numPoints,CV_8UC1);
     err_array = cvCreateMat( 1, numPoints, CV_32FC1 );
 
-    for (int i=0;i<numPoints;i++)
+    for (int i=0; i<numPoints; i++)
     {
         points1->data.fl[i*2]=hr1vec[indices[i].imindex1]->location.x;
         points1->data.fl[i*2+1]=hr1vec[indices[i].imindex1]->location.y;
@@ -624,7 +645,7 @@ int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vect
 
 
 
-    for (int i=(numPoints-1);i>=0;i--)
+    for (int i=(numPoints-1); i>=0; i--)
     {
         pointsRejected=pointsRejected+(1-status->data.ptr[i]);
 

@@ -22,7 +22,7 @@
 
 const char* TEMPDIR;
 
-CvScalar colors[2]={cvScalar(255,0,0), cvScalar(0,255,0)};
+CvScalar colors[2]= {cvScalar(255,0,0), cvScalar(0,255,0)};
 
 
 namespace fs = boost::filesystem;
@@ -57,7 +57,7 @@ void focalLengths::finished()
 {
     int i,j;
 
-    for (i=0;i<fLengths.size();i++)
+    for (i=0; i<fLengths.size(); i++)
     {
 
         mystats[i]=findStatsArray(fLengths[i]);
@@ -65,11 +65,11 @@ void focalLengths::finished()
 
     }
 
-    for (i=0;i<fLengths.size();i++)
+    for (i=0; i<fLengths.size(); i++)
     {
         printf(" frame %d has focal lengths estimated as :  ",i);
 
-        for (j=0;j<fLengths[i].size();j++)
+        for (j=0; j<fLengths[i].size(); j++)
         {
 
             printf("   %f    ", fLengths[i][j]);
@@ -77,7 +77,7 @@ void focalLengths::finished()
 
 
         }
-         printf("\n  median was: %f and number was %f and variance is %f \n",mystats[i].median,mystats[i].count,mystats[i].var );
+        printf("\n  median was: %f and number was %f and variance is %f \n",mystats[i].median,mystats[i].count,mystats[i].var );
     }
 }
 
@@ -261,9 +261,9 @@ void HRImage::scale(int pscale)
     }
 
     int temppix;
-    for (int i=0;i<height;i++)
+    for (int i=0; i<height; i++)
     {
-        for (int j=0;j<width;j++)
+        for (int j=0; j<width; j++)
         {
             temppix=getPixel(i,j)*pscale;
             setPixel(i,j,(temppix >= 0 && temppix <255)? temppix:0);
@@ -281,9 +281,9 @@ void HRImage::divideAll(int val)
         return ;
     }
     double pixel;
-    for (int i=0;i<height;i++)
+    for (int i=0; i<height; i++)
     {
-        for (int j=0;j<width;j++)
+        for (int j=0; j<width; j++)
         {
             pixel=getPixel(i,j);
             pixel/=val;
@@ -300,9 +300,9 @@ void  HRImage::setAll(int val)
         cout<<"image not loaded\n"<<endl;
         return ;
     }
-    for (int i=0;i<height;i++)
+    for (int i=0; i<height; i++)
     {
-        for (int j=0;j<width;j++)
+        for (int j=0; j<width; j++)
         {
             setPixel(i,j,val);
         }
@@ -462,7 +462,7 @@ int HRImage::writeFeatures()
 
 
 
-    for (i=0;i<HR2DVector.size();i++)
+    for (i=0; i<HR2DVector.size(); i++)
     {
         fp_out<<i<<"  \t\t  "<<HR2DVector[i]->location.x<<"  \t\t  "<<HR2DVector[i]->location.y<<endl;
 
@@ -576,7 +576,7 @@ int HRImage::displayImageFeatures()
 //    wait for a key
     cvWaitKey(0);
     cvReleaseImage(&tempImage );
-      cvDestroyWindow(filename.c_str());
+    cvDestroyWindow(filename.c_str());
     return 1;
 }
 
@@ -663,9 +663,9 @@ int HRCORRImage::init(IplImage* p_cv_im1,IplImage* p_cv_im2)
     int channels_im2   =  cv_im1->nChannels;
     uchar* tdata_im2    = (uchar *)cv_im1->imageData;
 
-    for (i=im1_top_left.y;i<(cv_im1->height+im1_top_left.y);i++)
+    for (i=im1_top_left.y; i<(cv_im1->height+im1_top_left.y); i++)
     {
-        for (j=im1_top_left.x;j<(cv_im1->width+im1_top_left.x);j++)
+        for (j=im1_top_left.x; j<(cv_im1->width+im1_top_left.x); j++)
         {
             tdata_main[i*step_main+j*channels_main+0] = tdata_im1[(i-im1_top_left.y)*step_im1+(j-im1_top_left.x)*channels_im1+0];
             tdata_main[i*step_main+j*channels_main+1] = tdata_im1[(i-im1_top_left.y)*step_im1+(j-im1_top_left.x)*channels_im1+0];
@@ -677,9 +677,9 @@ int HRCORRImage::init(IplImage* p_cv_im1,IplImage* p_cv_im2)
 
 
 
-    for (i=im2_top_left.y;i<(cv_im2->height+im2_top_left.y);i++)
+    for (i=im2_top_left.y; i<(cv_im2->height+im2_top_left.y); i++)
     {
-        for (j=im2_top_left.x;j<(cv_im2->width+im2_top_left.x);j++)
+        for (j=im2_top_left.x; j<(cv_im2->width+im2_top_left.x); j++)
         {
             tdata_main[i*step_main+j*channels_main+0] = tdata_im2[(i-im2_top_left.y)*step_im2+(j-im2_top_left.x)*channels_im2+0];
             tdata_main[i*step_main+j*channels_main+1] = tdata_im2[(i-im2_top_left.y)*step_im2+(j-im2_top_left.x)*channels_im2+0];
@@ -747,7 +747,7 @@ void HRImageSet::showOneByOneFeatureMotions()
 {
 
 #ifdef OS_WIN
-  string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw.exe"), fs::native )).file_string();
+    string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw.exe"), fs::native )).file_string();
 
 #else
     string funddrawname=(fs::path( string("utils"), fs::native )/fs::path(string("fundutils"), fs::native )/fs::path(string("funddraw"), fs::native )).file_string();
@@ -771,9 +771,9 @@ void HRImageSet::showOneByOneFeatureMotions()
 
     int i,j;
 
-    for (i=0;i<imageCollection.size();i++)
+    for (i=0; i<imageCollection.size(); i++)
     {
-        for (j=0;j<i;j++)
+        for (j=0; j<i; j++)
         {
             {
                 string command_run=funddrawname+string(" \"")+(*imageCollection[i]).filename+string("\" \"")+(*imageCollection[j]).filename+string("\" \"")+correspondencesPairWise[i][j].motion.filenameF+string("\" 1 ");
@@ -935,10 +935,23 @@ int HRImageSet::exhaustiveSIFTMatching()
 
     myFocals.open(imageCollection.size() );
 
+//deleting the index files, i should propbablyt find a better place for this
+    string fname1=TEMPDIR+string("/")+string("F_")+string(INDEXFNAME);
+    if( remove( fname1.c_str() ) != 0 )
+        perror( "Error deleting file" );
+    else
+        puts( "File successfully deleted" );
+    string fname2=TEMPDIR+string("/")+string("H_")+string(INDEXFNAME);
+    if( remove( fname2.c_str() ) != 0 )
+        perror( "Error deleting file" );
+    else
+        puts( "File successfully deleted" );
+//end of deleting index files, these files were necessary for self calibration
 
-    for (i=0;i<imageCollection.size();i++)
+
+    for (i=0; i<imageCollection.size(); i++)
     {
-        for (j=0;j<i;j++)
+        for (j=0; j<i; j++)
         {
             correspondencesPairWise[i][j].indexIm1=i;
             correspondencesPairWise[i][j].indexIm2=j;
@@ -957,7 +970,7 @@ int HRImageSet::exhaustiveSIFTMatching()
             myFocals.insertF(i,j,f1,f2);
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
-  drawMatchesSingle((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
+            drawMatchesSingle((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
 
 
         }
@@ -973,11 +986,11 @@ int HRImageSet::createFeatureTrackMatrix()
 
     int i, j, k,q;
 
-    for (i=0;i<imageCollection.size();i++)
+    for (i=0; i<imageCollection.size(); i++)
     {
-        for (j=0;j<i;j++)
+        for (j=0; j<i; j++)
         {
-            for (k=0;k<correspondencesPairWise[i][j].imIndices.size();k++)
+            for (k=0; k<correspondencesPairWise[i][j].imIndices.size(); k++)
             {
                 //cout<<"i is "<<i <<" and j is "<<j<<endl;
                 if (correspondencesPairWise[i][j].imIndices[k].inlier==1)
@@ -1031,7 +1044,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
     heightImage=(*imCollection[0]).height;
 
 
-    for (i=0;i<imCollection.size();i++)
+    for (i=0; i<imCollection.size(); i++)
     {
 
         IplImage* imgTemptemp=concatImagesVertical(imgTemp,(*imCollection[i]).cv_img);
@@ -1048,7 +1061,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 
     int matchCountr=0;
 
-    for (i=0;i<trackMatrix.size(); i++)
+    for (i=0; i<trackMatrix.size(); i++)
     {
         if (SINGLEMATCHPRINT==1)
         {
@@ -1056,7 +1069,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
             imgTemptempcopy=cvCloneImage(imgTempcopy);
         }
         matchCountr=0;
-        for (j=1;j<trackMatrix[i].size();j++)
+        for (j=1; j<trackMatrix[i].size(); j++)
         {
 
             if (trackMatrix[i][j]!=-1 && trackMatrix[i][j-1]!=-1)
@@ -1124,7 +1137,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 int FeatureTrack::findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices)
 {
     int i,j;
-    for (i=0;i<trackMatrix.size(); i++)
+    for (i=0; i<trackMatrix.size(); i++)
     {
 
         if (trackMatrix[i][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 || trackMatrix[i][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
@@ -1168,7 +1181,7 @@ int FeatureTrack::processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumbe
     else
     {
         rowNumsSize=matchedIndex.size() ;//this trick is done to make sure we dont keep readding same rows
-        for (i=0;i<rowNumsSize;i++)
+        for (i=0; i<rowNumsSize; i++)
         {
             if (trackMatrix[matchedIndex[i]][corrs.indexIm1]==corrs.imIndices[indexNumber].imindex1 && trackMatrix[matchedIndex[i]][corrs.indexIm2]==corrs.imIndices[indexNumber].imindex2)
             {
@@ -1208,10 +1221,10 @@ bool FeatureTrack::rowExistsinTrack(const vector<int>& indices, const vector<int
 {
     bool flagExists=true;
 
-    for (int i=0;i< indices.size();i++)
+    for (int i=0; i< indices.size(); i++)
     {
         flagExists=true;
-        for (int j=0;j<trackMatrix[indices[i]].size();j++)
+        for (int j=0; j<trackMatrix[indices[i]].size(); j++)
         {
 
             if (trackMatrix[indices[i]][j]!=newRow[j])
@@ -1235,16 +1248,16 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
     int count=0;
     curScores.resize(trackMatrix.size(),0);
     inliersStates.resize(trackMatrix.size(),1);//all start out as inliers
-    for (i=0;i<trackMatrix.size(); i++)
+    for (i=0; i<trackMatrix.size(); i++)
     {
         count=0;
-        for (j=0;j<trackMatrix[i].size();j++)
+        for (j=0; j<trackMatrix[i].size(); j++)
         {
-            for (k=0;k<j;k++)
+            for (k=0; k<j; k++)
             {
                 if (trackMatrix[i][k]!=-1 && trackMatrix[i][j]!=-1)
                 {
-                    for (l=0;l<pairCorrespondences[j][k].imIndices.size();l++)
+                    for (l=0; l<pairCorrespondences[j][k].imIndices.size(); l++)
                     {
                         if (pairCorrespondences[j][k].imIndices[l].imindex1==trackMatrix[i][j] && pairCorrespondences[j][k].imIndices[l].imindex2==trackMatrix[i][k]) // zzz indices might be wrong, how do you knwo which is which, check the previous ones too
                         {
@@ -1269,13 +1282,13 @@ int FeatureTrack::pruneFeatureTrack()
     int indexRemove=0;
 
 
-    for (i=0;i<trackMatrix.size(); i++)
+    for (i=0; i<trackMatrix.size(); i++)
     {
-        for (j=0;j<i; j++)
+        for (j=0; j<i; j++)
         {
             if (inliersStates[i]==1 && inliersStates[j]==1)
             {
-                for (k=0;k<trackMatrix[i].size();k++)
+                for (k=0; k<trackMatrix[i].size(); k++)
                 {
                     if (trackMatrix[i][k]==trackMatrix[j][k] && trackMatrix[j][k]!=-1)
                     {
@@ -1300,7 +1313,7 @@ bool FeatureTrack::displayTrackRow(int row)
 {
 
     cout<<"Track index : "<<row;
-    for (int j=0;j<trackMatrix[row].size();j++)
+    for (int j=0; j<trackMatrix[row].size(); j++)
     {
         fs::path p( (*trackImageCollection)[j]->filename, fs::native );
 
@@ -1390,10 +1403,10 @@ void FeatureTrack::writeTrackMatrix(string fname)
     }
 
 
-    for (i=0;i<trackMatrix.size(); i++)
+    for (i=0; i<trackMatrix.size(); i++)
     {
         file_op<<i<<"\t\t"<<setw(10)<<curScores[i]<<setw(10)<<"\t\t"<<setw(10)<<inliersStates[i]<<setw(10);
-        for (j=0;j<trackMatrix[i].size();j++)
+        for (j=0; j<trackMatrix[i].size(); j++)
         {
 
             file_op<<setw(10)<<setprecision(5)<< trackMatrix[i][j]<<"\t";
@@ -1414,7 +1427,7 @@ stats findStatsArray(const vector<double>& argarray)
     int i;
     vector<double> array;
 
-    for (i=0;i<argarray.size();i++)
+    for (i=0; i<argarray.size(); i++)
     {
         if (isnan(argarray[i])==false)
         {
@@ -1445,7 +1458,7 @@ stats findStatsArray(const vector<double>& argarray)
     mystats.max=mystats.min=array[0];
     double dsize=size;
 
-    for (i=0;i<size;i++)
+    for (i=0; i<size; i++)
     {
         mystats.mean+=array[i];
 
@@ -1457,7 +1470,7 @@ stats findStatsArray(const vector<double>& argarray)
 
 
 
-    for (i=0;i<size;i++)
+    for (i=0; i<size; i++)
     {
         mystats.var+=((array[i]-mystats.mean)*(array[i]-mystats.mean));
     }
@@ -1466,12 +1479,12 @@ stats findStatsArray(const vector<double>& argarray)
 
     mystats.s_deviation=sqrt(mystats.var);
 
-     sort(array.begin(), array.end());
+    sort(array.begin(), array.end());
 
-     if(size%2==1)
-     mystats.median=array[(size+1)/2];
-     else
-     mystats.median=(array[(size/2)]+array[(size/2)+1]  )/2.0F;
+    if(size%2==1)
+        mystats.median=array[(size+1)/2];
+    else
+        mystats.median=(array[(size/2)]+array[(size/2)+1]  )/2.0F;
 
 
     return mystats;
