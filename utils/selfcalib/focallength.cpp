@@ -28,6 +28,127 @@ const double typicalF= 5000.0;//change this back
 
 using namespace std;
 
+
+int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const &KV ,int width, int height, SELFCALIBMETHOD method)
+{
+    int i,j;
+    int numFrames=FV.size();
+
+    for(i=0; i<numFrames; i++)
+    {
+        if(KV[i]==NULL)
+        {
+
+            printf("****matrix is null in self calib,m inintialize the input matrices first\n");
+        }
+        if ( KV[i]->rows!=3 || KV[i]->cols!=3  )
+        {
+            cout<<"one of the input matrices has the wrong size in self calib, check to see they are all 3X3"<<endl;
+            return -1;
+        }
+
+
+
+        for(j=0; j<numFrames; j++)
+        {
+
+            if(FV[i][j]==NULL)
+            {
+
+                printf("****matrix is null in self calib,m inintialize the input matrices first\n");
+            }
+            if ( FV[i][j]->rows!=3 || FV[i][j]->cols!=3  )
+            {
+                cout<<"one of the input matrices has the wrong size in self calib, check to see they are all 3X3"<<endl;
+                return -1;
+            }
+
+        }
+
+    }
+///initializing
+
+    for(i=0; i<numFrames; i++)
+    {
+        cvSetZero(KV[i]);
+
+
+        for(j=0; j<numFrames; j++)
+        {
+
+            cvSetZero(FV[i][j]);
+
+
+        }
+
+    }
+
+//////////////////////////////////// DONE ERROR CHECKING ////////////////////////////
+    if (method==STRUM)
+    {
+
+        vector<double > focs((int)((numFrames*(numFrames-1))/2));
+
+        int counter=0;
+        for(i=0; i<numFrames; i++)
+        {
+            for(j=0; j<numFrames; j++)
+            {
+                estimateFocalLengthStrum(FV[i][j],width,height,focs[counter++]);
+
+            }
+        }
+
+        stats myfocstats=findStatsArray(focs);
+        for(i=0; i<numFrames; i++)
+        {
+            cvSetIdentity(KV[i]);
+
+
+            cvmSet(KV[i], 0, 0, myfocstats.median);
+            cvmSet(KV[i], 1, 1, myfocstats.median);
+            cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
+            cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
+
+
+        }
+
+    }
+
+
+    if (method==HARTLEY)
+    {
+        double foc2;
+        for(i=0; i<numFrames; i++)
+        {
+            vector<double > focs(numFrames);
+            for(j=0; j<numFrames; j++)
+            {
+
+                estimateFocalLengthsHartley(FV[i][j],width,height,width,height,focs[j],foc2);
+
+            }
+            stats myfocstats=findStatsArray(focs);
+
+            cvSetIdentity(KV[i]);
+
+
+            cvmSet(KV[i], 0, 0, myfocstats.median);
+            cvmSet(KV[i], 1, 1, myfocstats.median);
+            cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
+            cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
+
+
+        }
+
+
+
+    }
+
+
+
+
+}
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,double& f1,double& f2,SELFCALIBMETHOD method)
 {
 

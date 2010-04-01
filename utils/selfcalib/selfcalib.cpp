@@ -16,20 +16,23 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/path.hpp"
+
+
 #include "general.h"
 #include "HRprimitives.h"
 #include "visiongen.h"
 #include "focallength.h"
 
-#include <boost/shared_ptr.hpp>
 
-typedef boost::shared_ptr<HRImage> HRImagePtr;
-i left here, immplement the matrix stuff , invert matrices, imeplment method for self calibration
+
 using namespace std;
+namespace fs = boost::filesystem;
 
 
 
-char* fil_name1;
 
 
 MotionType MotionType;
@@ -38,20 +41,28 @@ MotionType MotionType;
 
 int main(int argc, char *argv[])
 {
+    string fil_name1;
 
-    CvMat* K1 = cvCreateMat(3,3, CV_64F);
-    CvMat* K2 = cvCreateMat(3,3, CV_64F);
 
-    CvMat* F = cvCreateMat(3,3, CV_64F);
+
+
+    int numFrames=0;
 
     double width,height;
 
-    height=width=256.0*2.0;
 
+
+    vector<CvMat* > intrinMatrix;
+    vector< vector<CvMat*> > funMatrix;
+    vector< vector<string> > funMatrixNames;
+
+
+
+    int mode=0;
 
     int i,j,k;
 
-    if (argc<2)
+    if (argc<5)
     {
         printf("Usage: main [<fundamental matrix>|<index fundmatrices>] [width] [height] [mode]\n");
         printf("<fundamental matrix> name of the file containing the fundamental matrix OR\n");
@@ -65,43 +76,173 @@ int main(int argc, char *argv[])
 
 
 
+
+
     fil_name1= argv[1] ;
-    readCvMatFfromfile(&F,fil_name1);
+    width=  atof(argv[2] );
+    height=  atof(argv[3] );
+    mode= atoi(argv[4] );
 
-    printf("Fundamental matrix read was\n");
-    writeCVMatrix(cout,F );
-    cout<<endl;
-
-    if (argc>2)
+    if(mode==1)
     {
+        numFrames=2;
 
-        width=  atof(argv[2] );
-        height=  atof(argv[3] );
+    }
+    else
+    {
+        int numFs=0;
+        char str[2000];
+        //finding number of frames
+        fstream file_cm(fil_name1.c_str(),ios::in);
+        while (!file_cm.eof())
+        {
+            file_cm.getline(str,2000);
+            numFs++;
+        }
+        numFs--;
+        file_cm.clear();
+        file_cm.seekg(0, ios::beg);
+        file_cm.close();
+
+        numFrames=(int)((1.0+sqrt(1.0+(8*numFs)))/2.0);
 
     }
 
 
 
-    double foc;
-    // estimateFocalLengthStrum(F,width,height,foc);
-    cvSetZero(K1);
-    cvSetZero(K2);
-    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,HARTLEY);
-    cout<<" According to Hartley F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
+//allocating martices
+    intrinMatrix.resize(numFrames);
+    funMatrix.resize(numFrames);
+    funMatrixNames.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+    {
+        funMatrix[i].resize(numFrames);
+        funMatrixNames[i].resize(numFrames);
+    }
 
-    cvSetZero(K1);
-    cvSetZero(K2);
-    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,STRUM);
-    cout<<" According to STRUM F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
+    for (int i = 0; i < numFrames; ++i)
+    {
+        intrinMatrix[i]=cvCreateMat(3,3, CV_64F);
+        for (int j = 0; j < numFrames; ++j)
+        {
+            funMatrix[i][j]=cvCreateMat(3,3, CV_64F);
+        }
+    }
 
-    cvSetZero(K1);
-    cvSetZero(K2);
-    HRSelfCalibtwoFrame(F,width,height, width,height,K1, K2,POLLEFEYVISUAL);
-    cout<<" According to POLLEFEYVISUAL F1= "<<  cvmGet( K1,0,0 )  << " and F2=  "<<  cvmGet( K2,0,0 )  <<endl;
 
-    cvReleaseMat(&F);
-    cvReleaseMat(&K1);
-    cvReleaseMat(&K2);
+
+    if(mode==1)
+    {
+        funMatrix[0][1]=fil_name1;
+
+    }
+    else
+    {
+        int i,j;
+        fs::path p( fil_name1, fs::native );
+        p.remove_leaf();
+        string curFname;
+
+        char str[2000];
+        //finding number of frames
+        fstream file_cm(fil_name1.c_str(),ios::in);
+        while (!file_cm.eof())
+        {
+            file_cm.getline(str,2000);
+            string s(str);
+            string out;
+            istringstream ss;
+            ss.str(s);
+
+            ss>>i;
+            ss>>j;
+            ss>>curFname;
+
+            if(i>=numFrames || j>=numFrames)
+            {
+                printf("something went wrong in the findex files\n");
+
+            }
+
+            funMatrixNames[i][j]=(p/fs::path(curFname, fs::native )).file_string();
+
+        }
+        file_cm.clear();
+        file_cm.seekg(0, ios::beg);
+        file_cm.close();
+
+    }
+
+    for(i=0; i<numFrames; i++)
+    {
+
+        for(j=0; j<numFrames; j++)
+        {
+
+            if(funMatrixNames[i][j]!="")
+            {
+
+                readCvMatFfromfile(&funMatrix[i][j],funMatrixNames[i][j]);
+
+            }
+        }
+
+    }
+
+
+    for(i=0; i<numFrames; i++)
+    {
+
+        for(j=0; j<numFrames; j++)
+        {
+
+            if(funMatrixNames[i][j]=="" && i!=j && funMatrixNames[j][i]!="")
+            {
+
+                cvTranspose(funMatrix[j][i], funMatrix[i][j]);
+
+            }
+        }
+
+    }
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, HARTLEY);
+
+
+    cout<<" According to Hartley :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(count,intrinMatrix[i]);
+    }
+
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
+
+    cout<<" According to Sturm :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(count,intrinMatrix[i]);
+    }
+
+
+
+
+
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        cvReleaseMat(&intrinMatrix[i]);
+        for (int j = 0; j < numFrames; ++j)
+        {
+            cvReleaseMat(&funMatrix[i][j]);
+        }
+    }
+
+
     return 0;
 }
 
