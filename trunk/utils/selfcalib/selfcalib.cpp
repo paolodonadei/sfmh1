@@ -20,6 +20,11 @@
 #include "HRprimitives.h"
 #include "visiongen.h"
 #include "focallength.h"
+
+#include <boost/shared_ptr.hpp>
+
+typedef boost::shared_ptr<HRImage> HRImagePtr;
+i left here, immplement the matrix stuff , invert matrices, imeplment method for self calibration
 using namespace std;
 
 
@@ -48,7 +53,11 @@ int main(int argc, char *argv[])
 
     if (argc<2)
     {
-        printf("Usage: main <fundamental matrix> [width] [height]\n\7");
+        printf("Usage: main [<fundamental matrix>|<index fundmatrices>] [width] [height] [mode]\n");
+        printf("<fundamental matrix> name of the file containing the fundamental matrix OR\n");
+        printf("<index fundmatrices> an index pointing to the set of fundamental matrices, see [mode] option\n");
+        printf("[width] [height] size of the images\n");
+        printf("[mode] 1 would indicate first option is a single fundamental matrix, 2 means its an index\n");
         exit(0);
     }
 

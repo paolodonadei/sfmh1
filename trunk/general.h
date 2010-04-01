@@ -14,6 +14,10 @@
 #include "HRImage.hpp"
 
 
+//some general definitions go here
+#define INDEXFNAME "motionindex.txt"
+
+
 using namespace std;
 
 

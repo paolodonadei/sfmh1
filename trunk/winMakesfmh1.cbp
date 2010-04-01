@@ -26,7 +26,7 @@
 					<Add option="-g" />
 				</Compiler>
 				<MakeCommands>
-					<Build command="$make  -f $makefile " />
+					<Build command="$make  -f all" />
 					<CompileFile command="$make -f $makefile " />
 					<Clean command="$make  -f $makefile clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
@@ -44,11 +44,8 @@
 		<Unit filename="HRprimitives.h" />
 		<Unit filename="MakefileWin" />
 		<Unit filename="TODO" />
-		<Unit filename="_cvmodelest.h" />
 		<Unit filename="argproc.cpp" />
 		<Unit filename="argproc.h" />
-		<Unit filename="cvfundam.cpp" />
-		<Unit filename="cvmodelest.cpp" />
 		<Unit filename="general.cpp" />
 		<Unit filename="general.h" />
 		<Unit filename="main.cpp" />

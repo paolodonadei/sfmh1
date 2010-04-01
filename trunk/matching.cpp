@@ -139,7 +139,7 @@ int drawMatchesSingle(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
     IplImage* imgTemp = cvCreateImage(cvGetSize(im1.cv_img), IPL_DEPTH_8U, 3);//png doesnt support alpha channel in opencv
     cvCvtColor(im1.cv_img, imgTemp, CV_GRAY2BGR);
 
-printf("the number of matches isTTTTTTTTTTTTTTTTTT  %d\n",hr_correspond.imIndices.size());
+
 
     int x0,y0,x1,y1;
     int inlier;
