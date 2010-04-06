@@ -6,23 +6,28 @@
 // image from a file, inverts it, and displays the result.
 //
 ////////////////////////////////////////////////////////////////////////
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+
 #include <cv.h>
 #include <highgui.h>
 #include <vector>
 #include <iostream>
+
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-#include <math.h>
-#include <stddef.h>
+
 #include <gsl/gsl_linalg.h>
+
 #include "general.h"
 
 #include "focallength.h"
 #include "visiongen.h"
+
+
+
+
+
 
 const double typicalF= 5000.0;//change this back
 
@@ -127,9 +132,9 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const
                 {
 
 
-                estimateFocalLengthsHartley(FV[i][j],width,height,width,height,foc1,foc2);
-                focs.push_back(foc2);
-                printf("focal length is %f\n", foc2);
+                    estimateFocalLengthsHartley(FV[i][j],width,height,width,height,foc1,foc2);
+                    focs.push_back(foc2);
+                    printf("focal length is %f\n", foc2);
                 }
             }
             printf("____________\n", foc1);
