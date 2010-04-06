@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <cv.h>
-#include <highgui.h>
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -32,7 +32,7 @@ int absoluteQuadricfromAY(const CvMat* pA, CvMat* pY,CvMat* Q);
 int formAYfromP1P2Pollefey(const CvMat* pP1,const CvMat* pP2, CvMat* pA, CvMat* pY);
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,double& f1,double& f2,SELFCALIBMETHOD method);
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method);
-
+void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata);
 int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const &KV ,int width, int height, SELFCALIBMETHOD method);
 
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);

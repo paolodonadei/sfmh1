@@ -1,9 +1,9 @@
 CC=g++
 INC = -I../../ -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
-LIBS=-lm  -lhrlib -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system -lgsl
+LIBS= -llevmar  -lhrlib -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system -llapack -lblas -lf2c  -lgsl
 LDFLAGS=-L../../ -L'$(MINGW)\lib'
-SOURCES=selfcalib.cpp focallength.cpp nonlinSVDlvm.cpp
+SOURCES=selfcalib.cpp focallength.cpp nonlinSClvm.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
 
