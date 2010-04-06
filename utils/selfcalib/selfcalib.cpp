@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
     if(mode==1)
     {
-        funMatrix[0][1]=fil_name1;
+        funMatrixNames[0][1]=fil_name1;
 
     }
     else
@@ -160,8 +160,8 @@ int main(int argc, char *argv[])
 
             if(i>=numFrames || j>=numFrames)
             {
-                printf("something went wrong in the findex files\n");
-
+                printf("something went wrong in the findex files, make sure teh indeices of the frames start with 0, aborting\n");
+                exit(1);
             }
 
             funMatrixNames[i][j]=(p/fs::path(curFname, fs::native )).file_string();
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < numFrames; ++i)
     {
-        writeCVMatrix(count,intrinMatrix[i]);
+        writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < numFrames; ++i)
     {
-        writeCVMatrix(count,intrinMatrix[i]);
+        writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 

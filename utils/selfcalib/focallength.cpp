@@ -73,29 +73,27 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const
         cvSetZero(KV[i]);
 
 
-        for(j=0; j<numFrames; j++)
-        {
-
-            cvSetZero(FV[i][j]);
-
-
-        }
-
     }
+
+
 
 //////////////////////////////////// DONE ERROR CHECKING ////////////////////////////
     if (method==STRUM)
     {
-
-        vector<double > focs((int)((numFrames*(numFrames-1))/2));
+        double foc;
+        vector<double > focs;
 
         int counter=0;
         for(i=0; i<numFrames; i++)
         {
             for(j=0; j<numFrames; j++)
             {
-                estimateFocalLengthStrum(FV[i][j],width,height,focs[counter++]);
+                if(i!=j)
+                {
 
+                    estimateFocalLengthStrum(FV[i][j],width,height,foc);
+                    focs.push_back(foc);
+                }
             }
         }
 
@@ -118,16 +116,23 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const
 
     if (method==HARTLEY)
     {
-        double foc2;
+        double foc2,foc1;
+        int counter=0;
         for(i=0; i<numFrames; i++)
         {
-            vector<double > focs(numFrames);
+            vector<double > focs;
             for(j=0; j<numFrames; j++)
             {
+                if(i!=j)
+                {
 
-                estimateFocalLengthsHartley(FV[i][j],width,height,width,height,focs[j],foc2);
 
+                estimateFocalLengthsHartley(FV[i][j],width,height,width,height,foc1,foc2);
+                focs.push_back(foc2);
+                printf("focal length is %f\n", foc2);
+                }
             }
+            printf("____________\n", foc1);
             stats myfocstats=findStatsArray(focs);
 
             cvSetIdentity(KV[i]);
@@ -137,6 +142,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const
             cvmSet(KV[i], 1, 1, myfocstats.median);
             cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
             cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
+            focs.clear();
 
 
         }

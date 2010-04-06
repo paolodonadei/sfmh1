@@ -1427,6 +1427,16 @@ stats findStatsArray(const vector<double>& argarray)
     int i;
     vector<double> array;
 
+
+//printing the content
+//    for (i=0; i<argarray.size(); i++)
+//    {
+//        printf("element %d is %f\n",i,argarray[i]);
+//    }
+
+
+
+
     for (i=0; i<argarray.size(); i++)
     {
         if (isnan(argarray[i])==false)
@@ -1484,7 +1494,8 @@ stats findStatsArray(const vector<double>& argarray)
     if(size%2==1)
         mystats.median=array[(size+1)/2];
     else
-        mystats.median=(array[(size/2)]+array[(size/2)+1]  )/2.0F;
+        mystats.median=(array[(size/2)]+array[(size/2)-1]  )/2.0F;
+
 
 
     return mystats;
