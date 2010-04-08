@@ -6,11 +6,12 @@
 // image from a file, inverts it, and displays the result.
 //
 ////////////////////////////////////////////////////////////////////////
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <cv.h>
-#include <highgui.h>
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -20,7 +21,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 
-
+#include "nonlinSClvm.h"
 #include "general.h"
 #include "HRprimitives.h"
 #include "visiongen.h"
@@ -30,8 +31,30 @@
 
 using namespace std;
 namespace fs = boost::filesystem;
+//
+//
+void printmat(void* mat)
+{
+
+    vector< vector<CvMat*> > *funatrix=(vector< vector<CvMat*> >*)mat;
+
+int numFrames=(*funatrix).size();
+
+    int i,j;
+    printf("inside the function");
+    for(i=0; i<numFrames; i++)
+    {
+
+        for(j=0; j<numFrames; j++)
+        {
+            writeCVMatrix(cout,(*funatrix)[i][j]);
+
+        }
+
+    }
 
 
+}
 
 
 
@@ -113,10 +136,12 @@ int main(int argc, char *argv[])
 //allocating martices
     intrinMatrix.resize(numFrames);
     funMatrix.resize(numFrames);
+
     funMatrixNames.resize(numFrames);
     for (int i = 0; i < numFrames; ++i)
     {
         funMatrix[i].resize(numFrames);
+
         funMatrixNames[i].resize(numFrames);
     }
 
@@ -126,6 +151,7 @@ int main(int argc, char *argv[])
         for (int j = 0; j < numFrames; ++j)
         {
             funMatrix[i][j]=cvCreateMat(3,3, CV_64F);
+
         }
     }
 
@@ -207,6 +233,7 @@ int main(int argc, char *argv[])
     }
 
 
+
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, HARTLEY);
 
 
@@ -230,6 +257,26 @@ int main(int argc, char *argv[])
 
 
 
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
+
+    cout<<" According to Sturm :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, NONLINSIMPLE);
+
+    cout<<" According to NONLINSIMPLE :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
+
 
 
 
@@ -245,5 +292,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
 
 
