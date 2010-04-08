@@ -9,7 +9,7 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <cv.h>
-#include <highgui.h>
+
 #include "sift.h"
 #include "HRImage.hpp"
 

@@ -9,14 +9,14 @@
 #include <math.h>
 
 #include <cv.h>
-#include <highgui.h>
+
 #include <vector>
 #include <iostream>
 
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
+#include "nonlinSClvm.h"
 #include <gsl/gsl_linalg.h>
 
 #include "general.h"
@@ -34,7 +34,7 @@ const double typicalF= 5000.0;//change this back
 using namespace std;
 
 
-int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const &KV ,int width, int height, SELFCALIBMETHOD method)
+int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method)
 {
     int i,j;
     int numFrames=FV.size();
@@ -115,6 +115,14 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*> const
 
 
         }
+
+    }
+
+
+    if (method==NONLINSIMPLE)
+    {
+       HRSelfCalibtwoFrameNonlin(FV,  KV , width, height);
+
 
     }
 
