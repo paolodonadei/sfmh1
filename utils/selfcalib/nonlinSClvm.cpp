@@ -95,17 +95,17 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
     int numFrames=KV.size();
     int m, n;
     m=NONLINPARMS*numFrames;
-    n=(int)(((NONLINPARMS)*(NONLINPARMS-1))/2);
+    n=(int)(((numFrames)*(numFrames-1))/2);
 
-    double p[m], x[n];
-    double lb[m], ub[m];
+    double p[m+1], x[n+1];
+    double lb[m+1], ub[m+1];
 
-vector<CvMat* > tempMats;
-tempMats.resize(4);
-  for(i=0; i<4; i++)
-  {
-      tempMats[i]=cvCreateMat(3,3, CV_64F);
-  }
+    vector<CvMat* > tempMats;
+    tempMats.resize(4);
+    for(i=0; i<4; i++)
+    {
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+    }
 
 //initializing measurements
     for(i=0; i<n; i++)
@@ -116,23 +116,24 @@ tempMats.resize(4);
     for(i=0; i<numFrames; i++)
     {
 
+
         j=0;
 
         if(NONLINPARMS>0)
         {
             //focal length
-            p[(i*numFrames)+j]=width;
-            lb[(i*numFrames)+j]=100;
-            ub[(i*numFrames)+j]=2000;
+            p[(i*NONLINPARMS)+j]=width;
+            lb[(i*NONLINPARMS)+j]=100;
+            ub[(i*NONLINPARMS)+j]=2000;
             j++;
 
         }
 
         if(NONLINPARMS>1)  //X CENTER
         {
-            p[(i*numFrames)+j]=width/2;
-            lb[(i*numFrames)+j]=(width/2)-(width/5);
-            ub[(i*numFrames)+j]=(width/2)+(width/5);
+            p[(i*NONLINPARMS)+j]=width/2;
+            lb[(i*NONLINPARMS)+j]=(width/2)-(width/5);
+            ub[(i*NONLINPARMS)+j]=(width/2)+(width/5);
             j++;
         }
 
@@ -140,30 +141,42 @@ tempMats.resize(4);
         if(NONLINPARMS>2)
         {
             //Y center
-            p[(i*numFrames)+j]=height/2;
-            lb[(i*numFrames)+j]=(height/2)-(height/5);
-            ub[(i*numFrames)+j]=(height/2)+(height/5);
+            p[(i*NONLINPARMS)+j]=height/2;
+            lb[(i*NONLINPARMS)+j]=(height/2)-(height/5);
+            ub[(i*NONLINPARMS)+j]=(height/2)+(height/5);
             j++;
         }
 
         if(NONLINPARMS>3)
         {
             //aspect ratio
-            p[(i*numFrames)+j]=1.0;
-            lb[(i*numFrames)+j]=0.8;
-            ub[(i*numFrames)+j]=1.2;
+            p[(i*NONLINPARMS)+j]=1.0;
+            lb[(i*NONLINPARMS)+j]=0.8;
+            ub[(i*NONLINPARMS)+j]=1.2;
             j++;
         }
         if(NONLINPARMS>4)
         {
             //skew
-            p[(i*numFrames)+j++]=0.0;
-            lb[(i*numFrames)+j]=0.8;
-            ub[(i*numFrames)+j]=1.2;
+            p[(i*NONLINPARMS)+j++]=0.0;
+            lb[(i*NONLINPARMS)+j]=-8;
+            ub[(i*NONLINPARMS)+j]=8;
             j++;
         }
 
+
     }
+
+
+//    for(int k=0; k<NONLINPARMS*numFrames; k++)
+//        {
+//            cout<<"number :"<<k<<"is: "<<lb[k]<<"\t"<<ub[k]<<"\t"<<p[k]<<endl;
+//
+//        }
+
+
+
+
     double *work, *covar;
     work=(double*)malloc((LM_DIF_WORKSZ(m, n)+m*m)*sizeof(double));
     if(!work)
@@ -186,6 +199,8 @@ tempMats.resize(4);
     mySCinputs.funds=&FV;
     mySCinputs.intrin=&KV;
     mySCinputs.tempMat=&tempMats;
+
+
 
     ret=dlevmar_bc_dif(errnonLinFunctionSelfCalib,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
 
@@ -211,10 +226,10 @@ tempMats.resize(4);
 
 
 
- for(i=0; i<4; i++)
-  {
+    for(i=0; i<4; i++)
+    {
         cvReleaseMat(&tempMats[i]);
-  }
+    }
     free(work);
 
 }
@@ -224,6 +239,9 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     SCinputs* mySCinputs=(SCinputs*)adata;
 
+
+printf("params are :\n")
+for (int i=0;i<)
 
 
 
@@ -236,7 +254,7 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     vector< vector<CvMat*> > *FMat=(vector< vector<CvMat*> >*)mySCinputs->funds;
     vector<CvMat* > *pintrin= (vector< CvMat* >*)mySCinputs->intrin;
-vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
+    vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
 
 
 ///////////////////// done putting F back into matrices
@@ -254,8 +272,8 @@ vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
         {
 
             //focal length
-            cvmSet((*pintrin)[i], 0, 0, p[(i*n)+j]);
-            cvmSet((*pintrin)[i], 1, 1, p[(i*n)+j]);
+            cvmSet((*pintrin)[i], 0, 0, p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 1, 1, p[(i*NONLINPARMS)+j]);
             cvmSet((*pintrin)[i], 0, 2, ((double)(width/2.00)));
             cvmSet((*pintrin)[i], 1, 2, ((double)(height/2.00)));
             cvmSet((*pintrin)[i], 0, 1, 0.0);
@@ -268,7 +286,7 @@ vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
         if(NONLINPARMS>1)  //X CENTER
         {
 
-            cvmSet((*pintrin)[i], 0, 2, p[(i*n)+j]);
+            cvmSet((*pintrin)[i], 0, 2, p[(i*NONLINPARMS)+j]);
             j++;
         }
 
@@ -276,7 +294,7 @@ vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
         if(NONLINPARMS>2)
         {
             //Y center
-            cvmSet((*pintrin)[i], 1, 2, p[(i*n)+j]);
+            cvmSet((*pintrin)[i], 1, 2, p[(i*NONLINPARMS)+j]);
             j++;
         }
 
@@ -284,14 +302,14 @@ vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
         {
             //aspect ratio
             //Y center
-            cvmSet((*pintrin)[i], 1, 1, cvmGet((*pintrin)[i],0,0)*p[(i*n)+j]);
+            cvmSet((*pintrin)[i], 1, 1, cvmGet((*pintrin)[i],0,0)*p[(i*NONLINPARMS)+j]);
             j++;
 
         }
         if(NONLINPARMS>4)
         {
             //skew
-            cvmSet((*pintrin)[i], 0, 1, p[(i*n)+j]);
+            cvmSet((*pintrin)[i], 0, 1, p[(i*NONLINPARMS)+j]);
             j++;
 
         }
@@ -300,13 +318,13 @@ vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
 
 ///////////////////// now calculating errors
 
-int count=0;
-   for ( i = 0; i < n; ++i)
+    int count=0;
+    for ( i = 0; i < n; ++i)
     {
 
         for ( j = 0; j < i; ++j)
         {
-            hx[count++]=hx[0]+findSVDerror((*FMat)[i][j], (*pintrin)[i],(*pintrin)[i],tempMtx);
+            hx[count++]=findSVDerror((*FMat)[i][j], (*pintrin)[i],(*pintrin)[i],tempMtx);
 
         }
     }
@@ -320,24 +338,24 @@ double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
 {
     double    err=0;
 
-CvMat* temp1=(*tempMat)[0];
-CvMat* temp2=(*tempMat)[2];
-CvMat* temp3=(*tempMat)[3];
-CvMat* temp4=(*tempMat)[4];
+    CvMat* temp1=(*tempMat)[0];
+    CvMat* temp2=(*tempMat)[1];
+    CvMat* temp3=(*tempMat)[2];
+    CvMat* temp4=(*tempMat)[3];
 
 
-cvTranspose(k1, temp1);
+    cvTranspose(k1, temp1);
 
 
-cvMatMul(temp1, F, temp2);   // Ma*Mb   -> Mc
-cvMatMul(temp2, k2, temp1);   // Ma*Mb   -> Mc
+    cvMatMul(temp1, F, temp2);   // Ma*Mb   -> Mc
+    cvMatMul(temp2, k2, temp1);   // Ma*Mb   -> Mc
 
 
-cvSVD( temp1, temp2,  temp3, temp4,CV_SVD_MODIFY_A|CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
+    cvSVD( temp1, temp2,  temp3, temp4,CV_SVD_MODIFY_A|CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 
-writeCVMatrix(cout,temp2);
 
-err=(cvmGet(temp2,0,0)-cvmGet(temp2,1,1))/cvmGet(temp2,1,1);
+
+    err=(cvmGet(temp2,0,0)-cvmGet(temp2,1,1))/cvmGet(temp2,1,1);
 
     return err;
 }
