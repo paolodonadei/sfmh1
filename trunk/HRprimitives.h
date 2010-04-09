@@ -2,7 +2,7 @@
 #define HRPRIMITIVES_HPP_INCLUDED
 #include <string>
 #include <cv.h>
-#include <highgui.h>
+
 #include <cxcore.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -84,7 +84,7 @@ class HRCorrespond2N
 {
 public:
     int findGeomtry();
-    int findFocalLength(double &f1,double &f2 );
+
     void writeIndices();
     friend ostream &operator<<(ostream &stream, const HRCorrespond2N& ob);
     HRCorrespond2N();

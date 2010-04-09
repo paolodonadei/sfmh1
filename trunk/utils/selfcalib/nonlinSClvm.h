@@ -1,3 +1,6 @@
+#ifndef NONLINSCLVM_HPP_INCLUDED
+#define NONLINSCLVM_HPP_INCLUDED
+
 #include <vector>
 
 #include <cxcore.h>
@@ -14,8 +17,6 @@ using namespace std;
 void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata);
 
 int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height);
-int CvMat2D_to_buff(vector< vector<CvMat*> >const &Mat,double** pbuffer);
-int buff_to_CvMat2D(double* pbuffer,vector< vector<CvMat*> >const &Mat);
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat);
 
 struct SCinputs
@@ -30,3 +31,5 @@ struct SCinputs
      int numunknownframes;
 
 };
+
+#endif

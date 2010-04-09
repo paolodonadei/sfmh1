@@ -3,7 +3,10 @@
 
 #include "general.h"
 #include <cv.h>
-#include <highgui.h>
+
+
+
+
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "HRprimitives.h"
@@ -12,7 +15,7 @@
 class HRFeature;
 class HRCorrespond2N;
 class FeatureTrack;
-using namespace std;
+
 class HRImage;
 
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
@@ -30,20 +33,7 @@ struct stats
     double median;
 };
 stats findStatsArray(const vector<double>& argarray);
-class focalLengths
-{
-public:
-    focalLengths();
-    focalLengths(int numimages);
-    ~focalLengths();
 
-    vector<vector<double> > fLengths;
-    vector<stats> mystats;
-    void open(int numimages);
-    void finished();
-    void insertF(int i, int j, double f1,double f2);
-
-};
 
 class HRImage
 {
@@ -85,9 +75,11 @@ public:
     string pgmfilename;//this is used for some external programs that need a pgm format, i.e. sift
     string siftkeyfilename;
     vector<HRPointFeatures> HR2DVector;
+    CvMat*  intrinsicMatrix;
 private:
 
     enum {BLACK=0,WHITE=255};
+
 
 
 
@@ -157,9 +149,10 @@ public:
     int exhaustiveSIFTMatching();
     FeatureTrack myTracks;
     string temporaryDir;
-    focalLengths myFocals;
+
     int createFeatureTrackMatrix();
     void showOneByOneFeatureMotions();
+    int SelfCalibrate();
 
 
 };

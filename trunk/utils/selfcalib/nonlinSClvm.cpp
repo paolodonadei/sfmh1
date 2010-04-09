@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include "nonlinSClvm.h"
-#define NONLINPARMS 3
+#define NONLINPARMS 1
 #define CONSTPARAMS 0
 #include "general.h"
 using namespace std;
@@ -20,6 +20,8 @@ using namespace std;
 
 int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height)
 {
+
+
 
 
     int i,j,ret;
@@ -237,12 +239,12 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     SCinputs* mySCinputs=(SCinputs*)adata;
 
-    printf("m is %d and n is %d :\n",m,n);
-    printf("params are :\n");
-    for (int i=0; i<m; i++)
-        printf("p %d is %f\n",i,p[i]);
+//    printf("m is %d and n is %d :\n",m,n);
+//    printf("params are :\n");
+//    for (int i=0; i<m; i++)
+//        printf("p %d is %f\n",i,p[i]);
 
-
+  //  printf(".");
 
     int i,j;
     int width=0;//figure thesed out
@@ -265,7 +267,7 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 ///////////////////// done putting F back into matrices
 
 
-     int numfr=0;
+    int numfr=0;
     for(i=0; i<numFrames; i++)
     {
 
@@ -327,15 +329,9 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
 ///////////////////// now calculating errors
 
-    for(i=0; i<numFrames; i++)
-    {
+//    for(i=0; i<numFrames; i++)
+//          writeCVMatrix(cout,(*pintrin)[i]);
 
-
-        writeCVMatrix(cout,(*pintrin)[i]);
-
-
-
-    }
 
     double count=0;
     double totEr=0;
@@ -353,9 +349,9 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
     for (int i=0; i<n; i++)
         hx[i]=totEr;
 
-          printf("errrs are :\n");
-    for (int i=0; i<n; i++)
-        printf("hx %d is %f\n",i,hx[i]);
+//    printf("errrs are :\n");
+//    for (int i=0; i<n; i++)
+//        printf("hx %d is %f\n",i,hx[i]);
 
 }
 
