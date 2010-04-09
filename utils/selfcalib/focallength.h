@@ -16,7 +16,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
+#include "nonlinSClvm.h"
 
 enum SELFCALIBMETHOD {STRUM, POLLEFEY, HARTLEY,POLLEFEYVISUAL,NONLINSIMPLE};
 

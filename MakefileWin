@@ -2,10 +2,10 @@ CC=g++
 VPATH = .:utils/selfcalib
 INC = -I../../ -I. -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
-LIBS=-lm  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl
+LIBS=-lm -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl -llapack -lblas -lf2c
 LDFLAGS= -L'$(MINGW)\lib'
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp
-OBJECTS=$(SOURCES:.cpp=.o) utils/selfcalib/focallength.o
+OBJECTS=$(SOURCES:.cpp=.o) utils/selfcalib/focallength.o utils/selfcalib/nonlinSClvm.o
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a
 

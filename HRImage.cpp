@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
+#include <highgui.h>
 #include <iostream>
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
@@ -26,69 +27,12 @@ CvScalar colors[2]= {cvScalar(255,0,0), cvScalar(0,255,0)};
 
 
 namespace fs = boost::filesystem;
-using namespace std;
 
 
-focalLengths::focalLengths()
-{
-
-}
-focalLengths::~focalLengths()
-{
-
-}
-
-focalLengths::focalLengths(int numimages)
-{
-    open( numimages);
-}
-
-void focalLengths::open(int numimages)
-{
-
-    fLengths.resize( numimages );
-
-    mystats.resize( numimages);
-
-
-
-}
-void focalLengths::finished()
-{
-    int i,j;
-
-    for (i=0; i<fLengths.size(); i++)
-    {
-
-        mystats[i]=findStatsArray(fLengths[i]);
-
-
-    }
-
-    for (i=0; i<fLengths.size(); i++)
-    {
-        printf(" frame %d has focal lengths estimated as :  ",i);
-
-        for (j=0; j<fLengths[i].size(); j++)
-        {
-
-            printf("   %f    ", fLengths[i][j]);
-
-
-
-        }
-        printf("\n  median was: %f and number was %f and variance is %f \n",mystats[i].median,mystats[i].count,mystats[i].var );
-    }
-}
-
-void focalLengths::insertF(int i, int j, double f1,double f2)
-{
-    fLengths[i].push_back(f1);
-    fLengths[j].push_back(f2);
-}
 
 HRImage::HRImage()
 {
+
     siftkeyfilename="";
     pgmfilename="";
     cv_img=NULL;
@@ -99,6 +43,7 @@ HRImage::HRImage()
 }
 int HRImage::openim(string fname)
 {
+    intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     siftkeyfilename="";
     pgmfilename="";
     cv_img=NULL;
@@ -159,7 +104,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     cv_img=cvCreateImage(cvSize(pwidth,pheight),IPL_DEPTH_8U,1);
     updateImageInfo();
 
-
+    intrinsicMatrix=cvCreateMat(3,3, CV_64F);
 
     filename="memimage.pgm";
     flag_valid=1;
@@ -171,7 +116,7 @@ HRImage::HRImage(const HRImage &img)
     siftkeyfilename="";
     pgmfilename="";
     flag_valid=img.flag_valid;
-
+    intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     cv_img=cvCloneImage(img.cv_img);
     updateImageInfo();
 
@@ -320,7 +265,7 @@ void HRImage::close()
         cout<<"freeing nonexistent image"<<endl;
         return ;
     }
-
+    cvReleaseMat(&intrinsicMatrix);
     cvReleaseImage(&cv_img );
 
     flag_valid=0;
@@ -927,23 +872,24 @@ int HRImageSet::featureDetectSift()
 *
 * @todo: document this function
 */
+
 int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
     double f1,f2;
     correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
 
-    myFocals.open(imageCollection.size() );
+
 
 //deleting the index files, i should propbablyt find a better place for this
     string fname1=TEMPDIR+string("/")+string("F_")+string(INDEXFNAME);
     if( remove( fname1.c_str() ) != 0 )
-        perror( "Error deleting file" );
+        perror( "ignore this error - Error deleting file" );
     else
         puts( "File successfully deleted" );
     string fname2=TEMPDIR+string("/")+string("H_")+string(INDEXFNAME);
     if( remove( fname2.c_str() ) != 0 )
-        perror( "Error deleting file" );
+        perror( "ignore this error - Error deleting file" );
     else
         puts( "File successfully deleted" );
 //end of deleting index files, these files were necessary for self calibration
@@ -966,8 +912,8 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
             correspondencesPairWise[i][j].WriteMatches();
             correspondencesPairWise[i][j].WriteMotion();
-            correspondencesPairWise[i][j].findFocalLength(f1,f2);
-            myFocals.insertF(i,j,f1,f2);
+
+
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
             drawMatchesSingle((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
@@ -976,7 +922,41 @@ int HRImageSet::exhaustiveSIFTMatching()
         }
     }
 
-    myFocals.finished();
+    SelfCalibrate();
+}
+
+int HRImageSet::SelfCalibrate()
+{
+    int numFrames=imageCollection.size();
+
+    vector<CvMat* > intrinMatrix;
+    vector< vector<CvMat*> > funMatrix;
+
+    intrinMatrix.resize(numFrames);
+    funMatrix.resize(numFrames);
+
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        funMatrix[i].resize(numFrames);
+
+    }
+
+
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        intrinMatrix[i]=(*imageCollection[i]).intrinsicMatrix;
+        for (int j = 0; j < numFrames; ++j)
+        {
+            funMatrix[i][j]=(correspondencesPairWise[i][j]).motion.MotionModel_F;
+
+        }
+    }
+I WAS HERE SHYTE I CANT COMPILE
+
+
+
 }
 
 

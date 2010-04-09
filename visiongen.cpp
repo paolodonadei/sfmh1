@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <cv.h>
-#include <highgui.h>
 #include <vector>
 #include <iostream>
 #include <fstream>

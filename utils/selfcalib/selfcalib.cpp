@@ -38,7 +38,7 @@ void printmat(void* mat)
 
     vector< vector<CvMat*> > *funatrix=(vector< vector<CvMat*> >*)mat;
 
-int numFrames=(*funatrix).size();
+    int numFrames=(*funatrix).size();
 
     int i,j;
     printf("inside the function");

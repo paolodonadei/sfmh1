@@ -19,7 +19,7 @@ lines on images:
 #include "sift.h"
 #include <stdarg.h>
 #include <cv.h>
-#include <highgui.h>
+
 
 /* -------------------- Local function prototypes ------------------------ */
 

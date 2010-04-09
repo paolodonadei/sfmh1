@@ -324,13 +324,6 @@ int HRCorrespond2N::removeOutliers(const CvMat* tstatus)
 
 }
 
-int HRCorrespond2N::findFocalLength(double &f1,double &f2 )
-{
-
-    //the code is really not able to handle 2 frames of different size, i dont know which ought to come first in the argument list of the below function
-    HRSelfCalibtwoFrame(motion.MotionModel_F,hr1ptr->width,hr1ptr->height, hr2ptr->width,hr2ptr->height,f1, f2,STRUM);
-    printf("focal lengths between frames %s and %s were %f and %f width =%d and height = %d\n",hr1ptr->filename.c_str(),hr2ptr->filename.c_str(),f1,f2,hr1ptr->width,hr1ptr->height);
-}
 int HRCorrespond2N::findGeomtry()
 {
 

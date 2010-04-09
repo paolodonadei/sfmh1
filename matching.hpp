@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 #include <cv.h>
-#include <highgui.h>
+
 #include "HRImage.hpp"
 
 using namespace std;
