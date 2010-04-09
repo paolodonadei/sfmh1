@@ -27,5 +27,6 @@ struct SCinputs
     vector<CvMat* > *tempMat;  //more temporary storage
     int numFrames;
     int numParams;
+     int numunknownframes;
 
 };
