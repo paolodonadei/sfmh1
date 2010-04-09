@@ -15,76 +15,7 @@
 #include "general.h"
 using namespace std;
 
-vector< vector<CvMat*> >const FVGlobal;
 
-int CvMat2D_to_buff(vector< vector<CvMat*> >const &Mat,double** pbuffer)
-{
-    int numFrames=Mat.size();
-    *pbuffer = new double [(numFrames*numFrames*9)+1];
-    int i,j,l,m;
-
-    for(i=0; i<=(numFrames*numFrames*9); i++)
-    {
-        (*pbuffer)[i]=0;
-    }
-
-
-
-    int count=0;
-    for(i=0; i<numFrames; i++)
-    {
-        for(j=0; j<numFrames; j++)
-        {
-
-            for(l=0; l<3; l++)
-            {
-                for(m=0; m<3; m++)
-                {
-
-                    (*pbuffer)[count++]=cvmGet(Mat[i][j],l,m);
-
-
-                }
-            }
-
-
-        }
-    }
-
-
-}
-
-//this matrix should have been preallocated
-int buff_to_CvMat2D(double* pbuffer,vector< vector<CvMat*> >const &Mat)
-{
-    int numFrames=Mat.size();
-
-    int i,j,l,m;
-
-    int count=0;
-
-    for(i=0; i<numFrames; i++)
-    {
-        for(j=0; j<numFrames; j++)
-        {
-
-            for(l=0; l<3; l++)
-            {
-                for(m=0; m<3; m++)
-                {
-
-                    cvmSet(Mat[i][j],l,m,pbuffer[count++]);
-
-
-                }
-            }
-
-
-        }
-    }
-
-
-}
 
 int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height)
 {
@@ -199,6 +130,8 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
     mySCinputs.funds=&FV;
     mySCinputs.intrin=&KV;
     mySCinputs.tempMat=&tempMats;
+    mySCinputs.numFrames=numFrames;
+    mySCinputs.numParams=NONLINPARMS;
 
 
 
@@ -239,16 +172,21 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     SCinputs* mySCinputs=(SCinputs*)adata;
 
-
-printf("params are :\n")
-for (int i=0;i<)
+printf("m is %d and n is %d :\n",m,n);
+    printf("params are :\n");
+    for (int i=0; i<m; i++)
+        printf("p %d is %f\n",i,p[i]);
 
 
 
     int i,j;
     int width=0;//figure thesed out
     int height=0;
+    int numFrames=0;
+    int numParams=0;
 
+    numFrames=mySCinputs->numFrames;
+    numParams=mySCinputs->numParams;
     width=mySCinputs->width;
     height=mySCinputs->height;
 
@@ -259,7 +197,7 @@ for (int i=0;i<)
 
 ///////////////////// done putting F back into matrices
 
-    for(i=0; i<n; i++)
+    for(i=0; i<numFrames; i++)
     {
 
         j=0;
@@ -318,18 +256,29 @@ for (int i=0;i<)
 
 ///////////////////// now calculating errors
 
+    for(i=0; i<numFrames; i++)
+    {
+
+
+        writeCVMatrix(cout,(*pintrin)[i]);
+
+
+
+    }
+
     int count=0;
     for ( i = 0; i < n; ++i)
     {
 
         for ( j = 0; j < i; ++j)
         {
-            hx[count++]=findSVDerror((*FMat)[i][j], (*pintrin)[i],(*pintrin)[i],tempMtx);
+            hx[count++]=findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
 
         }
     }
 
-
+for (int i=0; i<n; i++)
+        printf("hx %d is %f\n",i,hx[i]);
 
 }
 
