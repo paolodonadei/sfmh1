@@ -11,7 +11,8 @@
 
 #include <iostream>
 #include "nonlinSClvm.h"
-#define NONLINPARMS 1
+#define NONLINPARMS 3
+#define CONSTPARAMS 0
 #include "general.h"
 using namespace std;
 
@@ -24,9 +25,14 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
     int i,j,ret;
     double opts[LM_OPTS_SZ], info[LM_INFO_SZ];
     int numFrames=KV.size();
+    int unKnownframes=(CONSTPARAMS==0?numFrames:1);
     int m, n;
-    m=NONLINPARMS*numFrames;
-    n=(int)(((numFrames)*(numFrames-1))/2);
+
+    m=NONLINPARMS*unKnownframes;
+
+
+    n=m;
+    // n=(int)(((numFrames)*(numFrames-1))/2);
 
     double p[m+1], x[n+1];
     double lb[m+1], ub[m+1];
@@ -44,7 +50,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
 
 
 //initializing the parameters
-    for(i=0; i<numFrames; i++)
+    for(i=0; i<unKnownframes; i++)
     {
 
 
@@ -132,12 +138,71 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
     mySCinputs.tempMat=&tempMats;
     mySCinputs.numFrames=numFrames;
     mySCinputs.numParams=NONLINPARMS;
-
-
+    mySCinputs.numunknownframes=unKnownframes;
 
     ret=dlevmar_bc_dif(errnonLinFunctionSelfCalib,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
 
 
+//putting the p back into KV
+    int numfr=0;
+    for(i=0; i<numFrames; i++)
+    {
+
+        j=0;
+        numfr=(CONSTPARAMS==0?i:0);
+
+        cvSetIdentity(KV[i]);
+
+
+
+
+        if(NONLINPARMS>0)
+        {
+
+            //focal length
+            cvmSet(KV[i], 0, 0, p[(numfr*NONLINPARMS)+j]);
+            cvmSet(KV[i], 1, 1, p[(numfr*NONLINPARMS)+j]);
+            cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
+            cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
+            cvmSet(KV[i], 0, 1, 0.0);
+
+
+            j++;
+
+        }
+
+        if(NONLINPARMS>1)  //X CENTER
+        {
+
+            cvmSet(KV[i], 0, 2, p[(numfr*NONLINPARMS)+j]);
+            j++;
+        }
+
+
+        if(NONLINPARMS>2)
+        {
+            //Y center
+            cvmSet(KV[i], 1, 2, p[(numfr*NONLINPARMS)+j]);
+            j++;
+        }
+
+        if(NONLINPARMS>3)
+        {
+            //aspect ratio
+            //Y center
+            cvmSet(KV[i], 1, 1, cvmGet(KV[i],0,0)*p[(numfr*NONLINPARMS)+j]);
+            j++;
+
+        }
+        if(NONLINPARMS>4)
+        {
+            //skew
+            cvmSet(KV[i], 0, 1, p[(numfr*NONLINPARMS)+j]);
+            j++;
+
+        }
+
+    }
 
 
 
@@ -172,7 +237,7 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     SCinputs* mySCinputs=(SCinputs*)adata;
 
-printf("m is %d and n is %d :\n",m,n);
+    printf("m is %d and n is %d :\n",m,n);
     printf("params are :\n");
     for (int i=0; i<m; i++)
         printf("p %d is %f\n",i,p[i]);
@@ -184,11 +249,13 @@ printf("m is %d and n is %d :\n",m,n);
     int height=0;
     int numFrames=0;
     int numParams=0;
+    int unKnownFrames=0;
 
     numFrames=mySCinputs->numFrames;
     numParams=mySCinputs->numParams;
     width=mySCinputs->width;
     height=mySCinputs->height;
+    unKnownFrames=mySCinputs->numunknownframes;
 
     vector< vector<CvMat*> > *FMat=(vector< vector<CvMat*> >*)mySCinputs->funds;
     vector<CvMat* > *pintrin= (vector< CvMat* >*)mySCinputs->intrin;
@@ -197,10 +264,14 @@ printf("m is %d and n is %d :\n",m,n);
 
 ///////////////////// done putting F back into matrices
 
+
+     int numfr=0;
     for(i=0; i<numFrames; i++)
     {
 
         j=0;
+        numfr=(CONSTPARAMS==0?i:0);
+
         cvSetIdentity((*pintrin)[i]);
 
 
@@ -210,8 +281,8 @@ printf("m is %d and n is %d :\n",m,n);
         {
 
             //focal length
-            cvmSet((*pintrin)[i], 0, 0, p[(i*NONLINPARMS)+j]);
-            cvmSet((*pintrin)[i], 1, 1, p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 0, 0, p[(numfr*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 1, 1, p[(numfr*NONLINPARMS)+j]);
             cvmSet((*pintrin)[i], 0, 2, ((double)(width/2.00)));
             cvmSet((*pintrin)[i], 1, 2, ((double)(height/2.00)));
             cvmSet((*pintrin)[i], 0, 1, 0.0);
@@ -224,7 +295,7 @@ printf("m is %d and n is %d :\n",m,n);
         if(NONLINPARMS>1)  //X CENTER
         {
 
-            cvmSet((*pintrin)[i], 0, 2, p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 0, 2, p[(numfr*NONLINPARMS)+j]);
             j++;
         }
 
@@ -232,7 +303,7 @@ printf("m is %d and n is %d :\n",m,n);
         if(NONLINPARMS>2)
         {
             //Y center
-            cvmSet((*pintrin)[i], 1, 2, p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 1, 2, p[(numfr*NONLINPARMS)+j]);
             j++;
         }
 
@@ -240,14 +311,14 @@ printf("m is %d and n is %d :\n",m,n);
         {
             //aspect ratio
             //Y center
-            cvmSet((*pintrin)[i], 1, 1, cvmGet((*pintrin)[i],0,0)*p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 1, 1, cvmGet((*pintrin)[i],0,0)*p[(numfr*NONLINPARMS)+j]);
             j++;
 
         }
         if(NONLINPARMS>4)
         {
             //skew
-            cvmSet((*pintrin)[i], 0, 1, p[(i*NONLINPARMS)+j]);
+            cvmSet((*pintrin)[i], 0, 1, p[(numfr*NONLINPARMS)+j]);
             j++;
 
         }
@@ -266,18 +337,24 @@ printf("m is %d and n is %d :\n",m,n);
 
     }
 
-    int count=0;
-    for ( i = 0; i < n; ++i)
+    double count=0;
+    double totEr=0;
+    for ( i = 0; i < numFrames; ++i)
     {
 
         for ( j = 0; j < i; ++j)
         {
-            hx[count++]=findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
-
+            totEr=totEr+findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
+            count=count+1.0;
         }
     }
 
-for (int i=0; i<n; i++)
+    totEr=totEr/(count);
+    for (int i=0; i<n; i++)
+        hx[i]=totEr;
+
+          printf("errrs are :\n");
+    for (int i=0; i<n; i++)
         printf("hx %d is %f\n",i,hx[i]);
 
 }
