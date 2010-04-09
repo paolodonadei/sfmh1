@@ -25,5 +25,7 @@ struct SCinputs
    vector< vector<CvMat*> > const *funds;
     vector<CvMat* > *intrin;  //this is temporary storage
     vector<CvMat* > *tempMat;  //more temporary storage
+    int numFrames;
+    int numParams;
 
 };
