@@ -953,7 +953,7 @@ int HRImageSet::SelfCalibrate()
 
         }
     }
-I WAS HERE SHYTE I CANT COMPILE
+//I WAS HERE SHYTE I CANT COMPILE
 
 
 
