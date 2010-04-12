@@ -1,8 +1,10 @@
+LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
 VPATH = .:utils/selfcalib
+INC = -I. -I'$(LOCALLIBS)'/include
 CC=g++
-CFLAGS=-c -g -Wall  `pkg-config --cflags opencv` `gsl-config --cflags`
-LIBS=-lm -lboost_filesystem `pkg-config --libs opencv` `gsl-config --libs`
-LDFLAGS=
+CFLAGS=$(INC) -c -g -Wall
+LIBS=-lm -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl -llapack -lblas -lf2c
+LDFLAGS= -L'$(LOCALLIBS)'/lib
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp cvmodelest.cpp cvfundam.cpp visiongen.cpp utils/selfcalib/focallength.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmh1
