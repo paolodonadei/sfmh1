@@ -16,7 +16,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-#include "nonlinSClvm.h"
+//#include "nonlinSClvm.h"
 
 enum SELFCALIBMETHOD {STRUM, POLLEFEY, HARTLEY,POLLEFEYVISUAL,NONLINSIMPLE};
 
@@ -33,7 +33,7 @@ int formAYfromP1P2Pollefey(const CvMat* pP1,const CvMat* pP2, CvMat* pA, CvMat* 
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,double& f1,double& f2,SELFCALIBMETHOD method);
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method);
 void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata);
-int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method);
+int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method);
 
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);
 int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1,int width2, int height2,CvMat* K1,CvMat* K2);

@@ -8,7 +8,7 @@
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
-
+#include "focallength.h"
 #include "HRImage.hpp"
 #include "general.h"
 #include "pgmutils.hpp"
@@ -927,6 +927,11 @@ int HRImageSet::exhaustiveSIFTMatching()
 
 int HRImageSet::SelfCalibrate()
 {
+    int width =(*imageCollection[0]).width;
+    int height =(*imageCollection[0]).height;
+
+
+
     int numFrames=imageCollection.size();
 
     vector<CvMat* > intrinMatrix;
@@ -942,18 +947,59 @@ int HRImageSet::SelfCalibrate()
 
     }
 
-
-
     for (int i = 0; i < numFrames; ++i)
     {
         intrinMatrix[i]=(*imageCollection[i]).intrinsicMatrix;
         for (int j = 0; j < numFrames; ++j)
         {
+            funMatrix[i][j]=NULL;
+
+        }
+    }
+
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        intrinMatrix[i]=(*imageCollection[i]).intrinsicMatrix;
+        for (int j = 0; j < i; ++j)
+        {
             funMatrix[i][j]=(correspondencesPairWise[i][j]).motion.MotionModel_F;
 
         }
     }
-//I WAS HERE SHYTE I CANT COMPILE
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, HARTLEY);
+
+
+    cout<<" According to Hartley :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
+
+    cout<<" According to Sturm :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
+
+
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, NONLINSIMPLE);
+
+    cout<<" According to NONLINSIMPLE :"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
 
 
 

@@ -1,7 +1,7 @@
 #ifndef HRPRIMITIVES_HPP_INCLUDED
 #define HRPRIMITIVES_HPP_INCLUDED
 #include <string>
-#include <cv.h>
+
 
 #include <cxcore.h>
 #include <vector>

@@ -257,16 +257,6 @@ int main(int argc, char *argv[])
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
-
-    cout<<" According to Sturm :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-    }
-
-
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, NONLINSIMPLE);
 
     cout<<" According to NONLINSIMPLE :"<<endl;
