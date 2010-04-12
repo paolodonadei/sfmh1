@@ -12,6 +12,7 @@
 #include "general.h"
 #include "HRprimitives.h"
 #include "argproc.h"
+#include <highgui.h>
 #define DEBUGLVL 0
 
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)

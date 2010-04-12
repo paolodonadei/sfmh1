@@ -35,10 +35,74 @@ const double typicalF= 5000.0;//change this back
 using namespace std;
 
 
-int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method)
+int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method)
 {
     int i,j;
-    int numFrames=FV.size();
+    int numFrames=PFV.size();
+    vector<CvMat*>  tempMatx; //this holds teh temporary matrices
+
+    vector< vector<CvMat*> > FV;
+    FV.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+    {
+       FV[i].resize(numFrames);
+    }
+
+ for (int i = 0; i < numFrames; ++i)
+    {
+
+        for (int j = 0; j < numFrames; ++j)
+        {
+            FV[i][j]=  PFV[i][j];
+        }
+    }
+
+
+    printf("input fundamental matrices are:\n");
+
+    //here im fi
+    for (int i = 0; i < numFrames; ++i)
+    {
+
+        for (int j = 0; j < numFrames; ++j)
+        {
+
+            if(FV[i][j]==NULL && i==j)
+            {
+                FV[i][j]=cvCreateMat(3,3, CV_64F);
+                cvSetZero(FV[i][j]);
+                tempMatx.push_back(FV[i][j]);
+            }
+            else if(FV[i][j]==NULL && j>i && FV[j][i]!=NULL)
+            {
+                FV[i][j]=cvCreateMat(3,3, CV_64F);
+                cvTranspose(FV[j][i], FV[i][j]);
+                tempMatx.push_back(FV[i][j]);
+
+            }
+            else if(FV[i][j]==NULL)
+            {
+                printf("some fundamental matrices were not allocated, quitting \n");
+                return -1;
+
+            }
+
+        }
+    }
+
+
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//
+//        for (int j = 0; j < numFrames; ++j)
+//        {
+//            printf("fundamental[%d][%d]:\n",i,j);
+//            writeCVMatrix(cout,FV[i][j]);
+//
+//        }
+//    }
+
+
 
     for(i=0; i<numFrames; i++)
     {
@@ -122,7 +186,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*>  &KV 
 
     if (method==NONLINSIMPLE)
     {
-       HRSelfCalibtwoFrameNonlin(FV,  KV , width, height);
+        HRSelfCalibtwoFrameNonlin(FV,  KV , width, height);
 
 
     }
@@ -166,6 +230,13 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &FV,  vector<CvMat*>  &KV 
     }
 
 
+
+    for(i=0; i<tempMatx.size(); i++)
+    {
+        cvReleaseMat(&tempMatx[i]);
+
+
+    }
 
 
 }

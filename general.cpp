@@ -6,6 +6,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "argproc.h"
+#include <highgui.h>
 #define DEBUGLVL 0
 
 extern const char* TEMPDIR;

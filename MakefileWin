@@ -1,6 +1,6 @@
 CC=g++
 VPATH = .:utils/selfcalib
-INC = -I../../ -I. -I'$(MINGW)\include'
+INC = -I../../ -I. -I'$(MINGW)\include' -Iutils/selfcalib/
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl -llapack -lblas -lf2c
 LDFLAGS= -L'$(MINGW)\lib'

@@ -290,7 +290,7 @@ void HRCorrespond2N::WriteMotion()
 
         motion.filenameH=fname;
 
- fstream fp_out;
+        fstream fp_out;
         fp_out.open(motion.filenameH.c_str(), ios::out);
         motion.writeMatrix(fp_out ,HOMOGRAPHY);
         fp_out.close();
