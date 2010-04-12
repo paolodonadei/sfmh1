@@ -25,7 +25,7 @@
 #define PCA_THRESH 3000
 #define RECREATEFILES 0
 
-#define SIFTPCA 1
+#define SIFTPCA 0
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;

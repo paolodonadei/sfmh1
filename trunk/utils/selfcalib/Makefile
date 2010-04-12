@@ -1,8 +1,10 @@
+LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs/
 VPATH = .:../..
 CC=g++
-INC = -I../../
-CFLAGS=$(INC) -c -g -Wall  `pkg-config --cflags opencv` `gsl-config --cflags`
-LIBS=-lm  `pkg-config --libs opencv` -lhrlib -lboost_filesystem `gsl-config --libs`
+INC = -I../../ -I$(LOCALLIBS)/include
+
+CFLAGS=$(INC) -c -g -Wall   `gsl-config --cflags`
+LIBS=-lm  -L$(LOCALLIBS)/lib -lhrlib -lboost_filesystem `gsl-config --libs`
 LDFLAGS=-L../../
 SOURCES=selfcalib.cpp focallength.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
