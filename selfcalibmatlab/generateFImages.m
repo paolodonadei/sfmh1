@@ -19,10 +19,16 @@ maxfunds=11;
 dirname='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
 %dirname='/home/houman/work/test_data/';
 realFold=[dirname seqname '/'];
-imgformats={'pgm','jpg','png','tif'};
+imgformats={'pgm','jpg','png','tif','ppm'};
 numimages=0;
+outdirname=['projFolderre' num2str(sum(round(100*clock))) '/'];
+mkdir(outdirname);
 
 formatnum=1;
+fid2 = fopen([outdirname 'F_index.txt'], 'w');
+
+
+
 while(numimages==0)
     
     IMFiles=dir([realFold '*.' imgformats{1,formatnum}]);
@@ -142,15 +148,19 @@ for i=1:numIs
             
             [F, inliers] = ransacfitfundmatrix(x1, x2, t);
             MF{countF}=F;
-            
+            GG=F;
+            fname=['F' num2str(i-1) '_' num2str(j-1) '.txt'];
+            save([outdirname  fname], 'GG','-ascii', '-double');
+            fprintf(fid2, ' %d\t%d\t%s\n' ,i-1,j-1,fname);
+      
             [im,in]=size(inliers);
             
-                  disp(['number of inliers is: ' num2str(in)]);
-         
+            disp(['number of inliers is: ' num2str(in)]);
+            
             for k=1:in
                 xin1(:,k)= x1(:,inliers(1,k));
                 xin2(:,k)= x2(:,inliers(1,k));
-               
+                
             end
             corrs{1,countF}=xin1;
             corrs{2,countF}=xin2;
@@ -162,20 +172,20 @@ for i=1:numIs
             if(showgraphs==1)
                 
                 show(im1,1), hold on, plot(c1,r1,'r+');
-                saveas(gcf,[seqname  '_features_im' num2str(i) '.png']);
-                saveas(gcf,[seqname  '_features_im' num2str(i) '.eps'],'epsc');
+                saveas(gcf,[outdirname seqname  '_features_im' num2str(i) '.png']);
+                saveas(gcf,[outdirname seqname  '_features_im' num2str(i) '.eps'],'epsc');
                 
                 show(im2,2), hold on, plot(c2,r2,'r+');
-                saveas(gcf,[seqname  '_features_im' num2str(j) '.png']);
-                saveas(gcf,[seqname  '_features_im' num2str(j) '.eps'],'epsc');
+                saveas(gcf,[outdirname seqname  '_features_im' num2str(j) '.png']);
+                saveas(gcf,[outdirname seqname  '_features_im' num2str(j) '.eps'],'epsc');
                 
                 % Display putative matches
                 show(im1,3), set(3,'name','Putative matches'), hold on
                 for n = 1:length(m1);
                     line([m1(2,n) m2(2,n)], [m1(1,n) m2(1,n)])
                 end
-                saveas(gcf,[seqname  '_putative_' num2str(i) 'to_' num2str(j) '.png']);
-                saveas(gcf,[seqname  '_putative_' num2str(i) 'to_' num2str(j) '.eps'],'epsc');
+                saveas(gcf,[outdirname seqname  '_putative_' num2str(i) 'to_' num2str(j) '.png']);
+                saveas(gcf,[outdirname seqname  '_putative_' num2str(i) 'to_' num2str(j) '.eps'],'epsc');
                 
                 % Display both images overlayed with inlying matched feature points
                 show(double(im1)+double(im2),4), set(4,'name','Inlying matches'), hold on
@@ -185,8 +195,8 @@ for i=1:numIs
                 for n = inliers
                     line([m1(2,n) m2(2,n)], [m1(1,n) m2(1,n)],'color',[0 0 1])
                 end
-                saveas(gcf,[seqname  '_inlier_' num2str(i) 'to_' num2str(j) '.png']);
-                saveas(gcf,[seqname  '_inlier_' num2str(i) 'to_' num2str(j) '.eps'],'epsc');
+                saveas(gcf,[outdirname seqname  '_inlier_' num2str(i) 'to_' num2str(j) '.png']);
+                saveas(gcf,[outdirname seqname  '_inlier_' num2str(i) 'to_' num2str(j) '.eps'],'epsc');
                 
                 %                 for n = inliers
                 %                     figure(1), clf, show(im1,1), hold on, plot(x1(1,n),x1(2,n),'r+');
@@ -210,4 +220,16 @@ for i=1:numIs
     end
     
     toc
+    
+    
+    
+    
+end
+
+fclose(fid2);
+
+[stat, mess, id]=rmdir('currentProjreal','s');
+copyfile(outdirname,'currentProjreal');
+
+
 end
