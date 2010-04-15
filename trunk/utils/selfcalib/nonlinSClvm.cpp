@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include "nonlinSClvm.h"
-#define NONLINPARMS 1
+#define NONLINPARMS 4
 #define CONSTPARAMS 0
 #include "general.h"
 using namespace std;
