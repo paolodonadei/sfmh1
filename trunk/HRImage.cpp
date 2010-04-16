@@ -1371,6 +1371,9 @@ int FeatureTrack::eraseTrackMatRow(int index)
 }
 CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
 {
+
+    // col is the number of the image
+    //row is the number of the feature
     CvPoint2D32f temp;
     temp.x=-1;
     temp.y=-1;

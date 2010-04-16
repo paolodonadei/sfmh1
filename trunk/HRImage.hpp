@@ -76,6 +76,7 @@ public:
     string siftkeyfilename;
     vector<HRPointFeatures> HR2DVector;
     CvMat*  intrinsicMatrix;
+    double confidenceSelfCalib;
 private:
 
     enum {BLACK=0,WHITE=255};
