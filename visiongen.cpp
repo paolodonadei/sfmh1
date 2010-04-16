@@ -606,3 +606,10 @@ void scaleMatrix(CvMat* in,double s)
     }
 
 }
+
+int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
+{
+
+
+
+}

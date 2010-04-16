@@ -16,7 +16,7 @@ using namespace std;
 
 void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata);
 
-int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height);
+int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat);
 
 struct SCinputs

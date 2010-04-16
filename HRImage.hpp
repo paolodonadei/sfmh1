@@ -76,6 +76,7 @@ public:
     string siftkeyfilename;
     vector<HRPointFeatures> HR2DVector;
     CvMat*  intrinsicMatrix;
+    CvMat*  projectionMatrix;
     double confidenceSelfCalib;
 private:
 
@@ -132,11 +133,11 @@ public:
 
 class HRImageSet
 {
-
+public:
     vector<HRImagePtr> imageCollection;
     string dirName;
     int numImages;
-public:
+
     string dirStemName;
     int featureDetectSift();
     HRImageSet();
@@ -154,6 +155,7 @@ public:
     int createFeatureTrackMatrix();
     void showOneByOneFeatureMotions();
     int SelfCalibrate();
+    vector<double> confid;
 
 
 };

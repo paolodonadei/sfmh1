@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 {
     string fil_name1;
 
-
+vector<double> confidences;
 
 
     int numFrames=0;
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, HARTLEY);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
 
 
     cout<<" According to Hartley :"<<endl;
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences,, STRUM);
 
     cout<<" According to Sturm :"<<endl;
 
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, NONLINSIMPLE);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
 
     cout<<" According to NONLINSIMPLE :"<<endl;
 
