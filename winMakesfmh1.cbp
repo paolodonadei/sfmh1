@@ -42,6 +42,8 @@
 		<Unit filename="HRImage.hpp" />
 		<Unit filename="HRprimitives.cpp" />
 		<Unit filename="HRprimitives.h" />
+		<Unit filename="HRstructure.cpp" />
+		<Unit filename="HRstructure.h" />
 		<Unit filename="MakefileWin" />
 		<Unit filename="TODO" />
 		<Unit filename="argproc.cpp" />
