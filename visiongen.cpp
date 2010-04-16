@@ -196,7 +196,7 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                                     CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
 {
 
-cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,posVect,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
+    cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,posVect,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 }
 
 
@@ -299,7 +299,7 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 
     int i,j;
     cvSetZero(P1);
-    for (j=0;j<=2;j++)
+    for (j=0; j<=2; j++)
     {
         cvmSet(P1,j,j,((double)1.00)); // Set M(i,j)
 
@@ -308,9 +308,9 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 
 
 
-    for (i=0;i<=2;i++)
+    for (i=0; i<=2; i++)
     {
-        for (j=0;j<=2;j++)
+        for (j=0; j<=2; j++)
         {
             cvmSet(P2,i,j,cvmGet(left3,i,j)); // Set M(i,j)
 
@@ -318,7 +318,7 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 
     }
 
-    for (i=0;i<=2;i++)
+    for (i=0; i<=2; i++)
     {
 
         cvmSet(P2,i,3,scale*cvmGet(e2,i,0)); // Set M(i,j)
@@ -340,7 +340,7 @@ int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scal
 //        writeCVMatrix(cout,FDebug );
 //        cvReleaseMat(&FDebug);
 
-   }
+    }
 
 
 
@@ -451,9 +451,9 @@ int findCameraCenter(const CvMat* P, CvMat* C)
     int i,j;
 
 
-    for (i=0;i<=2;i++)
+    for (i=0; i<=2; i++)
     {
-        for (j=0;j<=3;j++)
+        for (j=0; j<=3; j++)
         {
             cvmSet(PCl,i,j,cvmGet(P,i,j)); // Set M(i,j)
 
@@ -464,7 +464,7 @@ int findCameraCenter(const CvMat* P, CvMat* C)
     cvSVD( PCl, W,  U, V );  //change all of the below back to U
 
 
-    for (j=0;j<=3;j++)
+    for (j=0; j<=3; j++)
     {
         cvmSet(C,j,0,cvmGet(V,j,3)); // Set M(i,j)
 
@@ -497,9 +497,9 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
     int i,j;
 
 
-    for (i=0;i<=2;i++)
+    for (i=0; i<=2; i++)
     {
-        for (j=0;j<=3;j++)
+        for (j=0; j<=3; j++)
         {
             cvmSet(inCl,i,j,cvmGet(in,i,j)); // Set M(i,j)
 
@@ -510,7 +510,7 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
     cvSVD( inCl, W,  U, V );  //change all of the below back to U
 
 
-    for (i=0;i<=3;i++)
+    for (i=0; i<=3; i++)
     {
         double t=cvmGet(W,i,i);
         cvmSet(W,i,i,(t<0.00000000001)?0:(((double)1.0)/t)); //inverse
@@ -523,9 +523,9 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out)
 
 
 
-    for (i=0;i<=3;i++)
+    for (i=0; i<=3; i++)
     {
-        for (j=0;j<=2;j++)
+        for (j=0; j<=2; j++)
         {
             cvmSet(out,i,j,cvmGet(outful,i,j)); // Set M(i,j)
 
@@ -594,9 +594,9 @@ void scaleMatrix(CvMat* in,double s)
 
 
 
-    for (i=0;i<h;i++)
+    for (i=0; i<h; i++)
     {
-        for (j=0;j<w;j++)
+        for (j=0; j<w; j++)
         {
             double t=cvmGet(in,i,j);
             cvmSet(in,i,j,t*s);
@@ -609,7 +609,49 @@ void scaleMatrix(CvMat* in,double s)
 
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
+    int i,j;
+    CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
 
 
+    checkMatrixOK(P,3,4);
+    checkMatrixOK(R,3,3);
+    checkMatrixOK(K,3,3);
+    checkMatrixOK(t,3,1);
+
+
+    for (i=0; i<3; i++)
+    {
+        for (j=0; j<3; j++)
+        {
+
+            cvmSet(P,i,j,cvmGet(R,i,j));
+
+        }
+
+    }
+
+    for (j=0; j<3; j++)
+    {
+
+        cvmSet(P,i,3,cvmGet(t,i,0));
+
+    }
+
+    cvMatMul(K, P, Ptemp);
+
+    for (i=0; i<3; i++)
+    {
+        for (j=0; j<4; j++)
+        {
+
+            cvmSet(P,i,j,cvmGet(Ptemp,i,j));
+
+        }
+
+    }
+
+
+
+    cvReleaseMat(&Ptemp);
 
 }
