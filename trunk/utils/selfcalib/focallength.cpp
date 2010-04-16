@@ -35,14 +35,21 @@ const double typicalF= 5000.0;//change this back
 using namespace std;
 
 
-int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV ,int width, int height, SELFCALIBMETHOD method)
+int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV ,int width, int height, vector<double>& confs,SELFCALIBMETHOD method)
 {
     int i,j;
     int numFrames=PFV.size();
+    confs.resize(numFrames);
     vector<CvMat*>  tempMatx; //this holds teh temporary matrices
 
     vector< vector<CvMat*> > FV;
     FV.resize(numFrames);
+
+     for (int i = 0; i < numFrames; ++i)
+     {
+         confs[i]=0;
+
+     }
     for (int i = 0; i < numFrames; ++i)
     {
        FV[i].resize(numFrames);
@@ -186,7 +193,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==NONLINSIMPLE)
     {
-        HRSelfCalibtwoFrameNonlin(FV,  KV , width, height);
+        HRSelfCalibtwoFrameNonlin(FV,  KV , width, height,confs);
 
 
     }

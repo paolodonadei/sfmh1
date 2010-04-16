@@ -16,6 +16,87 @@ using namespace boost;
 using namespace std;
 
 
+//these two functions just change from buffer to cvmat
+int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate)
+{
+    if (mat==NULL)
+    {
+        printf("****matrix is null\n");
+        return -1;
+
+    }
+
+    if (mat->rows==0 || mat->cols==0 )
+    {
+        cout<<"EMPTY"<<endl;
+        return -1;
+    }
+
+    int n_rows = mat->rows;
+
+    int n_cols = mat->cols;
+
+
+    if(allocate==1)
+    {
+        (*buffer)=new double [(n_rows*n_cols)+1];
+    }
+
+    int count =0;
+    for (int i = 0; i < n_rows; ++i)
+    {
+        for (int j = 0; j < n_cols; ++j)
+        {
+
+            (*buffer)[count++]=cvmGet( mat,i,j );
+        }
+
+
+    }
+    return (n_rows*n_cols);
+}
+int BuffertocvMatrix(double* buffer,CvMat** mat,int allocate,int rows, int cols)
+{
+
+    if(allocate==0)
+    {
+        if ((*mat)==NULL)
+        {
+            printf("****matrix is null\n");
+            return -1;
+
+        }
+
+        if ((*mat)->rows==0 || (*mat)->cols==0 )
+        {
+            cout<<"EMPTY"<<endl;
+            return -1;
+        }
+
+        rows = (*mat)->rows;
+
+        cols = (*mat)->cols;
+    }
+    else
+    {
+        (*mat)=cvCreateMat(rows,cols,CV_64F);
+        cvSetZero(*mat);
+    }
+
+    int count =0;
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+
+            cvmSet( (*mat),i,j,buffer[count++] );
+        }
+
+
+    }
+    return (rows*cols);
+
+}
 
 
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img )
@@ -119,9 +200,9 @@ IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
     int channels_im2   =  im2->nChannels;
     uchar* tdata_im2    = (uchar *)im2->imageData;
 
-    for (i=0;i<im1->height;i++)
+    for (i=0; i<im1->height; i++)
     {
-        for (j=0;j<im1->width;j++)
+        for (j=0; j<im1->width; j++)
         {
             tdata_main[i*step_main+j*channels_main+0] = tdata_im1[(i)*step_im1+(j)*channels_im1+0];
             tdata_main[i*step_main+j*channels_main+1] = tdata_im1[(i)*step_im1+(j)*channels_im1+0];
@@ -133,9 +214,9 @@ IplImage* concatImagesVertical(IplImage* im1,IplImage* im2)
 
 
 
-    for (i=im1->height;i<(im1->height+im2->height);i++)
+    for (i=im1->height; i<(im1->height+im2->height); i++)
     {
-        for (j=0;j<im1->width;j++)
+        for (j=0; j<im1->width; j++)
         {
             tdata_main[i*step_main+j*channels_main+0] = tdata_im2[(i-im1->height)*step_im2+(j)*channels_im2+0];
             tdata_main[i*step_main+j*channels_main+1] = tdata_im2[(i-im1->height)*step_im2+(j)*channels_im2+0];
@@ -193,7 +274,7 @@ string findSeedDirName(const vector<string>& oArray)
 
 
     vector<string> sArray;
-    for (i=0;i<oArray.size();i++)
+    for (i=0; i<oArray.size(); i++)
     {
 
         fs::path p( oArray[i], fs::native );
@@ -220,7 +301,7 @@ string findSeedDirName(const vector<string>& oArray)
     for (j = 0; j < sArray[0].length(); j++)
     {
         sArray[0][j];
-        for (i=1;i<sArray.size();i++)
+        for (i=1; i<sArray.size(); i++)
         {
             if (j>=sArray[i].size() || sArray[0][j]!=sArray[i][j])
             {
@@ -257,10 +338,10 @@ string findSeedDirName(const vector<string>& oArray)
 void writeCVMatrix(char* fname,const CvMat* M)
 {
 
-        fstream file_cmin(fname ,ios::out);
-        writeCVMatrix(file_cmin,M );
+    fstream file_cmin(fname ,ios::out);
+    writeCVMatrix(file_cmin,M );
 
-        file_cmin.close();
+    file_cmin.close();
 
 
 }
@@ -286,7 +367,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
     int n_cols = M->cols;
 
 
-   stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
+    stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
 
 
 
@@ -386,7 +467,7 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
         istringstream ss;
         ss.str(s);
 
-        for (i=0;i<n_cols;i++)
+        for (i=0; i<n_cols; i++)
         {
             ss>>out;
             cvmSet((*tmodel),j,i, from_string<float>(out, std::dec));
@@ -396,6 +477,38 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
 
 
     }
+
+}
+
+int indexMax(vector<double>& myvec)
+{
+    int n=myvec.size();
+    int temp=-1;
+
+    for(int x=0; x<n; x++)
+
+    {
+
+        for(int y=0; y<n-1; y++)
+
+        {
+
+            if(myvec[y]>myvec[y+1])
+
+            {
+
+                temp = y;
+
+
+
+            }
+
+        }
+
+    }
+
+
+    return temp;
 
 }
 

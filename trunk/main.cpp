@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "argproc.h"
 #include "HRImage.hpp"
+#include "HRstructure.h"
 
 
 
@@ -25,6 +26,9 @@ int main(int argc, char *argv[])
         imSet.exhaustiveSIFTMatching();
      //   imSet.showOneByOneFeatureMotions();
         imSet.createFeatureTrackMatrix();
+
+        HRStructure mystruct(&imSet);
+        mystruct.run();
     }
     return 0;
 }

@@ -43,7 +43,9 @@ HRImage::HRImage()
 }
 int HRImage::openim(string fname)
 {
+
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
+     projectionMatrix=cvCreateMat(3,4, CV_64F);
     siftkeyfilename="";
     pgmfilename="";
     cv_img=NULL;
@@ -105,7 +107,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     updateImageInfo();
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
-
+ projectionMatrix=cvCreateMat(3,4, CV_64F);
     filename="memimage.pgm";
     flag_valid=1;
     return 1;
@@ -117,6 +119,7 @@ HRImage::HRImage(const HRImage &img)
     pgmfilename="";
     flag_valid=img.flag_valid;
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
+     projectionMatrix=cvCreateMat(3,4, CV_64F);
     cv_img=cvCloneImage(img.cv_img);
     updateImageInfo();
 
@@ -266,6 +269,8 @@ void HRImage::close()
         return ;
     }
     cvReleaseMat(&intrinsicMatrix);
+    cvReleaseMat(&projectionMatrix);
+
     cvReleaseImage(&cv_img );
 
     flag_valid=0;
@@ -969,35 +974,38 @@ int HRImageSet::SelfCalibrate()
     }
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, HARTLEY);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confid, HARTLEY);
 
 
     cout<<" According to Hartley :"<<endl;
 
     for (int i = 0; i < numFrames; ++i)
     {
+        printf("confidence for K %d is %f\n",i,confid[i]);
         writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, STRUM);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
 
     cout<<" According to Sturm :"<<endl;
 
     for (int i = 0; i < numFrames; ++i)
     {
+        printf("confidence for K %d is %f\n",i,confid[i]);
         writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, NONLINSIMPLE);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLE);
 
     cout<<" According to NONLINSIMPLE :"<<endl;
 
     for (int i = 0; i < numFrames; ++i)
     {
+        printf("confidence for K %d is %f\n",i,confid[i]);
         writeCVMatrix(cout,intrinMatrix[i]);
     }
 

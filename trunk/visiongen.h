@@ -32,3 +32,4 @@ int findCameraCenter(const CvMat* P, CvMat* C);
 int findPseudoInverse_3x4(const CvMat* in,CvMat* out);
 void scaleMatrix(CvMat* in,double s);
 int normalizeMatrix( CvMat* in);
+int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
