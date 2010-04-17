@@ -136,9 +136,9 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame1])).projectionMatrix);
 
 //left here
-yo yo i left here, so now you have to add in teh stuff for triangulation,
-the bundler has a triangulation file inside the image file i think, use that
-one maybe if its approproiate and save the 3D data in the meshlab format
+//yo yo i left here, so now you have to add in teh stuff for triangulation,
+//he bundler has a triangulation file inside the image file i think, use that
+//one maybe if its approproiate and save the 3D data in the meshlab format
 
 
     delete [] k1_pts;
