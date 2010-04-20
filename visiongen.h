@@ -19,6 +19,8 @@
     static char cvFuncName[] = Name
 #endif
 
+using namespace std;
+
 /* Computes projection matrix decomposition */
 CVAPI(void) cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr, CvMat *rotMatr, CvMat *posVect, CvMat *rotMatrX CV_DEFAULT(NULL), CvMat *rotMatrY CV_DEFAULT(NULL), CvMat *rotMatrZ CV_DEFAULT(NULL), CvPoint3D64f *eulerAngles CV_DEFAULT(NULL));
 
@@ -33,3 +35,4 @@ int findPseudoInverse_3x4(const CvMat* in,CvMat* out);
 void scaleMatrix(CvMat* in,double s);
 int normalizeMatrix( CvMat* in);
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
+double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint);

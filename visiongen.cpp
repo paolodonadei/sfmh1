@@ -462,7 +462,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     for (j=0; j<3; j++)
     {
 
-        cvmSet(P,i,3,cvmGet(t,i,0));
+        cvmSet(P,j,3,cvmGet(t,j,0));
 
     }
 
@@ -480,7 +480,125 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     }
 
 
-
     cvReleaseMat(&Ptemp);
+
+}
+
+double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint)
+{
+
+    int i,j;
+
+    if(projMatrs.size()!=numframes || projPoints.size()!=numframes  )
+    {
+        printf("wrong size of vectors in triangulation\n");
+        printf("number of projection matrices was %d and number of points was %d and the unmfram was %d\n",projMatrs.size() , projPoints.size() , numframes);
+
+    }
+
+
+    for(i=0; i<numframes; i++)
+    {
+
+        if( projMatrs[i] == 0)
+            CV_Error( CV_StsNullPtr, "Some of parameters is a NULL pointer" );
+
+        if( !CV_IS_MAT(projMatrs[i])  )
+            CV_Error( CV_StsUnsupportedFormat, "Input parameters must be matrices" );
+
+        if( projMatrs[i]->cols != 4 || projMatrs[i]->rows != 3 )
+            CV_Error( CV_StsUnmatchedSizes, "Size of projection matrices must be 3x4" );
+
+    }
+
+
+
+
+
+
+
+    CvMat matrA;
+    double matrA_dat[numframes*3*4];
+    matrA = cvMat(numframes*3,4,CV_64F,matrA_dat);
+
+    //CvMat matrU;
+    CvMat matrW;
+    CvMat matrV;
+    //double matrU_dat[9*9];
+    double matrW_dat[numframes*3*4];
+    double matrV_dat[4*4];
+
+    //matrU = cvMat(6,6,CV_64F,matrU_dat);
+    matrW = cvMat(numframes*3,4,CV_64F,matrW_dat);
+    matrV = cvMat(4,4,CV_64F,matrV_dat);
+
+
+    /* Solve system for each point */
+
+    for( j = 0; j < numframes; j++ )/* For each view */
+    {
+        double x,y;
+        x = projPoints[j].x;
+        y = projPoints[j].y;
+        for( int k = 0; k < 4; k++ )
+        {
+            cvmSet(&matrA, j*3+0, k, x * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],0,k) );
+            cvmSet(&matrA, j*3+1, k, y * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],1,k) );
+            cvmSet(&matrA, j*3+2, k, x * cvmGet(projMatrs[j],1,k) - y * cvmGet(projMatrs[j],0,k) );
+        }
+    }
+
+
+    cvSVD(&matrA,&matrW,0,&matrV,CV_SVD_V_T);
+
+    /* Copy computed point */
+    spPoint.x=    cvmGet(&matrV,3,0)/cvmGet(&matrV,3,3);/* X */
+    spPoint.y=    cvmGet(&matrV,3,1)/cvmGet(&matrV,3,3);/* Y */
+    spPoint.z=    cvmGet(&matrV,3,2)/cvmGet(&matrV,3,3);/* Z */
+
+
+double    rep_error=0;
+
+
+    CvMat point3D;
+    double point3D_dat[4];
+    point3D = cvMat(4,1,CV_64F,point3D_dat);
+
+    CvMat point2D;
+    double point2D_dat[3];
+    point2D = cvMat(3,1,CV_64F,point2D_dat);
+
+
+
+    point3D_dat[0] = spPoint.x;
+    point3D_dat[1] = spPoint.y;
+    point3D_dat[2] = spPoint.z;
+    point3D_dat[3] = 1;
+
+    /* !!! Project this point for each camera */
+    for( int currCamera = 0; currCamera < numframes; currCamera++ )
+    {
+        cvmMul(projMatrs[currCamera], &point3D, &point2D);
+
+        float x,y;
+        float xr,yr,wr;
+        x = projPoints[i].x;
+        y = projPoints[i].y;
+
+        wr = (float)point2D_dat[2];
+        xr = (float)(point2D_dat[0]/wr);
+        yr = (float)(point2D_dat[1]/wr);
+
+        float deltaX,deltaY;
+        deltaX = (float)fabs(x-xr);
+        deltaY = (float)fabs(y-yr);
+        rep_error+=(deltaX+deltaY);
+    }
+rep_error=rep_error/((double)numframes );
+
+return rep_error;
+
+
+
 
 }

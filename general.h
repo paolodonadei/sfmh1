@@ -67,7 +67,7 @@ string findSeedDirName(const vector<string>& oArray);
 void readCvMatFfromfile(CvMat** tmodel,const string& mfname);
 void writeCVMatrix(char* fname,const CvMat* M);
 int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate=0);
-int BuffertocvMatrix(double* buffer,CvMat** mat,int allocate=0,int rows=0, int cols=0);
+int BuffertocvMatrix(double* buffer,CvMat** mat,int rows=0, int cols=0, int allocate=0);
 int indexMax(vector<double>& myvec);
 
 #endif //HRPRIMITIVES_HPP_INCLUDED

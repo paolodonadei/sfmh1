@@ -115,7 +115,8 @@ public:
     const vector<HRImagePtr>* trackImageCollection;
     FeatureTrack();
     CvPoint2D32f pointFromTrackloc(int row, int col);
-    vector< vector<int> > trackMatrix;
+    int validTrackEntry(int row, int col);
+ int valueTrackEntry(int row, int col);
 
     int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
     int findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
@@ -128,6 +129,10 @@ public:
     bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);
     int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
     bool displayTrackRow(int row);
+    int getNumTracks();
+    int getNumFrames();
+    private:
+     vector< vector<int> > trackMatrix;
 
 };
 
@@ -139,6 +144,8 @@ public:
     int numImages;
 
     string dirStemName;
+        string outdirStemName;
+
     int featureDetectSift();
     HRImageSet();
     HRImageSet(string directoryName,string TEMPdirectoryName);

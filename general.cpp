@@ -55,7 +55,7 @@ int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate)
     }
     return (n_rows*n_cols);
 }
-int BuffertocvMatrix(double* buffer,CvMat** mat,int allocate,int rows, int cols)
+int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate)
 {
 
     if(allocate==0)
@@ -67,15 +67,15 @@ int BuffertocvMatrix(double* buffer,CvMat** mat,int allocate,int rows, int cols)
 
         }
 
-        if ((*mat)->rows==0 || (*mat)->cols==0 )
+        if ((*mat)->rows!=rows || (*mat)->cols!=cols )
         {
-            cout<<"EMPTY"<<endl;
+            cout<<"wrong size"<<endl;
             return -1;
         }
 
-        rows = (*mat)->rows;
+       // rows = (*mat)->rows;
 
-        cols = (*mat)->cols;
+       // cols = (*mat)->cols;
     }
     else
     {
@@ -493,7 +493,7 @@ int indexMax(vector<double>& myvec)
 
         {
 
-            if(myvec[y]>myvec[y+1])
+            if(myvec[y]>=myvec[y+1])
 
             {
 
