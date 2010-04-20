@@ -25,10 +25,14 @@ int main(int argc, char *argv[])
    //   imSet.showOneByOneFeature();
         imSet.exhaustiveSIFTMatching();
      //   imSet.showOneByOneFeatureMotions();
+
+        imSet.multipleViewEstimate();
+        imSet.drawallMatches();
         imSet.createFeatureTrackMatrix();
+        imSet.SelfCalibrate();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
-        mystruct.run();
+       mystruct.run();
     }
     return 0;
 }

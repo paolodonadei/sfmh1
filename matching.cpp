@@ -27,15 +27,153 @@
 #define RECREATEFILES 0
 
 #define SIFTPCA 1
+
+
+#define OXFORDMATCHES 1
+
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;
 using namespace std;
 
+int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
+{
+    int i, j, num;
+    num=0;
+    int numcol1=0;
+    int numcol2=0;
 
+    string tempfilename1="";
+    fs::path p1( im1.filename, fs::native );
+
+    tempfilename1=basename(p1);
+
+    istringstream ss1;
+    ss1.str(tempfilename1);
+    ss1>>numcol1;
+
+    string tempfilename2="";
+    fs::path p2( im2.filename, fs::native );
+
+    tempfilename2=basename(p2);
+
+    istringstream ss2;
+    ss2.str(tempfilename2);
+    ss2>>numcol2;
+
+
+
+//printf(" col1 is %d for filename %s and cxol2 is %d for filename %s\n",numcol1,im1.filename.c_str(),numcol2,im2.filename.c_str());
+
+    string matchfile="";
+    fs::path p( im1.filename, fs::native );
+
+    matchfile=p.remove_leaf().native_file_string()+string("nview-corners");
+    cout<<"reading oxford match index"<< matchfile<<endl;
+
+
+    fstream file_cm(matchfile.c_str(),ios::in);
+    if (!file_cm.is_open())
+    {
+        cout << "File " <<  matchfile << " does not exist" << endl;
+        exit(1);
+    }
+
+    char str[2000];
+
+    int numImages=-1;
+    while (!file_cm.eof())
+    {
+        file_cm.getline(str,2000);
+        num++;
+
+        if (numImages==-1)//if we havnt foudn the number of images in the sequence
+        {
+            string s(str);
+            string out;
+            istringstream ss;
+            ss.str(s);
+
+            while ( ss >> out )
+                numImages++;
+
+            numImages++;
+        }
+
+    }
+    num--;  //last one doesnt count
+
+    int matchindex[numImages+2];
+
+    file_cm.clear();
+    file_cm.seekg (0, ios::beg);  //rewinding
+
+
+
+
+
+
+
+
+
+
+    int x,y;
+    i=0;
+    while (!file_cm.eof() && i<(num)) //second check is redundant, being safe
+    {
+        i++;
+        file_cm.getline(str,2000);
+
+        string s(str);
+        string out;
+        istringstream ss;
+        ss.str(s);
+
+
+        for(j=1; j<=numImages; j++)
+        {
+            ss >> out;
+            matchindex[j]=-1;
+
+            if (out.compare(string("*")) != 0)
+            {
+                istringstream ss2;
+                ss2.str(out);
+                ss2>>matchindex[j];
+
+            }
+
+
+        }
+
+
+        if(matchindex[numcol1]!=-1 && matchindex[numcol2]!=-1 )
+        {
+            matchIndex indexTemp;
+            indexTemp.imindex1=matchindex[numcol1];
+            indexTemp.imindex2=matchindex[numcol2];
+            indexTemp.score=1;
+
+            hr_correspond.imIndices.push_back(indexTemp);
+        }
+
+
+
+
+    }
+    file_cm.close();
+
+
+    return hr_correspond.imIndices.size();
+}
 
 int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond)
 {
+    if(OXFORDMATCHES==1)
+    {
+        return matchTWOImagesOxford( im1,im2,hr_correspond);
+    }
+
     double score;
     vector<HRPointFeatures>::iterator k;
     int index=-1;
@@ -321,63 +459,13 @@ int Dist(const HRPointFeatures& k1, const HRPointFeatures& k2)
 
 
 
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////
-int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
-{
-    FILE *fp;
-
-    fp = fopen (filename.c_str(), "r");
-    if (! fp)
-        FatalError("Could not open file: %s", filename.c_str());
-
-//
-    int i, j, num, len, val;
-    i= j= num= len= val=0;
-
-
-    if (fscanf(fp, "%d %d", &num, &len) != 2)
-        FatalError("Invalid keypoint file beginning.");
-
-    if (len != 128)
-    {
-        cout<<"reading PCA descriptors rather than plain sift"<<endl;
-    }
-
-    for (i = 0; i < num; i++)
-    {
-        HRPointFeatures newfeature( new HRFeature);
-
-        /* Allocate memory for the keypoint. */
-        newfeature->descriptor.reserve(len);
-
-        if (fscanf(fp, "%f %f %f %f", &(newfeature->location.y), &(newfeature->location.x), &(newfeature->scale),&(newfeature->ori)) != 4)
-            FatalError("Invalid keypoint file format.");
-
-        for (j = 0; j < len; j++)
-        {
-            if (fscanf(fp, "%d", &val) != 1/* || val < 0 || val > 255 */)
-                FatalError("Invalid keypoint file value.");
-
-            newfeature->descriptor.push_back((double) val);
-        }
-        siftVector.push_back(newfeature);
-    }
-
-
-    fclose(fp);
-    return num;
-}
-
 int findSIFTfeatures( HRImage& image)
 {
+    if(OXFORDMATCHES==1)
+    {
+        return readOxfordFeatures(  image);
+
+    }
 
 #ifdef OS_WIN
     string siftexec="utils\\siftWin32.exe";
@@ -537,14 +625,111 @@ int findSIFTfeatures( HRImage& image)
 
 }
 
+int  readOxfordFeatures( HRImage& image)
+{
+    int i, j, num;
+    num=0;
+
+    string tempfilename="";
+    fs::path p( image.filename, fs::native );
+
+    tempfilename=p.remove_leaf().native_file_string()+basename(p)+string(".corners");
+    cout<<"reading oxford match"<< tempfilename<<endl;
+
+
+    fstream file_cm(tempfilename.c_str(),ios::in);
+    if (!file_cm.is_open())
+    {
+        cout << "File " <<  tempfilename << " does not exist" << endl;
+        exit(1);
+    }
+
+    char str[2000];
+
+    while (!file_cm.eof())
+    {
+        file_cm.getline(str,2000);
+        num++;
+
+    }
+    num--;  //last one doesnt count
+
+    file_cm.clear();
+    file_cm.seekg (0, ios::beg);  //rewinding
+    int x,y;
+    i=0;
+    while (!file_cm.eof() && i<(num)) //second check is redundant, being safe
+    {
+        i++;
+        file_cm.getline(str,2000);
+
+        string s(str);
+        string out;
+        istringstream ss;
+        ss.str(s);
+
+
+
+        HRPointFeatures newfeature( new HRFeature);
+        ss >> newfeature->location.x;
+        ss >> newfeature->location.y;
+        //     printf("feature %d is x=%f and y=%f \n",i,newfeature->location.x,newfeature->location.x);
+
+        image.HR2DVector.push_back(newfeature);
+
+    }
+    file_cm.close();
 
 
 
 
 
+    return num;
+}
+
+//////////////////////////////////////////////////
+int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
+{
+    FILE *fp;
+
+    fp = fopen (filename.c_str(), "r");
+    if (! fp)
+        FatalError("Could not open file: %s", filename.c_str());
+
+//
+    int i, j, num, len, val;
+    i= j= num= len= val=0;
 
 
+    if (fscanf(fp, "%d %d", &num, &len) != 2)
+        FatalError("Invalid keypoint file beginning.");
+
+    if (len != 128)
+    {
+        cout<<"reading PCA descriptors rather than plain sift"<<endl;
+    }
+
+    for (i = 0; i < num; i++)
+    {
+        HRPointFeatures newfeature( new HRFeature);
+
+        /* Allocate memory for the keypoint. */
+        newfeature->descriptor.reserve(len);
+
+        if (fscanf(fp, "%f %f %f %f", &(newfeature->location.y), &(newfeature->location.x), &(newfeature->scale),&(newfeature->ori)) != 4)
+            FatalError("Invalid keypoint file format.");
+
+        for (j = 0; j < len; j++)
+        {
+            if (fscanf(fp, "%d", &val) != 1/* || val < 0 || val > 255 */)
+                FatalError("Invalid keypoint file value.");
+
+            newfeature->descriptor.push_back((double) val);
+        }
+        siftVector.push_back(newfeature);
+    }
 
 
-
-
+    fclose(fp);
+    return num;
+}

@@ -25,7 +25,7 @@ int Dist(const HRPointFeatures& k1, const HRPointFeatures& k2);
 int drawMatchesPair(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond);
 int drawMatchesSingle(HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond);
 
-
-
+int readOxfordFeatures( HRImage& image);
+int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspond);
 
 #endif // MATCHING_HPP_INCLUDED

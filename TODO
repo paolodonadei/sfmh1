@@ -1,3 +1,11 @@
+- make sure the oxford flag is off in the ReleaseCapture
+- make sure im not reading the projection matrices in the ReleaseCapture
+- the structure is whacked which means the 3D reconstruction is jacked, i suspect something is wrong with
+the 5 point algorithm, i have to look into it
+
+
+
+_________________________________________________________
 ! boat sequence not working
 ** the measure of proximity of two frames must not be the number of matches between them, but the number of inliers for the estimated motion model between them
 c! results are not the same as when using sift execs
