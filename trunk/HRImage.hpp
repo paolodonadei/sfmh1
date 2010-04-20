@@ -156,6 +156,7 @@ public:
     void showOneByOneFeature();
     vector<vector<HRCorrespond2N> > correspondencesPairWise;
     int exhaustiveSIFTMatching();
+      int multipleViewEstimate();
     FeatureTrack myTracks;
     string temporaryDir;
 
@@ -163,6 +164,7 @@ public:
     void showOneByOneFeatureMotions();
     int SelfCalibrate();
     vector<double> confid;
+    void drawallMatches();
 
 
 };

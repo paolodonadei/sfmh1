@@ -30,17 +30,26 @@ void HRStructure::run()
 {
     int i;
     vector<double> tempconf;
-    tempconf.resize((*imSet).confid.size());
-    sfmSequence.resize((*imSet).confid.size());
-    structureErrors.resize((*imSet).confid.size());
-    structureValid.resize((*imSet).confid.size());
+    tempconf.resize((*imSet).numImages);
+    sfmSequence.resize((*imSet).numImages);
+
+
     for(i=0; i< (*imSet).confid.size(); i++)
     {
         tempconf[i]=(*imSet).confid[i];
         sfmSequence[i]=-1;
+
+    }
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+    structureErrors.resize(maxlength);
+    structureValid.resize(maxlength);
+    for(i=0; i< maxlength; i++)
+    {
         structureErrors[i]=0;
         structureValid[i]=0;
     }
+
 
     int frame1=indexMax(tempconf);
     sfmSequence[0]=frame1;
@@ -78,7 +87,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     int count=0;
 
     int maxlength=(*imSet).myTracks.getNumTracks();
-
+    printf("hi jackass\n");
     printf("number of feature matches is %d and numframes is %d \n",(*imSet).myTracks.getNumTracks(),(*imSet).myTracks.getNumFrames());
     structure.resize(maxlength);
 
@@ -227,24 +236,25 @@ void HRStructure::DLTUpdateStructure()
 
                 numPts++;
                 CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
-                //   projMatrs.push_back((*((*imSet).imageCollection[curFrame])).projectionMatrix);
-                printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
-                printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
-                //   projPoints.push_back();
+                projMatrs.push_back((*((*imSet).imageCollection[curFrame])).projectionMatrix);
+                // printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
+                //printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
+                projPoints.push_back(curPt);
             }
         }
         if(numPts>1)
         {
+
             structureValid[i]++;
 
-            // structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
-            //printf("error for %d was %f \n",i,structureErrors[i]);
+            structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
+
         }
-        // projMatrs.clear();
-        // projPoints.clear();
+        projMatrs.clear();
+        projPoints.clear();
     }
 
-there is an error, things are crashing, fix it
+
 }
 
 void HRStructure::writeStructure()

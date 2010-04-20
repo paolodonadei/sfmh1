@@ -17,6 +17,7 @@
 #include "argproc.h"
 #define DEBUGLVL 0
 
+
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN
 #endif
@@ -455,12 +456,14 @@ int  HRImage::writeImageFeatures()
 
 
     feature_iterator = HR2DVector.begin();
+    int count=0;
     while ( feature_iterator  != HR2DVector.end() )
     {
+        count++;
         draw_cross((*feature_iterator)->location,CV_RGB(0,255,0),4,tempImage);
         ++feature_iterator;
     }
-
+    printf("drew %d crosses \n",count);
     string tempfilename="";
     fs::path p( filename, fs::native );
 
@@ -878,7 +881,26 @@ int HRImageSet::featureDetectSift()
 *
 * @todo: document this function
 */
+int HRImageSet::multipleViewEstimate()
+{
+    int i,j;
 
+    for (i=0; i<imageCollection.size(); i++)
+    {
+        for (j=0; j<i; j++)
+        {
+            correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
+            correspondencesPairWise[i][j].WriteMatches();
+            correspondencesPairWise[i][j].WriteMotion();
+
+
+        }
+    }
+
+
+
+
+}
 int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
@@ -912,14 +934,26 @@ int HRImageSet::exhaustiveSIFTMatching()
             correspondencesPairWise[i][j].hr2ptr=&(*imageCollection[j]);
 
             int numf_found= matchTWOImagesNearestNeighbour( (*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
+
             printf("between image %s having %d features and image %s with %d features, we found %d correspondences\n",(*imageCollection[i]).pgmfilename.c_str(),(*imageCollection[i]).HR2DVector.size()
                    ,(*imageCollection[j]).pgmfilename.c_str(),(*imageCollection[j]).HR2DVector.size(),numf_found);
 
-            correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
-            correspondencesPairWise[i][j].WriteMatches();
-            correspondencesPairWise[i][j].WriteMotion();
 
 
+
+        }
+    }
+
+
+}
+void HRImageSet::drawallMatches()
+{
+    int i,j;
+
+    for (i=0; i<imageCollection.size(); i++)
+    {
+        for (j=0; j<i; j++)
+        {
 
             drawMatchesPair((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
             drawMatchesSingle((*imageCollection[i]), (*imageCollection[j]),correspondencesPairWise[i][j]);
@@ -928,9 +962,10 @@ int HRImageSet::exhaustiveSIFTMatching()
         }
     }
 
-    SelfCalibrate();
-}
 
+
+
+}
 int HRImageSet::SelfCalibrate()
 {
     int width =(*imageCollection[0]).width;
@@ -1385,7 +1420,7 @@ int  FeatureTrack::getNumTracks()
 }
 int  FeatureTrack::getNumFrames()
 {
-return trackMatrix[0].size();
+    return trackMatrix[0].size();
 }
 
 int FeatureTrack::valueTrackEntry(int row, int col)
@@ -1460,9 +1495,9 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
         return temp;
     }
 
-     temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+    temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
 
-return temp;
+    return temp;
 
 
 
