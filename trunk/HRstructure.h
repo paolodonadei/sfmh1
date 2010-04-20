@@ -11,27 +11,33 @@ using namespace std;
 
 struct pose
 {
-CvMat* Rm;
-CvMat* tm;
-int frame1;
-int frame2;
+    CvMat* Rm;
+    CvMat* tm;
+    int frame1;
+    int frame2;
 };
 
 class HRStructure
 {
 public:
-vector<pose> poses;
-    HRStructure(HRImageSet* pimSet );
+    vector<pose> poses;
+    HRStructure(HRImageSet* pimSet,string pdir );
     HRStructure();
     ~HRStructure();
-    vector<CvPoint3D32f> strucPoints;
+
     int initializeKeyFrames(int frame1, int frame2);
     double bundleAdjust();
     int addFrame(int framenum);
     void run();
     vector<int> sfmSequence;
-HRImageSet* imSet;
-int numImages;
+    vector<CvPoint3D32f> structure;
+    vector<double> structureErrors;
+    vector<int> structureValid;
+    void DLTUpdateStructure();
+    void writeStructure();
+    HRImageSet* imSet;
+    string tempdir;
+    int numImages;
 };
 
 

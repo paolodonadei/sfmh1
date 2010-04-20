@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
      //   imSet.showOneByOneFeatureMotions();
         imSet.createFeatureTrackMatrix();
 
-        HRStructure mystruct(&imSet);
+        HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
     }
     return 0;

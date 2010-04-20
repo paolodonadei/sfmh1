@@ -45,7 +45,7 @@ int HRImage::openim(string fname)
 {
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
-     projectionMatrix=cvCreateMat(3,4, CV_64F);
+    projectionMatrix=cvCreateMat(3,4, CV_64F);
     siftkeyfilename="";
     pgmfilename="";
     cv_img=NULL;
@@ -107,7 +107,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     updateImageInfo();
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
- projectionMatrix=cvCreateMat(3,4, CV_64F);
+    projectionMatrix=cvCreateMat(3,4, CV_64F);
     filename="memimage.pgm";
     flag_valid=1;
     return 1;
@@ -119,7 +119,7 @@ HRImage::HRImage(const HRImage &img)
     pgmfilename="";
     flag_valid=img.flag_valid;
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
-     projectionMatrix=cvCreateMat(3,4, CV_64F);
+    projectionMatrix=cvCreateMat(3,4, CV_64F);
     cv_img=cvCloneImage(img.cv_img);
     updateImageInfo();
 
@@ -849,6 +849,7 @@ int  HRImageSet::open(string directoryName, string TEMPdirectoryName)
 
     temporaryDir=temp_path.file_string();
     TEMPDIR=temporaryDir.c_str();
+    outdirStemName=temporaryDir;
     return file_count;
 }
 
@@ -1036,7 +1037,7 @@ int HRImageSet::createFeatureTrackMatrix()
         }
     }
 
-    cout<<"number of feature tracks is ---------- "<<myTracks.trackMatrix.size()<<endl;
+    cout<<"number of feature tracks is ---------- "<<myTracks.getNumTracks()<<endl;
     myTracks.calcFeatureTrackScores(correspondencesPairWise);
 
     myTracks.writeTrackMatrix("trackbefore.txt");
@@ -1377,18 +1378,66 @@ int FeatureTrack::eraseTrackMatRow(int index)
 
     return 0;
 }
+int  FeatureTrack::getNumTracks()
+{
+    return trackMatrix.size();
+
+}
+int  FeatureTrack::getNumFrames()
+{
+return trackMatrix[0].size();
+}
+
+int FeatureTrack::valueTrackEntry(int row, int col)
+{
+    if(validTrackEntry(row,  col))
+    {
+        return trackMatrix[row][col];
+
+    }
+    else
+    {
+
+        return -1;
+    }
+
+
+}
+int FeatureTrack::validTrackEntry(int row, int col)
+{
+    if (row>=trackMatrix.size())
+    {
+        return 0;
+
+    }
+    if (col<0 || col>=(*trackImageCollection).size())
+    {
+
+        return 0;
+    }
+    if (trackMatrix[row][col]==-1)
+    {
+        return 0;
+
+    }
+
+    return 1;
+
+
+}
 CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
 {
 
     // col is the number of the image
     //row is the number of the feature
     CvPoint2D32f temp;
-    temp.x=-1;
-    temp.y=-1;
+    temp.x=0;
+    temp.y=0;
 
     if (row>=trackMatrix.size())
     {
         cout<<"1-calling on a nonexistent row, track this bug"<<endl;
+        printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
         return temp;
 
     }
@@ -1406,12 +1455,14 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
     if (trackMatrix[row][col]<0 || trackMatrix[row][col]>= (*trackImageCollection)[col]->HR2DVector.size())//this is becasue some columns will be -1
     {
         cout<<"3-calling on a nonexistent row, track this bug"<<endl;
+        printf("value of track matrix was %d\n",trackMatrix[row][col]);
+        printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
         return temp;
     }
 
-    return (*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+     temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
 
-
+return temp;
 
 
 
