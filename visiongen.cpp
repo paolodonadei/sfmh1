@@ -24,8 +24,25 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                                     CvMat *rotMatrX, CvMat *rotMatrY,
                                     CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
 {
+  CvMat* ttemp = cvCreateMat(4,1, CV_64F);
+    cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,ttemp,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 
-    cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,posVect,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
+printf("ttemp is \n");
+writeCVMatrix(cout,ttemp);
+
+int j;
+ for (j=0; j<3; j++)
+    {
+        cvmSet(posVect,j,0,cvmGet(ttemp,j,0)/cvmGet(ttemp,3,0)); // Set M(i,j)
+
+    }
+
+printf("posVect is \n");
+writeCVMatrix(cout,posVect);
+
+
+    cvReleaseMat(&ttemp);
+
 }
 
 
@@ -440,12 +457,15 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
     int i,j;
     CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
-
+   CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
 
     checkMatrixOK(P,3,4);
     checkMatrixOK(R,3,3);
     checkMatrixOK(K,3,3);
     checkMatrixOK(t,3,1);
+
+cvMatMul(R, t, Ttemp);
+scaleMatrix(Ttemp,-1);
 
 
     for (i=0; i<3; i++)
@@ -462,7 +482,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     for (j=0; j<3; j++)
     {
 
-        cvmSet(P,j,3,cvmGet(t,j,0));
+        cvmSet(P,j,3,cvmGet(Ttemp,j,0));
 
     }
 
@@ -481,7 +501,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 
 
     cvReleaseMat(&Ptemp);
-
+    cvReleaseMat(&Ttemp);
 }
 
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint)
@@ -580,19 +600,19 @@ double    rep_error=0;
     {
         cvmMul(projMatrs[currCamera], &point3D, &point2D);
 
-        float x,y;
-        float xr,yr,wr;
-        x = projPoints[i].x;
-        y = projPoints[i].y;
+        double x,y;
+        double xr,yr,wr;
+        x = projPoints[currCamera].x;
+        y = projPoints[currCamera].y;
 
-        wr = (float)point2D_dat[2];
-        xr = (float)(point2D_dat[0]/wr);
-        yr = (float)(point2D_dat[1]/wr);
+        wr = (double)point2D_dat[2];
+        xr = (double)(point2D_dat[0]/wr);
+        yr = (double)(point2D_dat[1]/wr);
 
-        float deltaX,deltaY;
-        deltaX = (float)fabs(x-xr);
-        deltaY = (float)fabs(y-yr);
-        rep_error+=(deltaX+deltaY);
+        double deltaX,deltaY;
+        deltaX = (double)fabs(x-xr);
+        deltaY = (double)fabs(y-yr);
+        rep_error+=(sqrt(deltaX*deltaX+deltaY*deltaY));
     }
 rep_error=rep_error/((double)numframes );
 

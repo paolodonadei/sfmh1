@@ -100,14 +100,17 @@ int main(int argc, char *argv[])
 
     printf("rotation matrix found for P1 was:\n");
     writeCVMatrix(cout,R1 );
+    writeCVMatrix("rotation.txt",R1 );
     cout<<endl;
 
     printf("translation matrix found for P1 was:\n");
     writeCVMatrix(cout,T1);
+    writeCVMatrix("translation.txt",T1 );
     cout<<endl;
 
     printf("intrinsics matrix found for P1 was:\n");
     writeCVMatrix(cout,K1 );
+        writeCVMatrix("intrinsics.txt",K1);
     cout<<endl;
 
     findCameraCenter(P1, C1);

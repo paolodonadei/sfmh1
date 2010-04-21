@@ -2,8 +2,10 @@ CC=g++
 
 INC = -I../../ -I. -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
-LIBS=-lm  -lhrlib   -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system -lgsl
-LDFLAGS=-L../../ -L'$(OPENCV_HOME)\lib'
+LIBS=-lm  -lhrlib  -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl   -llapack   -lcblas -lblas  -lf2c  -lminpack
+
+LDFLAGS= -L'$(MINGW)\lib' -L'..\..\..\locallibs\lib' -L'..\..\'
+
 SOURCES=decomp.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=decomp

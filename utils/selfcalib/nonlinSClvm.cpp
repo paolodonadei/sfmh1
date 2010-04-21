@@ -12,7 +12,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 #define NONLINPARMS 4
-#define CONSTPARAMS 0
+#define CONSTPARAMS 1
 #include "general.h"
 using namespace std;
 
