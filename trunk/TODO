@@ -3,8 +3,21 @@
 - the structure is whacked which means the 3D reconstruction is jacked, i suspect something is wrong with
 the 5 point algorithm, i have to look into it
 
+- i need more matches, i think somethign is going haywire, i ought to have more
+
+- maybe when i compose the projection matrix i should consider the position vector as the center of the camera rather than the rtasnslation vector
 
 
+
+
+
+
+
+
+
+
+_________________________________________________________
+OLD STUFF
 _________________________________________________________
 ! boat sequence not working
 ** the measure of proximity of two frames must not be the number of matches between them, but the number of inliers for the estimated motion model between them

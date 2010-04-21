@@ -5,7 +5,7 @@
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
-
+#include "matrix.h"
 namespace fs = boost::filesystem;
 
 HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
@@ -85,6 +85,17 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 {
     int i,j;
     int count=0;
+    ////find projection matrices
+    CvMat* Rident=cvCreateMat(3,3,CV_64F);
+    CvMat* tzero=cvCreateMat(3,1,CV_64F);
+    cvSetIdentity(Rident);
+    cvSetZero(tzero);
+        double* R=new double[9];
+    double* t= new double[3]  ;
+    double* tscaled= new double[3]  ;
+    double* K1= new double[10];
+    double* K2= new double[10];
+
 
     int maxlength=(*imSet).myTracks.getNumTracks();
     printf("hi jackass\n");
@@ -107,10 +118,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     poses[0].frame1=frame1;
     poses[0].frame2=frame2;
 
-    double* R=new double[9];
-    double* t= new double[3]  ;
-    double* K1= new double[10];
-    double* K2= new double[10];
+
 
     int num_pts = (int) count;
 
@@ -136,15 +144,34 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
+
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
 
-    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.25 * 9, 512, R, t);
 
+    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.25 * 1, 2512, R, t);
+
+//i dont knwo why this is a transpose
+    //matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
+  //  matrix_scale(3, 1,  tscaled, -1.0,t);
+////zzz remove the next 5 lines ground truth K, R , T
+
+
+
+    printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
 
     BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
+
+     readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
+
+
+// 5 point method is being a retard
 
     cout<<" R0 :"<<endl;
 
@@ -155,11 +182,9 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     writeCVMatrix(cout,poses[0].tm);
 
 
-    ////find projection matrices
-    CvMat* Rident=cvCreateMat(3,3,CV_64F);
-    CvMat* tzero=cvCreateMat(3,1,CV_64F);
-    cvSetIdentity(Rident);
-    cvSetZero(tzero);
+
+
+
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])).projectionMatrix,Rident,tzero,(*((*imSet).imageCollection[frame1])).intrinsicMatrix);
     findProjfromcompon((*((*imSet).imageCollection[frame2])).projectionMatrix,poses[0].Rm,poses[0].tm,(*((*imSet).imageCollection[frame2])).intrinsicMatrix);
@@ -200,14 +225,15 @@ void HRStructure::DLTUpdateStructure()
 
     int i,j;
 
-
-
-//remove this, it uses actual projection amtrices
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
-
-
+//
+//
+////zzz remove this, it uses actual projection amtrices
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
+////zzz remove this , this is the projective geometry
+//ProjectiveMatFromF( (*imSet).correspondencesPairWise[sfmSequence[0]][sfmSequence[1]].motion.MotionModel_F, ((*((*imSet).imageCollection[sfmSequence[0]])).projectionMatrix),((*((*imSet).imageCollection[sfmSequence[1]])).projectionMatrix));
+//
 
 
     int count=0;

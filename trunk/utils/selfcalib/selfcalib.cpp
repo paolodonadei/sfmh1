@@ -246,7 +246,7 @@ vector<double> confidences;
 
 
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences,, STRUM);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, STRUM);
 
     cout<<" According to Sturm :"<<endl;
 
