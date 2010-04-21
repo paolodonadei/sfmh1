@@ -88,8 +88,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     ////find projection matrices
     CvMat* Rident=cvCreateMat(3,3,CV_64F);
     CvMat* tzero=cvCreateMat(3,1,CV_64F);
-    cvSetIdentity(Rident);
-    cvSetZero(tzero);
+
         double* R=new double[9];
     double* t= new double[3]  ;
     double* tscaled= new double[3]  ;
@@ -145,6 +144,9 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
+  cvSetIdentity(Rident);
+    cvSetZero(tzero);
+
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
@@ -163,6 +165,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
+
 
      readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
     readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
