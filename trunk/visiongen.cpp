@@ -458,13 +458,20 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     int i,j;
     CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
+   CvMat* Rtemp=cvCreateMat(3,3,CV_64F);
 
     checkMatrixOK(P,3,4);
     checkMatrixOK(R,3,3);
     checkMatrixOK(K,3,3);
     checkMatrixOK(t,3,1);
 
-cvMatMul(R, t, Ttemp);
+
+cvTranspose(R, Rtemp);
+cvMatMul(Rtemp, t, Ttemp);
+//cvMatMul(R, t, Ttemp);
+
+
+
 scaleMatrix(Ttemp,-1);
 
 
