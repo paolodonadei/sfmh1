@@ -466,9 +466,9 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     checkMatrixOK(t,3,1);
 
 
-cvTranspose(R, Rtemp);
-cvMatMul(Rtemp, t, Ttemp);
-//cvMatMul(R, t, Ttemp);
+//cvTranspose(R, Rtemp);
+//cvMatMul(Rtemp, t, Ttemp);
+cvMatMul(R, t, Ttemp);
 
 
 
