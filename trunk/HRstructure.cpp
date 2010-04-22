@@ -89,7 +89,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     CvMat* Rident=cvCreateMat(3,3,CV_64F);
     CvMat* tzero=cvCreateMat(3,1,CV_64F);
 
-        double* R=new double[9];
+    double* R=new double[9];
     double* t= new double[3]  ;
     double* tscaled= new double[3]  ;
     double* K1= new double[10];
@@ -143,8 +143,14 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
 
-  cvSetIdentity(Rident);
+
+    cvSetIdentity(Rident);
     cvSetZero(tzero);
 
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
@@ -152,11 +158,11 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.25 * 1, 2512, R, t);
+    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
 
 //i dont knwo why this is a transpose
     //matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
-  //  matrix_scale(3, 1,  tscaled, -1.0,t);
+    //  matrix_scale(3, 1,  tscaled, -1.0,t);
 ////zzz remove the next 5 lines ground truth K, R , T
 
 
@@ -166,13 +172,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
 
-
-     readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
-
+normalizeMatrix(poses[0].tm);//normalizing the translation
 
 // 5 point method is being a retard
 
