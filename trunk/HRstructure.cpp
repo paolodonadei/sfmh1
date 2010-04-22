@@ -98,6 +98,11 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
      double* E= new double[10];
 
 
+
+
+
+
+
     int maxlength=(*imSet).myTracks.getNumTracks();
     printf("hi jackass\n");
     printf("number of feature matches is %d and numframes is %d \n",(*imSet).myTracks.getNumTracks(),(*imSet).myTracks.getNumFrames());
@@ -170,6 +175,7 @@ cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequen
    //   matrix_scale(3, 1,  tscaled, -1.0,t);
 ////zzz remove the next 5 lines ground truth K, R , T
 
+i was implementing the stuff from multiple view book in matlab
 
 
     printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
