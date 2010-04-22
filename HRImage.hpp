@@ -157,6 +157,7 @@ public:
     vector<vector<HRCorrespond2N> > correspondencesPairWise;
     int exhaustiveSIFTMatching();
       int multipleViewEstimate();
+      int writeMotions();
     FeatureTrack myTracks;
     string temporaryDir;
 
@@ -165,7 +166,7 @@ public:
     int SelfCalibrate();
     vector<double> confid;
     void drawallMatches();
-
+    void findEssentialMatrices();
 
 };
 

@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
    //   imSet.showOneByOneFeature();
+
         imSet.exhaustiveSIFTMatching();
      //   imSet.showOneByOneFeatureMotions();
 
@@ -30,6 +31,8 @@ int main(int argc, char *argv[])
         imSet.drawallMatches();
         imSet.createFeatureTrackMatrix();
         imSet.SelfCalibrate();
+      imSet.findEssentialMatrices();
+        imSet.writeMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
        mystruct.run();

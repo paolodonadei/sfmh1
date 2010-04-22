@@ -6,11 +6,12 @@
 #include <iostream>
 #include <fstream>
 #include <assert.h>
-
+#include "vector.h"
 #include <iomanip>
 #include <sstream>
 #include "visiongen.h"
 #include "general.h"
+
 using namespace std;
 
 

@@ -27,6 +27,8 @@ HRCorrespond2N::HRCorrespond2N()
     hr1ptr=NULL;
     hr2ptr=NULL;
 
+
+
 }
 
 
@@ -304,7 +306,25 @@ void HRCorrespond2N::WriteMotion()
         fp_out<< indexIm1 << "\t"  << indexIm2 <<"\t"  << combineFnames(hr1ptr->filename,hr2ptr->filename,"_HMotion.txt") << endl;
         fp_out.close();
     }
+    {
+        string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_EMotion.txt");
 
+        motion.filenameE=fname;
+
+        fstream fp_out;
+        fp_out.open(motion.filenameE.c_str(), ios::out);
+        motion.writeMatrix(fp_out ,ESSENTIAL);
+        fp_out.close();
+
+        string fname2=TEMPDIR+string("/")+string("E_")+string(INDEXFNAME);
+
+
+
+
+        fp_out.open(fname2.c_str(), ios::out |ios::app);
+        fp_out<< indexIm1 << "\t"  << indexIm2 <<"\t"  << combineFnames(hr1ptr->filename,hr2ptr->filename,"_EMotion.txt") << endl;
+        fp_out.close();
+    }
 }
 
 
@@ -370,7 +390,17 @@ HRFeature::~HRFeature()
 
 void MotionGeometry::writeMatrix(ostream &stream,MotionType mtype)
 {
-    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
+    CvMat* MotionModel;
+    if(mtype==FUNDAMENTAL)
+    MotionModel=MotionModel_F;
+    else if(mtype==HOMOGRAPHY)
+    MotionModel=MotionModel_H;
+    else if(mtype==ESSENTIAL)
+    MotionModel=MotionModel_E;
+    else
+    printf("incorect motion requested!\n");
+
+
     if ( MotionModel->height==0 || MotionModel->width==0 )
     {
         stream<<"EMPTY"<<endl;
@@ -405,6 +435,7 @@ MotionGeometry::MotionGeometry(const MotionGeometry & rec)
 
     MotionModel_F=cvCloneMat( rec.MotionModel_F);
     MotionModel_H=cvCloneMat( rec.MotionModel_H);
+      MotionModel_E=cvCloneMat( rec.MotionModel_E);
 
 
 }
@@ -423,8 +454,13 @@ MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
     {
         cvReleaseMat(&MotionModel_H);
     }
+    if ( MotionModel_E!=NULL)
+    {
+        cvReleaseMat(&MotionModel_E);
+    }
     MotionModel_F=cvCloneMat( rhs.MotionModel_F);
     MotionModel_H=cvCloneMat( rhs.MotionModel_H);
+     MotionModel_E=cvCloneMat( rhs.MotionModel_E);
     return *this;
 }
 
@@ -449,15 +485,12 @@ MotionGeometry::~MotionGeometry()
     {
         cvReleaseMat(&MotionModel_H);
     }
-    if ( MotionModel_P1!=NULL)
+    if ( MotionModel_E!=NULL)
     {
-        cvReleaseMat(&MotionModel_P1);
+        cvReleaseMat(&MotionModel_E);
     }
 
-    if ( MotionModel_P2!=NULL)
-    {
-        cvReleaseMat(&MotionModel_P2);
-    }
+
 }
 
 /** @brief MotionGeometry
@@ -468,8 +501,8 @@ MotionGeometry::MotionGeometry()
 {
     MotionModel_F = cvCreateMat(3,3,CV_64FC1);
     MotionModel_H = cvCreateMat(3,3,CV_64FC1);
-    MotionModel_P1 = cvCreateMat(3,4,CV_64FC1);
-    MotionModel_P2 = cvCreateMat(3,4,CV_64FC1);
+    MotionModel_E = cvCreateMat(3,3,CV_64FC1);
+
     motionError_F=0;//in pixels
     numOutlier_F=0;
     numInliers_F=0;
@@ -478,13 +511,23 @@ MotionGeometry::MotionGeometry()
     numInliers_H=0;
     filenameF="";
     filenameH="";
+    filenameE="";
     valid=0;
 }
 
 
 double MotionGeometry::getMotionElement(int i,int j,MotionType mtype) const
 {
-    CvMat* MotionModel=(mtype==FUNDAMENTAL)?MotionModel_F:MotionModel_H;
+    CvMat* MotionModel;
+     if(mtype==FUNDAMENTAL)
+    MotionModel=MotionModel_F;
+    else if(mtype==HOMOGRAPHY)
+    MotionModel=MotionModel_H;
+    else if (mtype==ESSENTIAL)
+    MotionModel=MotionModel_E;
+    else
+    printf("incorect motion requested!\n");
+
 
     if ( MotionModel->height==0 ||MotionModel->width==0 )
     {

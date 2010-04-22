@@ -6,6 +6,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "matrix.h"
+#include "triangulate.h"
 namespace fs = boost::filesystem;
 
 HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
@@ -94,6 +95,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     double* tscaled= new double[3]  ;
     double* K1= new double[10];
     double* K2= new double[10];
+     double* E= new double[10];
 
 
     int maxlength=(*imSet).myTracks.getNumTracks();
@@ -157,12 +159,15 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
 
+     readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\utils\\decompose\\essential.txt");
+cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E,&E, 0);
 
-    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
 
+ //   int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
+   int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 //i dont knwo why this is a transpose
-    //matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
-    //  matrix_scale(3, 1,  tscaled, -1.0,t);
+  //  matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
+   //   matrix_scale(3, 1,  tscaled, -1.0,t);
 ////zzz remove the next 5 lines ground truth K, R , T
 
 
