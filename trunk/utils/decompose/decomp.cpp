@@ -185,6 +185,7 @@ int main(int argc, char *argv[])
 
         printf("essential matrix was:\n");
         writeCVMatrix(cout,E1 );
+           writeCVMatrix("essential.txt",E1 );
         cout<<endl;
     }
 

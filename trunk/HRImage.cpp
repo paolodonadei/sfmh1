@@ -891,6 +891,25 @@ int HRImageSet::multipleViewEstimate()
         {
             correspondencesPairWise[i][j].findGeomtry();//remove outliers and find motion model
             correspondencesPairWise[i][j].WriteMatches();
+
+
+
+        }
+    }
+
+
+
+
+}
+int HRImageSet::writeMotions()
+{
+    int i,j;
+
+    for (i=0; i<imageCollection.size(); i++)
+    {
+        for (j=0; j<i; j++)
+        {
+
             correspondencesPairWise[i][j].WriteMotion();
 
 
@@ -901,12 +920,14 @@ int HRImageSet::multipleViewEstimate()
 
 
 }
+
 int HRImageSet::exhaustiveSIFTMatching()
 {
     int i,j;
     double f1,f2;
-    correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
 
+    correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
+printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
 
 
 //deleting the index files, i should propbablyt find a better place for this
@@ -1048,7 +1069,46 @@ int HRImageSet::SelfCalibrate()
 
 
 }
+void HRImageSet::findEssentialMatrices()
+{
+    int i, j, k,q;
+    CvMat* tempmat1 = cvCreateMat(3,3, CV_64F);
+    CvMat* tempmat2 = cvCreateMat(3,3, CV_64F);
 
+
+    CvMat* temp2 = cvCreateMat(3,3, CV_64F);
+    CvMat* temp3 = cvCreateMat(3,3, CV_64F);
+    CvMat* temp4 = cvCreateMat(3,3, CV_64F);
+
+    for (i=0; i<imageCollection.size(); i++)
+    {
+        for (j=0; j<i; j++)
+        {
+
+
+            cvTranspose((*imageCollection[j]).intrinsicMatrix, tempmat1);
+            cvMatMul(tempmat1, (correspondencesPairWise[i][j]).motion.MotionModel_F, tempmat2);
+            cvMatMul(tempmat2, (*imageCollection[i]).intrinsicMatrix, (correspondencesPairWise[i][j]).motion.MotionModel_E);
+
+//            cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_MODIFY_A|CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
+//
+//
+//
+//            double err=(cvmGet(temp2,0,0)-cvmGet(temp2,1,1))/cvmGet(temp2,1,1);
+//            printf("svd error %d and %d was %f \n",i,j,err);
+
+        }
+    }
+
+    cvReleaseMat(&tempmat1);
+    cvReleaseMat(&tempmat2);
+
+
+    cvReleaseMat(&temp2);
+    cvReleaseMat(&temp3);
+    cvReleaseMat(&temp4);
+
+}
 
 int HRImageSet::createFeatureTrackMatrix()
 {
@@ -1129,7 +1189,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 
     }
 
-    int matchCountr=0;
+
 
     for (i=0; i<trackMatrix.size(); i++)
     {
@@ -1138,13 +1198,13 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 
             imgTemptempcopy=cvCloneImage(imgTempcopy);
         }
-        matchCountr=0;
+
         for (j=1; j<trackMatrix[i].size(); j++)
         {
 
             if (trackMatrix[i][j]!=-1 && trackMatrix[i][j-1]!=-1)
             {
-                matchCountr++;
+
                 x0=(*imCollection[j-1]).HR2DVector[trackMatrix[i][j-1]]->location.x;
                 y0=(*imCollection[j-1]).HR2DVector[trackMatrix[i][j-1]]->location.y+ ((j-1)*heightImage);
                 x1=(*imCollection[j]).HR2DVector[trackMatrix[i][j]]->location.x;
@@ -1206,7 +1266,7 @@ int FeatureTrack::drawImageTrackMatches(const vector<HRImagePtr>& imCollection,s
 
 int FeatureTrack::findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices)
 {
-    int i,j;
+    int i;
     for (i=0; i<trackMatrix.size(); i++)
     {
 
@@ -1229,10 +1289,10 @@ int FeatureTrack::processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumbe
 //value for the other image then it clones that row with the new correspondence
 
 
-    int numTimes=0;
-    int i,j;
-    int flag=0; //1 means add new row, 2 means
-    int flagFound=0;
+
+    int i;
+
+
     vector<int> matchedIndex(0);
     int rowNumsSize=0;
 
@@ -1348,7 +1408,7 @@ int FeatureTrack::calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& 
 }
 int FeatureTrack::pruneFeatureTrack()
 {
-    int i,j,k,l;
+    int i,j,k;
     int indexRemove=0;
 
 
@@ -1397,7 +1457,7 @@ bool FeatureTrack::displayTrackRow(int row)
 }
 int FeatureTrack::eraseTrackMatRow(int index)
 {
-    int i,j,k,l;
+
 
 
 

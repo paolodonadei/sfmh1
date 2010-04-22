@@ -13,7 +13,7 @@
 class HRImage;
 
 using namespace std;
-enum MotionType { FUNDAMENTAL,HOMOGRAPHY, AFFINE };
+enum MotionType { FUNDAMENTAL,HOMOGRAPHY, AFFINE, ESSENTIAL };
 
 struct matchIndex
 {
@@ -49,6 +49,7 @@ public:
 
     string filenameH;
     string filenameF;
+     string filenameE;
 
     double calculateError();
 
@@ -66,8 +67,8 @@ public:
     MotionGeometry & operator=(const MotionGeometry & rhs) throw();
     CvMat* MotionModel_F;
     CvMat* MotionModel_H;
-    CvMat* MotionModel_P1;
-    CvMat* MotionModel_P2;
+    CvMat* MotionModel_E;
+
     double motionError_F;//in pixels
     int numOutlier_F;
     int valid;
