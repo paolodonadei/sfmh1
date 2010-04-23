@@ -17,7 +17,7 @@
 #include <iomanip>
 #include <sstream>
 #include "nonlinSClvm.h"
-#include <gsl/gsl_linalg.h>
+//#include <gsl/gsl_linalg.h>
 
 #include "general.h"
 
@@ -572,73 +572,73 @@ void h_handler (const char * reason,const char * file,int line, int gsl_errno)
 
 int extractKfromQ(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK)
 {
-    gsl_error_handler_t * old_handler = gsl_set_error_handler (&h_handler);
-
-
-    CvMat* IAC = cvCreateMat(3,3, CV_64F);
-    CvMat* inter1 = cvCreateMat(3,4, CV_64F);
-    CvMat* P_T= cvCreateMat(4,3, CV_64F);
-
-    cvTranspose(pPnormalized, P_T);
-
-    cvMatMul(pPnormalized,pQ,inter1);
-    cvMatMul(inter1,P_T,IAC);
-
-//cholesky decomposition using GSL
-    double* tempIAC=new double[9];
-
-
-    int z=0;
-    for (int i=0; i<3; i++)
-    {
-        for (int j=0; j<3; j++)
-        {
-            tempIAC[z]=cvmGet(IAC,i,j);
-            z++;
-        }
-
-    }
-
-//cholesky
-//http://www.gnu.org/software/gsl/manual/html_node/Cholesky-Decomposition.html
-    gsl_matrix_view m = gsl_matrix_view_array (tempIAC, 3, 3);
-
-    int retVal=gsl_linalg_cholesky_decomp (&m.matrix);
-
-    if (retVal==GSL_EDOM)
-    {
-
-        printf("the matrix was not positive definite, degenerate config\n");
-
-    }
-
-
-    z=0;
-    for (int i=0; i<3; i++)
-    {
-        for (int j=0; j<3; j++)
-        {
-            cvmSet(pK,i,j,tempIAC[z] );
-            z++;
-        }
-
-    }
-
-    cout<<"Q:" <<endl;
-    writeCVMatrix("Qf.txt",pQ);
-
-    cout<<"IAC:" <<endl;
-    writeCVMatrix("IAC.txt",IAC);
-
-    cout<<"pK:" <<endl;
-    writeCVMatrix("pKfromIAC.txt",pK );
-
-    gsl_set_error_handler (old_handler);
-
-    delete[] tempIAC;
-    cvReleaseMat(&IAC);
-    cvReleaseMat(&inter1);
-    cvReleaseMat(&P_T);
+//    gsl_error_handler_t * old_handler = gsl_set_error_handler (&h_handler);
+//
+//
+//    CvMat* IAC = cvCreateMat(3,3, CV_64F);
+//    CvMat* inter1 = cvCreateMat(3,4, CV_64F);
+//    CvMat* P_T= cvCreateMat(4,3, CV_64F);
+//
+//    cvTranspose(pPnormalized, P_T);
+//
+//    cvMatMul(pPnormalized,pQ,inter1);
+//    cvMatMul(inter1,P_T,IAC);
+//
+////cholesky decomposition using GSL
+//    double* tempIAC=new double[9];
+//
+//
+//    int z=0;
+//    for (int i=0; i<3; i++)
+//    {
+//        for (int j=0; j<3; j++)
+//        {
+//            tempIAC[z]=cvmGet(IAC,i,j);
+//            z++;
+//        }
+//
+//    }
+//
+////cholesky
+////http://www.gnu.org/software/gsl/manual/html_node/Cholesky-Decomposition.html
+//    gsl_matrix_view m = gsl_matrix_view_array (tempIAC, 3, 3);
+//
+//    int retVal=gsl_linalg_cholesky_decomp (&m.matrix);
+//
+//    if (retVal==GSL_EDOM)
+//    {
+//
+//        printf("the matrix was not positive definite, degenerate config\n");
+//
+//    }
+//
+//
+//    z=0;
+//    for (int i=0; i<3; i++)
+//    {
+//        for (int j=0; j<3; j++)
+//        {
+//            cvmSet(pK,i,j,tempIAC[z] );
+//            z++;
+//        }
+//
+//    }
+//
+//    cout<<"Q:" <<endl;
+//    writeCVMatrix("Qf.txt",pQ);
+//
+//    cout<<"IAC:" <<endl;
+//    writeCVMatrix("IAC.txt",IAC);
+//
+//    cout<<"pK:" <<endl;
+//    writeCVMatrix("pKfromIAC.txt",pK );
+//
+//    gsl_set_error_handler (old_handler);
+//
+//    delete[] tempIAC;
+//    cvReleaseMat(&IAC);
+//    cvReleaseMat(&inter1);
+//    cvReleaseMat(&P_T);
 }
 
 
