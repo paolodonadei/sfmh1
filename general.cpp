@@ -6,18 +6,26 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "argproc.h"
+
 #include <highgui.h>
+
+
+
+
 #define DEBUGLVL 0
 
 extern const char* TEMPDIR;
 namespace fs = boost::filesystem;
 using namespace boost::filesystem;
 using namespace boost;
+
 using namespace std;
 
 
+
+
 //these two functions just change from buffer to cvmat
-int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate)
+int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate,int major)
 {
     if (mat==NULL)
     {
@@ -47,15 +55,17 @@ int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate)
     {
         for (int j = 0; j < n_cols; ++j)
         {
-
-            (*buffer)[count++]=cvmGet( mat,i,j );
+            if(major==0)
+                (*buffer)[count++]=cvmGet( mat,i,j );
+            else
+                (*buffer)[count++]=cvmGet( mat,j,i );
         }
 
 
     }
     return (n_rows*n_cols);
 }
-int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate)
+int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate,int major)
 {
 
     if(allocate==0)
@@ -73,9 +83,9 @@ int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate
             return -1;
         }
 
-       // rows = (*mat)->rows;
+        // rows = (*mat)->rows;
 
-       // cols = (*mat)->cols;
+        // cols = (*mat)->cols;
     }
     else
     {
@@ -88,8 +98,10 @@ int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate
     {
         for (int j = 0; j < cols; ++j)
         {
-
-            cvmSet( (*mat),i,j,buffer[count++] );
+            if(major==0)
+                cvmSet( (*mat),i,j,buffer[count++] );
+            else
+                cvmSet( (*mat),j,i,buffer[count++] );
         }
 
 
@@ -510,6 +522,43 @@ int indexMax(vector<double>& myvec)
 
     return temp;
 
+}
+int checkSymmetric(CvMat* inM)
+{
+
+    if (inM==NULL)
+    {
+        printf("****matrix is null\n");
+        return 0;
+
+    }
+
+    if ( inM->rows==0 || inM->cols==0 )
+    {
+        cout<<"EMPTY"<<endl;
+        return 0;
+    }
+
+    int rows = inM->rows;
+
+    int cols = inM->cols;
+
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < cols; ++j)
+        {
+
+            if(fabs(cvmGet( inM,i,j)-cvmGet( inM,j,i))>1e-15) //should i subtract and compare with epsilon?
+            {
+                printf("matrix not symmetric, element i=%d j=%d is: %f and  i=%d j=%d is: %f\n",i,j,cvmGet( inM,i,j) ,j,i,cvmGet( inM,j,i) );
+                return 0;
+            }
+        }
+
+
+    }
+
+    return 1;
 }
 
 

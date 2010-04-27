@@ -7,7 +7,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "HRImage.hpp"
-#include "general.h"
+//#include "general.h"
 
 
 class HRImage;

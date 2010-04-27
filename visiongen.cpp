@@ -25,21 +25,21 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
                                     CvMat *rotMatrX, CvMat *rotMatrY,
                                     CvMat *rotMatrZ, CvPoint3D64f *eulerAngles)
 {
-  CvMat* ttemp = cvCreateMat(4,1, CV_64F);
+    CvMat* ttemp = cvCreateMat(4,1, CV_64F);
     cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,ttemp,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 
-printf("ttemp is \n");
-writeCVMatrix(cout,ttemp);
+    printf("ttemp is \n");
+    writeCVMatrix(cout,ttemp);
 
-int j;
- for (j=0; j<3; j++)
+    int j;
+    for (j=0; j<3; j++)
     {
         cvmSet(posVect,j,0,cvmGet(ttemp,j,0)/cvmGet(ttemp,3,0)); // Set M(i,j)
 
     }
 
-printf("posVect is \n");
-writeCVMatrix(cout,posVect);
+    printf("posVect is \n");
+    writeCVMatrix(cout,posVect);
 
 
     cvReleaseMat(&ttemp);
@@ -96,13 +96,13 @@ int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2)
     normalizeMatrix(e2);
 
 
-
-    printf("Debugging info for epipole estimation: \n Fundamental matrix read was\n");
-    writeCVMatrix(cout,F );
-    printf("Left Epipole (left null space) was\n");
-    writeCVMatrix(cout,e1 );
-    printf("Right Epipole (left null space) was\n");
-    writeCVMatrix(cout,e2 );
+//
+//    printf("Debugging info for epipole estimation: \n Fundamental matrix read was\n");
+//    writeCVMatrix(cout,F );
+//    printf("Left Epipole (left null space) was\n");
+//    writeCVMatrix(cout,e1 );
+//    printf("Right Epipole (left null space) was\n");
+//    writeCVMatrix(cout,e2 );
 
 
     cout<<endl;
@@ -458,8 +458,8 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
     int i,j;
     CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
-   CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
-   CvMat* Rtemp=cvCreateMat(3,3,CV_64F);
+    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
+    CvMat* Rtemp=cvCreateMat(3,3,CV_64F);
 
     checkMatrixOK(P,3,4);
     checkMatrixOK(R,3,3);
@@ -469,11 +469,16 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 
 //cvTranspose(R, Rtemp);
 //cvMatMul(Rtemp, t, Ttemp);
-cvMatMul(R, t, Ttemp);
+    for (i=0; i<3; i++)
+    {
+        cvmSet(Ttemp,i,0,cvmGet(t,i,0));
+    }
 
-
-
-scaleMatrix(Ttemp,-1);
+    //whether or not this rotation matrix should be transposed is still under debate , noah does it but just for multiplying with the t
+    //cvTranspose(R, Rtemp);
+    //cvMatMul(Rtemp, t, Ttemp);
+      cvMatMul(R, t, Ttemp);
+    scaleMatrix(Ttemp,-1);
 
 
     for (i=0; i<3; i++)
@@ -585,7 +590,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     spPoint.z=    cvmGet(&matrV,3,2)/cvmGet(&matrV,3,3);/* Z */
 
 
-double    rep_error=0;
+    double    rep_error=0;
 
 
     CvMat point3D;
@@ -622,9 +627,9 @@ double    rep_error=0;
         deltaY = (double)fabs(y-yr);
         rep_error+=(sqrt(deltaX*deltaX+deltaY*deltaY));
     }
-rep_error=rep_error/((double)numframes );
+    rep_error=rep_error/((double)numframes );
 
-return rep_error;
+    return rep_error;
 
 
 

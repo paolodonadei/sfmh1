@@ -2,26 +2,42 @@
 #define GENERAL_HPP_INCLUDED
 
 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#undef max
+#undef min
+#include <algorithm>
 #include <iostream>
+#undef max
+#undef min
+
+#undef real
+#undef complex
+
 #include <sstream>
 #include <string>
 #include <vector>
 #include <typeinfo>
 #include <stdexcept>
+
+
+
 #include <cv.h>
-
+#include <cxcore.h>
 #include "sift.h"
-#include "HRImage.hpp"
 
+#include "HRImage.hpp"
 
 //some general definitions go here
 #define INDEXFNAME "motionindex.txt"
-
-
 using namespace std;
 
-
 class HRImage;
+
 
 Image HRImagetoDLImage(HRImage& hr_im);
 
@@ -66,8 +82,8 @@ void writeCVMatrix(ostream &stream,const CvMat* M);
 string findSeedDirName(const vector<string>& oArray);
 void readCvMatFfromfile(CvMat** tmodel,const string& mfname);
 void writeCVMatrix(char* fname,const CvMat* M);
-int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate=0);
-int BuffertocvMatrix(double* buffer,CvMat** mat,int rows=0, int cols=0, int allocate=0);
+int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate=0,int major=0);//0 is row major, 1 is column major
+int BuffertocvMatrix(double* buffer,CvMat** mat,int rows=0, int cols=0, int allocate=0,int major=0);
 int indexMax(vector<double>& myvec);
-
+int checkSymmetric(CvMat* inM);
 #endif //HRPRIMITIVES_HPP_INCLUDED

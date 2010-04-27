@@ -1,7 +1,7 @@
 #ifndef HRIMAGE_HPP_INCLUDED
 #define HRIMAGE_HPP_INCLUDED
-
 #include "general.h"
+
 #include <cv.h>
 
 

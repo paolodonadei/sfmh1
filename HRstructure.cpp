@@ -2,6 +2,7 @@
 #include "5point.h"
 #include "vector.h"
 #include "visiongen.h"
+#include "general.h"
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
@@ -52,17 +53,20 @@ void HRStructure::run()
     }
 
 
+//zzz remove these
     int frame1=indexMax(tempconf);
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
+
     int frame2=indexMax(tempconf);
     sfmSequence[1]=frame2;
-    (*imSet).myTracks.writeTrackMatrix("trackafter2.txt");
+
+
     printf("key frames are %d and %d \n",frame1,frame2);
     initializeKeyFrames(frame1,  frame2);
-    (*imSet).myTracks.writeTrackMatrix("trackafter3.txt");
+
     DLTUpdateStructure();
-    (*imSet).myTracks.writeTrackMatrix("trackafter4.txt");
+
     writeStructure();
 }
 
@@ -95,7 +99,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     double* tscaled= new double[3]  ;
     double* K1= new double[10];
     double* K2= new double[10];
-     double* E= new double[10];
+    double* E= new double[10];
 
 
 
@@ -104,7 +108,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
     int maxlength=(*imSet).myTracks.getNumTracks();
-    printf("hi jackass\n");
+
     printf("number of feature matches is %d and numframes is %d \n",(*imSet).myTracks.getNumTracks(),(*imSet).myTracks.getNumFrames());
     structure.resize(maxlength);
 
@@ -150,11 +154,12 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+  readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
     readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
     readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
+
 
 
     cvSetIdentity(Rident);
@@ -164,18 +169,14 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
 
-     readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\utils\\decompose\\essential.txt");
-cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E,&E, 0);
+  //readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\utils\\decompose\\essential.txt");
+    cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame2]][sfmSequence[frame1]].motion.MotionModel_E,&E, 0);
 
 
- //   int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
-   int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
-//i dont knwo why this is a transpose
-  //  matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
-   //   matrix_scale(3, 1,  tscaled, -1.0,t);
-////zzz remove the next 5 lines ground truth K, R , T
+  // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
+    int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 
-i was implementing the stuff from multiple view book in matlab
+
 
 
     printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
@@ -183,9 +184,17 @@ i was implementing the stuff from multiple view book in matlab
     BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
 
-normalizeMatrix(poses[0].tm);//normalizing the translation
 
-// 5 point method is being a retard
+//
+//
+// readCvMatFfromfile(&(poses[0].Rm),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\R2.txt");
+// readCvMatFfromfile(&(poses[0].tm),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\t2.txt");
+//
+//readCvMatFfromfile(&(Rident),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\R1.txt");
+// readCvMatFfromfile(&(tzero),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\t1.txt");
+//
+
+
 
     cout<<" R0 :"<<endl;
 
@@ -202,6 +211,9 @@ normalizeMatrix(poses[0].tm);//normalizing the translation
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])).projectionMatrix,Rident,tzero,(*((*imSet).imageCollection[frame1])).intrinsicMatrix);
     findProjfromcompon((*((*imSet).imageCollection[frame2])).projectionMatrix,poses[0].Rm,poses[0].tm,(*((*imSet).imageCollection[frame2])).intrinsicMatrix);
+
+//readCvMatFfromfile(&((*((*imSet).imageCollection[frame2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\pguess.txt");
+
 
     cout<<" P0 :"<<endl;
 

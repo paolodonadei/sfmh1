@@ -1,4 +1,9 @@
+#ifndef VISIONGEN_HPP_INCLUDED
+#define VISIONGEN_HPP_INCLUDED
 
+
+#undef complex
+#undef real
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,13 +16,6 @@
 #include <iomanip>
 #include <sstream>
 
-#ifdef CV_NO_FUNC_NAMES
-    #define CV_FUNCNAME( Name )
-    #define cvFuncName ""
-#else
-    #define CV_FUNCNAME( Name )  \
-    static char cvFuncName[] = Name
-#endif
 
 using namespace std;
 
@@ -36,3 +34,5 @@ void scaleMatrix(CvMat* in,double s);
 int normalizeMatrix( CvMat* in);
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint);
+
+#endif
