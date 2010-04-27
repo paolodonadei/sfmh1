@@ -1,22 +1,20 @@
 #include <time.h>
+
 #include <cmath>
-#include <algorithm>
-#include <fstream>
-#include <iomanip>
-#include <highgui.h>
+
 #include <iostream>
 #include "boost/filesystem.hpp"   // includes all needed Boost.Filesystem declarations
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "focallength.h"
 #include "HRImage.hpp"
-#include "general.h"
+#include "highgui.h"
 #include "pgmutils.hpp"
 #include "sift.h"
 #include "matching.hpp"
 #include "argproc.h"
 #define DEBUGLVL 0
-
+#include "general.h"
 
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN

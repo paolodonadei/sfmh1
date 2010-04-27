@@ -115,7 +115,7 @@ int write_pgm_image(char *outfilename, unsigned char *image, int rows,int cols, 
 * All comments in the header are discarded in the process of reading the
 * image. Upon failure, this function returns 0, upon sucess it returns 1.
 ******************************************************************************/
-int read_ppm_image(char *infilename, unsigned char **image_red, 
+int read_ppm_image(char *infilename, unsigned char **image_red,
     unsigned char **image_grn, unsigned char **image_blu, int *rows,
     int *cols)
 {
@@ -228,4 +228,5 @@ int write_ppm_image(char *outfilename, unsigned char *image_red,
    if(fp != stdout) fclose(fp);
    return(1);
 }
+
 

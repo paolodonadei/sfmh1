@@ -268,6 +268,15 @@ vector<double> confidences;
 
 
 
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
+
+    cout<<" According to POLLEFEY:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
 
 
     for (int i = 0; i < numFrames; ++i)

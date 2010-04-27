@@ -34,7 +34,7 @@ int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int
 int HRSelfCalibtwoFrame(const CvMat* pF,int width1, int height1, int width2, int height2,CvMat* K1,CvMat* K2,SELFCALIBMETHOD method);
 void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata);
 int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV ,int width, int height, vector<double>& confs,SELFCALIBMETHOD method);
-
+int extractKfromQLAPACK(const CvMat* pQ,const CvMat* pPnormalized,CvMat* pK);
 int  estimateFocalLengthsPollefey(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);
 int  estimateFocalLengthsPollefeyVisual(const CvMat* pF, int width1, int height1,int width2, int height2,CvMat* K1,CvMat* K2);
 int estimateFocalLengthsHartley(const CvMat* pF, int width1, int height1,int width2, int height2,double& foc1,double& foc2);

@@ -244,7 +244,7 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 //    for (int i=0; i<m; i++)
 //        printf("p %d is %f\n",i,p[i]);
 
-  //  printf(".");
+    //  printf(".");
 
     int i,j;
     int width=0;//figure thesed out
@@ -381,4 +381,91 @@ double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
 
     return err;
 }
+
+int cvCholesky(CvMat* inM,CvMat* outM)
+{
+
+
+    if (inM==NULL)
+    {
+        printf("****matrix is null\n");
+        return -1;
+
+    }
+
+    if ( inM->rows==0 || inM->cols==0 )
+    {
+        cout<<"EMPTY"<<endl;
+        return -1;
+    }
+
+    int rows = inM->rows;
+
+    int cols = inM->cols;
+
+
+    if(rows!=cols)
+    {
+        printf("matrix is not square so it cant be symmetric\n");
+        return -2;
+
+
+    }
+
+
+    //check to see if matrix is symetric
+    if(checkSymmetric(inM)==0)
+    {
+        printf("matrix not symmetric\n");
+        return -1;
+    }
+
+    double *AT;
+
+    printf("the input matrix is \n");
+
+    int count =0;
+    for (int i = 0; i < rows; ++i)
+    {
+        for (int j = 0; j < i; ++j)
+        {
+
+            cvmSet( inM,i,j,0 );
+        }
+
+
+    }
+
+    writeCVMatrix(cout,inM);
+    cvMatrixtoBuffer(inM,&AT, 1,1);
+
+
+    char L[] = {'U', '\0'};
+    integer n=rows;
+    integer lda=rows; //i dont knwo whats lda
+    integer info=0;
+
+
+    dpotrf_(L, &n, (double*)AT, &lda, &info);
+
+    if(info== 0) printf("successful cholesky exit \n");
+    if(info< 0)        printf("the %d-th argument had an illegal value \n",info);
+    if(info> 0)        printf("the %d-th argument had an illegal value \n",info);
+    if(info > 0)       printf("the leading minor of order %d is not positive definite, and the factorization could not be completed\n",info);
+
+
+    cvSetZero(outM);
+
+
+
+    BuffertocvMatrix(AT,&outM,rows, cols, 0,1);
+    printf("output matrix is \n");
+    writeCVMatrix(cout,outM);
+    delete [] AT;
+
+    return info;
+
+}
+
+
 

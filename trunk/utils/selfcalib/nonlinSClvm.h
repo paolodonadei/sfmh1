@@ -10,7 +10,7 @@ extern "C" {
 #include "blaswrap.h"
 }
 
-
+int cvCholesky(CvMat* inM,CvMat* outM);
 using namespace std;
 
 
