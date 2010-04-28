@@ -1,4 +1,4 @@
-function [corrs, IMS, P,K, F] = readCorrsOxford(seq_name, noiselevel, numbadf)
+function [corrs, IMS, P,K, F, E] = readCorrsOxford(seq_name, noiselevel, numbadf)
 
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
@@ -150,6 +150,8 @@ for i=1:numcolum
             corrs{2,corcount}=x2;
 
             [F{corcount}, e1, e2] = fundmatrix(x1, x2);
+           
+            E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i})');
             
             corcount=corcount+1;
 

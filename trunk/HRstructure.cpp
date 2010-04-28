@@ -154,7 +154,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-  readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
     readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
     readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
@@ -169,21 +169,21 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
 
-  //readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\utils\\decompose\\essential.txt");
+    //readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame1]][sfmSequence[frame2]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\utils\\decompose\\essential.txt");
     cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame2]][sfmSequence[frame1]].motion.MotionModel_E,&E, 0);
 
 
-  // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
-    int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
+    int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
+    //int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 
-
-
-
-    printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
-
-    BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
 
+    matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
+    matrix_scale(3, 1, tscaled, -1.0, t);
+
+    BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
+
+    printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
 
 //
 //
@@ -238,6 +238,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     return num_inliers;
 
 }
+
 double HRStructure::bundleAdjust()
 {
 
