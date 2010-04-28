@@ -38,6 +38,7 @@ public:
     HRImageSet* imSet;
     string tempdir;
     int numImages;
+    int initializeKeyFrames2(int frame1, int frame2);
 };
 
 
