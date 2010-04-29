@@ -55,10 +55,12 @@ void HRStructure::run()
 
 //zzz remove these
     int frame1=indexMax(tempconf);
+    frame1=0;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
+    frame2=1;
     sfmSequence[1]=frame2;
 
 

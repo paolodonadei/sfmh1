@@ -409,7 +409,7 @@ int normalizeMatrix( CvMat* in)
     if (fabs(s)<=0.00000000001)
     {
         printf("cant normalize matridx if last element is zero\n");
-
+        return 0;
     }
     else
     {
@@ -477,7 +477,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     //whether or not this rotation matrix should be transposed is still under debate , noah does it but just for multiplying with the t
     //cvTranspose(R, Rtemp);
     //cvMatMul(Rtemp, t, Ttemp);
-      cvMatMul(R, t, Ttemp);
+    cvMatMul(R, t, Ttemp);
     scaleMatrix(Ttemp,-1);
 
 
