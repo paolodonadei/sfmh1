@@ -1,7 +1,7 @@
 %function[X] = reconstructOxford(seqname)
 %close all;
 %clc;
-close all
+%close all
 seqname='wadham';
 
 frame1=1;

@@ -30,7 +30,6 @@
 
 
 #define OXFORDMATCHES 0
-
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;
