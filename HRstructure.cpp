@@ -52,15 +52,15 @@ void HRStructure::run()
         structureValid[i]=0;
     }
 
-
+// this is all wrong, you need to find the best two frames and consecutively add more frames
 //zzz remove these
     int frame1=indexMax(tempconf);
-
+    frame1=0;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-
+    frame2=1;
     sfmSequence[1]=frame2;
 
 
@@ -69,7 +69,13 @@ void HRStructure::run()
 
     DLTUpdateStructure();
 
-    writeStructure();
+    writeStructure("structure1.txt");
+
+//    sfmSequence[2]=2;
+//    DLTUpdateStructure();
+//
+//
+//    writeStructure("structure2.txt");
 }
 
 
@@ -149,19 +155,19 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
             k1_pts[count] = v2_new(p1.x, p1.y);
             k2_pts[count] = v2_new(p2.x, p2.y);
-            //  printf("point %d is x=%f and y=%f out of %d\n",count,(double)k1_pts[count].p[0],(double)k1_pts[count].p[1]   ,num_pts);
+
             count++;
         }
     }
 
-
-
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\unilibrary\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\unilibrary\\002.P");
-//   readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\unilibrary\\003.P");
+//
+//
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\002.P");
+//   readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\003.P");
 //    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
 //   cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
-//
+////
 //  writeCVMatrix("P1pre.txt",(*((*imSet).imageCollection[frame1])).projectionMatrix);
 //
 //   writeCVMatrix("P2pre.txt",(*((*imSet).imageCollection[frame2])).projectionMatrix);
@@ -173,32 +179,22 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
 //
-//printf("essential amtrix %d - %d was \n",frame2,frame1);
-// writeCVMatrix(cout,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
+    printf("essential amtrix %d - %d was \n",frame2,frame1);
+    writeCVMatrix(cout,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
 
 
     cvMatrixtoBuffer((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E,&E, 0);
 
-   //int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
+   // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
     int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 
     BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
 
-//    matrix_transpose_product(3, 3, 3, 1, R, t, tscaled);
-//   matrix_scale(3, 1, tscaled, -1.0, t);
 
     BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
-//normalizeMatrix(poses[0].tm);
+
     printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
 
-//
-//
-// readCvMatFfromfile(&(poses[0].Rm),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\R2.txt");
-// readCvMatFfromfile(&(poses[0].tm),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\t2.txt");
-//
-//readCvMatFfromfile(&(Rident),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\R1.txt");
-// readCvMatFfromfile(&(tzero),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\t1.txt");
-//
 
 
 
@@ -217,8 +213,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])).projectionMatrix,Rident,tzero,(*((*imSet).imageCollection[frame1])).intrinsicMatrix);
     findProjfromcompon((*((*imSet).imageCollection[frame2])).projectionMatrix,poses[0].Rm,poses[0].tm,(*((*imSet).imageCollection[frame2])).intrinsicMatrix);
-
-//readCvMatFfromfile(&((*((*imSet).imageCollection[frame2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\pguess.txt");
 
 
     cout<<" P0 :"<<endl;
@@ -260,15 +254,9 @@ void HRStructure::DLTUpdateStructure()
 
     int i,j;
 
-//
-//
-////zzz remove this, it uses actual projection amtrices
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-////zzz remove this , this is the projective geometry
-//ProjectiveMatFromF( (*imSet).correspondencesPairWise[sfmSequence[0]][sfmSequence[1]].motion.MotionModel_F, ((*((*imSet).imageCollection[sfmSequence[0]])).projectionMatrix),((*((*imSet).imageCollection[sfmSequence[1]])).projectionMatrix));
-//
 
 
     int count=0;
@@ -318,14 +306,14 @@ void HRStructure::DLTUpdateStructure()
 
 }
 
-void HRStructure::writeStructure()
+void HRStructure::writeStructure(string fn)
 {
     int i;
     int maxlength=(*imSet).myTracks.getNumTracks();
 
 
 
-    string tempfilename="structure.txt";
+    string tempfilename=fn;
     fs::path p( tempfilename, fs::native );
 
 

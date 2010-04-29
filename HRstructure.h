@@ -34,7 +34,7 @@ public:
     vector<double> structureErrors;
     vector<int> structureValid;
     void DLTUpdateStructure();
-    void writeStructure();
+    void writeStructure(string fn);
     HRImageSet* imSet;
     string tempdir;
     int numImages;
