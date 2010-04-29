@@ -1,7 +1,7 @@
 % close all;
 % clear all;
 % clc
-seqname='merton2';
+seqname='merton1';
 
 A=dlmread(['C:\Documents and Settings\hrast019\Desktop\sfmh1\temporary\' seqname 'sfmh\structure.txt']);
 

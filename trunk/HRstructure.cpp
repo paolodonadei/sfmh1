@@ -55,12 +55,12 @@ void HRStructure::run()
 
 //zzz remove these
     int frame1=indexMax(tempconf);
-    frame1=0;
+
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-    frame2=1;
+
     sfmSequence[1]=frame2;
 
 
@@ -155,7 +155,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     }
 
 
-//
+
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
@@ -172,12 +172,12 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
- //readCvMatFfromfile(&((*imSet).correspondencesPairWise[sfmSequence[frame2]][sfmSequence[frame1]].motion.MotionModel_E),"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\essential.txt");
+
 printf("essential amtrix %d - %d was \n",frame2,frame1);
- writeCVMatrix(cout,(*imSet).correspondencesPairWise[sfmSequence[frame2]][sfmSequence[frame1]].motion.MotionModel_E);
+ writeCVMatrix(cout,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
 
 
-    cvMatrixtoBuffer((*imSet).correspondencesPairWise[sfmSequence[frame2]][sfmSequence[frame1]].motion.MotionModel_E,&E, 0);
+    cvMatrixtoBuffer((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E,&E, 0);
 
    //int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
     int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
