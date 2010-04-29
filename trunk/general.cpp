@@ -379,7 +379,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
     int n_cols = M->cols;
 
 
-    stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
+ //   stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
 
 
 

@@ -151,7 +151,8 @@ for i=1:numcolum
 
             [F{corcount}, e1, e2] = fundmatrix(x1, x2);
            
-            E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i})');
+            E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i}));
+            E{corcount}=E{corcount}/E{corcount}(3,3);
             
             corcount=corcount+1;
 
