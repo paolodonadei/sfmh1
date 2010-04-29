@@ -491,11 +491,11 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
         }
 
     }
-
+//change back zzzz i should put -Rt or t here?
     for (j=0; j<3; j++)
     {
 
-        cvmSet(P,j,3,cvmGet(Ttemp,j,0));
+        cvmSet(P,j,3,cvmGet(t,j,0));
 
     }
 

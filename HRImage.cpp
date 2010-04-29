@@ -15,7 +15,7 @@
 #include "argproc.h"
 #define DEBUGLVL 0
 #include "general.h"
-
+#include "visiongen.h"
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN
 #endif
@@ -925,7 +925,7 @@ int HRImageSet::exhaustiveSIFTMatching()
     double f1,f2;
 
     correspondencesPairWise.resize( imageCollection.size(), vector<HRCorrespond2N> ( imageCollection.size() ) );
-printf("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz\n");
+
 
 
 //deleting the index files, i should propbablyt find a better place for this
@@ -1018,15 +1018,33 @@ int HRImageSet::SelfCalibrate()
     }
 
 
+
+    //filling in the rest of the Fs
     for (int i = 0; i < numFrames; ++i)
     {
-        intrinMatrix[i]=(*imageCollection[i]).intrinsicMatrix;
-        for (int j = 0; j < i; ++j)
+
+        for (int j = i+1; j < numFrames; ++j)
         {
-            funMatrix[i][j]=(correspondencesPairWise[i][j]).motion.MotionModel_F;
+            cvTranspose((correspondencesPairWise[j][i]).motion.MotionModel_F,(correspondencesPairWise[i][j]).motion.MotionModel_F);
+
 
         }
     }
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        intrinMatrix[i]=(*imageCollection[i]).intrinsicMatrix;
+        for (int j = 0; j < numFrames; ++j)
+        {
+            if(i!=j)
+            {
+
+
+                funMatrix[i][j]=(correspondencesPairWise[i][j]).motion.MotionModel_F;
+            }
+        }
+    }
+
 
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confid, HARTLEY);
@@ -1078,23 +1096,31 @@ void HRImageSet::findEssentialMatrices()
     CvMat* temp3 = cvCreateMat(3,3, CV_64F);
     CvMat* temp4 = cvCreateMat(3,3, CV_64F);
 
+
+
     for (i=0; i<imageCollection.size(); i++)
     {
-        for (j=0; j<i; j++)
+        for (j=0; j<imageCollection.size(); j++)
         {
+            if(i!=j)
+            {
 
 
-            cvTranspose((*imageCollection[j]).intrinsicMatrix, tempmat1);
-            cvMatMul(tempmat1, (correspondencesPairWise[i][j]).motion.MotionModel_F, tempmat2);
-            cvMatMul(tempmat2, (*imageCollection[i]).intrinsicMatrix, (correspondencesPairWise[i][j]).motion.MotionModel_E);
 
-//            cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_MODIFY_A|CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
+                cvTranspose((*imageCollection[j]).intrinsicMatrix, tempmat1);
+                cvMatMul(tempmat1, (correspondencesPairWise[i][j]).motion.MotionModel_F, tempmat2);
+                cvMatMul(tempmat2, (*imageCollection[i]).intrinsicMatrix, (correspondencesPairWise[i][j]).motion.MotionModel_E);
+
+
+
+                normalizeMatrix((correspondencesPairWise[i][j]).motion.MotionModel_E);
+//                cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 //
 //
 //
-//            double err=(cvmGet(temp2,0,0)-cvmGet(temp2,1,1))/cvmGet(temp2,1,1);
-//            printf("svd error %d and %d was %f \n",i,j,err);
-
+//                double err=cvmGet(temp2,0,0)-cvmGet(temp2,1,1);
+//                printf("svd error %d and %d was %f \n",i,j,err);
+            }
         }
     }
 
