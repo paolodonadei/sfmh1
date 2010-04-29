@@ -1104,7 +1104,15 @@ void HRImageSet::findEssentialMatrices()
         {
             if(i!=j)
             {
-
+//                printf("__________________________________________________\n");
+//                printf("calculating essential %d -> %d \n",i,j);
+//                printf("intrinsic %d\n:",i);
+//                writeCVMatrix(cout,(*imageCollection[i]).intrinsicMatrix);
+//
+//                printf("intrinsic %d\n:",j);
+//                writeCVMatrix(cout,(*imageCollection[j]).intrinsicMatrix);
+//                printf("fundamental %d -> %d \n",i,j);
+//                writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_F);
 
 
                 cvTranspose((*imageCollection[j]).intrinsicMatrix, tempmat1);
@@ -1114,6 +1122,10 @@ void HRImageSet::findEssentialMatrices()
 
 
                 normalizeMatrix((correspondencesPairWise[i][j]).motion.MotionModel_E);
+
+//                printf("essential %d -> %d \n",i,j);
+//                writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
+            //    printf("__________________________________________________\n");
 //                cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 //
 //
