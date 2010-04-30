@@ -86,4 +86,6 @@ int cvMatrixtoBuffer(CvMat* mat,double** buffer, int allocate=0,int major=0);//0
 int BuffertocvMatrix(double* buffer,CvMat** mat,int rows=0, int cols=0, int allocate=0,int major=0);
 int indexMax(vector<double>& myvec);
 int checkSymmetric(CvMat* inM);
+void matrix_to_quaternion(CvMat* inRm, CvMat* inqm);
+void quaternion_to_matrix(CvMat* inqm,CvMat* inRm);
 #endif //HRPRIMITIVES_HPP_INCLUDED

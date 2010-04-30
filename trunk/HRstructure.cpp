@@ -346,12 +346,6 @@ void HRStructure::writeStructure(string fn)
     }
 
 
-
-
-
-
-
-
     fp_out.close();
 
 }
