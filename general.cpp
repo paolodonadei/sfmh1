@@ -379,7 +379,7 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
     int n_cols = M->cols;
 
 
- //   stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
+//   stream<< "\nnumber of rows is "<<n_rows <<" and number of cols is "<<n_cols<<endl<<endl;
 
 
 
@@ -562,3 +562,104 @@ int checkSymmetric(CvMat* inM)
 }
 
 
+
+/* Convert a matrix to a normalize quaternion */
+void matrix_to_quaternion(CvMat* inRm, CvMat* inqm)
+{
+
+    double* R= new double[10];
+    double* q= new double[5];
+
+    cvMatrixtoBuffer(inRm,&R, 0);
+
+
+    double n4; // the norm of quaternion multiplied by 4
+    double tr = R[0] + R[4] + R[8]; // trace of martix
+    double factor;
+
+    if (tr > 0.0)
+    {
+        q[1] = R[5] - R[7];
+        q[2] = R[6] - R[2];
+        q[3] = R[1] - R[3];
+        q[0] = tr + 1.0;
+        n4 = q[0];
+    }
+    else if ((R[0] > R[4]) && (R[0] > R[8]))
+    {
+        q[1] = 1.0 + R[0] - R[4] - R[8];
+        q[2] = R[3] + R[1];
+        q[3] = R[6] + R[2];
+        q[0] = R[5] - R[7];
+        n4 = q[1];
+    }
+    else if (R[4] > R[8])
+    {
+        q[1] = R[3] + R[1];
+        q[2] = 1.0 + R[4] - R[0] - R[8];
+        q[3] = R[7] + R[5];
+        q[0] = R[6] - R[2];
+        n4 = q[2];
+    }
+    else
+    {
+        q[1] = R[6] + R[2];
+        q[2] = R[7] + R[5];
+        q[3] = 1.0 + R[8] - R[0] - R[4];
+        q[0] = R[1] - R[3];
+        n4 = q[3];
+    }
+
+    factor = 0.5 / sqrt(n4);
+    q[0] *= factor;
+    q[1] *= factor;
+    q[2] *= factor;
+    q[3] *= factor;
+
+    BuffertocvMatrix(q,&inqm,4,1, 0);
+    delete []  R;
+    delete []  q;
+}
+
+/* Convert a normalized quaternion to a matrix */
+void quaternion_to_matrix(CvMat* inqm,CvMat* inRm)
+{
+
+    double* R= new double[10];
+    double* q= new double[5];
+
+    cvMatrixtoBuffer(inqm,&q, 0);
+
+    double sqw = q[0] * q[0];
+    double sqx = q[1] * q[1];
+    double sqy = q[2] * q[2];
+    double sqz = q[3] * q[3];
+
+    double tmp1, tmp2;
+
+    R[0] =  sqx - sqy - sqz + sqw; // since sqw + sqx + sqy + sqz = 1
+    R[4] = -sqx + sqy - sqz + sqw;
+    R[8] = -sqx - sqy + sqz + sqw;
+
+    tmp1 = q[1] * q[2];
+    tmp2 = q[3] * q[0];
+
+    R[1] = 2.0 * (tmp1 + tmp2);
+    R[3] = 2.0 * (tmp1 - tmp2);
+
+    tmp1 = q[1] * q[3];
+    tmp2 = q[2] * q[0];
+
+    R[2] = 2.0 * (tmp1 - tmp2);
+    R[6] = 2.0 * (tmp1 + tmp2);
+
+    tmp1 = q[2] * q[3];
+    tmp2 = q[1] * q[0];
+
+    R[5] = 2.0 * (tmp1 + tmp2);
+    R[7] = 2.0 * (tmp1 - tmp2);
+
+    BuffertocvMatrix(R,&inRm,3,3, 0);
+    delete []  R;
+    delete []  q;
+}
