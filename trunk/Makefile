@@ -3,7 +3,7 @@ VPATH = .:utils/selfcalib
 INC = -I. -I'$(LOCALLIBS)'/include -Iutils/selfcalib
 CC=g++
 CFLAGS=$(INC) -c -g -Wall
-LIBS=   -lm -lgtk-x11-2.0 -lpthread -lgthread-2.0 -lrt -ldbus-glib-1 -ldbus-1 -lgobject-2.0 -lglib-2.0 -lgtk -lgtk -lgdk   -rdynamic -lgmodule -lglib -ldl -lXi -lXext -lX11 -lm  -llevmar  -lcxcore -lcv  -lhighgui  -lboost_filesystem -lboost_system  -ljasper -ljpeg -lpng -ltiff   -l5point -limage  -lmatrix -llapack   -lcblas -lblas  -lf2c  -lminpack
+LIBS= -lm  -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system    -l5point -limage  -lmatrix -llapack   -lcblas -lblas  -lf2c  -lminpack `pkg-config opencv --cflags --libs` -lgfortran
 LDFLAGS= -L'$(LOCALLIBS)'/lib -L/usr/lib
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp HRstructure.cpp
 OBJECTS=$(SOURCES:.cpp=.o) utils/selfcalib/focallength.o utils/selfcalib/nonlinSClvm.o
