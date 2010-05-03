@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
        mystruct.run();
+       mystruct.printSBAstyleData();
     }
     return 0;
 }

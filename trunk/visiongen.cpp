@@ -453,7 +453,13 @@ void scaleMatrix(CvMat* in,double s)
     }
 
 }
+int findProjfromcompon(HRImage& img)
+{
 
+findProjfromcompon(img.projectionMatrix,img.camPose.Rm,img.camPose.tm,img.intrinsicMatrix);
+
+
+}
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
     int i,j;

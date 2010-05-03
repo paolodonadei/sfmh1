@@ -29,7 +29,7 @@
 #define SIFTPCA 1
 
 
-#define OXFORDMATCHES 0
+#define OXFORDMATCHES 1
 extern const char* TEMPDIR;
 
 namespace fs = boost::filesystem;

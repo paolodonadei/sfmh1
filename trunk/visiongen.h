@@ -15,13 +15,13 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
-
+#include "HRImage.hpp"
 
 using namespace std;
 
 /* Computes projection matrix decomposition */
 CVAPI(void) cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr, CvMat *rotMatr, CvMat *posVect, CvMat *rotMatrX CV_DEFAULT(NULL), CvMat *rotMatrY CV_DEFAULT(NULL), CvMat *rotMatrZ CV_DEFAULT(NULL), CvPoint3D64f *eulerAngles CV_DEFAULT(NULL));
-
+int findProjfromcompon(HRImage& img);
 int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2);
 int ProjectiveMatFromF( const CvMat *F, CvMat *P1,CvMat *P2,CvMat* v,double scale );
 int findEpipoles(const CvMat *F, CvMat *e1,CvMat *e2);
