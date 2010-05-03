@@ -9,18 +9,11 @@
 
 using namespace std;
 
-struct pose
-{
-    CvMat* Rm;
-    CvMat* tm;
-    int frame1;
-    int frame2;
-};
 
 class HRStructure
 {
 public:
-    vector<pose> poses;
+
     HRStructure(HRImageSet* pimSet,string pdir );
     HRStructure();
     ~HRStructure();
@@ -39,6 +32,7 @@ public:
     string tempdir;
     int numImages;
     int initializeKeyFrames2(int frame1, int frame2);
+     int printSBAstyleData();
 };
 
 

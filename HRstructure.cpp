@@ -18,14 +18,7 @@ HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
     numImages=(*pimSet).imageCollection.size();
 
     (*imSet).myTracks.writeTrackMatrix("trackafter1.txt");
-    poses.resize(numImages);
 
-    for(i=0; i<numImages; i++)
-    {
-        poses[i].tm=cvCreateMat(3,1,CV_64F);
-        poses[i].Rm=cvCreateMat(3,3,CV_64F);
-
-    }
 
 }
 void HRStructure::run()
@@ -86,13 +79,7 @@ HRStructure::HRStructure()
 }
 HRStructure::~HRStructure()
 {
-    int i;
-    for(i=0; i<numImages; i++)
-    {
-        cvReleaseMat(&poses[i].tm);
-        cvReleaseMat(&poses[i].Rm);
 
-    }
 }
 int HRStructure::initializeKeyFrames(int frame1, int frame2)
 {
@@ -109,7 +96,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     double* K2= new double[10];
     double* E= new double[10];
 
-
+//frame 1 would go to the coordinate system origin
 
 
 
@@ -132,9 +119,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-
-    poses[0].frame1=frame1;
-    poses[0].frame2=frame2;
 
 
 
@@ -162,18 +146,12 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 //
 //
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\002.P");
-//   readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\wadham\\003.P");
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
-//   cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix, poses[0].Rm,poses[0].tm, 0, 0, 0, 0);
 ////
 //  writeCVMatrix("P1pre.txt",(*((*imSet).imageCollection[frame1])).projectionMatrix);
 //
 //   writeCVMatrix("P2pre.txt",(*((*imSet).imageCollection[frame2])).projectionMatrix);
 
-    cvSetIdentity(Rident);
-    cvSetZero(tzero);
+
 //(*imSet).findEssentialMatrices();
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
@@ -185,34 +163,45 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     cvMatrixtoBuffer((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E,&E, 0);
 
-   // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
+    // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
     int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 
-    BuffertocvMatrix(R,&(poses[0].Rm),3,3, 0);
+    BuffertocvMatrix(R,&((*((*imSet).imageCollection[frame2])).camPose.Rm),3,3, 0);
+    BuffertocvMatrix(t,&((*((*imSet).imageCollection[frame2])).camPose.tm),3,1, 0);
 
 
-    BuffertocvMatrix(t,&(poses[0].tm),3,1, 0);
+    //camera 1 goes to origin
+
+    cvSetIdentity((*(*imSet).imageCollection[frame1]).camPose.Rm);
+    cvSetZero((*(*imSet).imageCollection[frame1]).camPose.tm);
 
     printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
 
 
 
 
+
+    findProjfromcompon((*((*imSet).imageCollection[frame1])));
+    findProjfromcompon((*((*imSet).imageCollection[frame2])));
+
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,(*((*imSet).imageCollection[frame1])).camPose.Rm,(*((*imSet).imageCollection[frame1])).camPose.tm, 0, 0, 0, 0);
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix,(*((*imSet).imageCollection[frame2])).camPose.Rm,(*((*imSet).imageCollection[frame2])).camPose.tm, 0, 0, 0, 0);
+
+
+
+
     cout<<" R0 :"<<endl;
 
-    writeCVMatrix(cout,poses[0].Rm);
+    writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).camPose.Rm);
 
     cout<<" T0 :"<<endl;
 
-    writeCVMatrix(cout,poses[0].tm);
+    writeCVMatrix(cout,((*((*imSet).imageCollection[frame2])).camPose.tm));
 
 
-
-
-
-
-    findProjfromcompon((*((*imSet).imageCollection[frame1])).projectionMatrix,Rident,tzero,(*((*imSet).imageCollection[frame1])).intrinsicMatrix);
-    findProjfromcompon((*((*imSet).imageCollection[frame2])).projectionMatrix,poses[0].Rm,poses[0].tm,(*((*imSet).imageCollection[frame2])).intrinsicMatrix);
 
 
     cout<<" P0 :"<<endl;
@@ -222,8 +211,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cout<<" P1 :"<<endl;
 
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
-
-
 
 
 
@@ -257,7 +244,8 @@ void HRStructure::DLTUpdateStructure()
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-
+    double rerror=0;
+    int numReconstructed=0;
 
     int count=0;
     for(i=0; i< numImages; i++)
@@ -293,19 +281,96 @@ void HRStructure::DLTUpdateStructure()
         }
         if(numPts>1)
         {
-
-            structureValid[i]++;
+            numReconstructed++;
+            structureValid[i]=numPts;
 
             structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
-
+            rerror+=structureErrors[i];
         }
         projMatrs.clear();
         projPoints.clear();
     }
 
+    rerror/=((double)numReconstructed);
+
+    printf("reconstruction error was %f\n",rerror);
+}
+int HRStructure::printSBAstyleData()
+{
+
+
+    int i,j;
+    CvMat* curq=cvCreateMat(4,1,CV_64F);
+
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+
+    fstream file_cams("cameras.txt" ,ios::out);
+    file_cams<<"# fu, u0, v0, ar, s   kc(1:5)   quaternion translation"<<endl;
+    for (j = 0; j < numImages; j++)
+    {
+        if(sfmSequence[j]!=-1)
+        {
+            int curFrame=sfmSequence[j];
+            CvMat* curK=(*((*imSet).imageCollection[curFrame])).intrinsicMatrix;
+            CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
+            CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
+            CvMat* disto=(*((*imSet).imageCollection[curFrame])).distortion;
+
+            matrix_to_quaternion(curR,curq);
+
+            file_cams<<cvmGet(curK,0,0)<<" "<<cvmGet(curK,0,2)<<" "<<cvmGet(curK,1,2)<<" "<<cvmGet(curK,1,1)/cvmGet(curK,0,0)<<" "<<cvmGet(curK,0,1);
+            file_cams<<" "<<cvmGet(disto,0,0)<<" "<<cvmGet(disto,1,0)<<" "<<cvmGet(disto,2,0)<<" "<<cvmGet(disto,3,0)<<" "<<cvmGet(disto,4,0);
+            file_cams<<" "<<cvmGet(curq,0,0)<<" "<<cvmGet(curq,1,0)<<" "<<cvmGet(curq,2,0)<<" "<<cvmGet(curq,3,0);
+            file_cams<<" "<<cvmGet(curt,0,0)<<" "<<cvmGet(curt,1,0)<<" "<<cvmGet(curt,2,0);
+            file_cams<<endl;
+        }
+
+
+    }
+    file_cams.close();
+
+
+/////////////////////
+    fstream file_pts("3Dpts.txt" ,ios::out);
+    file_pts<<"# # X Y Z  nframes  frame0 x0 y0  frame1 x1 y1 ..."<<endl;
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+
+            file_pts<<structure[i].x<<" "<<structure[i].y<<" "<<structure[i].y<<" "<<structureValid[i]<<" ";
+            for (j = 0; j < numImages; j++)
+            {
+
+
+
+                if(sfmSequence[j]!=-1)
+                {
+
+                    int curFrame=sfmSequence[j];
+                    if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
+                    {
+                        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+                        file_pts<<curFrame<<" "<<curPt.x<<" "<<curPt.y<<" ";
+
+                    }
+                }
+            }
+            file_pts<<endl;
+        }
+
+    }
+
+    file_pts.close();
+
+
+
+    cvReleaseMat(&curq);
+    return 0;
 
 }
-
 void HRStructure::writeStructure(string fn)
 {
     int i;

@@ -21,6 +21,13 @@ class HRImage;
 typedef boost::shared_ptr<HRFeature> HRPointFeatures;
 typedef boost::shared_ptr<HRImage> HRImagePtr;
 
+struct pose
+{
+    CvMat* Rm;
+    CvMat* tm;
+
+};
+
 struct stats
 {
     double s_deviation;
@@ -39,6 +46,7 @@ class HRImage
 {
 
 public:
+pose camPose;
     HRImage();
     HRImage(string fname);
     HRImage(char* fname);
@@ -77,6 +85,7 @@ public:
     vector<HRPointFeatures> HR2DVector;
     CvMat*  intrinsicMatrix;
     CvMat*  projectionMatrix;
+     CvMat* distortion;
     double confidenceSelfCalib;
 private:
 
@@ -167,6 +176,7 @@ public:
     vector<double> confid;
     void drawallMatches();
     void findEssentialMatrices();
+
 
 };
 

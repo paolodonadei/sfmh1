@@ -29,6 +29,7 @@ namespace fs = boost::filesystem;
 
 
 
+
 HRImage::HRImage()
 {
 
@@ -42,6 +43,14 @@ HRImage::HRImage()
 }
 int HRImage::openim(string fname)
 {
+
+
+
+    camPose.tm=cvCreateMat(3,1,CV_64F);
+    camPose.Rm=cvCreateMat(3,3,CV_64F);
+
+    distortion=cvCreateMat(5,1,CV_64F);
+    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
@@ -105,6 +114,13 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     cv_img=cvCreateImage(cvSize(pwidth,pheight),IPL_DEPTH_8U,1);
     updateImageInfo();
 
+
+    camPose.tm=cvCreateMat(3,1,CV_64F);
+    camPose.Rm=cvCreateMat(3,3,CV_64F);
+
+    distortion=cvCreateMat(5,1,CV_64F);
+    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
+
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
     filename="memimage.pgm";
@@ -117,6 +133,14 @@ HRImage::HRImage(const HRImage &img)
     siftkeyfilename="";
     pgmfilename="";
     flag_valid=img.flag_valid;
+
+
+    camPose.tm=cvCreateMat(3,1,CV_64F);
+    camPose.Rm=cvCreateMat(3,3,CV_64F);
+
+    distortion=cvCreateMat(5,1,CV_64F);
+    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
+
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
     cv_img=cvCloneImage(img.cv_img);
@@ -269,6 +293,10 @@ void HRImage::close()
     }
     cvReleaseMat(&intrinsicMatrix);
     cvReleaseMat(&projectionMatrix);
+    cvReleaseMat(&distortion);
+    cvReleaseMat(&camPose.tm);
+    cvReleaseMat(&camPose.Rm);
+
 
     cvReleaseImage(&cv_img );
 
@@ -1125,7 +1153,7 @@ void HRImageSet::findEssentialMatrices()
 
 //                printf("essential %d -> %d \n",i,j);
 //                writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
-            //    printf("__________________________________________________\n");
+                //    printf("__________________________________________________\n");
 //                cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 //
 //
