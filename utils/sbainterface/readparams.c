@@ -343,40 +343,6 @@ register int i, ii, jj, k;
         exit(1);
       }
 
-      if(covprojs!=NULL){
-        if(havecov==TRICOV){
-          ntord=tricovsz;
-        }
-        else{
-          ntord=covsz;
-        }
-        n=readNDoubles(fp, covprojs, ntord); /* read in covariance values */
-        if(n!=ntord){
-          fprintf(stderr, "readPointParamsAndProjections(): error reading image projection covariances from line %d [n=%d].\n"
-                          "Perhaps line contains fewer than %d projections?\n", lineno+1, n, nframes);
-          exit(1);
-        }
-        if(havecov==TRICOV){
-          /* complete the full matrix from the triangular part that was read.
-           * First, prepare upper part: element (ii, mnp-1) is at position mnp-1 + ii*(2*mnp-ii-1)/2.
-           * Row ii has mnp-ii elements that must be shifted by ii*(ii+1)/2
-           * positions to the right to make space for the lower triangular part
-           */
-          for(ii=mnp; --ii; ){
-            k=mnp-1 + ((ii*((mnp<<1)-ii-1))>>1); //mnp-1 + ii*(2*mnp-ii-1)/2
-            nshift=(ii*(ii+1))>>1; //ii*(ii+1)/2;
-            for(jj=0; jj<mnp-ii; ++jj){
-              covprojs[k-jj+nshift]=covprojs[k-jj];
-              //covprojs[k-jj]=0.0; // this clears the lower part
-            }
-          }
-          /* copy to lower part */
-          for(ii=mnp; ii--; )
-            for(jj=ii; jj--; )
-              covprojs[ii*mnp+jj]=covprojs[jj*mnp+ii];
-        }
-        covprojs+=covsz;
-      }
 
       vmask[ptno*ncams+frameno]=1;
     }

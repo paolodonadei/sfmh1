@@ -7,7 +7,12 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "matrix.h"
+#include <sba.h>
+
+#include "eucsbademo.h"
 #include "triangulate.h"
+
+
 namespace fs = boost::filesystem;
 
 HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
@@ -423,4 +428,387 @@ void HRStructure::writeStructure(string fn)
 
     }
     fp_out.close();
+}
+////////////////////////////////////////////////////////////////////
+
+/* interface for the Driver for sba_xxx_levmar */
+int HRStructure::sba_driver_interface()
+{
+
+    int cnp=16, /* 3 rot params + 3 trans params */
+            pnp=3, /* euclidean 3D points */
+                mnp=2; /* image points are 2D */
+    int filecnp=cnp+1;
+    int i,j;
+    double *motstruct, *motstruct_copy, *imgpts, *imgpts_copy, *covimgpts, *initrot, *initrot_copy;
+    double K[9], ical[5]; // intrinsic calibration matrix & temp. storage for its params
+    char *vmask, tbuf[32];
+    double opts[SBA_OPTSSZ], info[SBA_INFOSZ], phi;
+    int howto, expert, analyticjac, fixedcal, havedist, n, prnt, verbose=0;
+    int nframes, numpts3D, numprojs, nvars;
+    const int nconstframes=0;
+
+    FILE *fp;
+
+    static char *howtoname[]= {"BA_MOTSTRUCT", "BA_MOT", "BA_STRUCT", "BA_MOT_MOTSTRUCT"};
+
+    clock_t start_time, end_time;
+
+    /* Notice the various BA options demonstrated below */
+
+    /* minimize motion & structure, motion only, or
+     * motion and possibly motion & structure in a 2nd pass?
+     */
+    howto=BA_MOTSTRUCT;
+    //howto=BA_MOT;
+    //howto=BA_STRUCT;
+    //howto=BA_MOT_MOTSTRUCT;
+
+    /* simple or expert drivers? */
+    //expert=0;
+    expert=1;
+
+    /* analytic or approximate jacobian? */
+    //analyticjac=0;
+    analyticjac=1;
+
+    /* prinstructureValid[i]t motion & structure estimates,
+     * motion only or structure only upon completion?
+     */
+    prnt=BA_NONE;
+    //  prnt=BA_MOTSTRUCT;
+    //prnt=BA_MOT;
+    //prnt=BA_STRUCT;
+
+    int havecov=0;
+
+///// MY PART BEGINS
+
+    int count=0;
+    for(i=0; i< numImages; i++)
+    {
+        if(sfmSequence[i]!=-1) //this array should indicate how many frazmes have had their proj matrices found
+            count++;
+    }
+
+    nframes=count;
+    numprojs=0;
+    int maxlength=(*imSet).myTracks.getNumTracks();
+    count=0;
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+            count++;
+
+        numprojs=numprojs+structureValid[i];
+    }
+
+    numpts3D=count;
+
+
+
+    motstruct=(double *)malloc((nframes*cnp + numpts3D*pnp)*sizeof(double));
+    motstruct_copy=motstruct;
+    if(motstruct==NULL)
+    {
+        fprintf(stderr, "memory allocation for 'motstruct' failed in readInitialSBAEstimate()\n");
+        exit(1);
+    }
+    initrot=(double *)malloc((nframes*FULLQUATSZ)*sizeof(double)); // Note: this assumes quaternions for rotations!
+    initrot_copy= initrot;
+    if(initrot==NULL)
+    {
+        fprintf(stderr, "memory allocation for 'initrot' failed in readInitialSBAEstimate()\n");
+        exit(1);
+    }
+    imgpts=(double *)malloc(numprojs*mnp*sizeof(double));
+    imgpts_copy=imgpts;
+    if(imgpts==NULL)
+    {
+        fprintf(stderr, "memory allocation for 'imgpts' failed in readInitialSBAEstimate()\n");
+        exit(1);
+    }
+    if(havecov)
+    {
+        covimgpts=(double *)malloc(numprojs*mnp*mnp*sizeof(double));
+        if(covimgpts==NULL)
+        {
+            fprintf(stderr, "memory allocation for 'covimgpts' failed in readInitialSBAEstimate()\n");
+            exit(1);
+        }
+    }
+    else
+        covimgpts=NULL;
+    vmask=(char *)malloc(numpts3D *nframes * sizeof(char));
+    if(vmask==NULL)
+    {
+        fprintf(stderr, "memory allocation for 'vmask' failed in readInitialSBAEstimate()\n");
+        exit(1);
+    }
+    memset(vmask, 0, numpts3D * nframes * sizeof(char)); /* clear vmask */
+
+
+//camera params
+    CvMat* curq=cvCreateMat(4,1,CV_64F);
+    double *tofilter;
+
+
+    if((tofilter=(double *)malloc(filecnp*sizeof(double)))==NULL)
+    {
+        fprintf(stderr, "memory allocation failed in readCameraParams()\n");
+        exit(1);
+    }
+
+
+    for (j = 0; j < numImages; j++)
+    {
+        if(sfmSequence[j]!=-1)
+        {
+            int curFrame=sfmSequence[j];
+            CvMat* curK=(*((*imSet).imageCollection[curFrame])).intrinsicMatrix;
+            CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
+            CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
+            CvMat* disto=(*((*imSet).imageCollection[curFrame])).distortion;
+
+            matrix_to_quaternion(curR,curq);
+
+            tofilter[0]=cvmGet(curK,0,0);
+            tofilter[1]=cvmGet(curK,0,2);
+            tofilter[2]=cvmGet(curK,1,2);
+            tofilter[3]= cvmGet(curK,1,1)/cvmGet(curK,0,0);
+            tofilter[4]=cvmGet(curK,0,1);
+
+            tofilter[5]=cvmGet(disto,0,0);
+            tofilter[6]=cvmGet(disto,1,0);
+            tofilter[7]=cvmGet(disto,2,0);
+            tofilter[8]=cvmGet(disto,3,0);
+            tofilter[9]=cvmGet(disto,4,0);
+
+            tofilter[10]=cvmGet(curq,0,0);
+            tofilter[11]=cvmGet(curq,1,0);
+            tofilter[12]=cvmGet(curq,2,0);
+            tofilter[13]=cvmGet(curq,3,0);
+
+            tofilter[14]=cvmGet(curt,0,0);
+            tofilter[15]=cvmGet(curt,1,0);
+            tofilter[16]=cvmGet(curt,2,0);
+
+
+
+            quat2vec(tofilter, filecnp, motstruct, cnp);
+
+
+
+            /* save rotation assuming the last 3 parameters correspond to translation */
+            initrot[1]=motstruct[cnp-6];
+            initrot[2]=motstruct[cnp-5];
+            initrot[3]=motstruct[cnp-4];
+            initrot[0]=sqrt(1.0 - initrot[1]*initrot[1] - initrot[2]*initrot[2] - initrot[3]*initrot[3]);
+
+            motstruct+=cnp;
+            initrot+=FULLQUATSZ;
+
+        }
+
+
+    }
+
+
+
+    free(tofilter);
+    cvReleaseMat(&curq);
+//end of reading cameras
+//read image points
+    int ptno=0;
+    motstruct=motstruct_copy+(nframes*cnp);
+
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+
+
+            motstruct[0]=structure[i].x;
+            motstruct[1]=structure[i].y;
+            motstruct[2]=structure[i].z;
+            motstruct+=pnp;
+            for (j = 0; j < numImages; j++)
+            {
+
+
+
+                if(sfmSequence[j]!=-1)
+                {
+
+                    int curFrame=sfmSequence[j];
+                    if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
+                    {
+                        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+
+
+                        imgpts[0]=curPt.x  ;
+                        imgpts[1]= curPt.y ;
+
+                        imgpts+=mnp;
+                    }
+                    vmask[ptno*nframes+j]=1;
+                }
+            }
+            ptno++;
+        }
+
+    }
+
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
+///// MY PART ENDS
+
+//printSBAData(stdout, motstruct, cnp, pnp, mnp, camoutfilter, filecnp, nframes, numpts3D, imgpts, numprojs, vmask);
+
+    if(howto!=BA_STRUCT)
+    {
+        /* initialize the local rotation estimates to 0, corresponding to local quats (1, 0, 0, 0) */
+        for(i=0; i<nframes; ++i)
+        {
+            register int j;
+
+            j=(i+1)*cnp; // note the +1, below we move from right to left, assuming 3 parameters for the translation!
+            motstruct[j-4]=motstruct[j-5]=motstruct[j-6]=0.0; // clear rotation
+        }
+    }
+    /* note that if howto==BA_STRUCT the rotation parts of motstruct actually equal the initial rotations! */
+
+    /* set up globs structure */
+    globs_ mglobs;
+    mglobs.cnp=cnp;
+    mglobs.pnp=pnp;
+    mglobs.mnp=mnp;
+    mglobs.rot0params=initrot;
+
+    mglobs.intrcalib=NULL;
+    /* specify the number of intrinsic parameters that are to be fixed
+     * equal to their initial values, as follows:
+     * 0: all free, 1: skew fixed, 2: skew, ar fixed, 4: skew, ar, ppt fixed
+     * Note that a value of 3 does not make sense
+     */
+    mglobs.nccalib=2; /* number of intrinsics to keep fixed, must be between 0 and 5 */
+    fixedcal=0; /* varying intrinsics */
+
+    if(cnp==16)  // 16 = 5+5+6
+    {
+        havedist=1; /* with distortion */
+        mglobs.ncdist=3; /* number of distortion params to keep fixed, must be between 0 and 5 */
+    }
+    else
+    {
+        havedist=0;
+        mglobs.ncdist=-9999;
+    }
+
+
+    mglobs.ptparams=NULL;
+    mglobs.camparams=NULL;
+
+    /* call sparse LM routine */
+    opts[0]=SBA_INIT_MU;
+    opts[1]=SBA_STOP_THRESH;
+    opts[2]=SBA_STOP_THRESH;
+    opts[3]=SBA_STOP_THRESH;
+//opts[3]=0.05*numprojs; // uncomment to force termination if the average reprojection error drops below 0.05
+    opts[4]=0.0;
+//opts[4]=1E-05; // uncomment to force termination if the relative reduction in the RMS reprojection error drops below 1E-05
+
+//    FILE *f1p;
+//    f1p=fopen("imgpts.txt", "w");
+//    for (i=0; i< numprojs*mnp; i++)
+//    {
+//        fprintf(f1p,"%f\n",imgpts[i]);
+//    }
+//    fclose(f1p);
+//
+//    f1p=fopen("motstruct.txt", "w");
+//    for (i=0; i< (nframes*cnp + numpts3D*pnp); i++)
+//    {
+//        fprintf(f1p,"%f\n",motstruct[i]);
+//    }
+//    fclose(f1p);
+//
+//    f1p=fopen("initrot.txt", "w");
+//    for (i=0; i< nframes*FULLQUATSZ; i++)
+//    {
+//        fprintf(f1p,"%f\n", initrot[i]);
+//    }
+//    fclose(f1p);
+
+
+    start_time=clock();
+
+    nvars=nframes*cnp+numpts3D*pnp;
+
+
+
+
+    n=sba_motstr_levmar_x(numpts3D, 0, nframes, nconstframes, vmask, motstruct, cnp, pnp, imgpts, covimgpts, mnp,
+                          fixedcal? img_projsRTS_x : (havedist? img_projsKDRTS_x : img_projsKRTS_x),
+                          analyticjac? (fixedcal? img_projsRTS_jac_x : (havedist? img_projsKDRTS_jac_x : img_projsKRTS_jac_x)) : NULL,
+                              (void *)(&mglobs), MAXITER2, verbose, opts, info);
+
+    end_time=clock();
+
+
+    char* refcamsfname="mycams.txt";
+    char* refptsfname="mypts.txt";
+    if(n==SBA_ERROR) goto cleanup;
+
+    fflush(stdout);
+    fprintf(stdout, "SBA using %d 3D pts, %d frames and %d image projections, %d variables\n", numpts3D, nframes, numprojs, nvars);
+    if(havedist) sprintf(tbuf, " (%d fixed)", mglobs.ncdist);
+    fprintf(stdout, "\nMethod %s, %s driver, %s Jacobian, %s covariances, %s distortion%s, %s intrinsics", howtoname[howto],
+            expert? "expert" : "simple",
+            analyticjac? "analytic" : "approximate",
+            covimgpts? "with" : "without",
+            havedist? "variable" : "without",
+            havedist? tbuf : "",
+            fixedcal? "fixed" : "variable");
+    if(!fixedcal) fprintf(stdout, " (%d fixed)", mglobs.nccalib);
+    fputs("\n\n", stdout);
+    fprintf(stdout, "SBA returned %d in %g iter, reason %g, error %g [initial %g], %d/%d func/fjac evals, %d lin. systems\n", n,
+            info[5], info[6], info[1]/numprojs, info[0]/numprojs, (int)info[7], (int)info[8], (int)info[9]);
+    fprintf(stdout, "Elapsed time: %.2lf seconds, %.2lf msecs\n", ((double) (end_time - start_time)) / CLOCKS_PER_SEC,
+            ((double) (end_time - start_time)) / CLOCKS_PER_MSEC);
+    fflush(stdout);
+
+    /* refined motion and structure are now in motstruct */
+
+    if((fp=fopen(refcamsfname, "w"))==NULL)
+{
+        fprintf(stderr, "error opening file %s for writing in sba_driver()!\n", refcamsfname);
+        exit(1);
+    }
+    printSBAMotionData(fp, motstruct, nframes, cnp, vec2quat, filecnp);
+    fclose(fp);
+
+
+    if((fp=fopen(refptsfname, "w"))==NULL)
+    {
+        fprintf(stderr, "error opening file %s for writing in sba_driver()!\n", refptsfname);
+        exit(1);
+    }
+    printSBAStructureData(fp, motstruct, nframes, numpts3D, cnp, pnp);
+    fclose(fp);
+
+
+cleanup:
+    /* just in case... */
+    mglobs.intrcalib=NULL;
+    mglobs.nccalib=0;
+    mglobs.ncdist=0;
+
+    free(motstruct);
+    free(imgpts);
+    free(initrot);
+    mglobs.rot0params=NULL;
+    if(covimgpts) free(covimgpts);
+    free(vmask);
 }
