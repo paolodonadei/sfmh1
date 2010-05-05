@@ -33,6 +33,7 @@ public:
     int numImages;
     int initializeKeyFrames2(int frame1, int frame2);
      int printSBAstyleData();
+     int sba_driver_interface();
 };
 
 

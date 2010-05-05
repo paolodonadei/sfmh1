@@ -22,21 +22,22 @@ int main(int argc, char *argv[])
     {
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
-   //   imSet.showOneByOneFeature();
+        //   imSet.showOneByOneFeature();
 
         imSet.exhaustiveSIFTMatching();
-     //   imSet.showOneByOneFeatureMotions();
+        //   imSet.showOneByOneFeatureMotions();
 
         imSet.multipleViewEstimate();
         imSet.drawallMatches();
         imSet.createFeatureTrackMatrix();
         imSet.SelfCalibrate();
-      imSet.findEssentialMatrices();
+        imSet.findEssentialMatrices();
         imSet.writeMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
-       mystruct.run();
-       mystruct.printSBAstyleData();
+        mystruct.run();
+        mystruct.printSBAstyleData();
+        mystruct.sba_driver_interface();
     }
     return 0;
 }

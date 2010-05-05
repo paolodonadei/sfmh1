@@ -2,7 +2,7 @@
 
 /* Computation of the predicted projection of a 3D point and its jacobians */
 
-#include "eucsbademo.h"
+#include "imgproj.h"
 
 #include <math.h>
 void calcImgProj(double a[5],double qr0[4],double v[3],double t[3],double M[3],
@@ -73,8 +73,7 @@ double n[2])
   }
 }
 
-void calcImgProjFullR(double a[5],double qr0[4],double t[3],double M[3],
-double n[2])
+void calcImgProjFullR(double a[5],double qr0[4],double t[3],double M[3],double n[2])
 {
   double t1;
   double t11;
@@ -566,9 +565,8 @@ t239;
   }
 }
 
-#include <math.h>
-void calcImgProjJacS(double a[5],double qr0[4],double v[3],double t[3],
-double M[3],double jacmS[2][3])
+
+void calcImgProjJacS(double a[5],double qr0[4],double v[3],double t[3],double M[3],double jacmS[2][3])
 {
   double t1;
   double t10;
