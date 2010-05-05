@@ -566,55 +566,72 @@ int checkSymmetric(CvMat* inM)
 /* Convert a matrix to a normalize quaternion */
 void matrix_to_quaternion(CvMat* inRm, CvMat* inqm)
 {
-
+    int i;
+    int maxpos;
     double* R= new double[10];
     double* q= new double[5];
 
     cvMatrixtoBuffer(inRm,&R, 0);
+    double tmp[10];
+    double mag=-1;
+// find the maximum of the 4 quantities
+    tmp[0]=1.0 + R[0] + R[4] + R[8];
+    tmp[1]=1.0 + R[0] - R[4] - R[8];
+    tmp[2]=1.0 - R[0] + R[4] - R[8];
+    tmp[3]=1.0 - R[0] - R[4] + R[8];
 
-
-    double n4; // the norm of quaternion multiplied by 4
-    double tr = R[0] + R[4] + R[8]; // trace of martix
-    double factor;
-
-    if (tr > 0.0)
+    for(i=0, mag=-1.0; i<4; i++)
     {
-        q[1] = R[5] - R[7];
-        q[2] = R[6] - R[2];
-        q[3] = R[1] - R[3];
-        q[0] = tr + 1.0;
-        n4 = q[0];
+        if(tmp[i]>mag)
+        {
+            mag=tmp[i];
+            maxpos=i;
+        }
     }
-    else if ((R[0] > R[4]) && (R[0] > R[8]))
+
+    if(maxpos==0)
     {
-        q[1] = 1.0 + R[0] - R[4] - R[8];
-        q[2] = R[3] + R[1];
-        q[3] = R[6] + R[2];
-        q[0] = R[5] - R[7];
-        n4 = q[1];
+        q[0]=sqrt(tmp[0])*0.5;
+        q[1]=(R[7] - R[5])/(4.0*q[0]);
+        q[2]=(R[2] - R[6])/(4.0*q[0]);
+        q[3]=(R[3] - R[1])/(4.0*q[0]);
     }
-    else if (R[4] > R[8])
+    else if(maxpos==1)
     {
-        q[1] = R[3] + R[1];
-        q[2] = 1.0 + R[4] - R[0] - R[8];
-        q[3] = R[7] + R[5];
-        q[0] = R[6] - R[2];
-        n4 = q[2];
+        q[1]=sqrt(tmp[1])*0.5;
+        q[0]=(R[7] - R[5])/(4.0*q[1]);
+        q[2]=(R[3] + R[1])/(4.0*q[1]);
+        q[3]=(R[2] + R[6])/(4.0*q[1]);
+    }
+    else if(maxpos==2)
+    {
+        q[2]=sqrt(tmp[2])*0.5;
+        q[0]=(R[2] - R[6])/(4.0*q[2]);
+        q[1]=(R[3] + R[1])/(4.0*q[2]);
+        q[3]=(R[7] + R[5])/(4.0*q[2]);
+    }
+    else if(maxpos==3)
+    {
+        q[3]=sqrt(tmp[3])*0.5;
+        q[0]=(R[3] - R[1])/(4.0*q[3]);
+        q[1]=(R[2] + R[6])/(4.0*q[3]);
+        q[2]=(R[7] + R[5])/(4.0*q[3]);
     }
     else
     {
-        q[1] = R[6] + R[2];
-        q[2] = R[7] + R[5];
-        q[3] = 1.0 + R[8] - R[0] - R[4];
-        q[0] = R[1] - R[3];
-        n4 = q[3];
+        printf("Internal error in rotmat2quat\n");
     }
 
-    factor = 0.5 / sqrt(n4);
-    q[0] *= factor;
-    q[1] *= factor;
-    q[2] *= factor;
-    q[3] *= factor;
+// enforce unit length
+    mag=q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
+
+
+
+    mag=((double)1.0)/sqrt(mag);
+    q[0]*=mag;
+    q[1]*=mag;
+    q[2]*=mag;
+    q[3]*=mag;
 
     BuffertocvMatrix(q,&inqm,4,1, 0);
     delete []  R;
@@ -630,34 +647,28 @@ void quaternion_to_matrix(CvMat* inqm,CvMat* inRm)
 
     cvMatrixtoBuffer(inqm,&q, 0);
 
-    double sqw = q[0] * q[0];
-    double sqx = q[1] * q[1];
-    double sqy = q[2] * q[2];
-    double sqz = q[3] * q[3];
+    double mag=0;
 
-    double tmp1, tmp2;
+    mag=q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3];
 
-    R[0] =  sqx - sqy - sqz + sqw; // since sqw + sqx + sqy + sqz = 1
-    R[4] = -sqx + sqy - sqz + sqw;
-    R[8] = -sqx - sqy + sqz + sqw;
+    mag=1.0/sqrt(mag);
+    q[0]*=mag;
+    q[1]*=mag;
+    q[2]*=mag;
+    q[3]*=mag;
 
-    tmp1 = q[1] * q[2];
-    tmp2 = q[3] * q[0];
 
-    R[1] = 2.0 * (tmp1 + tmp2);
-    R[3] = 2.0 * (tmp1 - tmp2);
+    R[0]=q[0]*q[0]+q[1]*q[1]-q[2]*q[2]-q[3]*q[3];
+    R[1]=2*(q[1]*q[2]-q[0]*q[3]);
+    R[2]=2*(q[1]*q[3]+q[0]*q[2]);
 
-    tmp1 = q[1] * q[3];
-    tmp2 = q[2] * q[0];
+    R[3]=2*(q[1]*q[2]+q[0]*q[3]);
+    R[4]=q[0]*q[0]+q[2]*q[2]-q[1]*q[1]-q[3]*q[3];
+    R[5]=2*(q[2]*q[3]-q[0]*q[1]);
 
-    R[2] = 2.0 * (tmp1 - tmp2);
-    R[6] = 2.0 * (tmp1 + tmp2);
-
-    tmp1 = q[2] * q[3];
-    tmp2 = q[1] * q[0];
-
-    R[5] = 2.0 * (tmp1 + tmp2);
-    R[7] = 2.0 * (tmp1 - tmp2);
+    R[6]=2*(q[1]*q[3]-q[0]*q[2]);
+    R[7]=2*(q[2]*q[3]+q[0]*q[1]);
+    R[8]=q[0]*q[0]+q[3]*q[3]-q[1]*q[1]-q[2]*q[2];
 
     BuffertocvMatrix(R,&inRm,3,3, 0);
     delete []  R;

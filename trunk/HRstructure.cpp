@@ -184,12 +184,12 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     findProjfromcompon((*((*imSet).imageCollection[frame1])));
     findProjfromcompon((*((*imSet).imageCollection[frame2])));
 
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,(*((*imSet).imageCollection[frame1])).camPose.Rm,(*((*imSet).imageCollection[frame1])).camPose.tm, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix,(*((*imSet).imageCollection[frame2])).camPose.Rm,(*((*imSet).imageCollection[frame2])).camPose.tm, 0, 0, 0, 0);
-
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,(*((*imSet).imageCollection[frame1])).camPose.Rm,(*((*imSet).imageCollection[frame1])).camPose.tm, 0, 0, 0, 0);
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix,(*((*imSet).imageCollection[frame2])).camPose.Rm,(*((*imSet).imageCollection[frame2])).camPose.tm, 0, 0, 0, 0);
+//
 
 
 
@@ -340,7 +340,7 @@ int HRStructure::printSBAstyleData()
         if(structureValid[i]!=0)
         {
 
-            file_pts<<structure[i].x<<" "<<structure[i].y<<" "<<structure[i].y<<" "<<structureValid[i]<<" ";
+            file_pts<<structure[i].x<<" "<<structure[i].y<<" "<<structure[i].z<<" "<<structureValid[i]<<" ";
             for (j = 0; j < numImages; j++)
             {
 
@@ -373,7 +373,7 @@ int HRStructure::printSBAstyleData()
 }
 void HRStructure::writeStructure(string fn)
 {
-    int i;
+    int i,j;
     int maxlength=(*imSet).myTracks.getNumTracks();
 
 
@@ -404,13 +404,23 @@ void HRStructure::writeStructure(string fn)
         if(structureValid[i]>0)
         {
 
-            fp_out<< setw(17)<<setprecision(10)<<structure[i].x << "\t"<<structure[i].y << "\t"<<structure[i].z<< "\t"<<structureErrors[i]<<endl;
+            fp_out<< setw(17)<<setprecision(10)<<structure[i].x << "\t"<<structure[i].y << "\t"<<structure[i].z<< "\t"<<structureErrors[i];
+            for (j = 0; j < numImages; j++)
+            {
+                if(sfmSequence[j]!=-1)
+                {
+                    int curFrame=sfmSequence[j];
+                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+                    fp_out<< "\t" << curFrame << "\t" << curPt.x<< "\t" << curPt.y;
+                }
 
+            }
+            fp_out<<endl;
         }
 
+
+
+
     }
-
-
     fp_out.close();
-
 }
