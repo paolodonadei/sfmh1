@@ -613,7 +613,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     point3D_dat[1] = spPoint.y;
     point3D_dat[2] = spPoint.z;
     point3D_dat[3] = 1;
-
+rep_error=0;
     /* !!! Project this point for each camera */
     for( int currCamera = 0; currCamera < numframes; currCamera++ )
     {
@@ -629,9 +629,9 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
         yr = (double)(point2D_dat[1]/wr);
 
         double deltaX,deltaY;
-        deltaX = (double)fabs(x-xr);
-        deltaY = (double)fabs(y-yr);
-        rep_error+=(sqrt(deltaX*deltaX+deltaY*deltaY));
+        deltaX = (double)(x-xr);
+        deltaY = (double)(y-yr);
+        rep_error+=((deltaX*deltaX)+(deltaY*deltaY));
     }
     rep_error=rep_error/((double)numframes );
 
