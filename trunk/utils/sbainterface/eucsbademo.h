@@ -36,6 +36,12 @@ struct globs_{
 	double *ptparams; /* needed only when bundle adjusting for camera parameters only */
 	double *camparams; /* needed only when bundle adjusting for structure parameters only */
 } ;
+/* unit quaternion from vector part */
+#define _MK_QUAT_FRM_VEC(q, v){                                     \
+  (q)[1]=(v)[0]; (q)[2]=(v)[1]; (q)[3]=(v)[2];                      \
+  (q)[0]=sqrt(1.0 - (q)[1]*(q)[1] - (q)[2]*(q)[2]- (q)[3]*(q)[3]);  \
+}
+
 
 #define CLOCKS_PER_MSEC (CLOCKS_PER_SEC/1000.0)
 

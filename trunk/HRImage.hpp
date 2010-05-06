@@ -46,7 +46,7 @@ class HRImage
 {
 
 public:
-pose camPose;
+    pose camPose;
     HRImage();
     HRImage(string fname);
     HRImage(char* fname);
@@ -83,9 +83,11 @@ pose camPose;
     string pgmfilename;//this is used for some external programs that need a pgm format, i.e. sift
     string siftkeyfilename;
     vector<HRPointFeatures> HR2DVector;
+    vector<HRPointFeatures> HR2DVectorUndistorted;
     CvMat*  intrinsicMatrix;
     CvMat*  projectionMatrix;
-     CvMat* distortion;
+    CvMat* distortion;
+    int undistortPoints();
     double confidenceSelfCalib;
 private:
 
@@ -123,9 +125,9 @@ class FeatureTrack
 public:
     const vector<HRImagePtr>* trackImageCollection;
     FeatureTrack();
-    CvPoint2D32f pointFromTrackloc(int row, int col);
+    CvPoint2D32f pointFromTrackloc(int row, int col,int undistorted=0);
     int validTrackEntry(int row, int col);
- int valueTrackEntry(int row, int col);
+    int valueTrackEntry(int row, int col);
 
     int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
     int findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
@@ -140,8 +142,8 @@ public:
     bool displayTrackRow(int row);
     int getNumTracks();
     int getNumFrames();
-    private:
-     vector< vector<int> > trackMatrix;
+private:
+    vector< vector<int> > trackMatrix;
 
 };
 
@@ -153,7 +155,7 @@ public:
     int numImages;
 
     string dirStemName;
-        string outdirStemName;
+    string outdirStemName;
 
     int featureDetectSift();
     HRImageSet();
@@ -165,8 +167,8 @@ public:
     void showOneByOneFeature();
     vector<vector<HRCorrespond2N> > correspondencesPairWise;
     int exhaustiveSIFTMatching();
-      int multipleViewEstimate();
-      int writeMotions();
+    int multipleViewEstimate();
+    int writeMotions();
     FeatureTrack myTracks;
     string temporaryDir;
 
@@ -176,7 +178,7 @@ public:
     vector<double> confid;
     void drawallMatches();
     void findEssentialMatrices();
-
+    void undistortall();
 
 };
 

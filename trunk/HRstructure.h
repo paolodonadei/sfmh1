@@ -32,8 +32,9 @@ public:
     string tempdir;
     int numImages;
     int initializeKeyFrames2(int frame1, int frame2);
-     int printSBAstyleData();
+     int printSBAstyleData(string camFname, string ptFname);
      int sba_driver_interface();
+     double findReconstructionError(int usingUndistort=0);
 };
 
 

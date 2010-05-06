@@ -680,7 +680,7 @@ void copyMatrix(CvMat* src,CvMat* dst)
 {
     if (src==NULL ||dst==NULL)
     {
-        printf("parameters is a NULL pointer!");
+        printf("parameters is a NULL pointer1!");
         return ;
     }
 
