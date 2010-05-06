@@ -616,7 +616,7 @@ int HRStructure::sba_driver_interface()
 
 
     free(tofilter);
-    cvReleaseMat(&curq);
+
 //end of reading cameras
 //read image points
     int ptno=0;
@@ -782,7 +782,9 @@ int HRStructure::sba_driver_interface()
     /* refined motion and structure are now in motstruct */
 
 ////put the parameters back
-
+ imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
 
 //first cameras
     double *filtered;
@@ -831,10 +833,10 @@ int HRStructure::sba_driver_interface()
             cvmSet(curt,1,0,filtered[15]);
             cvmSet(curt,2,0,filtered[16]);
 
-
             quaternion_to_matrix(curq,curR);
 
-            motstruct=motstruct+(nframes*cnp);
+            motstruct=motstruct+(cnp);
+
         }
 
 
@@ -842,6 +844,9 @@ int HRStructure::sba_driver_interface()
 
 
     free(filtered);
+
+     cvReleaseMat(&curq);
+
     //end of cameras
     imgpts=imgpts_copy;
     motstruct=motstruct_copy;  //rewind pointer
@@ -850,7 +855,7 @@ int HRStructure::sba_driver_interface()
 
 //beginning of taking back the 3D points
 
-    motstruct+=nframes*cnp;
+    motstruct+=(nframes*cnp);
 
     for ( i = 0; i < maxlength; i++)
     {
@@ -859,8 +864,8 @@ int HRStructure::sba_driver_interface()
 
 
             structure[i].x=motstruct[(k*pnp)+1];
-            structure[i].y=motstruct[(k*pnp)+1];
-            structure[i].z=motstruct[(k*pnp)+1];
+            structure[i].y=motstruct[(k*pnp)+2];
+            structure[i].z=motstruct[(k*pnp)+3];
             k++;
 
         }
@@ -880,7 +885,8 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
 
-    saveSBAStructureDataAsPLY("structure.ply", motstruct, nframes, numpts3D,cnp, pnp, 1);
+    saveSBAStructureDataAsPLY("structure.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
+        printf("cameras begin11\n");
 cleanup:
     /* just in case... */
     mglobs.intrcalib=NULL;
