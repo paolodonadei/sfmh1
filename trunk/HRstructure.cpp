@@ -755,7 +755,7 @@ int HRStructure::sba_driver_interface()
                               (void *)(&mglobs), MAXITER2, verbose, opts, info);
 
     end_time=clock();
-
+   int k=0;
 
     char* refcamsfname="mycams.txt";
     char* refptsfname="mypts.txt";
@@ -781,24 +781,106 @@ int HRStructure::sba_driver_interface()
 
     /* refined motion and structure are now in motstruct */
 
-    if((fp=fopen(refcamsfname, "w"))==NULL)
+////put the parameters back
+
+
+//first cameras
+    double *filtered;
+
+    if((filtered=(double *)malloc(filecnp*sizeof(double)))==NULL)
 {
-        fprintf(stderr, "error opening file %s for writing in sba_driver()!\n", refcamsfname);
+        fprintf(stderr, "memory allocation failed in printSBAMotionData()\n");
         exit(1);
     }
-    printSBAMotionData(fp, motstruct, nframes, cnp, vec2quat, filecnp);
-    fclose(fp);
 
 
-    if((fp=fopen(refptsfname, "w"))==NULL)
+
+
+    for (j = 0; j < numImages; j++)
     {
-        fprintf(stderr, "error opening file %s for writing in sba_driver()!\n", refptsfname);
-        exit(1);
+        if(sfmSequence[j]!=-1)
+        {
+            vec2quat(motstruct, cnp, filtered,  filecnp);
+
+            int curFrame=sfmSequence[j];
+            CvMat* curK=(*((*imSet).imageCollection[curFrame])).intrinsicMatrix;
+            CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
+            CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
+            CvMat* disto=(*((*imSet).imageCollection[curFrame])).distortion;
+
+
+
+            cvmSet(curK,0,0,filtered[0]);
+            cvmSet(curK,0,2,filtered[1]);
+            cvmSet(curK,1,2,filtered[2]);
+            cvmSet(curK,1,1,filtered[3]*cvmGet(curK,0,0));
+            cvmSet(curK,0,1,filtered[4]);
+
+            cvmSet(disto,0,0,filtered[5]);
+            cvmSet(disto,1,0,filtered[6]);
+            cvmSet(disto,2,0,filtered[7]);
+            cvmSet(disto,3,0,filtered[8]);
+            cvmSet(disto,4,0,filtered[9]);
+
+            cvmSet(curq,0,0,filtered[10]);
+            cvmSet(curq,1,0,filtered[11]);
+            cvmSet(curq,2,0,filtered[12]);
+            cvmSet(curq,3,0, filtered[13]);
+
+            cvmSet(curt,0,0,filtered[14]);
+            cvmSet(curt,1,0,filtered[15]);
+            cvmSet(curt,2,0,filtered[16]);
+
+
+            quaternion_to_matrix(curq,curR);
+
+            motstruct=motstruct+(nframes*cnp);
+        }
+
+
     }
-    printSBAStructureData(fp, motstruct, nframes, numpts3D, cnp, pnp);
-    fclose(fp);
 
 
+    free(filtered);
+    //end of cameras
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
+
+
+//beginning of taking back the 3D points
+
+    motstruct+=nframes*cnp;
+
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+
+
+            structure[i].x=motstruct[(k*pnp)+1];
+            structure[i].y=motstruct[(k*pnp)+1];
+            structure[i].z=motstruct[(k*pnp)+1];
+            k++;
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+    //end of parameters putting back
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
+
+    saveSBAStructureDataAsPLY("structure.ply", motstruct, nframes, numpts3D,cnp, pnp, 1);
 cleanup:
     /* just in case... */
     mglobs.intrcalib=NULL;
