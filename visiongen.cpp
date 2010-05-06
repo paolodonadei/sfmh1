@@ -453,13 +453,17 @@ void scaleMatrix(CvMat* in,double s)
     }
 
 }
+
+
 int findProjfromcompon(HRImage& img)
 {
 
-findProjfromcompon(img.projectionMatrix,img.camPose.Rm,img.camPose.tm,img.intrinsicMatrix);
+    findProjfromcompon(img.projectionMatrix,img.camPose.Rm,img.camPose.tm,img.intrinsicMatrix);
 
 
 }
+
+
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
     int i,j;
@@ -613,7 +617,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     point3D_dat[1] = spPoint.y;
     point3D_dat[2] = spPoint.z;
     point3D_dat[3] = 1;
-rep_error=0;
+    rep_error=0;
     /* !!! Project this point for each camera */
     for( int currCamera = 0; currCamera < numframes; currCamera++ )
     {

@@ -674,3 +674,54 @@ void quaternion_to_matrix(CvMat* inqm,CvMat* inRm)
     delete []  R;
     delete []  q;
 }
+
+
+void copyMatrix(CvMat* src,CvMat* dst)
+{
+    if (src==NULL ||dst==NULL)
+    {
+        printf("parameters is a NULL pointer!");
+        return ;
+    }
+
+    if (!CV_IS_MAT(src))
+    {
+        printf("Input parameter must be a matrix!");
+        return ;
+    }
+    if (!CV_IS_MAT(dst))
+    {
+        printf("Input parameter must be a matrix!");
+        return ;
+    }
+    if(src->rows !=dst->rows  )
+    {
+        printf("unequal dimensions!");
+        return ;
+
+    }
+    if(src->cols !=dst->cols  )
+    {
+        printf("unequal dimensions!");
+        return ;
+
+    }
+    int h = src->rows;
+
+    int w = src->cols;
+
+    int i,j;
+
+
+
+    for (i=0; i<h; i++)
+    {
+        for (j=0; j<w; j++)
+        {
+            cvmSet(dst,i,j,cvmGet(src,i,j));
+
+        }
+
+    }
+
+}
