@@ -72,7 +72,7 @@ int n, j;
   for(i=n=0; i<nvals; ++i){
     j=fscanf(fp, "%d", vals+i);
     if(j==EOF) return EOF;
-    
+
     if(j!=1 || ferror(fp)) return EOF-1;
 
     n+=j;
@@ -130,7 +130,7 @@ double dummy;
     }
 
     if(feof(fp)) return 0;
-    
+
     ungetc(ch, fp);
     ++lineno;
     if(!fgets(buf, MAXSTRLEN-1, fp)){ /* read the line found... */
@@ -224,7 +224,7 @@ double *tofilter;
 
 
 /* determines the number of 3D points contained in a points parameter file as well as the
- * total number of their 2D image projections across all images. Also decides if point 
+ * total number of their 2D image projections across all images. Also decides if point
  * covariances are being supplied. Each 3D point is assumed to be described by "pnp"
  * parameters and its parameters & image projections are stored as a single line.
  * The file format is
@@ -238,7 +238,7 @@ int nfirst, lineno, npts, nframes, ch, n;
   /* #parameters for the first line */
   nfirst=countNDoubles(fp);
   *havecov=NOCOV;
-  
+
   *n3Dpts=*nprojs=lineno=npts=0;
   while(!feof(fp)){
     if((ch=fgetc(fp))=='#'){ /* skip comments */
@@ -279,7 +279,7 @@ int nfirst, lineno, npts, nframes, ch, n;
 
 /* reads a points parameter file.
  * "params", "projs" & "vmask" are assumed preallocated, pointing to
- * memory blocks large enough to hold the parameters of 3D points, 
+ * memory blocks large enough to hold the parameters of 3D points,
  * their projections in all images and the point visibility mask, respectively.
  * Also, if "covprojs" is non-NULL, it is assumed preallocated and pointing to
  * a memory block suitable to hold the covariances of image projections.
@@ -473,7 +473,7 @@ int n;
 /* routines for printing the motion and structure parameters, plus the projections
  * of 3D points across images. Mainly for debugging purposes.
  *
- * outfilter points to a function that converts a motion parameters vector from 
+ * outfilter points to a function that converts a motion parameters vector from
  * the interrnal representation used by eucsbademo to a format suitable for display.
  * For instance, it can expand a quaternion to 4 elements from its vector part.
  */
@@ -525,7 +525,7 @@ register int i;
 /* prints the estimates of the motion + structure parameters. It also prints the projections
  * of 3D points across images.
  */
-void printSBAData(FILE *fp, double *motstruct, int cnp, int pnp, int mnp, 
+void printSBAData(FILE *fp, double *motstruct, int cnp, int pnp, int mnp,
                   void (*outfilter)(double *pin, int nin, double *pout, int nout), int outcnp,
                   int ncams, int n3Dpts, double *imgpts, int n2Dprojs, char *vmask)
 {
@@ -539,7 +539,7 @@ int nframes;
   for(i=k=0; i<n3Dpts; ++i){
     for(j=0; j<pnp; ++j)
       fprintf(fp, "%.10e ", motstruct[i*pnp+j]);
-    
+
     for(j=nframes=0; j<ncams; ++j)
       if(vmask[i*ncams+j]) ++nframes;
     fprintf(fp, "%d", nframes);
@@ -581,6 +581,7 @@ int nframes;
  */
 void saveSBAStructureDataAsPLY(char *fname, double *motstruct, int ncams, int n3Dpts, int cnp, int pnp, int withrgb)
 {
+
 register int i;
 FILE *fp;
 
@@ -603,12 +604,14 @@ FILE *fp;
   fprintf(fp, "end_header\n");
 
   motstruct+=ncams*cnp;
+
+
   for(i=0; i<n3Dpts; ++i){
     if(withrgb)
       fprintf(fp, "%.6f %.6f %.6f 0 0 0\n", motstruct[i], motstruct[i+1], motstruct[i+2]);
     else
-      fprintf(fp, "%.6f %.6f %.6f\n", motstruct[i], motstruct[i+1], motstruct[i+2]);
-    motstruct+=pnp;
+      fprintf(fp, "%.6f %.6f %.6f\n", motstruct[(i*pnp)+1], motstruct[(i*pnp)+2], motstruct[(i*pnp)+3]);
+
   }
 
   fclose(fp);

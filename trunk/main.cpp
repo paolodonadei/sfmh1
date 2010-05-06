@@ -36,8 +36,9 @@ int main(int argc, char *argv[])
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
-        mystruct.printSBAstyleData();
+
         mystruct.sba_driver_interface();
+           mystruct.writeStructure("structure2.txt");
     }
     return 0;
 }
