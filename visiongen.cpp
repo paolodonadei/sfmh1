@@ -233,7 +233,7 @@ bool checkMatrixOK(const CvMat *in,int h,int w)
 {
     if (in == 0)
     {
-        printf("parameters is a NULL pointer!");
+        printf("parameters is a NULL pointer2!");
         return false;
     }
 
@@ -392,7 +392,7 @@ int normalizeMatrix( CvMat* in)
 {
     if (in == 0)
     {
-        printf("parameters is a NULL pointer!");
+        printf("parameters is a NULL pointer3!");
         return false;
     }
 
@@ -423,7 +423,7 @@ void scaleMatrix(CvMat* in,double s)
 {
     if (in == 0)
     {
-        printf("parameters is a NULL pointer!");
+        printf("parameters is a NULL pointer4!");
         return ;
     }
 
@@ -600,48 +600,12 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     spPoint.z=    cvmGet(&matrV,3,2)/cvmGet(&matrV,3,3);/* Z */
 
 
-    double    rep_error=0;
 
 
-    CvMat point3D;
-    double point3D_dat[4];
-    point3D = cvMat(4,1,CV_64F,point3D_dat);
-
-    CvMat point2D;
-    double point2D_dat[3];
-    point2D = cvMat(3,1,CV_64F,point2D_dat);
-
-
-
-    point3D_dat[0] = spPoint.x;
-    point3D_dat[1] = spPoint.y;
-    point3D_dat[2] = spPoint.z;
-    point3D_dat[3] = 1;
-    rep_error=0;
-    /* !!! Project this point for each camera */
-    for( int currCamera = 0; currCamera < numframes; currCamera++ )
-    {
-        cvmMul(projMatrs[currCamera], &point3D, &point2D);
-
-        double x,y;
-        double xr,yr,wr;
-        x = projPoints[currCamera].x;
-        y = projPoints[currCamera].y;
-
-        wr = (double)point2D_dat[2];
-        xr = (double)(point2D_dat[0]/wr);
-        yr = (double)(point2D_dat[1]/wr);
-
-        double deltaX,deltaY;
-        deltaX = (double)(x-xr);
-        deltaY = (double)(y-yr);
-        rep_error+=((deltaX*deltaX)+(deltaY*deltaY));
-    }
-    rep_error=rep_error/((double)numframes );
-
-    return rep_error;
+    return 0;
 
 
 
 
 }
+

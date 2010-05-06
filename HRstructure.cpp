@@ -290,17 +290,108 @@ void HRStructure::DLTUpdateStructure()
             structureValid[i]=numPts;
 
             structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
-            rerror+=structureErrors[i];
+
         }
         projMatrs.clear();
         projPoints.clear();
     }
 
+
+}
+
+double HRStructure::findReconstructionError(int usingUndistort)
+{
+
+    int i,j;
+
+    double rerror=0;
+    int numReconstructed=0;
+
+    int count=0;
+    for(i=0; i< numImages; i++)
+    {
+        if(sfmSequence[i]!=-1) //this array should indicate how many frazmes have had their proj matrices found
+            count++;
+    }
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+
+    int numValidProjs= count;
+
+
+    CvMat point3D;
+    double point3D_dat[4];
+    point3D = cvMat(4,1,CV_64F,point3D_dat);
+
+    CvMat point2D;
+    double point2D_dat[3];
+    point2D = cvMat(3,1,CV_64F,point2D_dat);
+
+    double x,y;
+    double xr,yr,wr;
+    double deltaX,deltaY;
+    double rep_error=0;
+    int numFrames=0;
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+
+
+            rep_error=0;
+            numFrames=0;
+            numReconstructed++;
+            for (j = 0; j < numValidProjs; j++)
+            {
+                int curFrame=sfmSequence[j];
+                if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
+                {
+                    numFrames++;
+                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame,usingUndistort);//using undistoreted points yyy
+                    CvMat* P=(*((*imSet).imageCollection[curFrame])).projectionMatrix;
+
+                    point3D_dat[0] = structure[i].x;
+                    point3D_dat[1] = structure[i].y;
+                    point3D_dat[2] = structure[i].z;
+                    point3D_dat[3] = 1;
+
+                    cvmMul(P, &point3D, &point2D);
+
+
+                    x = curPt.x;
+                    y = curPt.y;
+
+                    wr = (double)point2D_dat[2];
+                    xr = (double)(point2D_dat[0]/wr);
+                    yr = (double)(point2D_dat[1]/wr);
+
+
+                    deltaX = (double)(x-xr);
+                    deltaY = (double)(y-yr);
+                    rep_error+=((deltaX*deltaX)+(deltaY*deltaY));
+
+
+                    // printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
+                    //printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
+
+
+
+                }
+            }
+            rep_error/=((double)numFrames);
+            structureErrors[i]=rep_error;
+            rerror+=rep_error;
+        }
+    }
+
     rerror/=((double)numReconstructed);
 
     printf("reconstruction error was %f\n",rerror);
+
+    return rerror;
 }
-int HRStructure::printSBAstyleData()
+int HRStructure::printSBAstyleData(string camFname, string ptFname)
 {
 
 
@@ -311,7 +402,7 @@ int HRStructure::printSBAstyleData()
     int maxlength=(*imSet).myTracks.getNumTracks();
 
 
-    fstream file_cams("cameras.txt" ,ios::out);
+    fstream file_cams(camFname.c_str() ,ios::out);
     file_cams<<"# fu, u0, v0, ar, s   kc(1:5)   quaternion translation"<<endl;
     for (j = 0; j < numImages; j++)
     {
@@ -338,7 +429,7 @@ int HRStructure::printSBAstyleData()
 
 
 /////////////////////
-    fstream file_pts("3Dpts.txt" ,ios::out);
+    fstream file_pts(ptFname.c_str() ,ios::out);
     file_pts<<"# # X Y Z  nframes  frame0 x0 y0  frame1 x1 y1 ..."<<endl;
     for ( i = 0; i < maxlength; i++)
     {
@@ -662,7 +753,12 @@ int HRStructure::sba_driver_interface()
     imgpts=imgpts_copy;
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
+
+
 ///// MY PART ENDS
+
+
+
 
 //printSBAData(stdout, motstruct, cnp, pnp, mnp, camoutfilter, filecnp, nframes, numpts3D, imgpts, numprojs, vmask);
 
@@ -742,24 +838,67 @@ int HRStructure::sba_driver_interface()
 //    fclose(f1p);
 
 
+
     start_time=clock();
 
     nvars=nframes*cnp+numpts3D*pnp;
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
 
-
-
-
+    saveSBAStructureDataAsPLY("structurbefore.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
     n=sba_motstr_levmar_x(numpts3D, 0, nframes, nconstframes, vmask, motstruct, cnp, pnp, imgpts, covimgpts, mnp,
                           fixedcal? img_projsRTS_x : (havedist? img_projsKDRTS_x : img_projsKRTS_x),
                           analyticjac? (fixedcal? img_projsRTS_jac_x : (havedist? img_projsKDRTS_jac_x : img_projsKRTS_jac_x)) : NULL,
                               (void *)(&mglobs), MAXITER2, verbose, opts, info);
 
+
+
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
+
+
     end_time=clock();
-   int k=0;
+    int k=0;
 
     char* refcamsfname="mycams.txt";
     char* refptsfname="mypts.txt";
     if(n==SBA_ERROR) goto cleanup;
+
+
+    if(howto!=BA_STRUCT)
+    {
+        /* combine the local rotation estimates with the initial ones */
+        for(i=0; i<nframes; ++i)
+        {
+            double *v, qs[FULLQUATSZ], *q0, prd[FULLQUATSZ];
+
+            /* retrieve the vector part */
+            v=motstruct + (i+1)*cnp - 6; // note the +1, we access the motion parameters from the right, assuming 3 for translation!
+            _MK_QUAT_FRM_VEC(qs, v);
+
+            q0=initrot+i*FULLQUATSZ;
+            quatMultFast(qs, q0, prd); // prd=qs*q0
+
+            /* copy back vector part making sure that the scalar part is non-negative */
+            if(prd[0]>=0.0)
+            {
+                v[0]=prd[1];
+                v[1]=prd[2];
+                v[2]=prd[3];
+            }
+            else  // negate since two quaternions q and -q represent the same rotation
+            {
+                v[0]=-prd[1];
+                v[1]=-prd[2];
+                v[2]=-prd[3];
+            }
+        }
+    }
 
     fflush(stdout);
     fprintf(stdout, "SBA using %d 3D pts, %d frames and %d image projections, %d variables\n", numpts3D, nframes, numprojs, nvars);
@@ -782,15 +921,16 @@ int HRStructure::sba_driver_interface()
     /* refined motion and structure are now in motstruct */
 
 ////put the parameters back
- imgpts=imgpts_copy;
+    imgpts=imgpts_copy;
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
+
 
 //first cameras
     double *filtered;
 
     if((filtered=(double *)malloc(filecnp*sizeof(double)))==NULL)
-{
+    {
         fprintf(stderr, "memory allocation failed in printSBAMotionData()\n");
         exit(1);
     }
@@ -835,6 +975,10 @@ int HRStructure::sba_driver_interface()
 
             quaternion_to_matrix(curq,curR);
 
+//putting the P matrix back together
+
+            findProjfromcompon((*((*imSet).imageCollection[curFrame])));
+          (*((*imSet).imageCollection[curFrame])).undistortPoints();
             motstruct=motstruct+(cnp);
 
         }
@@ -845,7 +989,7 @@ int HRStructure::sba_driver_interface()
 
     free(filtered);
 
-     cvReleaseMat(&curq);
+    cvReleaseMat(&curq);
 
     //end of cameras
     imgpts=imgpts_copy;
@@ -863,9 +1007,9 @@ int HRStructure::sba_driver_interface()
         {
 
 
-            structure[i].x=motstruct[(k*pnp)+1];
-            structure[i].y=motstruct[(k*pnp)+2];
-            structure[i].z=motstruct[(k*pnp)+3];
+            structure[i].x=motstruct[(k*pnp)+0];
+            structure[i].y=motstruct[(k*pnp)+1];
+            structure[i].z=motstruct[(k*pnp)+2];
             k++;
 
         }
@@ -885,8 +1029,16 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
 
-    saveSBAStructureDataAsPLY("structure.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
-        printf("cameras begin11\n");
+
+    // printSBAMotionData(stdout, motstruct, nframes, cnp, vec2quat, filecnp);
+    //printSBAStructureData(stdout, motstruct, nframes, numpts3D, cnp, pnp);
+
+    imgpts=imgpts_copy;
+    motstruct=motstruct_copy;  //rewind pointer
+    initrot=initrot_copy;
+
+    saveSBAStructureDataAsPLY("structureafter.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
+
 cleanup:
     /* just in case... */
     mglobs.intrcalib=NULL;

@@ -402,6 +402,54 @@ void HRImage::updateImageInfo()
 
 
 }
+int HRImage::undistortPoints()
+{
+    int i;
+    printf("gbegin\n");
+
+    HR2DVectorUndistorted.clear();
+    CvMat* curPT=cvCreateMat(1,1,CV_32FC2);
+    CvMat* curPTundist=cvCreateMat(1,1,CV_32FC2);
+
+
+    if (flag_valid==0)
+    {
+        cout<<"image now created yet\n"<<endl;
+        return 0;
+    }
+
+    HR2DVectorUndistorted.resize(HR2DVector.size());
+
+
+
+    vector<HRPointFeatures>::iterator feature_iterator;
+
+
+    feature_iterator = HR2DVector.begin();
+    int count=0;
+
+    for(i=0; i<HR2DVector.size(); i++)
+    {
+        HRPointFeatures newfeature( new HRFeature);
+
+        curPT->data.fl[0]=HR2DVector[i]->location.x;
+        curPT->data.fl[1]=HR2DVector[i]->location.y;
+
+
+        cvUndistortPoints(curPT, curPTundist, intrinsicMatrix, distortion, NULL, NULL);
+
+
+        newfeature->location.x=curPTundist->data.fl[0];
+        newfeature->location.y=curPTundist->data.fl[1];
+
+        HR2DVectorUndistorted[i]=newfeature;
+        printf("undistorted point [%f  ; %f] -> [%f  ; %f]\n", curPT->data.fl[0], curPT->data.fl[1],curPTundist->data.fl[0] ,curPTundist->data.fl[1] );
+    }
+
+    cvReleaseMat(&curPTundist);
+    cvReleaseMat(&curPT);
+
+}
 int HRImage::writeFeatures()
 {
 
@@ -1173,6 +1221,21 @@ void HRImageSet::findEssentialMatrices()
     cvReleaseMat(&temp4);
 
 }
+void HRImageSet::undistortall()
+{
+
+    for (int i=0; i<imageCollection.size(); i++)
+    {
+
+
+        (*imageCollection[i]).undistortPoints();
+
+
+    }
+
+
+
+}
 
 int HRImageSet::createFeatureTrackMatrix()
 {
@@ -1584,7 +1647,7 @@ int FeatureTrack::validTrackEntry(int row, int col)
 
 
 }
-CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
+CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
 {
 
     // col is the number of the image
@@ -1618,8 +1681,10 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col)
         printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
         return temp;
     }
-
-    temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+    if(undistorted==0)
+        temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+    else
+        temp=(*trackImageCollection)[col]->HR2DVectorUndistorted[trackMatrix[row][col]]->location;
 
     return temp;
 

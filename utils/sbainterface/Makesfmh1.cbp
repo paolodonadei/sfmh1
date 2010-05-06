@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="sbainterface" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<MakeCommands>
+			<Build command="$make " />
+			<CompileFile command="$make " />
+			<Clean command="$make clean" />
+			<DistClean command="$make -f $makefile distclean$target" />
+		</MakeCommands>
+		<Build>
+			<Target title="Debug">
+				<Option output="sbainter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="." />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters=" ~/Desktop/funddata/synth1/proj1_synth_data.txt ~/Desktop/funddata/synth1/proj2_synth_data.txt" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile" />
+					<CompileFile command="$make -f $makefile" />
+					<Clean command="$make -f $makefile clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile" />
+		<Unit filename="eucsbademo.c" />
+		<Unit filename="eucsbademo.h" />
+		<Unit filename="imgproj.c" />
+		<Unit filename="readparams.c" />
+		<Unit filename="readparams.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

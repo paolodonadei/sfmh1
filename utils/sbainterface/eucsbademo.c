@@ -16,12 +16,6 @@
 
 
 
-/* unit quaternion from vector part */
-#define _MK_QUAT_FRM_VEC(q, v){                                     \
-  (q)[1]=(v)[0]; (q)[2]=(v)[1]; (q)[3]=(v)[2];                      \
-  (q)[0]=sqrt(1.0 - (q)[1]*(q)[1] - (q)[2]*(q)[2]- (q)[3]*(q)[3]);  \
-}
-
 
 /*
  * fast multiplication of the two quaternions in q1 and q2 into p
