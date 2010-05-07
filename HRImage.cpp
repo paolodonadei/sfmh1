@@ -50,7 +50,9 @@ int HRImage::openim(string fname)
     camPose.Rm=cvCreateMat(3,3,CV_64F);
 
     distortion=cvCreateMat(5,1,CV_64F);
-    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
+    cvSetZero(distortion);
+    cvSetZero(camPose.tm);
+    cvSetIdentity(camPose.Rm);
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
@@ -119,7 +121,9 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     camPose.Rm=cvCreateMat(3,3,CV_64F);
 
     distortion=cvCreateMat(5,1,CV_64F);
-    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
+       cvSetZero(distortion);
+    cvSetZero(camPose.tm);
+    cvSetIdentity(camPose.Rm);
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
@@ -139,7 +143,9 @@ HRImage::HRImage(const HRImage &img)
     camPose.Rm=cvCreateMat(3,3,CV_64F);
 
     distortion=cvCreateMat(5,1,CV_64F);
-    for(int q=0; q<5; q++) cvmSet(distortion,q,0,0);
+       cvSetZero(distortion);
+    cvSetZero(camPose.tm);
+    cvSetIdentity(camPose.Rm);
 
     intrinsicMatrix=cvCreateMat(3,3, CV_64F);
     projectionMatrix=cvCreateMat(3,4, CV_64F);
