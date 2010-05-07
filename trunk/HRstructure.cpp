@@ -122,11 +122,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     }
 
-
-
-
-
-
     int num_pts = (int) count;
 
     v2_t *k1_pts = new v2_t[num_pts];
@@ -152,11 +147,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
     cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
 
-//
-    printf("essential amtrix %d - %d was \n",frame2,frame1);
-    writeCVMatrix(cout,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
-
-
     cvMatrixtoBuffer((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E,&E, 0);
 
     // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
@@ -166,7 +156,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     BuffertocvMatrix(t,&((*((*imSet).imageCollection[frame2])).camPose.tm),3,1, 0);
 
 
-    //camera 1 goes to origin
+
 
     cvSetIdentity((*(*imSet).imageCollection[frame1]).camPose.Rm);
     cvSetZero((*(*imSet).imageCollection[frame1]).camPose.tm);
@@ -179,13 +169,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])));
     findProjfromcompon((*((*imSet).imageCollection[frame2])));
-
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame1])).projectionMatrix, (*((*imSet).imageCollection[frame1])).intrinsicMatrix,(*((*imSet).imageCollection[frame1])).camPose.Rm,(*((*imSet).imageCollection[frame1])).camPose.tm, 0, 0, 0, 0);
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[frame2])).projectionMatrix, (*((*imSet).imageCollection[frame2])).intrinsicMatrix,(*((*imSet).imageCollection[frame2])).camPose.Rm,(*((*imSet).imageCollection[frame2])).camPose.tm, 0, 0, 0, 0);
-//
 
 
 
@@ -230,16 +213,78 @@ double HRStructure::bundleAdjust()
 }
 int HRStructure::addFrame(int framenum)
 {
+    int numCommonPts=0;
 
+    int count=0;
+
+    int i;
+
+
+    for(i=0; i< numImages; i++)
+    {
+        if(sfmSequence[i]!=-1) //this array should indicate how many frazmes have had their proj matrices found
+            count++;
+    }
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+
+    int numValidProjs= count;
+
+
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
+            numCommonPts++;
+
+    }
+
+
+    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_32F);
+    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_32F);
+    CvMat* rvec=cvCreateMat(3,1,CV_32F);
+
+
+    int countr=0;
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
+        {
+
+
+
+            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+
+            cvmSet(imgPts,countr,0,curPt.x );
+            cvmSet(imgPts,countr,1,curPt.y );
+
+            cvmSet(objectPts,countr,0,structure[i].x);
+            cvmSet(objectPts,countr,1,structure[i].y);
+            cvmSet(objectPts,countr,2,structure[i].z);
+
+            countr++;
+
+        }
+    }
+
+
+
+
+    cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
+    cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
+
+    cvReleaseMat(&imgPts);
+    cvReleaseMat(&objectPts);
+    cvReleaseMat(&rvec);
+
+    sfmSequence[framenum]=1;
+        findProjfromcompon((*((*imSet).imageCollection[framenum])));
 }
 void HRStructure::DLTUpdateStructure()
 {
 
     int i,j;
 
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
     double rerror=0;
     int numReconstructed=0;
 
@@ -287,7 +332,7 @@ void HRStructure::DLTUpdateStructure()
         projPoints.clear();
     }
 
-
+printf("reconstructed %d points\n",numReconstructed);
 }
 
 double HRStructure::findReconstructionError(int usingUndistort)
@@ -783,8 +828,8 @@ int HRStructure::sba_driver_interface()
     fixedcal=0; /* varying intrinsics */
 
 
-        havedist=1; /* with distortion */
-        mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
+    havedist=1; /* with distortion */
+    mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
 
 
@@ -856,7 +901,7 @@ int HRStructure::sba_driver_interface()
 
 
     if(howto!=BA_STRUCT)
-    {
+{
         /* combine the local rotation estimates with the initial ones */
         for(i=0; i<nframes; ++i)
         {
@@ -963,7 +1008,7 @@ int HRStructure::sba_driver_interface()
 //putting the P matrix back together
 
             findProjfromcompon((*((*imSet).imageCollection[curFrame])));
-          (*((*imSet).imageCollection[curFrame])).undistortPoints();
+            (*((*imSet).imageCollection[curFrame])).undistortPoints();
             motstruct=motstruct+(cnp);
 
         }

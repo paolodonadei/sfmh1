@@ -37,13 +37,12 @@ int main(int argc, char *argv[])
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
 
-        mystruct.printSBAstyleData("cam1.txt","3Dpt1.txt");
         mystruct.findReconstructionError();
         imSet.showparamsALL();
         mystruct.sba_driver_interface();
         imSet.showparamsALL();
         mystruct.findReconstructionError(1);
-        mystruct.printSBAstyleData("cam2.txt","3Dpt2.txt");
+zzzzzzzzz move these to run
         mystruct.writeStructure("structure2.txt");
 
 
