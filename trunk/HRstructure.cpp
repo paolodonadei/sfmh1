@@ -788,19 +788,13 @@ int HRStructure::sba_driver_interface()
      * 0: all free, 1: skew fixed, 2: skew, ar fixed, 4: skew, ar, ppt fixed
      * Note that a value of 3 does not make sense
      */
-    mglobs.nccalib=2; /* number of intrinsics to keep fixed, must be between 0 and 5 */
+    mglobs.nccalib=0; /* number of intrinsics to keep fixed, must be between 0 and 5 */
     fixedcal=0; /* varying intrinsics */
 
-    if(cnp==16)  // 16 = 5+5+6
-    {
+
         havedist=1; /* with distortion */
-        mglobs.ncdist=3; /* number of distortion params to keep fixed, must be between 0 and 5 */
-    }
-    else
-    {
-        havedist=0;
-        mglobs.ncdist=-9999;
-    }
+        mglobs.ncdist=0; /* number of distortion params to keep fixed, must be between 0 and 5 */
+
 
 
     mglobs.ptparams=NULL;

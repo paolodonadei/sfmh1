@@ -424,7 +424,7 @@ int HRImage::undistortPoints()
 
     vector<HRPointFeatures>::iterator feature_iterator;
 
-
+//cvSetZero(distortion);
     feature_iterator = HR2DVector.begin();
     int count=0;
 
@@ -439,16 +439,32 @@ int HRImage::undistortPoints()
         cvUndistortPoints(curPT, curPTundist, intrinsicMatrix, distortion, NULL, NULL);
 
 
-        newfeature->location.x=curPTundist->data.fl[0];
-        newfeature->location.y=curPTundist->data.fl[1];
+        newfeature->location.x=(cvmGet(intrinsicMatrix, 0,0)*curPTundist->data.fl[0])+cvmGet(intrinsicMatrix, 0,2);
+        newfeature->location.y=(cvmGet(intrinsicMatrix, 1,1)*curPTundist->data.fl[1])+cvmGet(intrinsicMatrix, 1,2);
 
         HR2DVectorUndistorted[i]=newfeature;
-        printf("undistorted point [%f  ; %f] -> [%f  ; %f]\n", curPT->data.fl[0], curPT->data.fl[1],curPTundist->data.fl[0] ,curPTundist->data.fl[1] );
+        //   printf("undistorted point [%f  ; %f] -> [%f  ; %f]\n", curPT->data.fl[0], curPT->data.fl[1],newfeature->location.x,newfeature->location.y );
     }
 
     cvReleaseMat(&curPTundist);
     cvReleaseMat(&curPT);
 
+}
+int HRImage::showParams()
+{
+    printf("current image is %s\n",pgmfilename.c_str());
+    printf("intrinsics:\n");
+    writeCVMatrix(cout,intrinsicMatrix);
+    printf("distortion:\n");
+    writeCVMatrix(cout,distortion);
+    printf("rotation:\n");
+    writeCVMatrix(cout,camPose.Rm);
+    printf("translation :\n");
+    writeCVMatrix(cout,camPose.tm);
+    printf("projection :\n");
+    writeCVMatrix(cout,projectionMatrix);
+
+    return 0;
 }
 int HRImage::writeFeatures()
 {
@@ -1219,6 +1235,21 @@ void HRImageSet::findEssentialMatrices()
     cvReleaseMat(&temp2);
     cvReleaseMat(&temp3);
     cvReleaseMat(&temp4);
+
+}
+void HRImageSet::showparamsALL()
+{
+
+
+    for (int i=0; i<imageCollection.size(); i++)
+    {
+        printf("image %d\n",i);
+
+        (*imageCollection[i]).showParams();
+
+        printf("___________________________________\n",i);
+    }
+
 
 }
 void HRImageSet::undistortall()

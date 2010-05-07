@@ -60,6 +60,7 @@ public:
     void close();
     void divideAll(int val);
     int height,width,step,channels;
+    int showParams();
     uchar *data;
     int flag_valid;
     string filename;
@@ -179,7 +180,7 @@ public:
     void drawallMatches();
     void findEssentialMatrices();
     void undistortall();
-
+void showparamsALL();
 };
 
 
