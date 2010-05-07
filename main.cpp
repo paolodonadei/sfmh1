@@ -39,7 +39,9 @@ int main(int argc, char *argv[])
 
         mystruct.printSBAstyleData("cam1.txt","3Dpt1.txt");
         mystruct.findReconstructionError();
+        imSet.showparamsALL();
         mystruct.sba_driver_interface();
+        imSet.showparamsALL();
         mystruct.findReconstructionError(1);
         mystruct.printSBAstyleData("cam2.txt","3Dpt2.txt");
         mystruct.writeStructure("structure2.txt");
