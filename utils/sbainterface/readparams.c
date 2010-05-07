@@ -610,7 +610,7 @@ FILE *fp;
     if(withrgb)
       fprintf(fp, "%.6f %.6f %.6f 0 0 0\n", motstruct[i], motstruct[i+1], motstruct[i+2]);
     else
-      fprintf(fp, "%.6f %.6f %.6f\n", motstruct[(i*pnp)+1], motstruct[(i*pnp)+2], motstruct[(i*pnp)+3]);
+      fprintf(fp, "%.6f %.6f %.6f\n", motstruct[(i*pnp)+0], motstruct[(i*pnp)+1], motstruct[(i*pnp)+2]);
 
   }
 
