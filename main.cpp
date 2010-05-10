@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
         mystruct.sba_driver_interface();
         imSet.showparamsALL();
         mystruct.findReconstructionError(1);
-zzzzzzzzz move these to run
-        mystruct.writeStructure("structure2.txt");
+
+
 
 
     }
