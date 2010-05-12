@@ -36,12 +36,12 @@ int main(int argc, char *argv[])
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
+mystruct.printSBAstyleData("mcams.txt","ptfile.txt");
 
-        mystruct.findReconstructionError();
-        imSet.showparamsALL();
-        mystruct.sba_driver_interface();
-        imSet.showparamsALL();
-        mystruct.findReconstructionError(1);
+
+
+
+
 
 
 

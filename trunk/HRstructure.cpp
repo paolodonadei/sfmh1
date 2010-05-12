@@ -53,7 +53,7 @@ void HRStructure::run()
 // this is all wrong, you need to find the best two frames and consecutively add more frames
 //zzz remove these
     int frame1=indexMax(tempconf);
-    frame1=0;
+    frame1=2;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
@@ -69,11 +69,13 @@ void HRStructure::run()
 
     writeStructure("structure1.txt");
 
-//    sfmSequence[2]=2;
-//    DLTUpdateStructure();
-//
-//
-//    writeStructure("structure2.txt");
+
+    addFrame(0);
+    DLTUpdateStructure();
+
+    writeStructure("structure2.txt");
+
+
 }
 
 
@@ -240,9 +242,9 @@ int HRStructure::addFrame(int framenum)
     }
 
 
-    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_32F);
-    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_32F);
-    CvMat* rvec=cvCreateMat(3,1,CV_32F);
+    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_64F);
+    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_64F);
+    CvMat* rvec=cvCreateMat(3,1,CV_64F);
 
 
     int countr=0;
@@ -253,7 +255,7 @@ int HRStructure::addFrame(int framenum)
 
 
 
-            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
 
             cvmSet(imgPts,countr,0,curPt.x );
             cvmSet(imgPts,countr,1,curPt.y );
@@ -277,13 +279,47 @@ int HRStructure::addFrame(int framenum)
     cvReleaseMat(&objectPts);
     cvReleaseMat(&rvec);
 
-    sfmSequence[framenum]=1;
-        findProjfromcompon((*((*imSet).imageCollection[framenum])));
+    for(i=0; i< numImages; i++)
+    {
+        if(sfmSequence[i]==-1)
+        {
+            sfmSequence[i]=framenum;
+            break;
+        }
+    }
+
+
+//zzz you need this back   findProjfromcompon((*((*imSet).imageCollection[framenum])));
 }
 void HRStructure::DLTUpdateStructure()
 {
+    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
+    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
+
+    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
+    scaleMatrix(Ttemp,-1);
+    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
+
+
+    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
+    scaleMatrix(Ttemp,-1);
+    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
+
+    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
+    scaleMatrix(Ttemp,-1);
+    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
+
+
+
 
     int i,j;
+
+
 
     double rerror=0;
     int numReconstructed=0;
@@ -300,11 +336,15 @@ void HRStructure::DLTUpdateStructure()
 
     int numValidProjs= count;
 
-
+    for ( i = 0; i < structureValid.size(); i++)
+    {
+        structureValid[i]=0;
+    }
     for ( i = 0; i < maxlength; i++)
     {
         vector<CvMat*> projMatrs;
         vector<CvPoint2D32f> projPoints;
+        vector<int> pointsUsed;
         int numPts=0;
         for (j = 0; j < numValidProjs; j++)
         {
@@ -313,10 +353,11 @@ void HRStructure::DLTUpdateStructure()
             {
 
                 numPts++;
+                pointsUsed.push_back(curFrame);
                 CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
                 projMatrs.push_back((*((*imSet).imageCollection[curFrame])).projectionMatrix);
                 // printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
-                //printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
+                // printf("track point %d frame: %d point was x=%f and y=%f\n",i,curFrame,curPt.x,curPt.y);
                 projPoints.push_back(curPt);
             }
         }
@@ -325,21 +366,37 @@ void HRStructure::DLTUpdateStructure()
             numReconstructed++;
             structureValid[i]=numPts;
 
+
+//            for (int q=0; q<projPoints.size(); q++)
+//            {
+//                if(q==0) printf("reconstructing track %d with : ",i);
+//                printf(" +frame (%d) [%f %f]+ \t",pointsUsed[q],projPoints[q].x,projPoints[q].y);
+//                if(q==(numPts-1)) printf("\n");
+//            }
+
+
+
             structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
 
         }
         projMatrs.clear();
         projPoints.clear();
+        pointsUsed.clear();
     }
 
-printf("reconstructed %d points\n",numReconstructed);
+    printf("reconstructed %d points\n",numReconstructed);
+    printf("error before sba=%f \t",findReconstructionError(1));
+    sba_driver_interface();
+    printf("error after sba=%f \t",findReconstructionError(1));
+
+    cvReleaseMat(&Ttemp);
 }
 
 double HRStructure::findReconstructionError(int usingUndistort)
 {
 
     int i,j;
-
+    int numbads=0;
     double rerror=0;
     int numReconstructed=0;
 
@@ -408,22 +465,29 @@ double HRStructure::findReconstructionError(int usingUndistort)
                     rep_error+=((deltaX*deltaX)+(deltaY*deltaY));
 
 
-                    // printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
-                    //printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
-
-
+                    //    printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
+                    //  printf("point was x=%f and y=%f\n",curPt.x,curPt.y);
+                    //    printf("point number %d was x=%f and y=%f z=%f, numpts=%d\n",i,structure[i].x,structure[i].y,structure[i].z,structureValid[i] );
+                    //   printf("error was %f\n",rep_error);
+                    //   printf("________________________\n");
 
                 }
             }
             rep_error/=((double)numFrames);
+            if(rep_error>1)
+            {
+                //     printf("point %d had error %f \n",i,rep_error);
+                numbads++;
+            }
+
             structureErrors[i]=rep_error;
             rerror+=rep_error;
         }
     }
 
     rerror/=((double)numReconstructed);
+    printf("number of bad points is %d \n",numbads);
 
-    printf("reconstruction error was %f\n",rerror);
 
     return rerror;
 }
@@ -436,6 +500,7 @@ int HRStructure::printSBAstyleData(string camFname, string ptFname)
 
 
     int maxlength=(*imSet).myTracks.getNumTracks();
+
 
 
     fstream file_cams(camFname.c_str() ,ios::out);
@@ -485,7 +550,7 @@ int HRStructure::printSBAstyleData(string camFname, string ptFname)
                     if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
                     {
                         CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
-                        file_pts<<curFrame<<" "<<curPt.x<<" "<<curPt.y<<" ";
+                        file_pts<<j<<" "<<curPt.x<<" "<<curPt.y<<" ";
 
                     }
                 }
@@ -720,7 +785,13 @@ int HRStructure::sba_driver_interface()
             tofilter[15]=cvmGet(curt,1,0);
             tofilter[16]=cvmGet(curt,2,0);
 
-
+//
+//            printf("params for cams is \n");
+//            for(int u=0; u<=16; u++)
+//            {
+//                printf("  %f  ",tofilter[u]);
+//            }
+//            printf("\n");
 
             quat2vec(tofilter, filecnp, motstruct, cnp);
 
@@ -762,24 +833,20 @@ int HRStructure::sba_driver_interface()
             for (j = 0; j < numImages; j++)
             {
 
-
-
-                if(sfmSequence[j]!=-1)
+                int curFrame=sfmSequence[j];
+                if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
                 {
-
-                    int curFrame=sfmSequence[j];
-                    if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
-                    {
-                        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
 
 
-                        imgpts[0]=curPt.x  ;
-                        imgpts[1]= curPt.y ;
+                    imgpts[0]=curPt.x  ;
+                    imgpts[1]=curPt.y ;
 
-                        imgpts+=mnp;
-                    }
+                    imgpts+=mnp;
                     vmask[ptno*nframes+j]=1;
                 }
+
+
             }
             ptno++;
         }
@@ -829,6 +896,7 @@ int HRStructure::sba_driver_interface()
 
 
     havedist=1; /* with distortion */
+    //zzz unfix these distortion parameters
     mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
 
@@ -845,27 +913,40 @@ int HRStructure::sba_driver_interface()
     opts[4]=0.0;
 //opts[4]=1E-05; // uncomment to force termination if the relative reduction in the RMS reprojection error drops below 1E-05
 
-//    FILE *f1p;
-//    f1p=fopen("imgpts.txt", "w");
-//    for (i=0; i< numprojs*mnp; i++)
-//    {
-//        fprintf(f1p,"%f\n",imgpts[i]);
-//    }
-//    fclose(f1p);
-//
-//    f1p=fopen("motstruct.txt", "w");
-//    for (i=0; i< (nframes*cnp + numpts3D*pnp); i++)
-//    {
-//        fprintf(f1p,"%f\n",motstruct[i]);
-//    }
-//    fclose(f1p);
-//
-//    f1p=fopen("initrot.txt", "w");
-//    for (i=0; i< nframes*FULLQUATSZ; i++)
-//    {
-//        fprintf(f1p,"%f\n", initrot[i]);
-//    }
-//    fclose(f1p);
+    FILE *f1p;
+    f1p=fopen("imgpts.txt", "w");
+    for (i=0; i< numprojs*mnp; i++)
+    {
+        fprintf(f1p,"%f\n",imgpts[i]);
+    }
+    fclose(f1p);
+
+    f1p=fopen("motstruct.txt", "w");
+    for (i=0; i< (nframes*cnp + numpts3D*pnp); i++)
+    {
+        fprintf(f1p,"%f\n",motstruct[i]);
+    }
+    fclose(f1p);
+
+    f1p=fopen("initrot.txt", "w");
+    for (i=0; i< nframes*FULLQUATSZ; i++)
+    {
+        fprintf(f1p,"%f\n", initrot[i]);
+    }
+    fclose(f1p);
+
+
+    f1p=fopen("vmask.txt", "w");
+    for (i=0; i< numpts3D; i++)
+    {
+        for (j=0; j< nframes; j++)
+        {
+            fprintf(f1p,"\t%d", (int)vmask[i*nframes+j]);
+        }
+        fprintf(f1p,"\n");
+    }
+    fclose(f1p);
+
 
 
 
@@ -881,9 +962,8 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
     n=sba_motstr_levmar_x(numpts3D, 0, nframes, nconstframes, vmask, motstruct, cnp, pnp, imgpts, covimgpts, mnp,
-                          fixedcal? img_projsRTS_x : (havedist? img_projsKDRTS_x : img_projsKRTS_x),
-                          analyticjac? (fixedcal? img_projsRTS_jac_x : (havedist? img_projsKDRTS_jac_x : img_projsKRTS_jac_x)) : NULL,
-                              (void *)(&mglobs), MAXITER2, verbose, opts, info);
+                          img_projsKDRTS_x ,img_projsKDRTS_jac_x ,
+                          (void *)(&mglobs), MAXITER2, verbose, opts, info);
 
 
 
@@ -897,11 +977,15 @@ int HRStructure::sba_driver_interface()
 
     char* refcamsfname="mycams.txt";
     char* refptsfname="mypts.txt";
-    if(n==SBA_ERROR) goto cleanup;
+    if(n==SBA_ERROR)
+    {
+        printf("SBA error happened\n");
+        goto cleanup;
+    }
 
 
     if(howto!=BA_STRUCT)
-{
+    {
         /* combine the local rotation estimates with the initial ones */
         for(i=0; i<nframes; ++i)
         {
