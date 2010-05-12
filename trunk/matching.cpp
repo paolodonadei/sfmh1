@@ -28,7 +28,7 @@
 
 #define SIFTPCA 1
 
-
+//make sure this is zero for release version
 #define OXFORDMATCHES 0
 extern const char* TEMPDIR;
 

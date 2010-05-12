@@ -3,7 +3,7 @@
 % clc
 seqname='merton2';
 
-A=dlmread(['C:\Documents and Settings\hrast019\Desktop\sfmh1\temporary\' seqname 'sfmh\structure2.txt']);
+A=dlmread(['C:\Documents and Settings\hrast019\Desktop\sfmh1\temporary\' seqname 'sfmh\structure1.txt']);
 
 size(A)
 

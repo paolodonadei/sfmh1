@@ -207,22 +207,22 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
     }
 
 
-
-
-
-
-
-    printf("Covariance of the fit:\n");
-    for(i=0; i<m; ++i)
-    {
-        for(j=0; j<m; ++j)
-        {
-            printf("%g ", covar[i*m+j]);
-        }
-
-        printf("\n");
-    }
-    printf("\n");
+//
+//
+//
+//
+//
+//    printf("Covariance of the fit:\n");
+//    for(i=0; i<m; ++i)
+//    {
+//        for(j=0; j<m; ++j)
+//        {
+//            printf("%g ", covar[i*m+j]);
+//        }
+//
+//        printf("\n");
+//    }
+//    printf("\n");
 
 
 

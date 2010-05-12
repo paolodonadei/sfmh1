@@ -22,21 +22,25 @@ int main(int argc, char *argv[])
     {
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
-        //   imSet.showOneByOneFeature();
+     //   imSet.showOneByOneFeature();
 
         imSet.exhaustiveSIFTMatching();
-        //   imSet.showOneByOneFeatureMotions();
+
+
 
         imSet.multipleViewEstimate();
         imSet.drawallMatches();
         imSet.createFeatureTrackMatrix();
         imSet.SelfCalibrate();
         imSet.findEssentialMatrices();
-        imSet.writeMotions();
+
+
+            imSet.writeMotions();
+    //    imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
-mystruct.printSBAstyleData("mcams.txt","ptfile.txt");
+
 
 
 
