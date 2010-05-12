@@ -392,13 +392,13 @@ void MotionGeometry::writeMatrix(ostream &stream,MotionType mtype)
 {
     CvMat* MotionModel;
     if(mtype==FUNDAMENTAL)
-    MotionModel=MotionModel_F;
+        MotionModel=MotionModel_F;
     else if(mtype==HOMOGRAPHY)
-    MotionModel=MotionModel_H;
+        MotionModel=MotionModel_H;
     else if(mtype==ESSENTIAL)
-    MotionModel=MotionModel_E;
+        MotionModel=MotionModel_E;
     else
-    printf("incorect motion requested!\n");
+        printf("incorect motion requested!\n");
 
 
     if ( MotionModel->height==0 || MotionModel->width==0 )
@@ -435,7 +435,7 @@ MotionGeometry::MotionGeometry(const MotionGeometry & rec)
 
     MotionModel_F=cvCloneMat( rec.MotionModel_F);
     MotionModel_H=cvCloneMat( rec.MotionModel_H);
-      MotionModel_E=cvCloneMat( rec.MotionModel_E);
+    MotionModel_E=cvCloneMat( rec.MotionModel_E);
 
 
 }
@@ -460,7 +460,7 @@ MotionGeometry & MotionGeometry::operator=(const MotionGeometry & rhs) throw()
     }
     MotionModel_F=cvCloneMat( rhs.MotionModel_F);
     MotionModel_H=cvCloneMat( rhs.MotionModel_H);
-     MotionModel_E=cvCloneMat( rhs.MotionModel_E);
+    MotionModel_E=cvCloneMat( rhs.MotionModel_E);
     return *this;
 }
 
@@ -519,14 +519,14 @@ MotionGeometry::MotionGeometry()
 double MotionGeometry::getMotionElement(int i,int j,MotionType mtype) const
 {
     CvMat* MotionModel;
-     if(mtype==FUNDAMENTAL)
-    MotionModel=MotionModel_F;
+    if(mtype==FUNDAMENTAL)
+        MotionModel=MotionModel_F;
     else if(mtype==HOMOGRAPHY)
-    MotionModel=MotionModel_H;
+        MotionModel=MotionModel_H;
     else if (mtype==ESSENTIAL)
-    MotionModel=MotionModel_E;
+        MotionModel=MotionModel_E;
     else
-    printf("incorect motion requested!\n");
+        printf("incorect motion requested!\n");
 
 
     if ( MotionModel->height==0 ||MotionModel->width==0 )
@@ -696,7 +696,7 @@ int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vect
     numInliers_F=numPoints-numOutlier_F;
 
 
-
+    printf("fundamental matrix estimation had error %f and percentage of inliers %f\n",motionError_F,((double)numInliers_F)/((double)numPoints) );
 
 
     cvReleaseMat(&points1);

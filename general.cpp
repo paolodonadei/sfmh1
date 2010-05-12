@@ -452,7 +452,7 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
     int n_cols = (*tmodel)->cols;
 
 
-    printf("\nnumber of rows is %d and number of cols is %d and reading from file %s \n",n_rows,n_cols,mfname.c_str());
+ //   printf("\nnumber of rows is %d and number of cols is %d and reading from file %s \n",n_rows,n_cols,mfname.c_str());
 //this function is not very error resilient, it will crash and burn if the data file is not the right format
     string fname(mfname);
 

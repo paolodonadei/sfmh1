@@ -980,7 +980,7 @@ int HRImageSet::featureDetectSift()
 int HRImageSet::multipleViewEstimate()
 {
     int i,j;
-
+printf("\n\n *********Beginning of motion estimation (Fundamental and Homography\n\n");
     for (i=0; i<imageCollection.size(); i++)
     {
         for (j=0; j<i; j++)
@@ -993,7 +993,7 @@ int HRImageSet::multipleViewEstimate()
         }
     }
 
-
+printf("\n\n *********end of motion estimation (Fundamental and Homography\n\n");
 
 
 }
@@ -1143,30 +1143,30 @@ int HRImageSet::SelfCalibrate()
         }
     }
 
-
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confid, HARTLEY);
-
-
-    cout<<" According to Hartley :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        printf("confidence for K %d is %f\n",i,confid[i]);
-        writeCVMatrix(cout,intrinMatrix[i]);
-    }
-
-
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
-
-    cout<<" According to Sturm :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        printf("confidence for K %d is %f\n",i,confid[i]);
-        writeCVMatrix(cout,intrinMatrix[i]);
-    }
+//
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confid, HARTLEY);
+//
+//
+//    cout<<" According to Hartley :"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        printf("confidence for K %d is %f\n",i,confid[i]);
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//    }
+//
+//
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
+//
+//    cout<<" According to Sturm :"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        printf("confidence for K %d is %f\n",i,confid[i]);
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//    }
 
 
 
@@ -1176,8 +1176,8 @@ int HRImageSet::SelfCalibrate()
 
     for (int i = 0; i < numFrames; ++i)
     {
-        printf("confidence for K %d is %f\n",i,confid[i]);
-        writeCVMatrix(cout,intrinMatrix[i]);
+        printf("confidence for K %d is %f, focal lengths are %f and %f \n",i,confid[i],cvmGet(intrinMatrix[i],0,0),cvmGet(intrinMatrix[i],1,1));
+     //   writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 
@@ -1211,7 +1211,7 @@ void HRImageSet::findEssentialMatrices()
 //                writeCVMatrix(cout,(*imageCollection[j]).intrinsicMatrix);
 //                printf("fundamental %d -> %d \n",i,j);
 //                writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_F);
-
+//
 
                 cvTranspose((*imageCollection[j]).intrinsicMatrix, tempmat1);
                 cvMatMul(tempmat1, (correspondencesPairWise[i][j]).motion.MotionModel_F, tempmat2);
@@ -1221,15 +1221,15 @@ void HRImageSet::findEssentialMatrices()
 
                 normalizeMatrix((correspondencesPairWise[i][j]).motion.MotionModel_E);
 
-//                printf("essential %d -> %d \n",i,j);
-//                writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
-                //    printf("__________________________________________________\n");
-//                cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
-//
-//
-//
-//                double err=cvmGet(temp2,0,0)-cvmGet(temp2,1,1);
-//                printf("svd error %d and %d was %f \n",i,j,err);
+            //    printf("essential %d -> %d \n",i,j);
+             //   writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
+           //         printf("__________________________________________________\n");
+                cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
+
+
+
+                double err=cvmGet(temp2,0,0)-cvmGet(temp2,1,1);
+                printf("Essential matrix error for for E(%d,%d) was %f \n",i,j,err);
             }
         }
     }

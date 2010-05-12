@@ -69,11 +69,11 @@ void HRStructure::run()
 
     writeStructure("structure1.txt");
 
-
-    addFrame(0);
-    DLTUpdateStructure();
-
-    writeStructure("structure2.txt");
+//
+//    addFrame(0);
+//    DLTUpdateStructure();
+//
+//    writeStructure("structure2.txt");
 
 
 }
@@ -104,8 +104,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     double* E= new double[10];
 
 //frame 1 would go to the coordinate system origin
-
-
 
 
 
@@ -163,7 +161,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cvSetIdentity((*(*imSet).imageCollection[frame1]).camPose.Rm);
     cvSetZero((*(*imSet).imageCollection[frame1]).camPose.tm);
 
-    printf("**5 point decided the number of inliers are %d\n\n", num_inliers);
+
 
 
 
@@ -192,6 +190,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     cout<<" P1 :"<<endl;
 
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
+
 
 
 
@@ -275,6 +274,15 @@ int HRStructure::addFrame(int framenum)
     cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
     cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
 
+    findProjfromcompon((*((*imSet).imageCollection[framenum])));
+
+    printf("inside pose estimation\n");
+    writeCVMatrix(cout<<"rvec"<<endl,rvec );
+    writeCVMatrix(cout<<"tvec"<<endl,(*((*imSet).imageCollection[framenum])).camPose.tm );
+    writeCVMatrix(cout<<"rotation"<<endl,(*((*imSet).imageCollection[framenum])).camPose.Rm );
+    writeCVMatrix(cout<<"distortion"<<endl,(*((*imSet).imageCollection[framenum])).distortion );
+    writeCVMatrix(cout<<"intrinsic"<<endl,(*((*imSet).imageCollection[framenum])).intrinsicMatrix);
+    writeCVMatrix(cout<<"projection"<<endl,(*((*imSet).imageCollection[framenum])).projectionMatrix);
     cvReleaseMat(&imgPts);
     cvReleaseMat(&objectPts);
     cvReleaseMat(&rvec);
@@ -289,33 +297,10 @@ int HRStructure::addFrame(int framenum)
     }
 
 
-//zzz you need this back   findProjfromcompon((*((*imSet).imageCollection[framenum])));
+
 }
 void HRStructure::DLTUpdateStructure()
 {
-    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
-
-    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
-
-
-    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
-
-    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
-
-
-
 
     int i,j;
 
@@ -386,10 +371,10 @@ void HRStructure::DLTUpdateStructure()
 
     printf("reconstructed %d points\n",numReconstructed);
     printf("error before sba=%f \t",findReconstructionError(1));
-    sba_driver_interface();
+  // sba_driver_interface();
     printf("error after sba=%f \t",findReconstructionError(1));
 
-    cvReleaseMat(&Ttemp);
+
 }
 
 double HRStructure::findReconstructionError(int usingUndistort)
@@ -476,7 +461,7 @@ double HRStructure::findReconstructionError(int usingUndistort)
             rep_error/=((double)numFrames);
             if(rep_error>1)
             {
-                //     printf("point %d had error %f \n",i,rep_error);
+                   //  printf("point %d had error %f \n",i,rep_error);
                 numbads++;
             }
 
@@ -486,7 +471,7 @@ double HRStructure::findReconstructionError(int usingUndistort)
     }
 
     rerror/=((double)numReconstructed);
-    printf("number of bad points is %d \n",numbads);
+    printf("number of bad points is %d  or %f %%\n",numbads,(((double)numbads)/((double)numReconstructed))*100.0    );
 
 
     return rerror;
