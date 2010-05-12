@@ -411,7 +411,7 @@ void HRImage::updateImageInfo()
 int HRImage::undistortPoints()
 {
     int i;
-    printf("gbegin\n");
+
 
     HR2DVectorUndistorted.clear();
     CvMat* curPT=cvCreateMat(1,1,CV_32FC2);
@@ -1693,6 +1693,7 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
     temp.x=0;
     temp.y=0;
 
+
     if (row>=trackMatrix.size())
     {
         cout<<"1-calling on a nonexistent row, track this bug"<<endl;
@@ -1718,7 +1719,7 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
         printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
         return temp;
     }
-    if(undistorted==0)
+    if(undistorted==0 || (*trackImageCollection)[col]->HR2DVectorUndistorted.size()!=(*trackImageCollection)[col]->HR2DVector.size())
         temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
     else
         temp=(*trackImageCollection)[col]->HR2DVectorUndistorted[trackMatrix[row][col]]->location;

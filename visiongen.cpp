@@ -28,8 +28,8 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
     CvMat* ttemp = cvCreateMat(4,1, CV_64F);
     cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,ttemp,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 
-    printf("ttemp is \n");
-    writeCVMatrix(cout,ttemp);
+   // printf("ttemp is \n");
+   // writeCVMatrix(cout,ttemp);
 
     int j;
     for (j=0; j<3; j++)
@@ -38,8 +38,8 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
 
     }
 
-    printf("posVect is \n");
-    writeCVMatrix(cout,posVect);
+   // printf("posVect is \n");
+   // writeCVMatrix(cout,posVect);
 
 
     cvReleaseMat(&ttemp);
@@ -559,23 +559,9 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
 
 
 
-
-    CvMat matrA;
-    double matrA_dat[numframes*3*4];
-    matrA = cvMat(numframes*3,4,CV_64F,matrA_dat);
-
-    //CvMat matrU;
-    CvMat matrW;
-    CvMat matrV;
-    //double matrU_dat[9*9];
-    double matrW_dat[numframes*3*4];
-    double matrV_dat[4*4];
-
-    //matrU = cvMat(6,6,CV_64F,matrU_dat);
-    matrW = cvMat(numframes*3,4,CV_64F,matrW_dat);
-    matrV = cvMat(4,4,CV_64F,matrV_dat);
-
-
+    CvMat* matrV=cvCreateMat(4,4,CV_64F);
+    CvMat* matrW=cvCreateMat(numframes*2,4,CV_64F);
+    CvMat* matrA=cvCreateMat(numframes*2,4,CV_64F);
     /* Solve system for each point */
 
     for( j = 0; j < numframes; j++ )/* For each view */
@@ -583,24 +569,31 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
         double x,y;
         x = projPoints[j].x;
         y = projPoints[j].y;
+
         for( int k = 0; k < 4; k++ )
         {
-            cvmSet(&matrA, j*3+0, k, x * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],0,k) );
-            cvmSet(&matrA, j*3+1, k, y * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],1,k) );
-            cvmSet(&matrA, j*3+2, k, x * cvmGet(projMatrs[j],1,k) - y * cvmGet(projMatrs[j],0,k) );
+            cvmSet(matrA, j*2+0, k, x * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],0,k) );
+            cvmSet(matrA, j*2+1, k, y * cvmGet(projMatrs[j],2,k) -     cvmGet(projMatrs[j],1,k) );
+            //    cvmSet(matrA, j*3+2, k, x * cvmGet(projMatrs[j],1,k) - y * cvmGet(projMatrs[j],0,k) );
         }
     }
 
 
-    cvSVD(&matrA,&matrW,0,&matrV,CV_SVD_V_T);
+
+    cvSVD(matrA,matrW,0,matrV,CV_SVD_V_T);
 
     /* Copy computed point */
-    spPoint.x=    cvmGet(&matrV,3,0)/cvmGet(&matrV,3,3);/* X */
-    spPoint.y=    cvmGet(&matrV,3,1)/cvmGet(&matrV,3,3);/* Y */
-    spPoint.z=    cvmGet(&matrV,3,2)/cvmGet(&matrV,3,3);/* Z */
+    spPoint.x=    cvmGet(matrV,3,0)/cvmGet(matrV,3,3);/* X */
+    spPoint.y=    cvmGet(matrV,3,1)/cvmGet(matrV,3,3);/* Y */
+    spPoint.z=    cvmGet(matrV,3,2)/cvmGet(matrV,3,3);/* Z */
 
 
 
+
+
+    cvReleaseMat(&matrV);
+    cvReleaseMat(&matrW);
+    cvReleaseMat(&matrA);
 
     return 0;
 
