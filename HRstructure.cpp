@@ -53,7 +53,7 @@ void HRStructure::run()
 // this is all wrong, you need to find the best two frames and consecutively add more frames
 //zzz remove these
     int frame1=indexMax(tempconf);
-    frame1=2;
+    frame1=0;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
@@ -66,8 +66,9 @@ void HRStructure::run()
     initializeKeyFrames(frame1,  frame2);
 
     DLTUpdateStructure();
-
     writeStructure("structure1.txt");
+
+
 
 //
 //    addFrame(0);
@@ -104,7 +105,32 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     double* E= new double[10];
 
 //frame 1 would go to the coordinate system origin
-
+/////////////////
+//  CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
+//
+//    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
+//
+//
+//    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
+//
+//    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
+//
+//
+//    (*imSet).findEssentialMatrices();
+//    cvReleaseMat(&Ttemp);
+    ////////////
 
 
     int maxlength=(*imSet).myTracks.getNumTracks();
@@ -169,6 +195,8 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])));
     findProjfromcompon((*((*imSet).imageCollection[frame2])));
+
+
 
 
 
@@ -371,7 +399,7 @@ void HRStructure::DLTUpdateStructure()
 
     printf("reconstructed %d points\n",numReconstructed);
     printf("error before sba=%f \t",findReconstructionError(1));
-  // sba_driver_interface();
+ // sba_driver_interface();
     printf("error after sba=%f \t",findReconstructionError(1));
 
 

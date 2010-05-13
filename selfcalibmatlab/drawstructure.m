@@ -1,4 +1,4 @@
-% close all;
+ close all;
 % clear all;
 % clc
 seqname='merton2';
