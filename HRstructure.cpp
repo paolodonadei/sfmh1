@@ -178,6 +178,16 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
     int num_inliers= find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
 
+
+
+
+
+
+
+    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
+
+
+
     BuffertocvMatrix(R,&((*((*imSet).imageCollection[frame2])).camPose.Rm),3,3, 0);
     BuffertocvMatrix(t,&((*((*imSet).imageCollection[frame2])).camPose.tm),3,1, 0);
 
