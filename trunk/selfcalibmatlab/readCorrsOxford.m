@@ -150,6 +150,15 @@ for i=1:numcolum
             corrs{2,corcount}=x2;
 
             [F{corcount}, e1, e2] = fundmatrix(x1, x2);
+            
+%            remove ths zzzz for debugging
+%             if(corcount==3)
+%                 F{corcount}=[-3.091443805e-008      3.705490041e-006       -0.001516392009
+%                   2.124729772e-006     -5.076737385e-007        -0.01432558912
+%                 -0.0009284088307         0.01149868612                     1
+%                     ];
+%         
+%             end
            
             E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i}));
             E{corcount}=E{corcount}/E{corcount}(3,3);
