@@ -34,6 +34,7 @@
 
 //some general definitions go here
 #define INDEXFNAME "motionindex.txt"
+#define OXFORDMATCHES 1
 using namespace std;
 
 class HRImage;

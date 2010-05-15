@@ -74,6 +74,7 @@ public:
     int valid;
     int numInliers_F;
 
+
     double motionError_H;//in pixels
     int numOutlier_H;
 

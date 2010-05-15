@@ -675,7 +675,14 @@ int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vect
 
     int pointsRejected=0;
     double error=0;
-    int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
+
+int num=0;
+//no RANSAC if all the matches are ground truth
+    if(OXFORDMATCHES==1)
+         num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_8POINT,1.0,0.99,status);
+    else
+         num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
+
     error= computeReprojErrorF( points1,points2, MotionModel_F, err_array ,status);
 
 
