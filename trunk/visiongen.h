@@ -34,5 +34,6 @@ void scaleMatrix(CvMat* in,double s);
 int normalizeMatrix( CvMat* in);
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint);
+double findDepth(CvMat* P,CvPoint3D32f S);
 
 #endif

@@ -35,6 +35,7 @@ public:
      int printSBAstyleData(string camFname, string ptFname);
      int sba_driver_interface();
      double findReconstructionError(int usingUndistort=0);
+     int decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t);
 };
 
 

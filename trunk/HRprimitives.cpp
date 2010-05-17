@@ -348,7 +348,7 @@ int HRCorrespond2N::findGeomtry()
 {
 
 
-
+printf(" f matrix [%d][%d] has left side image %d and right side %d \n",indexIm1,indexIm2,indexIm2,indexIm1);
     int num=motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  FUNDAMENTAL);
     motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  HOMOGRAPHY);
 
