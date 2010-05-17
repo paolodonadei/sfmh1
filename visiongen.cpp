@@ -28,8 +28,8 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
     CvMat* ttemp = cvCreateMat(4,1, CV_64F);
     cvDecomposeProjectionMatrix(projMatr, calibMatr,rotMatr,ttemp,rotMatrX, rotMatrY,rotMatrZ,eulerAngles);
 
-   // printf("ttemp is \n");
-   // writeCVMatrix(cout,ttemp);
+    // printf("ttemp is \n");
+    // writeCVMatrix(cout,ttemp);
 
     int j;
     for (j=0; j<3; j++)
@@ -38,8 +38,8 @@ void cvDecomposeProjectionMatrixHR( const CvMat *projMatr, CvMat *calibMatr,
 
     }
 
-   // printf("posVect is \n");
-   // writeCVMatrix(cout,posVect);
+    // printf("posVect is \n");
+    // writeCVMatrix(cout,posVect);
 
 
     cvReleaseMat(&ttemp);
@@ -602,3 +602,59 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
 
 }
 
+double findDepth(CvMat* P,CvPoint3D32f S)
+{
+
+    int i,j;
+    double w;
+    double T=1.0;
+    double deter=0;
+    double norm=0;
+    double sig=0;
+    double depth=0;
+
+    CvMat* PT=cvCreateMat(4,1,CV_64F);
+    CvMat* PTim=cvCreateMat(3,1,CV_64F);
+
+    CvMat* M=cvCreateMat(3,3,CV_64F);
+
+
+
+
+
+    for(i=0; i<3; i++)
+    {
+        for(j=0; j<3; j++)
+        {
+            cvmSet(M,i,j, cvmGet(P,i,j));
+        }
+
+    }
+
+
+
+    cvmSet(PT,0,0,S.x);
+    cvmSet(PT,1,0,S.y);
+    cvmSet(PT,2,0,S.z);
+    cvmSet(PT,3,0,T);
+
+    cvMatMul(P,PT,PTim);
+
+    w=cvmGet(PTim,2,0);
+
+    norm= sqrt( (cvmGet(M,2,0)*cvmGet(M,2,0))+(cvmGet(M,2,1)*cvmGet(M,2,1))+(cvmGet(M,2,2)*cvmGet(M,2,2)) );
+    deter=cvDet(M);
+
+    if(deter<=0)
+        sig=-1.0;
+    else
+        sig=1.0;
+
+    depth=(sig*w)/norm;
+
+    cvReleaseMat(&PT);
+    cvReleaseMat(&M);
+    cvReleaseMat(&PTim);
+
+    return depth;
+}

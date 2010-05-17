@@ -153,63 +153,33 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     structure.resize(maxlength);
 
 
-
+    int indexfirstmatch=0;
     for (j=0; j<maxlength; j++)
     {
 
         if((*imSet).myTracks.validTrackEntry(j,frame1)!=0 && (*imSet).myTracks.validTrackEntry(j,frame2)!=0 )
-            count++;
-
-    }
-
-    int num_pts = (int) count;
-
-    v2_t *k1_pts = new v2_t[num_pts];
-    v2_t *k2_pts = new v2_t[num_pts];
-
-
-    count=0;
-    for (int i = 0; i < maxlength; i++)
-    {
-        if((*imSet).myTracks.validTrackEntry(i,frame1)!=0 && (*imSet).myTracks.validTrackEntry(i,frame2)!=0 )
         {
-
-            CvPoint2D32f p1 = (*imSet).myTracks.pointFromTrackloc(i, frame1) ;
-            CvPoint2D32f p2 = (*imSet).myTracks.pointFromTrackloc(i, frame2) ;
-
-            k1_pts[count] = v2_new(p1.x, p1.y);
-            k2_pts[count] = v2_new(p2.x, p2.y);
-
-            count++;
+            indexfirstmatch=j;
+            break;
         }
+        count++;
+
     }
 
-    cvMatrixtoBuffer((*((*imSet).imageCollection[frame1])).intrinsicMatrix,&K1, 0);
-    cvMatrixtoBuffer((*((*imSet).imageCollection[frame2])).intrinsicMatrix,&K2, 0);
-
-
-    cvMatrixtoBuffer((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E,&E, 0);
 
 
 
 
-    // int num_inliers = compute_pose_ransac(num_pts, k1_pts, k2_pts,K1, K2, (double) 0.05, 2512, R, t);
-    find_extrinsics_essential(E, k1_pts[1], k2_pts[1], R, t);
+    decomposeEssential((*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
+                       (*((*imSet).imageCollection[frame2])).intrinsicMatrix,((*((*imSet).imageCollection[frame2])).camPose.Rm),((*((*imSet).imageCollection[frame2])).camPose.tm));
 
 
 
 
 
+    writeCVMatrix(cout<<"fundamental matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_F);
+    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E);
 
-    writeCVMatrix(cout<<"fundamental matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_F);
-    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E);
-
-
-
-
-
-    BuffertocvMatrix(R,&((*((*imSet).imageCollection[frame2])).camPose.Rm),3,3, 0);
-    BuffertocvMatrix(t,&((*((*imSet).imageCollection[frame2])).camPose.tm),3,1, 0);
 
 
 
@@ -251,13 +221,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-
-    delete [] k1_pts;
-    delete [] k2_pts;
-    delete []  R;
-    delete []  t;
-    delete []  K1;
-    delete []  K2;
 
     cvReleaseMat(&Rident);
     cvReleaseMat(&tzero);
@@ -611,6 +574,268 @@ int HRStructure::printSBAstyleData(string camFname, string ptFname)
 
     cvReleaseMat(&curq);
     return 0;
+
+}
+
+int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t)
+{
+    int i,j;
+    int exitflag=0;
+    double depth1,depth2;
+    CvMat* W=cvCreateMat(3,3,CV_64F);
+    CvMat* WT=cvCreateMat(3,3,CV_64F);
+    CvMat* U=cvCreateMat(3,3,CV_64F);
+    CvMat* VT=cvCreateMat(3,3,CV_64F);
+    CvMat* WW=cvCreateMat(3,3,CV_64F);
+
+    CvMat* temp1=cvCreateMat(3,3,CV_64F);
+    CvMat* temp2=cvCreateMat(3,3,CV_64F);
+
+    CvMat* PT=cvCreateMat(4,1,CV_64F);
+    CvMat* PT_R=cvCreateMat(4,1,CV_64F);
+
+    CvMat* R1=cvCreateMat(3,3,CV_64F);
+    CvMat* R2=cvCreateMat(3,3,CV_64F);
+    CvMat* t1=cvCreateMat(3,1,CV_64F);
+    CvMat* t2=cvCreateMat(3,1,CV_64F);
+
+    CvMat* P1=cvCreateMat(3,4,CV_64F);
+    CvMat* P2=cvCreateMat(3,4,CV_64F);
+    CvMat* P3=cvCreateMat(3,4,CV_64F);
+    CvMat* P4=cvCreateMat(3,4,CV_64F);
+
+    CvMat* PTemp=cvCreateMat(3,4,CV_64F);
+
+
+    CvMat* POrigin=cvCreateMat(3,4,CV_64F);
+
+    CvMat* Rident=cvCreateMat(3,3,CV_64F);
+    CvMat* tzero=cvCreateMat(3,1,CV_64F);
+
+
+    cvSetZero(W);
+    cvmSet(W,0,1,-1.0);
+    cvmSet(W,1,0,1.0);
+    cvmSet(W,2,2,1.0);
+
+    cvTranspose(W,WT);
+
+    //create p matrix at origin
+
+    cvSetIdentity(Rident);
+    cvSetZero(tzero);
+///////////////////////////// svd of E
+
+
+
+    copyMatrix(E,temp1);
+    cvSVD( temp1, WW,  U, VT,CV_SVD_V_T );
+
+/////////////////////////////// get R1, R2 , T1 , T2
+
+    cvMatMul(U,W,temp1);
+    cvMatMul(temp1,VT,R1);
+
+
+    cvMatMul(U,WT,temp1);
+    cvMatMul(temp1,VT,R2);
+
+    for(i=0; i<3; i++)
+    {
+        cvmSet(t1,i,0,cvmGet(U,i,2));
+        cvmSet(t2,i,0,cvmGet(U,i,2));
+    }
+
+    scaleMatrix(t2,-1.0);
+
+// finished buildong R, t
+    for(i=0; i<3; i++)
+    {
+        for(j=0; j<3; j++)
+        {
+            cvmSet(P1,i,j, cvmGet(R1,i,j));
+            cvmSet(P2,i,j, cvmGet(R1,i,j));
+            cvmSet(P3,i,j, cvmGet(R2,i,j));
+            cvmSet(P4,i,j, cvmGet(R2,i,j));
+            cvmSet(POrigin,i,j, cvmGet(Rident,i,j));
+        }
+
+    }
+
+    for(i=0; i<3; i++)
+    {
+        cvmSet(P1,i,3, cvmGet(t1,i,0));
+        cvmSet(P2,i,3, cvmGet(t2,i,0));
+        cvmSet(P3,i,3, cvmGet(t1,i,0));
+        cvmSet(P4,i,3, cvmGet(t2,i,0));
+        cvmSet(POrigin,i,3, cvmGet(tzero,i,0));
+    }
+
+
+
+    cvMatMul(K1,POrigin,PTemp);
+    copyMatrix(PTemp,POrigin);
+
+    cvMatMul(K2,P1,PTemp);
+    copyMatrix(PTemp,P1);
+
+    cvMatMul(K2,P2,PTemp);
+    copyMatrix(PTemp,P2);
+
+
+    cvMatMul(K2,P3,PTemp);
+    copyMatrix(PTemp,P3);
+
+
+    cvMatMul(K2,P4,PTemp);
+    copyMatrix(PTemp,P4);
+
+///////
+
+    writeCVMatrix(cout<<"porigin:"<<endl,POrigin);
+    writeCVMatrix(cout<<"P1:"<<endl,P1);
+    writeCVMatrix(cout<<"P2:"<<endl,P2);
+    writeCVMatrix(cout<<"P3:"<<endl,P3);
+    writeCVMatrix(cout<<"P4:"<<endl,P4);
+
+
+
+// go through the cases
+
+    vector<CvMat*> projMatrs;
+    vector<CvPoint2D32f> projPoints;
+    projPoints.push_back(p1);
+    projPoints.push_back(p2);
+
+
+//case 1
+    if(exitflag==0)
+    {
+        projMatrs.push_back(POrigin);
+        projMatrs.push_back(P1);
+
+        CvPoint3D32f S1;
+        cvTriangulatePointsNframs(2, projMatrs,projPoints,S1 );
+
+        depth1=findDepth(POrigin,S1);
+        depth2=findDepth(P1,S1);
+
+        printf("for P1 depth1 is %f and depth2 is %f\n",depth1,depth2);
+
+        if(depth1>0 && depth2>0)
+        {
+            exitflag=1;
+
+            copyMatrix(R1,R);
+            copyMatrix(t1,t);
+        }
+
+
+        projMatrs.clear();
+    }
+
+//case 2
+    if(exitflag==0)
+    {
+        projMatrs.push_back(POrigin);
+        projMatrs.push_back(P2);
+
+        CvPoint3D32f S2;
+        cvTriangulatePointsNframs(2, projMatrs,projPoints,S2 );
+
+        depth1=findDepth(POrigin,S2);
+        depth2=findDepth(P2,S2);
+        printf("for P2 depth1 is %f and depth2 is %f\n",depth1,depth2);
+
+        if(depth1>0 && depth2>0)
+        {
+            exitflag=1;
+
+            copyMatrix(R1,R);
+            copyMatrix(t2,t);
+        }
+
+        projMatrs.clear();
+
+    }
+
+//case 3
+    if(exitflag==0)
+    {
+        projMatrs.push_back(POrigin);
+        projMatrs.push_back(P3);
+
+        CvPoint3D32f S3;
+        cvTriangulatePointsNframs(2, projMatrs,projPoints,S3 );
+
+        depth1=findDepth(POrigin,S3);
+        depth2=findDepth(P3,S3);
+        printf("for P3 depth1 is %f and depth2 is %f\n",depth1,depth2);
+
+        if(depth1>0 && depth2>0)
+        {
+            exitflag=1;
+
+            copyMatrix(R2,R);
+            copyMatrix(t1,t);
+        }
+
+
+
+        projMatrs.clear();
+    }
+//case 4
+    if(exitflag==0)
+    {
+        projMatrs.push_back(POrigin);
+        projMatrs.push_back(P4);
+
+        CvPoint3D32f S4;
+        cvTriangulatePointsNframs(2, projMatrs,projPoints,S4 );
+
+        depth1=findDepth(POrigin,S4);
+        depth2=findDepth(P4,S4);
+        printf("for P4 depth1 is %f and depth2 is %f\n",depth1,depth2);
+
+        if(depth1>0 && depth2>0)
+        {
+            exitflag=1;
+
+            copyMatrix(R2,R);
+            copyMatrix(t2,t);
+        }
+
+
+        projMatrs.clear();
+
+    }
+
+    cvReleaseMat(&Rident);
+    cvReleaseMat(&tzero);
+
+    cvReleaseMat(&R1);
+    cvReleaseMat(&R2);
+    cvReleaseMat(&t1);
+    cvReleaseMat(&t2);
+    cvReleaseMat(&P1);
+    cvReleaseMat(&P2);
+    cvReleaseMat(&P3);
+    cvReleaseMat(&P4);
+
+    cvReleaseMat(&POrigin);
+    cvReleaseMat(&W);
+    cvReleaseMat(&WT);
+    cvReleaseMat(&WW);
+    cvReleaseMat(&U);
+    cvReleaseMat(&VT);
+    cvReleaseMat(&temp1);
+    cvReleaseMat(&temp2);
+
+    cvReleaseMat(&PTemp);
+
+    cvReleaseMat(&PT);
+
+    cvReleaseMat(&PT_R);
 
 }
 void HRStructure::writeStructure(string fn)
@@ -1211,3 +1436,5 @@ cleanup:
     if(covimgpts) free(covimgpts);
     free(vmask);
 }
+
+
