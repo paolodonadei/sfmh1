@@ -10,7 +10,7 @@ using namespace std;
 
 
 enum { SIFT=1, HARRIS };
-enum { SIFTCLOSEST=1, SIFTPCA};
+
 
 
 

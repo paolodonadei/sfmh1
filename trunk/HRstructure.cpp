@@ -58,7 +58,7 @@ void HRStructure::run()
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-    frame2=1;
+    frame2=0;
     sfmSequence[1]=frame2;
 
 
@@ -93,42 +93,42 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     int i,j;
     int count=0;
     ////find projection matrices
-
+    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
+    CvMat* Ttemp2=cvCreateMat(3,3,CV_64F);
 
 
 //frame 1 would go to the coordinate system origin
 /////////////////
-    CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
-    CvMat* Ttemp2=cvCreateMat(3,3,CV_64F);
+
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
 //    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
 
-      readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"/home/houman/work/test_data/merton2/001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"/home/houman/work/test_data/merton2/002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"/home/houman/work/test_data/merton2/003.P");
-
-
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
-    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
-
-    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
-
-
-    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
-
-    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
-    scaleMatrix(Ttemp,-1);
-    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
-
-
-    (*imSet).findEssentialMatrices();
-    cvReleaseMat(&Ttemp);
+//      readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"/home/houman/work/test_data/merton2/001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"/home/houman/work/test_data/merton2/002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"/home/houman/work/test_data/merton2/003.P");
+//
+//
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
+//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
+//
+//    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
+//
+//
+//    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
+//
+//    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
+//    scaleMatrix(Ttemp,-1);
+//    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
+//
+//
+//    (*imSet).findEssentialMatrices();
+//
     ////////////
 
 
@@ -155,7 +155,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-   decomposeEssential((*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
+   decomposeEssential((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
                        (*((*imSet).imageCollection[frame2])).intrinsicMatrix,((*((*imSet).imageCollection[frame2])).camPose.Rm),((*((*imSet).imageCollection[frame2])).camPose.tm));
 
 
@@ -204,7 +204,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
 
 
-
+cvReleaseMat(&Ttemp);
     cvReleaseMat(&Ttemp2);
     return 0;
 
