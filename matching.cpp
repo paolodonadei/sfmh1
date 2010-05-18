@@ -24,9 +24,7 @@
 
 #define SIFT_THRESH 90
 #define PCA_THRESH 3000
-#define RECREATEFILES 0
 
-#define SIFTPCA 1
 
 //make sure this is zero for release version
 
