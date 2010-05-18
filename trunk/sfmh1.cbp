@@ -20,7 +20,7 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters=" -D ~/Desktop/data/reduced/ " />
+				<Option parameters="-D ../../test_data/merton2/" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -41,6 +41,8 @@
 		<Unit filename="HRImage.hpp" />
 		<Unit filename="HRprimitives.cpp" />
 		<Unit filename="HRprimitives.h" />
+		<Unit filename="HRstructure.cpp" />
+		<Unit filename="HRstructure.h" />
 		<Unit filename="Makefile" />
 		<Unit filename="TODO" />
 		<Unit filename="argproc.cpp" />
