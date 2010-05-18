@@ -93,37 +93,22 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     int i,j;
     int count=0;
     ////find projection matrices
-    CvMat* Rident=cvCreateMat(3,3,CV_64F);
-    CvMat* tzero=cvCreateMat(3,1,CV_64F);
 
-    double* R=new double[9];
-    double* t= new double[4]  ;
-    double* tscaled= new double[3]  ;
-    double* K1= new double[10];
-    double* K2= new double[10];
-    double* E= new double[10];
-
-    for(i=0; i<10; i++)
-    {
-        K1[i]=0;
-        K2[i]=0;
-        E[i]=0;
-        R[i]=0;
-    }
-    for(i=0; i<4; i++)
-    {
-        t[i]=0;
-
-    }
 
 
 //frame 1 would go to the coordinate system origin
 /////////////////
     CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
     CvMat* Ttemp2=cvCreateMat(3,3,CV_64F);
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+
+      readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"/home/houman/work/test_data/merton2/001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"/home/houman/work/test_data/merton2/002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"/home/houman/work/test_data/merton2/003.P");
+
+
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
     cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
@@ -170,7 +155,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-    decomposeEssential((*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
+   decomposeEssential((*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
                        (*((*imSet).imageCollection[frame2])).intrinsicMatrix,((*((*imSet).imageCollection[frame2])).camPose.Rm),((*((*imSet).imageCollection[frame2])).camPose.tm));
 
 
@@ -220,10 +205,6 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-
-
-    cvReleaseMat(&Rident);
-    cvReleaseMat(&tzero);
     cvReleaseMat(&Ttemp2);
     return 0;
 
