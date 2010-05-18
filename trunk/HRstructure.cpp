@@ -58,7 +58,7 @@ void HRStructure::run()
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-    frame2=0;
+    frame2=0 ;
     sfmSequence[1]=frame2;
 
 
