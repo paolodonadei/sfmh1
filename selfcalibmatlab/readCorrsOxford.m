@@ -155,7 +155,8 @@ for i=1:numcolum
            
             E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i}));
             E{corcount}=E{corcount}/E{corcount}(3,3);
-            fprintf(' i=%d j=%d and index=%d \n',i,j,corcount);
+%             fprintf(' right i=%d left j=%d and index=%d \n',i,j,corcount);
+%             E{corcount}
             corcount=corcount+1;
 
         end

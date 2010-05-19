@@ -121,7 +121,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
     camPose.Rm=cvCreateMat(3,3,CV_64F);
 
     distortion=cvCreateMat(5,1,CV_64F);
-       cvSetZero(distortion);
+    cvSetZero(distortion);
     cvSetZero(camPose.tm);
     cvSetIdentity(camPose.Rm);
 
@@ -143,7 +143,7 @@ HRImage::HRImage(const HRImage &img)
     camPose.Rm=cvCreateMat(3,3,CV_64F);
 
     distortion=cvCreateMat(5,1,CV_64F);
-       cvSetZero(distortion);
+    cvSetZero(distortion);
     cvSetZero(camPose.tm);
     cvSetIdentity(camPose.Rm);
 
@@ -980,7 +980,7 @@ int HRImageSet::featureDetectSift()
 int HRImageSet::multipleViewEstimate()
 {
     int i,j;
-printf("\n\n *********Beginning of motion estimation (Fundamental and Homography\n\n");
+    printf("\n\n *********Beginning of motion estimation (Fundamental and Homography\n\n");
     for (i=0; i<imageCollection.size(); i++)
     {
         for (j=0; j<i; j++)
@@ -993,7 +993,22 @@ printf("\n\n *********Beginning of motion estimation (Fundamental and Homography
         }
     }
 
-printf("\n\n *********end of motion estimation (Fundamental and Homography\n\n");
+    //filling in the rest of the Fs
+    for (int i = 0; i < imageCollection.size(); ++i)
+    {
+
+        for (int j = i+1; j <imageCollection.size(); ++j)
+        {
+            cvTranspose((correspondencesPairWise[j][i]).motion.MotionModel_F,(correspondencesPairWise[i][j]).motion.MotionModel_F);
+
+
+        }
+    }
+
+
+
+
+    printf("\n\n *********end of motion estimation (Fundamental and Homography\n\n");
 
 
 }
@@ -1083,8 +1098,93 @@ void HRImageSet::drawallMatches()
 
 
 }
+int HRImageSet::readIntrinsicsOxford()
+{
+    int i;
+
+    CvMat* Rident=cvCreateMat(3,3,CV_64F);
+    CvMat* tzero=cvCreateMat(3,1,CV_64F);
+    CvMat* P=cvCreateMat(3,4,CV_64F);
+    string fname="";
+    int numFrames=imageCollection.size();
+    for (int i = 0; i < numFrames; ++i)
+    {
+
+
+
+        fs::path p( (*imageCollection[i]).filename, fs::native );
+
+        fname=p.remove_leaf().native_file_string()+basename(p)+string(".P");
+        printf("for image %d with name %s reading intrinsic %s\n",i,(*imageCollection[i]).filename.c_str(),fname.c_str());
+
+
+        readCvMatFfromfile(&P,fname.c_str());
+        cvDecomposeProjectionMatrixHR(P, (*imageCollection[i]).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
+
+
+
+    }
+
+
+
+
+    cvReleaseMat(&Rident);
+    cvReleaseMat(&tzero);
+    cvReleaseMat(&P);
+}
+
+
+
+int HRImageSet::readPoseOxford()
+{
+    int i;
+
+    CvMat* intrin=cvCreateMat(3,3,CV_64F);
+
+    CvMat* P=cvCreateMat(3,4,CV_64F);
+    string fname="";
+    int numFrames=imageCollection.size();
+    for (int i = 0; i < numFrames; ++i)
+    {
+
+
+
+        fs::path p( (*imageCollection[i]).filename, fs::native );
+
+        fname=p.remove_leaf().native_file_string()+basename(p)+string(".P");
+
+
+
+        readCvMatFfromfile(&P,fname.c_str());
+        cvDecomposeProjectionMatrixHR(P, intrin,(*imageCollection[i]).camPose.Rm,(*imageCollection[i]).camPose.tm, 0, 0, 0, 0);
+
+
+
+    }
+
+
+
+
+    cvReleaseMat(&intrin);
+
+    cvReleaseMat(&P);
+}
+
 int HRImageSet::SelfCalibrate()
 {
+    confid.resize(imageCollection.size());
+
+    for(int i=0;i<imageCollection.size();i++)
+    {
+        confid[i]=0;
+    }
+
+    if(USEOXINTRINSIC==1)
+    {
+        printf("reading intrinsics for oxford rather than self calibrating\n");
+        //if we are using ground truth intrinsics
+        return readIntrinsicsOxford();
+    }
     int width =(*imageCollection[0]).width;
     int height =(*imageCollection[0]).height;
 
@@ -1117,17 +1217,6 @@ int HRImageSet::SelfCalibrate()
 
 
 
-    //filling in the rest of the Fs
-    for (int i = 0; i < numFrames; ++i)
-    {
-
-        for (int j = i+1; j < numFrames; ++j)
-        {
-            cvTranspose((correspondencesPairWise[j][i]).motion.MotionModel_F,(correspondencesPairWise[i][j]).motion.MotionModel_F);
-
-
-        }
-    }
 
     for (int i = 0; i < numFrames; ++i)
     {
@@ -1143,32 +1232,6 @@ int HRImageSet::SelfCalibrate()
         }
     }
 
-//
-//
-//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confid, HARTLEY);
-//
-//
-//    cout<<" According to Hartley :"<<endl;
-//
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        printf("confidence for K %d is %f\n",i,confid[i]);
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//    }
-//
-//
-//
-//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
-//
-//    cout<<" According to Sturm :"<<endl;
-//
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        printf("confidence for K %d is %f\n",i,confid[i]);
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//    }
-
-
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLE);
 
@@ -1177,7 +1240,7 @@ int HRImageSet::SelfCalibrate()
     for (int i = 0; i < numFrames; ++i)
     {
         printf("confidence for K %d is %f, focal lengths are %f and %f \n",i,confid[i],cvmGet(intrinMatrix[i],0,0),cvmGet(intrinMatrix[i],1,1));
-     //   writeCVMatrix(cout,intrinMatrix[i]);
+        //   writeCVMatrix(cout,intrinMatrix[i]);
     }
 
 
@@ -1221,9 +1284,9 @@ void HRImageSet::findEssentialMatrices()
 
                 normalizeMatrix((correspondencesPairWise[i][j]).motion.MotionModel_E);
 
-            //    printf("essential %d -> %d \n",i,j);
-             //   writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
-           //         printf("__________________________________________________\n");
+                //    printf("essential %d -> %d \n",i,j);
+                //   writeCVMatrix(cout,(correspondencesPairWise[i][j]).motion.MotionModel_E);
+                //         printf("__________________________________________________\n");
                 cvSVD( (correspondencesPairWise[i][j]).motion.MotionModel_E, temp2,  temp3, temp4,CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 
 

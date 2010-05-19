@@ -37,6 +37,7 @@
 #define OXFORDMATCHES 1
 #define RECREATEFILES 1
 #define SIFTPCA 1
+#define USEOXINTRINSIC 1
 
 using namespace std;
 

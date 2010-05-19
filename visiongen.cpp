@@ -563,12 +563,15 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     CvMat* matrW=cvCreateMat(numframes*2,4,CV_64F);
     CvMat* matrA=cvCreateMat(numframes*2,4,CV_64F);
     /* Solve system for each point */
+//printf("__________________________________\n");
 
     for( j = 0; j < numframes; j++ )/* For each view */
     {
         double x,y;
         x = projPoints[j].x;
         y = projPoints[j].y;
+      //  printf("point [%f  %f]\t",x,y);
+        //    writeCVMatrix(cout<<"P"<<endl,projMatrs[j] );
 
         for( int k = 0; k < 4; k++ )
         {
@@ -588,7 +591,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
     spPoint.z=    cvmGet(matrV,3,2)/cvmGet(matrV,3,3);/* Z */
 
 
-
+//printf("mapped point to [%lf %lf %lf]\n"  ,spPoint.x,spPoint.y,spPoint.z);
 
 
     cvReleaseMat(&matrV);

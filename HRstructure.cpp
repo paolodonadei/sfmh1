@@ -34,10 +34,17 @@ void HRStructure::run()
     sfmSequence.resize((*imSet).numImages);
 
 
-    for(i=0; i< (*imSet).confid.size(); i++)
+    for(i=0; i< (*imSet).numImages; i++)
     {
         tempconf[i]=(*imSet).confid[i];
         sfmSequence[i]=-1;
+
+    }
+
+
+    for(int y=0; y< (*imSet).numImages; y++)
+    {
+        printf("3 sfm structure %d is %d \n",y,sfmSequence[y]);
 
     }
 
@@ -53,12 +60,12 @@ void HRStructure::run()
 // this is all wrong, you need to find the best two frames and consecutively add more frames
 //zzz remove these
     int frame1=indexMax(tempconf);
-    frame1=2;
+    frame1=0;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-    frame2=0 ;
+    frame2=1 ;
     sfmSequence[1]=frame2;
 
 
@@ -66,15 +73,22 @@ void HRStructure::run()
     initializeKeyFrames(frame1,  frame2);
 
     DLTUpdateStructure();
-    writeStructure("structure1.txt");
+
+
+//    for(i=0; i<numImages; i++)
+//    {
+//        if(i!=frame1 && i!=frame2)
+//        {
+//            addFrame(i);
+//            printf("added frame %d \n",i);
+//            DLTUpdateStructure();
+//        }
+//    }
 
 
 
-//
-//    addFrame(0);
-//    DLTUpdateStructure();
-//
-//    writeStructure("structure2.txt");
+
+   writeStructure("structurelast.txt");
 
 
 }
@@ -97,39 +111,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     CvMat* Ttemp2=cvCreateMat(3,3,CV_64F);
 
 
-//frame 1 would go to the coordinate system origin
-/////////////////
 
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
-
-//      readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"/home/houman/work/test_data/merton2/001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"/home/houman/work/test_data/merton2/002.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"/home/houman/work/test_data/merton2/003.P");
-//
-//
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[0])).projectionMatrix, (*((*imSet).imageCollection[0])).intrinsicMatrix, (*((*imSet).imageCollection[0])).camPose.Rm,(*((*imSet).imageCollection[0])).camPose.tm, 0, 0, 0, 0);
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[1])).projectionMatrix, (*((*imSet).imageCollection[1])).intrinsicMatrix, (*((*imSet).imageCollection[1])).camPose.Rm,(*((*imSet).imageCollection[1])).camPose.tm, 0, 0, 0, 0);
-//    cvDecomposeProjectionMatrixHR((*((*imSet).imageCollection[2])).projectionMatrix, (*((*imSet).imageCollection[2])).intrinsicMatrix, (*((*imSet).imageCollection[2])).camPose.Rm,(*((*imSet).imageCollection[2])).camPose.tm, 0, 0, 0, 0);
-//
-//    cvMatMul((*((*imSet).imageCollection[0])).camPose.Rm, (*((*imSet).imageCollection[0])).camPose.tm, Ttemp);
-//    scaleMatrix(Ttemp,-1);
-//    copyMatrix(Ttemp,(*((*imSet).imageCollection[0])).camPose.tm);
-//
-//
-//    cvMatMul((*((*imSet).imageCollection[1])).camPose.Rm, (*((*imSet).imageCollection[1])).camPose.tm, Ttemp);
-//    scaleMatrix(Ttemp,-1);
-//    copyMatrix(Ttemp,(*((*imSet).imageCollection[1])).camPose.tm);
-//
-//    cvMatMul((*((*imSet).imageCollection[2])).camPose.Rm, (*((*imSet).imageCollection[2])).camPose.tm, Ttemp);
-//    scaleMatrix(Ttemp,-1);
-//    copyMatrix(Ttemp,(*((*imSet).imageCollection[2])).camPose.tm);
-//
-//
-//    (*imSet).findEssentialMatrices();
-//
-    ////////////
 
 
     int maxlength=(*imSet).myTracks.getNumTracks();
@@ -155,19 +137,17 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-   decomposeEssential((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
+
+//2nd frame
+    decomposeEssential((*imSet).correspondencesPairWise[frame1][frame2].motion.MotionModel_E, (*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame1),(*imSet).myTracks.pointFromTrackloc(indexfirstmatch, frame2),(*((*imSet).imageCollection[frame1])).intrinsicMatrix,
                        (*((*imSet).imageCollection[frame2])).intrinsicMatrix,((*((*imSet).imageCollection[frame2])).camPose.Rm),((*((*imSet).imageCollection[frame2])).camPose.tm));
 
 
 
 
 
-    writeCVMatrix(cout<<"fundamental matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_F);
-    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,(*imSet).correspondencesPairWise[frame2][frame1].motion.MotionModel_E);
 
-
-
-
+//the first frame at origin
     cvSetIdentity((*(*imSet).imageCollection[frame1]).camPose.Rm);
     cvSetZero((*(*imSet).imageCollection[frame1]).camPose.tm);
 
@@ -175,7 +155,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-
+//us the poses and the intrinsics to compose projection matrices
 
     findProjfromcompon((*((*imSet).imageCollection[frame1])));
     findProjfromcompon((*((*imSet).imageCollection[frame2])));
@@ -184,11 +164,11 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
 
 
-    cout<<" R0 :"<<endl;
+    cout<<" R1 :"<<endl;
 
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).camPose.Rm);
 
-    cout<<" T0 :"<<endl;
+    cout<<" T1 :"<<endl;
 
     writeCVMatrix(cout,((*((*imSet).imageCollection[frame2])).camPose.tm));
 
@@ -204,7 +184,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
 
 
-cvReleaseMat(&Ttemp);
+    cvReleaseMat(&Ttemp);
     cvReleaseMat(&Ttemp2);
     return 0;
 
@@ -318,6 +298,15 @@ void HRStructure::DLTUpdateStructure()
             count++;
     }
 
+
+    for(i=0; i< numImages; i++)
+    {
+        printf("sfm structure %d is %d \n",i,sfmSequence[i]);
+
+    }
+
+
+
     int maxlength=(*imSet).myTracks.getNumTracks();
 
 
@@ -372,12 +361,12 @@ void HRStructure::DLTUpdateStructure()
         projPoints.clear();
         pointsUsed.clear();
     }
-
+    writeStructure("structure1.txt");
     printf("reconstructed %d points\n",numReconstructed);
-    printf("error before sba=%f \t",findReconstructionError(1));
-// sba_driver_interface();
-    printf("error after sba=%f \t",findReconstructionError(1));
-
+    printf("error before sba=%f \t",findReconstructionError(0));
+   sba_driver_interface();
+    printf("error after sba=%f \t",findReconstructionError(0));
+    writeStructure("structure2.txt");
 
 }
 
@@ -594,6 +583,13 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
     CvMat* tzero=cvCreateMat(3,1,CV_64F);
 
 
+
+//zzz in the matlab file this is done differently , the image location is multiplied by inverse of K
+
+
+
+
+
     cvSetZero(W);
     cvmSet(W,0,1,-1.0);
     cvmSet(W,1,0,1.0);
@@ -610,8 +606,12 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
 
     copyMatrix(E,temp1);
+        writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
     cvSVD( temp1, WW,  U, VT,CV_SVD_V_T );
 
+ writeCVMatrix(cout<<"U:"<<endl,U);
+    writeCVMatrix(cout<<"VT:"<<endl,VT);
+ writeCVMatrix(cout<<"WW:"<<endl,WW);
 /////////////////////////////// get R1, R2 , T1 , T2
 
     cvMatMul(U,W,temp1);
@@ -1002,12 +1002,21 @@ int HRStructure::sba_driver_interface()
         exit(1);
     }
 
+printf("num images is %d and size of sfm is %d \n",numImages,sfmSequence.size());
 
+    for(int y=0; y<  numImages; y++)
+    {
+        printf("1 sfm structure %d  is %d \n",y,sfmSequence[y]);
+
+    }
+
+left off here, for some sequiences sba is not working
     for (j = 0; j < numImages; j++)
     {
         if(sfmSequence[j]!=-1)
         {
             int curFrame=sfmSequence[j];
+            printf("2 sba current frame is %d our j was %d\n",curFrame,j );
             CvMat* curK=(*((*imSet).imageCollection[curFrame])).intrinsicMatrix;
             CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
             CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
