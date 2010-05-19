@@ -181,6 +181,8 @@ public:
     void findEssentialMatrices();
     void undistortall();
 void showparamsALL();
+int readIntrinsicsOxford();
+int readPoseOxford();
 };
 
 

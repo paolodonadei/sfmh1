@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     {
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
-     //   imSet.showOneByOneFeature();
+        //   imSet.showOneByOneFeature();
 
         imSet.exhaustiveSIFTMatching();
 
@@ -35,22 +35,23 @@ int main(int argc, char *argv[])
         imSet.findEssentialMatrices();
 
 
-            imSet.writeMotions();
-    //    imSet.showOneByOneFeatureMotions();
+
+        imSet.writeMotions();
+        //    imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
 
-
-
-
-
-
-
-
-
-
+        mystruct.printSBAstyleData("myccams.txt", "mycpts.txt");
     }
+
+
+
+
+
+
+
+
     return 0;
 }
 
