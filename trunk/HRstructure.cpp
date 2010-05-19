@@ -42,12 +42,6 @@ void HRStructure::run()
     }
 
 
-    for(int y=0; y< (*imSet).numImages; y++)
-    {
-        printf("3 sfm structure %d is %d \n",y,sfmSequence[y]);
-
-    }
-
     int maxlength=(*imSet).myTracks.getNumTracks();
     structureErrors.resize(maxlength);
     structureValid.resize(maxlength);
@@ -75,20 +69,20 @@ void HRStructure::run()
     DLTUpdateStructure();
 
 
-//    for(i=0; i<numImages; i++)
-//    {
-//        if(i!=frame1 && i!=frame2)
-//        {
-//            addFrame(i);
-//            printf("added frame %d \n",i);
-//            DLTUpdateStructure();
-//        }
-//    }
+    for(i=0; i<numImages; i++)
+    {
+        if(i!=frame1 && i!=frame2)
+        {
+            addFrame(i);
+            printf("added frame %d \n",i);
+            DLTUpdateStructure();
+        }
+    }
 
 
 
 
-   writeStructure("structurelast.txt");
+    writeStructure("structurelast.txt");
 
 
 }
@@ -299,13 +293,6 @@ void HRStructure::DLTUpdateStructure()
     }
 
 
-    for(i=0; i< numImages; i++)
-    {
-        printf("sfm structure %d is %d \n",i,sfmSequence[i]);
-
-    }
-
-
 
     int maxlength=(*imSet).myTracks.getNumTracks();
 
@@ -364,9 +351,14 @@ void HRStructure::DLTUpdateStructure()
     writeStructure("structure1.txt");
     printf("reconstructed %d points\n",numReconstructed);
     printf("error before sba=%f \t",findReconstructionError(0));
-   sba_driver_interface();
+    printSBAstyleData("myccams.txt", "mycpts.txt");
+    sba_driver_interface();
     printf("error after sba=%f \t",findReconstructionError(0));
     writeStructure("structure2.txt");
+
+
+
+
 
 }
 
@@ -606,12 +598,10 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
 
     copyMatrix(E,temp1);
-        writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
+    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
     cvSVD( temp1, WW,  U, VT,CV_SVD_V_T );
 
- writeCVMatrix(cout<<"U:"<<endl,U);
-    writeCVMatrix(cout<<"VT:"<<endl,VT);
- writeCVMatrix(cout<<"WW:"<<endl,WW);
+
 /////////////////////////////// get R1, R2 , T1 , T2
 
     cvMatMul(U,W,temp1);
@@ -620,6 +610,20 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
     cvMatMul(U,WT,temp1);
     cvMatMul(temp1,VT,R2);
+
+
+//flipping rotations if determinant is negative
+    if(cvDet(R1)<0.0)
+    {
+        scaleMatrix(R1,-1.0);
+    }
+    if(cvDet(R2)<0.0)
+    {
+        scaleMatrix(R2,-1.0);
+    }
+
+
+
 
     for(i=0; i<3; i++)
     {
@@ -1002,15 +1006,10 @@ int HRStructure::sba_driver_interface()
         exit(1);
     }
 
-printf("num images is %d and size of sfm is %d \n",numImages,sfmSequence.size());
+    printf("num images is %d and size of sfm is %d \n",numImages,sfmSequence.size());
 
-    for(int y=0; y<  numImages; y++)
-    {
-        printf("1 sfm structure %d  is %d \n",y,sfmSequence[y]);
 
-    }
 
-left off here, for some sequiences sba is not working
     for (j = 0; j < numImages; j++)
     {
         if(sfmSequence[j]!=-1)

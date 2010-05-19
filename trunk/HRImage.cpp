@@ -1121,8 +1121,6 @@ int HRImageSet::readIntrinsicsOxford()
         readCvMatFfromfile(&P,fname.c_str());
         cvDecomposeProjectionMatrixHR(P, (*imageCollection[i]).intrinsicMatrix,Rident,tzero, 0, 0, 0, 0);
 
-
-
     }
 
 
