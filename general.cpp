@@ -566,6 +566,8 @@ int checkSymmetric(CvMat* inM)
 /* Convert a matrix to a normalize quaternion */
 void matrix_to_quaternion(CvMat* inRm, CvMat* inqm)
 {
+
+
     int i;
     int maxpos;
     double* R= new double[10];
