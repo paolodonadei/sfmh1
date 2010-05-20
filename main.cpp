@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
         mystruct.run();
         imSet.showOneByOneUndistorted();
 
+        imSet.printAllImageParams(); //imeplement this and try to figure out why the distortion paramrters look so whacked and the errrors so high
+
     }
 
 

@@ -628,6 +628,7 @@ int  readOxfordFeatures( HRImage& image)
     num=0;
 
     string tempfilename="";
+    cout<<"file name is "<<image.filename<<endl;
     fs::path p( image.filename, fs::native );
 
     tempfilename=p.remove_leaf().native_file_string()+basename(p)+string(".corners");

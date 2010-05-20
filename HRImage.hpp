@@ -47,6 +47,7 @@ class HRImage
 
 public:
     pose camPose;
+    int havedistortion;
     HRImage();
     HRImage(string fname);
     HRImage(char* fname);
