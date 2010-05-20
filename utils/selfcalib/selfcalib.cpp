@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 {
     string fil_name1;
 
-vector<double> confidences;
+    vector<double> confidences;
 
 
     int numFrames=0;

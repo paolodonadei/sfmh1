@@ -156,6 +156,30 @@ HRImage::HRImage(const HRImage &img)
 
 
 }
+int HRImage::undistortImage( IplImage** undistorted)
+{
+
+    IplImage* tempImage ;
+    tempImage=cvCloneImage(cv_img);
+wtf is going on here
+   // (*undistorted)=cvCloneImage(tempImage);
+    IplImage* tempImage2=cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,1);;
+     printf("now undostorting right before\n");
+
+writeCVMatrix(cout<<"intrin"<<endl,intrinsicMatrix);
+writeCVMatrix(cout<<"distort"<<endl,distortion);
+
+
+    cv::Mat src = cv::cvarrToMat((CvArr*)tempImage), dst = cv::cvarrToMat((CvArr*)tempImage2), dst0 = dst;
+    cv::Mat A = cv::cvarrToMat((CvMat*)intrinsicMatrix), distCoeffs = cv::cvarrToMat((CvMat*)distortion);
+
+
+     printf("now undostorting right beforexxx\n");
+    cvUndistort2(tempImage, tempImage2, intrinsicMatrix, distortion);
+
+printf("now undostorting right after\n");
+    cvReleaseImage(& tempImage);
+}
 int HRImage::displayImage()
 {
     if (flag_valid==0)
@@ -170,7 +194,7 @@ int HRImage::displayImage()
 
 //    wait for a key
     cvWaitKey(0);
-
+  cvDestroyWindow(filename.c_str());
     return 1;
 
 }
@@ -778,6 +802,42 @@ HRImageSet::~HRImageSet()
 {
 
 }
+
+void HRImageSet::showOneByOneUndistorted()
+{
+
+    vector<HRImagePtr>::iterator img_iterator;
+
+    IplImage* tempImage ;
+
+
+
+
+    img_iterator = imageCollection.begin();
+    while ( img_iterator  != imageCollection.end() )
+    {
+        printf("now undostorting\n");
+        (*img_iterator)->undistortImage(&tempImage);
+        ++img_iterator;
+
+        string WinName=string( string("undistorted ")+(*img_iterator)->filename);
+        cvNamedWindow(   WinName.c_str(), CV_WINDOW_AUTOSIZE);
+
+        cvMoveWindow(WinName.c_str(), 100, 100);
+        printf("now showing\n");
+        cvShowImage(WinName.c_str(), tempImage );
+        cvWaitKey(0);
+
+        cvReleaseImage(& tempImage);
+        cvDestroyWindow(WinName.c_str());
+    }
+
+
+
+
+}
+
+
 void HRImageSet::showOneByOne()
 {
     if (DEBUGLVL>0)   cout<<"displaying images size of the vector is "<<imageCollection.size()<<endl;
@@ -1172,7 +1232,7 @@ int HRImageSet::SelfCalibrate()
 {
     confid.resize(imageCollection.size());
 
-    for(int i=0;i<imageCollection.size();i++)
+    for(int i=0; i<imageCollection.size(); i++)
     {
         confid[i]=0;
     }

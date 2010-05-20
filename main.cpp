@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     {
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
         imSet.featureDetectSift();
-        //   imSet.showOneByOneFeature();
+        //imSet.showOneByOneFeature();
 
         imSet.exhaustiveSIFTMatching();
 
@@ -37,11 +37,11 @@ int main(int argc, char *argv[])
 
 
         imSet.writeMotions();
-        //    imSet.showOneByOneFeatureMotions();
+      //  imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
-
+        imSet.showOneByOneUndistorted();
 
     }
 

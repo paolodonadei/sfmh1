@@ -90,6 +90,7 @@ public:
     CvMat* distortion;
     int undistortPoints();
     double confidenceSelfCalib;
+    int undistortImage( IplImage** undistorted);
 private:
 
     enum {BLACK=0,WHITE=255};
@@ -180,9 +181,10 @@ public:
     void drawallMatches();
     void findEssentialMatrices();
     void undistortall();
-void showparamsALL();
-int readIntrinsicsOxford();
-int readPoseOxford();
+    void showparamsALL();
+    int readIntrinsicsOxford();
+    int readPoseOxford();
+    void showOneByOneUndistorted();
 };
 
 
