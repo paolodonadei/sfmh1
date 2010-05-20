@@ -22,8 +22,6 @@ HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
     imSet=pimSet;
     numImages=(*pimSet).imageCollection.size();
 
-    (*imSet).myTracks.writeTrackMatrix("trackafter1.txt");
-
 
 }
 void HRStructure::run()
@@ -348,13 +346,13 @@ void HRStructure::DLTUpdateStructure()
         projPoints.clear();
         pointsUsed.clear();
     }
-    writeStructure("structure1.txt");
+
     printf("reconstructed %d points\n",numReconstructed);
     printf("error before sba=%f \t",findReconstructionError(0));
-    printSBAstyleData("myccams.txt", "mycpts.txt");
+    // printSBAstyleData("myccams.txt", "mycpts.txt");
     sba_driver_interface();
     printf("error after sba=%f \t",findReconstructionError(0));
-    writeStructure("structure2.txt");
+    //  writeStructure("structure2.txt");
 
 
 
@@ -939,6 +937,9 @@ int HRStructure::sba_driver_interface()
     }
 
     nframes=count;
+
+    string numberFrames=stringify(nframes);
+
     numprojs=0;
     int maxlength=(*imSet).myTracks.getNumTracks();
     count=0;
@@ -1151,12 +1152,13 @@ int HRStructure::sba_driver_interface()
      * Note that a value of 3 does not make sense
      */
     mglobs.nccalib=1; /* number of intrinsics to keep fixed, must be between 0 and 5 */
+   //zzz this is important, maybe change this to 5
     fixedcal=0; /* varying intrinsics */
 
 
     havedist=1; /* with distortion */
     //zzz unfix these distortion parameters
-    mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
+    mglobs.ncdist=0; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
 
 
@@ -1172,39 +1174,39 @@ int HRStructure::sba_driver_interface()
     opts[4]=0.0;
 //opts[4]=1E-05; // uncomment to force termination if the relative reduction in the RMS reprojection error drops below 1E-05
 
-    FILE *f1p;
-    f1p=fopen("imgpts.txt", "w");
-    for (i=0; i< numprojs*mnp; i++)
-    {
-        fprintf(f1p,"%f\n",imgpts[i]);
-    }
-    fclose(f1p);
-
-    f1p=fopen("motstruct.txt", "w");
-    for (i=0; i< (nframes*cnp + numpts3D*pnp); i++)
-    {
-        fprintf(f1p,"%f\n",motstruct[i]);
-    }
-    fclose(f1p);
-
-    f1p=fopen("initrot.txt", "w");
-    for (i=0; i< nframes*FULLQUATSZ; i++)
-    {
-        fprintf(f1p,"%f\n", initrot[i]);
-    }
-    fclose(f1p);
-
-
-    f1p=fopen("vmask.txt", "w");
-    for (i=0; i< numpts3D; i++)
-    {
-        for (j=0; j< nframes; j++)
-        {
-            fprintf(f1p,"\t%d", (int)vmask[i*nframes+j]);
-        }
-        fprintf(f1p,"\n");
-    }
-    fclose(f1p);
+//    FILE *f1p;
+//    f1p=fopen("imgpts.txt", "w");
+//    for (i=0; i< numprojs*mnp; i++)
+//    {
+//        fprintf(f1p,"%f\n",imgpts[i]);
+//    }
+//    fclose(f1p);
+//
+//    f1p=fopen("motstruct.txt", "w");
+//    for (i=0; i< (nframes*cnp + numpts3D*pnp); i++)
+//    {
+//        fprintf(f1p,"%f\n",motstruct[i]);
+//    }
+//    fclose(f1p);
+//
+//    f1p=fopen("initrot.txt", "w");
+//    for (i=0; i< nframes*FULLQUATSZ; i++)
+//    {
+//        fprintf(f1p,"%f\n", initrot[i]);
+//    }
+//    fclose(f1p);
+//
+//
+//    f1p=fopen("vmask.txt", "w");
+//    for (i=0; i< numpts3D; i++)
+//    {
+//        for (j=0; j< nframes; j++)
+//        {
+//            fprintf(f1p,"\t%d", (int)vmask[i*nframes+j]);
+//        }
+//        fprintf(f1p,"\n");
+//    }
+//    fclose(f1p);
 
 
 
@@ -1216,7 +1218,19 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
 
-    saveSBAStructureDataAsPLY("structurbefore.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
+
+    {
+
+
+        string tfname="structurbefore.ply";
+        string mfname=string("frames_")+numberFrames+tfname;
+        fs::path tempath( (*imSet).temporaryDir, fs::native );
+        tempath/=mfname;
+        string newfname=tempath.file_string();
+
+        saveSBAStructureDataAsPLY((char*)newfname.c_str(), motstruct, nframes, numpts3D,cnp, pnp, 0);
+    }
+
     imgpts=imgpts_copy;
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
@@ -1410,8 +1424,17 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
 
-    saveSBAStructureDataAsPLY("structureafter.ply", motstruct, nframes, numpts3D,cnp, pnp, 0);
+    {
 
+
+        string tfname="structurafter.ply";
+        string mfname=string("frames_")+numberFrames+tfname;
+        fs::path tempath( (*imSet).temporaryDir, fs::native );
+        tempath/=mfname;
+        string newfname=tempath.file_string();
+
+        saveSBAStructureDataAsPLY((char*)newfname.c_str(), motstruct, nframes, numpts3D,cnp, pnp, 0);
+    }
 cleanup:
     /* just in case... */
     mglobs.intrcalib=NULL;
