@@ -44,7 +44,7 @@ HRImage::HRImage()
 int HRImage::openim(string fname)
 {
 
-
+    havedistortion=0;
 
     camPose.tm=cvCreateMat(3,1,CV_64F);
     camPose.Rm=cvCreateMat(3,3,CV_64F);
@@ -119,7 +119,7 @@ int HRImage::openim(int pheight, int pwidth,int initial)
 
     camPose.tm=cvCreateMat(3,1,CV_64F);
     camPose.Rm=cvCreateMat(3,3,CV_64F);
-
+    havedistortion=0;
     distortion=cvCreateMat(5,1,CV_64F);
     cvSetZero(distortion);
     cvSetZero(camPose.tm);
@@ -141,7 +141,7 @@ HRImage::HRImage(const HRImage &img)
 
     camPose.tm=cvCreateMat(3,1,CV_64F);
     camPose.Rm=cvCreateMat(3,3,CV_64F);
-
+    havedistortion=0;
     distortion=cvCreateMat(5,1,CV_64F);
     cvSetZero(distortion);
     cvSetZero(camPose.tm);
@@ -159,26 +159,20 @@ HRImage::HRImage(const HRImage &img)
 int HRImage::undistortImage( IplImage** undistorted)
 {
 
-    IplImage* tempImage ;
-    tempImage=cvCloneImage(cv_img);
-wtf is going on here
-   // (*undistorted)=cvCloneImage(tempImage);
-    IplImage* tempImage2=cvCreateImage(cvSize(width,height),IPL_DEPTH_8U,1);;
-     printf("now undostorting right before\n");
-
-writeCVMatrix(cout<<"intrin"<<endl,intrinsicMatrix);
-writeCVMatrix(cout<<"distort"<<endl,distortion);
 
 
-    cv::Mat src = cv::cvarrToMat((CvArr*)tempImage), dst = cv::cvarrToMat((CvArr*)tempImage2), dst0 = dst;
-    cv::Mat A = cv::cvarrToMat((CvMat*)intrinsicMatrix), distCoeffs = cv::cvarrToMat((CvMat*)distortion);
+    (*undistorted)=cvCloneImage(cv_img);
 
 
-     printf("now undostorting right beforexxx\n");
-    cvUndistort2(tempImage, tempImage2, intrinsicMatrix, distortion);
 
-printf("now undostorting right after\n");
-    cvReleaseImage(& tempImage);
+    writeCVMatrix(cout<<"intrin"<<endl,intrinsicMatrix);
+    writeCVMatrix(cout<<"distort"<<endl,distortion);
+
+
+    cvUndistort2(cv_img, (*undistorted), intrinsicMatrix, distortion);
+
+
+
 }
 int HRImage::displayImage()
 {
@@ -194,7 +188,7 @@ int HRImage::displayImage()
 
 //    wait for a key
     cvWaitKey(0);
-  cvDestroyWindow(filename.c_str());
+    cvDestroyWindow(filename.c_str());
     return 1;
 
 }
@@ -814,19 +808,40 @@ void HRImageSet::showOneByOneUndistorted()
 
 
     img_iterator = imageCollection.begin();
-    while ( img_iterator  != imageCollection.end() )
+    for (int i=0; i<imageCollection.size(); i++)
     {
-        printf("now undostorting\n");
-        (*img_iterator)->undistortImage(&tempImage);
-        ++img_iterator;
 
-        string WinName=string( string("undistorted ")+(*img_iterator)->filename);
-        cvNamedWindow(   WinName.c_str(), CV_WINDOW_AUTOSIZE);
 
-        cvMoveWindow(WinName.c_str(), 100, 100);
-        printf("now showing\n");
-        cvShowImage(WinName.c_str(), tempImage );
+        (*imageCollection[i]).undistortImage(&tempImage);
+
+
+        string WinName=string( string("undistorted ")+(*imageCollection[i]).filename );
+        cvNamedWindow( WinName.c_str(), CV_WINDOW_AUTOSIZE);
+
+        cvMoveWindow( WinName.c_str(), 100, 100);
+
+        cvShowImage( WinName.c_str(), tempImage );
         cvWaitKey(0);
+
+        {
+            string tempfilename="";
+            fs::path p( (*imageCollection[i]).filename, fs::native );
+
+            tempfilename=fs::basename(p)+"undistorted.png";
+
+            tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+            if (!cvSaveImage(tempfilename.c_str(),tempImage))
+            {
+
+                cout<<"image "<<tempfilename <<" not saved\n"<<endl;
+
+            }
+
+
+        }
+
+
 
         cvReleaseImage(& tempImage);
         cvDestroyWindow(WinName.c_str());
@@ -1840,11 +1855,18 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
         printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
         return temp;
     }
-    if(undistorted==0 || (*trackImageCollection)[col]->HR2DVectorUndistorted.size()!=(*trackImageCollection)[col]->HR2DVector.size())
-        temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
-    else
-        temp=(*trackImageCollection)[col]->HR2DVectorUndistorted[trackMatrix[row][col]]->location;
 
+    ///zzz so what happens is that by default if distortion parameters are available i use the undostorted points, i dont know if this is a good idea
+    if(undistorted==0 || (*trackImageCollection)[col]->havedistortion==0 || (*trackImageCollection)[col]->HR2DVectorUndistorted.size()!=(*trackImageCollection)[col]->HR2DVector.size())
+    {
+
+        temp=(*trackImageCollection)[col]->HR2DVector[trackMatrix[row][col]]->location;
+    }
+    else
+    {
+
+        temp=(*trackImageCollection)[col]->HR2DVectorUndistorted[trackMatrix[row][col]]->location;
+    }
     return temp;
 
 

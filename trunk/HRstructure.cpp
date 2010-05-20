@@ -65,17 +65,17 @@ void HRStructure::run()
     initializeKeyFrames(frame1,  frame2);
 
     DLTUpdateStructure();
-
-
-    for(i=0; i<numImages; i++)
-    {
-        if(i!=frame1 && i!=frame2)
-        {
-            addFrame(i);
-            printf("added frame %d \n",i);
-            DLTUpdateStructure();
-        }
-    }
+//
+//
+//    for(i=0; i<numImages; i++)
+//    {
+//        if(i!=frame1 && i!=frame2)
+//        {
+//            addFrame(i);
+//            printf("added frame %d \n",i);
+//            DLTUpdateStructure();
+//        }
+//    }
 
 
 
@@ -348,10 +348,10 @@ void HRStructure::DLTUpdateStructure()
     }
 
     printf("reconstructed %d points\n",numReconstructed);
-    printf("error before sba=%f \t",findReconstructionError(0));
+    printf("error before sba=%f \t",findReconstructionError());
     // printSBAstyleData("myccams.txt", "mycpts.txt");
     sba_driver_interface();
-    printf("error after sba=%f \t",findReconstructionError(0));
+    printf("error after sba=%f \t",findReconstructionError());
     //  writeStructure("structure2.txt");
 
 
@@ -360,7 +360,7 @@ void HRStructure::DLTUpdateStructure()
 
 }
 
-double HRStructure::findReconstructionError(int usingUndistort)
+double HRStructure::findReconstructionError()
 {
 
     int i,j;
@@ -409,7 +409,7 @@ double HRStructure::findReconstructionError(int usingUndistort)
                 if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
                 {
                     numFrames++;
-                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame,usingUndistort);//using undistoreted points yyy
+                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame,0);//using undistoreted points yyy
                     CvMat* P=(*((*imSet).imageCollection[curFrame])).projectionMatrix;
 
                     point3D_dat[0] = structure[i].x;
@@ -1152,7 +1152,7 @@ int HRStructure::sba_driver_interface()
      * Note that a value of 3 does not make sense
      */
     mglobs.nccalib=1; /* number of intrinsics to keep fixed, must be between 0 and 5 */
-   //zzz this is important, maybe change this to 5
+    //zzz this is important, maybe change this to 5
     fixedcal=0; /* varying intrinsics */
 
 
@@ -1336,7 +1336,10 @@ int HRStructure::sba_driver_interface()
             CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
             CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
             CvMat* disto=(*((*imSet).imageCollection[curFrame])).distortion;
-
+            if(mglobs.ncdist<5)
+            {
+                (*((*imSet).imageCollection[curFrame])).havedistortion=1;
+            }
 
 
             cvmSet(curK,0,0,filtered[0]);
