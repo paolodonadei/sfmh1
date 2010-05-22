@@ -92,6 +92,8 @@ public:
     int undistortPoints();
     double confidenceSelfCalib;
     int undistortImage( IplImage** undistorted);
+    int writeImageParams();
+    int writeFeaturesANDundistorted();
 private:
 
     enum {BLACK=0,WHITE=255};
@@ -186,6 +188,11 @@ public:
     int readIntrinsicsOxford();
     int readPoseOxford();
     void showOneByOneUndistorted();
+    void printAllImageParams();
+    void writeDistANDundistFeats();
+    void showIMFeature(int imnumber,int featurenumber);
+    void showTrackNumber(int featurenumber);
+
 };
 
 

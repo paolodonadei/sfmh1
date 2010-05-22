@@ -34,10 +34,10 @@
 
 //some general definitions go here
 #define INDEXFNAME "motionindex.txt"
-#define OXFORDMATCHES 1
-#define RECREATEFILES 1
+#define OXFORDMATCHES 0
+#define RECREATEFILES 0
 #define SIFTPCA 1
-#define USEOXINTRINSIC 1
+#define USEOXINTRINSIC 0
 
 using namespace std;
 
