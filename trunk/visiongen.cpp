@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <sstream>
 #include "visiongen.h"
+#include <highgui.h>
 #include "general.h"
 
 using namespace std;
@@ -466,6 +467,11 @@ int findProjfromcompon(HRImage& img)
 
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
+
+    ////zzz remove this!
+
+    return 0;
+
     int i,j;
     CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
     CvMat* Ttemp=cvCreateMat(3,1,CV_64F);
@@ -527,6 +533,53 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     cvReleaseMat(&Ttemp);
 }
 
+
+
+void showMatchAcross(vector<string>& fnames,    vector<CvPoint2D32f>& projPoints)
+{
+
+    if(fnames.size()!= projPoints.size())
+    {
+        printf("sizes are nto compatible\n");
+        return;
+
+    }
+
+    int numimg=projPoints.size();
+    int i;
+
+    vector<string> winNames;
+    vector<IplImage*> imagesCopy;
+
+    for(i=0; i<numimg; i++)
+    {
+        IplImage* imgTemp=cvLoadImage(fnames[i].c_str());
+        draw_cross(projPoints[i], CV_RGB(255,0,0),4,imgTemp );
+        string winname=fnames[i].c_str();
+        winNames.push_back(winname);
+        imagesCopy.push_back(imgTemp);
+        cvNamedWindow( winname.c_str(), CV_WINDOW_AUTOSIZE);
+
+        cvMoveWindow( winname.c_str(), 100+(i*50), 100);
+
+        cvShowImage( winname.c_str(),imagesCopy[i]  );
+
+
+    }
+
+
+
+    cvWaitKey(0);
+
+    for(i=0; i<numimg; i++)
+    {
+        cvDestroyWindow(winNames[i].c_str());
+
+        cvReleaseImage(&imagesCopy[i]);
+    }
+
+}
+
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint)
 {
 
@@ -570,7 +623,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
         double x,y;
         x = projPoints[j].x;
         y = projPoints[j].y;
-      //  printf("point [%f  %f]\t",x,y);
+        //  printf("point [%f  %f]\t",x,y);
         //    writeCVMatrix(cout<<"P"<<endl,projMatrs[j] );
 
         for( int k = 0; k < 4; k++ )
@@ -605,6 +658,56 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
 
 }
 
+double projectionErrorSquared(CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt)
+{
+    CvPoint2D32f im_proj_pt=project3DPoint(P, s_pt);
+
+    double deltaX,deltaY;
+    double rep_error=0;
+
+
+
+
+    deltaX = (double)(im_proj_pt.x-im_pt.x);
+    deltaY = (double)(im_proj_pt.y-im_pt.y);
+    rep_error=((deltaX*deltaX)+(deltaY*deltaY));
+
+    return rep_error;
+}
+
+CvPoint2D32f project3DPoint(CvMat* P, CvPoint3D32f S)
+{
+    CvMat point3D;
+    double point3D_dat[4];
+    point3D = cvMat(4,1,CV_64F,point3D_dat);
+
+    CvMat point2D;
+    double point2D_dat[3];
+    point2D = cvMat(3,1,CV_64F,point2D_dat);
+
+
+    point3D_dat[0] =S.x;
+    point3D_dat[1] = S.y;
+    point3D_dat[2] = S.z;
+    point3D_dat[3] = 1;
+
+
+    cvmMul(P, &point3D, &point2D);
+
+
+    double wr = (double)point2D_dat[2];
+    double xr = (double)(point2D_dat[0]/wr);
+    double yr = (double)(point2D_dat[1]/wr);
+
+    CvPoint2D32f  curPt;
+    curPt.x= xr ;
+    curPt.y= yr ;
+
+
+    return curPt;
+
+
+}
 double findDepth(CvMat* P,CvPoint3D32f S)
 {
 

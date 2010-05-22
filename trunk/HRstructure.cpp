@@ -60,22 +60,29 @@ void HRStructure::run()
     frame2=1 ;
     sfmSequence[1]=frame2;
 
+///zzz remove this
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+
+
+
 
     printf("key frames are %d and %d \n",frame1,frame2);
     initializeKeyFrames(frame1,  frame2);
 
     DLTUpdateStructure();
-//
-//
-//    for(i=0; i<numImages; i++)
-//    {
-//        if(i!=frame1 && i!=frame2)
-//        {
-//            addFrame(i);
-//            printf("added frame %d \n",i);
-//            DLTUpdateStructure();
-//        }
-//    }
+
+
+    for(i=0; i<numImages; i++)
+    {
+        if(i!=frame1 && i!=frame2)
+        {
+            addFrame(i);
+            printf("added frame %d \n",i);
+            DLTUpdateStructure();
+        }
+    }
 
 
 
@@ -227,8 +234,19 @@ int HRStructure::addFrame(int framenum)
         {
 
 
+            CvMat* P=(*((*imSet).imageCollection[framenum])).projectionMatrix;
+
 
             CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
+
+            double err=projectionErrorSquared( P,structure[i],curPt);
+
+
+            if(err>1)
+            {
+                 printf("error is %f \n",err);
+                (*imSet).showTrackNumber(i);
+            }
 
             cvmSet(imgPts,countr,0,curPt.x );
             cvmSet(imgPts,countr,1,curPt.y );
@@ -303,6 +321,7 @@ void HRStructure::DLTUpdateStructure()
     }
     for ( i = 0; i < maxlength; i++)
     {
+        vector<string> imagesNames;
         vector<CvMat*> projMatrs;
         vector<CvPoint2D32f> projPoints;
         vector<int> pointsUsed;
@@ -320,13 +339,13 @@ void HRStructure::DLTUpdateStructure()
                 // printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
                 // printf("track point %d frame: %d point was x=%f and y=%f\n",i,curFrame,curPt.x,curPt.y);
                 projPoints.push_back(curPt);
+                imagesNames.push_back((*imSet).imageCollection[curFrame]->filename);
             }
         }
         if(numPts>1)
         {
             numReconstructed++;
             structureValid[i]=numPts;
-
 
 
 
@@ -337,22 +356,29 @@ void HRStructure::DLTUpdateStructure()
 //                if(q==(numPts-1)) printf("\n");
 //            }
 
+//            if(count>2)
+//            {
+//                printf("showing feature %d\n",i);
+//                 showMatchAcross(imagesNames,  projPoints);
+//            }
 
 
-            structureErrors[i]= cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
+            cvTriangulatePointsNframs(numPts, projMatrs,projPoints,structure[i] );
 
         }
         projMatrs.clear();
         projPoints.clear();
         pointsUsed.clear();
+        imagesNames.clear();
     }
-
+    double err_beforesba=findReconstructionError();
     printf("reconstructed %d points\n",numReconstructed);
-    printf("error before sba=%f \t",findReconstructionError());
-    // printSBAstyleData("myccams.txt", "mycpts.txt");
-    sba_driver_interface();
-    printf("error after sba=%f \t",findReconstructionError());
-    //  writeStructure("structure2.txt");
+    printf("error before sba=%f \t",err_beforesba);
+
+    // sba_driver_interface();
+    double err_aftersba=findReconstructionError();
+    printf("error after sba=%f \t",err_aftersba);
+
 
 
 
@@ -381,16 +407,10 @@ double HRStructure::findReconstructionError()
     int numValidProjs= count;
 
 
-    CvMat point3D;
-    double point3D_dat[4];
-    point3D = cvMat(4,1,CV_64F,point3D_dat);
 
-    CvMat point2D;
-    double point2D_dat[3];
-    point2D = cvMat(3,1,CV_64F,point2D_dat);
 
     double x,y;
-    double xr,yr,wr;
+
     double deltaX,deltaY;
     double rep_error=0;
     int numFrames=0;
@@ -409,28 +429,11 @@ double HRStructure::findReconstructionError()
                 if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
                 {
                     numFrames++;
-                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame,0);//using undistoreted points yyy
+                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame,1);//using undistoreted points yyy
                     CvMat* P=(*((*imSet).imageCollection[curFrame])).projectionMatrix;
 
-                    point3D_dat[0] = structure[i].x;
-                    point3D_dat[1] = structure[i].y;
-                    point3D_dat[2] = structure[i].z;
-                    point3D_dat[3] = 1;
 
-                    cvmMul(P, &point3D, &point2D);
-
-
-                    x = curPt.x;
-                    y = curPt.y;
-
-                    wr = (double)point2D_dat[2];
-                    xr = (double)(point2D_dat[0]/wr);
-                    yr = (double)(point2D_dat[1]/wr);
-
-
-                    deltaX = (double)(x-xr);
-                    deltaY = (double)(y-yr);
-                    rep_error+=((deltaX*deltaX)+(deltaY*deltaY));
+                    rep_error+= projectionErrorSquared( P,structure[i],curPt);
 
 
                     //    printf("requesting feature %d from frame %d and track was %d\n",i,curFrame, (*imSet).myTracks.valueTrackEntry(i,curFrame));
@@ -444,7 +447,7 @@ double HRStructure::findReconstructionError()
             rep_error/=((double)numFrames);
             if(rep_error>1)
             {
-                //  printf("point %d had error %f \n",i,rep_error);
+                //      printf("point %d had error %f \n",i,rep_error);
                 numbads++;
             }
 
@@ -1157,8 +1160,8 @@ int HRStructure::sba_driver_interface()
 
 
     havedist=1; /* with distortion */
-    //zzz unfix these distortion parameters
-    mglobs.ncdist=0; /* number of distortion params to keep fixed, must be between 0 and 5 */
+    //zzz unfix these distortion parameters, right now i keep 3 parameters fixed, wich 3 are these?
+    mglobs.ncdist=3; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
 
 

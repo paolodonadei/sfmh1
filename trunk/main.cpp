@@ -37,14 +37,14 @@ int main(int argc, char *argv[])
 
 
         imSet.writeMotions();
-      //  imSet.showOneByOneFeatureMotions();
+        //  imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();
         imSet.showOneByOneUndistorted();
 
         imSet.printAllImageParams(); //imeplement this and try to figure out why the distortion paramrters look so whacked and the errrors so high
-
+        imSet.writeDistANDundistFeats();
     }
 
 

@@ -156,17 +156,100 @@ HRImage::HRImage(const HRImage &img)
 
 
 }
+int HRImage::writeImageParams()
+{
+    //writing R
+    {
+
+        string tempfilename="";
+        fs::path p( filename, fs::native );
+
+        tempfilename=fs::basename(p)+"_R.txt";
+
+        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+        fstream file_cmin(tempfilename.c_str() ,ios::out);
+        writeCVMatrix(file_cmin,camPose.Rm );
+
+        file_cmin.close();
+
+    }
+    //writing T
+    {
+
+        string tempfilename="";
+        fs::path p( filename, fs::native );
+
+        tempfilename=fs::basename(p)+"_t.txt";
+
+        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+        fstream file_cmin(tempfilename.c_str() ,ios::out);
+        writeCVMatrix(file_cmin,camPose.tm );
+
+        file_cmin.close();
+
+    }
+
+    //distortion
+    {
+
+        string tempfilename="";
+        fs::path p( filename, fs::native );
+
+        tempfilename=fs::basename(p)+"_dist.txt";
+
+        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+        fstream file_cmin(tempfilename.c_str(),ios::out);
+        writeCVMatrix(file_cmin,distortion );
+
+        file_cmin.close();
+
+    }
+
+    //intrinsics
+    {
+
+        string tempfilename="";
+        fs::path p( filename, fs::native );
+
+        tempfilename=fs::basename(p)+"_intrin.txt";
+
+        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+        fstream file_cmin(tempfilename.c_str() ,ios::out);
+        writeCVMatrix(file_cmin,intrinsicMatrix );
+
+        file_cmin.close();
+
+    }
+
+    //projection
+    {
+
+        string tempfilename="";
+        fs::path p( filename, fs::native );
+
+        tempfilename=fs::basename(p)+"_proj.txt";
+
+        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+        fstream file_cmin(tempfilename.c_str() ,ios::out);
+        writeCVMatrix(file_cmin,projectionMatrix );
+
+        file_cmin.close();
+
+    }
+
+
+}
 int HRImage::undistortImage( IplImage** undistorted)
 {
 
 
 
     (*undistorted)=cvCloneImage(cv_img);
-
-
-
-    writeCVMatrix(cout<<"intrin"<<endl,intrinsicMatrix);
-    writeCVMatrix(cout<<"distort"<<endl,distortion);
 
 
     cvUndistort2(cv_img, (*undistorted), intrinsicMatrix, distortion);
@@ -474,6 +557,51 @@ int HRImage::undistortPoints()
     cvReleaseMat(&curPT);
 
 }
+
+int HRImage::writeFeaturesANDundistorted()
+{
+    int i;
+
+    if (flag_valid==0)
+    {
+        cout<<"image now created yet\n"<<endl;
+        return 0;
+    }
+
+
+
+    if(HR2DVector.size()!=HR2DVectorUndistorted.size())
+    {
+        printf("undistorted points dont exist, but request to write them for image %s \n",filename.c_str());
+        return 0;
+    }
+
+    string tempfilename="";
+    fs::path p( filename, fs::native );
+
+
+
+    tempfilename=fs::basename(p)+"_distANDundistfeatures.txt";
+
+    tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+
+    FILE *out = fopen( tempfilename.c_str(), "w" );
+
+    fprintf(out,"#\t distorted [x y] -> undistorted [x y]\n");
+
+    for(i=0; i<HR2DVector.size(); i++)
+    {
+
+        fprintf(out,"[%f  ; %f] -> [%f  ; %f]\n", HR2DVector[i]->location.x, HR2DVector[i]->location.y,HR2DVectorUndistorted[i]->location.x, HR2DVectorUndistorted[i]->location.y);
+    }
+    fclose(out);
+
+
+}
+
+
+
 int HRImage::showParams()
 {
     printf("current image is %s\n",pgmfilename.c_str());
@@ -1379,6 +1507,59 @@ void HRImageSet::findEssentialMatrices()
     cvReleaseMat(&temp4);
 
 }
+void HRImageSet::showTrackNumber(int featurenumber)
+{
+
+    vector<string> imagesNames;
+
+    vector<CvPoint2D32f> projPoints;
+
+    int numPts=0;
+    for (int j = 0; j < imageCollection.size(); j++)
+    {
+        int curFrame=j;
+        if(myTracks.validTrackEntry(featurenumber,curFrame)!=0)
+        {
+
+            numPts++;
+
+            CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, curFrame);
+
+            projPoints.push_back(curPt);
+            imagesNames.push_back(imageCollection[curFrame]->filename);
+            printf("\t image: %d",j);
+        }
+    }
+    printf("\t total images %d\n",numPts);
+    showMatchAcross(imagesNames, projPoints);
+
+}
+void HRImageSet::showIMFeature(int imnumber,int featurenumber)
+{
+    vector<string> fnames;
+    vector<CvPoint2D32f> projPoints;
+
+    if(myTracks.validTrackEntry(featurenumber,imnumber)!=0)
+    {
+
+        CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, imnumber);
+        string curfname=imageCollection[imnumber]->filename;
+
+        projPoints.push_back(curPt);
+        showMatchAcross(fnames, projPoints);
+    }
+    else
+    {
+        printf("can not show feature since it doesnt exist\n");
+        return;
+
+    }
+
+
+
+
+
+}
 void HRImageSet::showparamsALL()
 {
 
@@ -1394,6 +1575,37 @@ void HRImageSet::showparamsALL()
 
 
 }
+
+void HRImageSet::printAllImageParams()
+{
+
+
+    for (int i=0; i<imageCollection.size(); i++)
+    {
+
+
+        (*imageCollection[i]).writeImageParams();
+
+
+    }
+
+}
+
+void HRImageSet::writeDistANDundistFeats()
+{
+
+
+    for (int i=0; i<imageCollection.size(); i++)
+    {
+
+
+        (*imageCollection[i]).writeFeaturesANDundistorted();
+
+
+    }
+
+}
+
 void HRImageSet::undistortall()
 {
 

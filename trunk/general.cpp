@@ -356,6 +356,7 @@ void writeCVMatrix(char* fname,const CvMat* M)
     file_cmin.close();
 
 
+
 }
 
 void writeCVMatrix(ostream &stream,const CvMat* M)
