@@ -36,7 +36,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint);
 double findDepth(CvMat* P,CvPoint3D32f S);
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
-void showMatchAcross(vector<string>& fnames,    vector<CvPoint2D32f>& projPoints);
+void showMatchAcross(vector<string>& fnames,const  vector< vector< CvPoint2D32f> >& projPoints);
 CvPoint2D32f project3DPoint(CvMat* P, CvPoint3D32f S);
 double projectionErrorSquared(CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt);
 #endif

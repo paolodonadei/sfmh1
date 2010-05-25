@@ -171,6 +171,7 @@ public:
     void showOneByOne();
     void showOneByOneFeature();
     vector<vector<HRCorrespond2N> > correspondencesPairWise;
+    void showTrackNumberwithReprojection(int featurenumber, CvPoint3D32f space);
     int exhaustiveSIFTMatching();
     int multipleViewEstimate();
     int writeMotions();

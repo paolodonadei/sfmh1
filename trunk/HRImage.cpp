@@ -1512,7 +1512,7 @@ void HRImageSet::showTrackNumber(int featurenumber)
 
     vector<string> imagesNames;
 
-    vector<CvPoint2D32f> projPoints;
+    vector< vector<CvPoint2D32f> > projPoints;
 
     int numPts=0;
     for (int j = 0; j < imageCollection.size(); j++)
@@ -1525,7 +1525,10 @@ void HRImageSet::showTrackNumber(int featurenumber)
 
             CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, curFrame);
 
-            projPoints.push_back(curPt);
+            vector<CvPoint2D32f> temppoints;
+            temppoints.push_back(curPt);
+
+            projPoints.push_back(temppoints);
             imagesNames.push_back(imageCollection[curFrame]->filename);
             printf("\t image: %d",j);
         }
@@ -1534,10 +1537,46 @@ void HRImageSet::showTrackNumber(int featurenumber)
     showMatchAcross(imagesNames, projPoints);
 
 }
+
+void HRImageSet::showTrackNumberwithReprojection(int featurenumber, CvPoint3D32f space)
+{
+
+    vector<string> imagesNames;
+
+    vector< vector<CvPoint2D32f> > projPoints;
+
+    int numPts=0;
+    for (int j = 0; j < imageCollection.size(); j++)
+    {
+
+        int curFrame=j;
+        if(myTracks.validTrackEntry(featurenumber,curFrame)!=0)
+        {
+
+            numPts++;
+
+            CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, curFrame);
+            vector<CvPoint2D32f> temppoints;
+            temppoints.push_back(curPt);
+
+            CvPoint2D32f im_proj_pt=project3DPoint(imageCollection[curFrame]->projectionMatrix, space);
+            temppoints.push_back(im_proj_pt);
+            projPoints.push_back(temppoints);
+            imagesNames.push_back(imageCollection[curFrame]->filename);
+            printf("\t image: %d",j);
+        }
+    }
+    printf("\t total images %d\n",numPts);
+    showMatchAcross(imagesNames, projPoints);
+
+}
+
+
 void HRImageSet::showIMFeature(int imnumber,int featurenumber)
 {
     vector<string> fnames;
-    vector<CvPoint2D32f> projPoints;
+    vector< vector<CvPoint2D32f> > projPoints;
+
 
     if(myTracks.validTrackEntry(featurenumber,imnumber)!=0)
     {
@@ -1545,7 +1584,10 @@ void HRImageSet::showIMFeature(int imnumber,int featurenumber)
         CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, imnumber);
         string curfname=imageCollection[imnumber]->filename;
 
-        projPoints.push_back(curPt);
+        vector<CvPoint2D32f> temppoints;
+        temppoints.push_back(curPt);
+
+        projPoints.push_back(temppoints);
         showMatchAcross(fnames, projPoints);
     }
     else

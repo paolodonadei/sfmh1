@@ -61,9 +61,9 @@ void HRStructure::run()
     sfmSequence[1]=frame2;
 
 ///zzz remove this
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton2\\003.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
+    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
 
 
 
@@ -198,9 +198,17 @@ int HRStructure::addFrame(int framenum)
     int numCommonPts=0;
 
     int count=0;
+    vector<double> errors;
+    vector<int> index_vector;
+    int i,j;
+    int numPointsUsed=0;
 
-    int i;
-
+    CvMat* imgPts;
+    CvMat* objectPts;
+    double currentthrshold=20;
+    double idealthreshold=0.1;
+    int numPass=0;
+    double err=0;
 
     for(i=0; i< numImages; i++)
     {
@@ -222,53 +230,98 @@ int HRStructure::addFrame(int framenum)
     }
 
 
-    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_64F);
-    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_64F);
-    CvMat* rvec=cvCreateMat(3,1,CV_64F);
+    CvMat*    rvec=cvCreateMat(3,1,CV_64F);
 
-
-    int countr=0;
-    for ( i = 0; i < maxlength; i++)
+    do
     {
-        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
+        errors.clear();
+        index_vector.clear();
+        int numbadPts=0;
+        int countr=0;
+        for ( i = 0; i < maxlength; i++)
         {
-
-
-            CvMat* P=(*((*imSet).imageCollection[framenum])).projectionMatrix;
-
-
-            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
-
-            double err=projectionErrorSquared( P,structure[i],curPt);
-
-
-            if(err>1)
+            if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
             {
-                 printf("error is %f \n",err);
-                (*imSet).showTrackNumber(i);
+
+
+                CvMat* P=(*((*imSet).imageCollection[framenum])).projectionMatrix;
+                CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
+
+                if(numPass>0)
+                    err=projectionErrorSquared( P,structure[i],curPt);
+                else
+                    err=0;
+
+                errors.push_back(err);
+
+//                if(err>1)
+//                {
+//                    printf("point %d and error is %f \n",i,err);
+//                    numbadPts++;
+//                    //(*imSet).showTrackNumberwithReprojection(i,structure[i]);
+//                }
+
+
+                if(err<currentthrshold)
+                {
+                    index_vector.push_back(i);
+
+                }
+
+
             }
-
-            cvmSet(imgPts,countr,0,curPt.x );
-            cvmSet(imgPts,countr,1,curPt.y );
-
-            cvmSet(objectPts,countr,0,structure[i].x);
-            cvmSet(objectPts,countr,1,structure[i].y);
-            cvmSet(objectPts,countr,2,structure[i].z);
-
-            countr++;
-
         }
+
+        numPointsUsed=index_vector.size();
+        imgPts=cvCreateMat(numCommonPts,2,CV_64F);
+        objectPts=cvCreateMat(numCommonPts,3,CV_64F);
+
+        if(numPointsUsed<20)
+        {
+            cvReleaseMat(&imgPts);
+            cvReleaseMat(&objectPts);
+            printf("preemptive break in pose estimation \n");
+            break;
+        }
+
+        for ( j = 0; j < index_vector.size(); j++)
+        {
+            i=index_vector[j];
+            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
+            cvmSet(imgPts,j,0,curPt.x );
+            cvmSet(imgPts,j,1,curPt.y );
+
+            cvmSet(objectPts,j,0,structure[i].x);
+            cvmSet(objectPts,j,1,structure[i].y);
+            cvmSet(objectPts,j,2,structure[i].z);
+        }
+
+
+
+        cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
+        cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
+
+        findProjfromcompon((*((*imSet).imageCollection[framenum])));
+
+        stats myerrstats=findStatsArray( errors);
+        currentthrshold=myerrstats.median;
+        cvReleaseMat(&imgPts);
+        cvReleaseMat(&objectPts);
+
+
+        numPass++;
+        if(numPass==1)
+        {
+            currentthrshold=100;
+        }
+        printf("\npass %d used points %d out of total %d threshold %f\n",numPass,numPointsUsed,errors.size(),currentthrshold );
     }
+    while( numPass<20 && numPointsUsed>20 && currentthrshold>idealthreshold);
 
 
-
-
-    cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
-    cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
-
-    findProjfromcompon((*((*imSet).imageCollection[framenum])));
 
     printf("inside pose estimation\n");
+
     writeCVMatrix(cout<<"rvec"<<endl,rvec );
     writeCVMatrix(cout<<"tvec"<<endl,(*((*imSet).imageCollection[framenum])).camPose.tm );
     writeCVMatrix(cout<<"rotation"<<endl,(*((*imSet).imageCollection[framenum])).camPose.Rm );
@@ -302,6 +355,9 @@ void HRStructure::DLTUpdateStructure()
     int numReconstructed=0;
 
     int count=0;
+
+
+
     for(i=0; i< numImages; i++)
     {
         if(sfmSequence[i]!=-1) //this array should indicate how many frazmes have had their proj matrices found
@@ -1161,7 +1217,7 @@ int HRStructure::sba_driver_interface()
 
     havedist=1; /* with distortion */
     //zzz unfix these distortion parameters, right now i keep 3 parameters fixed, wich 3 are these?
-    mglobs.ncdist=3; /* number of distortion params to keep fixed, must be between 0 and 5 */
+    mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
 
 
