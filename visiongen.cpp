@@ -469,8 +469,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 {
 
     ////zzz remove this!
-
-    return 0;
+    //return 0;
 
     int i,j;
     CvMat* Ptemp=cvCreateMat(3,4,CV_64F);
@@ -535,7 +534,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
 
 
 
-void showMatchAcross(vector<string>& fnames,    vector<CvPoint2D32f>& projPoints)
+void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints)
 {
 
     if(fnames.size()!= projPoints.size())
@@ -546,7 +545,7 @@ void showMatchAcross(vector<string>& fnames,    vector<CvPoint2D32f>& projPoints
     }
 
     int numimg=projPoints.size();
-    int i;
+    int j,i;
 
     vector<string> winNames;
     vector<IplImage*> imagesCopy;
@@ -554,7 +553,12 @@ void showMatchAcross(vector<string>& fnames,    vector<CvPoint2D32f>& projPoints
     for(i=0; i<numimg; i++)
     {
         IplImage* imgTemp=cvLoadImage(fnames[i].c_str());
-        draw_cross(projPoints[i], CV_RGB(255,0,0),4,imgTemp );
+        int numpts=projPoints[i].size();
+        for(j=0; j<numpts; j++)
+        {
+            draw_cross(projPoints[i][j], CV_RGB(255*(j%3==0?1:0),255*(j%3==1?1:0),255*(j%3==2?1:0)),4,imgTemp );
+        }
+
         string winname=fnames[i].c_str();
         winNames.push_back(winname);
         imagesCopy.push_back(imgTemp);
