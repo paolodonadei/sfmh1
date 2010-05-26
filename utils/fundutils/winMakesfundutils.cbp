@@ -40,6 +40,8 @@
 		</Compiler>
 		<Unit filename="MakefileWin" />
 		<Unit filename="funddraw.cpp" />
+		<Unit filename="funddrawutils.cpp" />
+		<Unit filename="funddrawutils.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

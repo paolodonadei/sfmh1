@@ -195,26 +195,26 @@ double HRStructure::bundleAdjust()
 }
 int HRStructure::addFrame(int framenum)
 {
+    what i was doing last:
+    i was decomposing the funddrawutils so i could draw point matches and their epipolar line
+    then i was going to filter out points when adding a third frame if the intersection of the epipolar lines of the closest
+    finished two frames doesnt come near the third match
+
+    also teh reason i wanted to draw this is so that i could see if it works or not
+
     int numCommonPts=0;
 
     int count=0;
-    vector<double> errors;
-    vector<int> index_vector;
-    int i,j;
-    int numPointsUsed=0;
 
-    CvMat* imgPts;
-    CvMat* objectPts;
-    double currentthrshold=20;
-    double idealthreshold=0.1;
-    int numPass=0;
-    double err=0;
+    int i;
+
 
     for(i=0; i< numImages; i++)
     {
         if(sfmSequence[i]!=-1) //this array should indicate how many frazmes have had their proj matrices found
             count++;
     }
+
 
     int maxlength=(*imSet).myTracks.getNumTracks();
 
@@ -230,98 +230,42 @@ int HRStructure::addFrame(int framenum)
     }
 
 
-    CvMat*    rvec=cvCreateMat(3,1,CV_64F);
+    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_64F);
+    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_64F);
+    CvMat* rvec=cvCreateMat(3,1,CV_64F);
 
-    do
+
+    int countr=0;
+    for ( i = 0; i < maxlength; i++)
     {
-        errors.clear();
-        index_vector.clear();
-        int numbadPts=0;
-        int countr=0;
-        for ( i = 0; i < maxlength; i++)
+        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
         {
-            if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
-            {
 
 
-                CvMat* P=(*((*imSet).imageCollection[framenum])).projectionMatrix;
-                CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
 
-                if(numPass>0)
-                    err=projectionErrorSquared( P,structure[i],curPt);
-                else
-                    err=0;
-
-                errors.push_back(err);
-
-//                if(err>1)
-//                {
-//                    printf("point %d and error is %f \n",i,err);
-//                    numbadPts++;
-//                    //(*imSet).showTrackNumberwithReprojection(i,structure[i]);
-//                }
-
-
-                if(err<currentthrshold)
-                {
-                    index_vector.push_back(i);
-
-                }
-
-
-            }
-        }
-
-        numPointsUsed=index_vector.size();
-        imgPts=cvCreateMat(numCommonPts,2,CV_64F);
-        objectPts=cvCreateMat(numCommonPts,3,CV_64F);
-
-        if(numPointsUsed<20)
-        {
-            cvReleaseMat(&imgPts);
-            cvReleaseMat(&objectPts);
-            printf("preemptive break in pose estimation \n");
-            break;
-        }
-
-        for ( j = 0; j < index_vector.size(); j++)
-        {
-            i=index_vector[j];
             CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
-            cvmSet(imgPts,j,0,curPt.x );
-            cvmSet(imgPts,j,1,curPt.y );
 
-            cvmSet(objectPts,j,0,structure[i].x);
-            cvmSet(objectPts,j,1,structure[i].y);
-            cvmSet(objectPts,j,2,structure[i].z);
+            cvmSet(imgPts,countr,0,curPt.x );
+            cvmSet(imgPts,countr,1,curPt.y );
+
+            cvmSet(objectPts,countr,0,structure[i].x);
+            cvmSet(objectPts,countr,1,structure[i].y);
+            cvmSet(objectPts,countr,2,structure[i].z);
+
+            countr++;
+
         }
-
-
-
-        cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
-        cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
-
-        findProjfromcompon((*((*imSet).imageCollection[framenum])));
-
-        stats myerrstats=findStatsArray( errors);
-        currentthrshold=myerrstats.median;
-        cvReleaseMat(&imgPts);
-        cvReleaseMat(&objectPts);
-
-
-        numPass++;
-        if(numPass==1)
-        {
-            currentthrshold=100;
-        }
-        printf("\npass %d used points %d out of total %d threshold %f\n",numPass,numPointsUsed,errors.size(),currentthrshold );
     }
-    while( numPass<20 && numPointsUsed>20 && currentthrshold>idealthreshold);
 
 
+
+
+    cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
+    cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
+
+    findProjfromcompon((*((*imSet).imageCollection[framenum])));
 
     printf("inside pose estimation\n");
-
     writeCVMatrix(cout<<"rvec"<<endl,rvec );
     writeCVMatrix(cout<<"tvec"<<endl,(*((*imSet).imageCollection[framenum])).camPose.tm );
     writeCVMatrix(cout<<"rotation"<<endl,(*((*imSet).imageCollection[framenum])).camPose.Rm );
@@ -344,6 +288,7 @@ int HRStructure::addFrame(int framenum)
 
 
 }
+
 void HRStructure::DLTUpdateStructure()
 {
 
