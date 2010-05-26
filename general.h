@@ -94,4 +94,5 @@ int checkSymmetric(CvMat* inM);
 void matrix_to_quaternion(CvMat* inRm, CvMat* inqm);
 void quaternion_to_matrix(CvMat* inqm,CvMat* inRm);
 void copyMatrix(CvMat* src,CvMat* dst);
+int indexMax(vector<int>& myvec);
 #endif //HRPRIMITIVES_HPP_INCLUDED

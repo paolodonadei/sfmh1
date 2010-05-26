@@ -1279,6 +1279,33 @@ int HRImageSet::exhaustiveSIFTMatching()
         }
     }
 
+    //copying the info to the same correpsondences but opposite direction, sort of unnecessary
+    for (int i = 0; i < imageCollection.size(); ++i)
+    {
+
+        for (int j = i+1; j <imageCollection.size(); ++j)
+        {
+            correspondencesPairWise[i][j].indexIm1=i;
+            correspondencesPairWise[i][j].indexIm2=j;
+
+            correspondencesPairWise[i][j].hr1ptr=&(*imageCollection[i]);
+            correspondencesPairWise[i][j].hr2ptr=&(*imageCollection[j]);
+
+            for(int k=0; k<correspondencesPairWise[j][i].imIndices.size() ; k++)
+            {
+                matchIndex indexTemp=correspondencesPairWise[j][i].imIndices[k];
+                int ttemp=indexTemp.imindex1;
+
+                indexTemp.imindex1=indexTemp.imindex2;
+                indexTemp.imindex2=ttemp;
+                correspondencesPairWise[i][j].imIndices.push_back(indexTemp);
+            }
+            printf("num matches %d -> %d is %d\n",i,j,correspondencesPairWise[i][j].imIndices.size());
+            printf("num matches %d -> %d is %d\n",j,i,correspondencesPairWise[j][i].imIndices.size());
+
+        }
+    }
+
 
 }
 void HRImageSet::drawallMatches()

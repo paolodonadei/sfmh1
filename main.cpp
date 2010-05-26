@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
 
         imSet.writeMotions();
-        //  imSet.showOneByOneFeatureMotions();
+       //  imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         mystruct.run();

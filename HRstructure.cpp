@@ -195,18 +195,15 @@ double HRStructure::bundleAdjust()
 }
 int HRStructure::addFrame(int framenum)
 {
-    what i was doing last:
-    i was decomposing the funddrawutils so i could draw point matches and their epipolar line
-    then i was going to filter out points when adding a third frame if the intersection of the epipolar lines of the closest
-    finished two frames doesnt come near the third match
 
-    also teh reason i wanted to draw this is so that i could see if it works or not
+    vector<int> neighbours;
+    findBestTwoNehgbourFrames( framenum,neighbours);
 
     int numCommonPts=0;
 
     int count=0;
 
-    int i;
+    int i,j;
 
 
     for(i=0; i< numImages; i++)
@@ -220,41 +217,45 @@ int HRStructure::addFrame(int framenum)
 
 
     int numValidProjs= count;
+    vector<int> goodMatchIndex;
 
-
-    for ( i = 0; i < maxlength; i++)
-    {
-        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
-            numCommonPts++;
-
-    }
-
-
-    CvMat* imgPts=cvCreateMat(numCommonPts,2,CV_64F);
-    CvMat* objectPts=cvCreateMat(numCommonPts,3,CV_64F);
-    CvMat* rvec=cvCreateMat(3,1,CV_64F);
-
-
-    int countr=0;
     for ( i = 0; i < maxlength; i++)
     {
         if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
         {
 
-
-
-            CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
-
-            cvmSet(imgPts,countr,0,curPt.x );
-            cvmSet(imgPts,countr,1,curPt.y );
-
-            cvmSet(objectPts,countr,0,structure[i].x);
-            cvmSet(objectPts,countr,1,structure[i].y);
-            cvmSet(objectPts,countr,2,structure[i].z);
-
-            countr++;
+            if(matchThreeWayValid(i,framenum,neighbours))
+            {
+                goodMatchIndex.push_back(i);
+            }
 
         }
+    }
+
+    int numGoodMatches=goodMatchIndex.size();
+
+    CvMat* imgPts=cvCreateMat(numGoodMatches,2,CV_64F);
+    CvMat* objectPts=cvCreateMat(numGoodMatches,3,CV_64F);
+    CvMat* rvec=cvCreateMat(3,1,CV_64F);
+
+
+
+    for ( j = 0; j < numGoodMatches; j++)
+    {
+        i=goodMatchIndex[j];
+
+        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
+
+        cvmSet(imgPts,j,0,curPt.x );
+        cvmSet(imgPts,j,1,curPt.y );
+
+        cvmSet(objectPts,j,0,structure[i].x);
+        cvmSet(objectPts,j,1,structure[i].y);
+        cvmSet(objectPts,j,2,structure[i].z);
+
+
+
+
     }
 
 
@@ -287,6 +288,95 @@ int HRStructure::addFrame(int framenum)
 
 
 
+}
+//this finds the best closes neighbour frames whose pose has been estimated
+int HRStructure::findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrames)
+{
+    int i;
+    vector<int> numMatches;
+    neighbourFrames.clear();
+
+    for(i=0; i< sfmSequence.size(); i++)
+    {
+
+        if(sfmSequence[i]!=-1)
+            numMatches.push_back((*imSet).correspondencesPairWise[frame][sfmSequence[i]].imIndices.size());
+        else
+            numMatches.push_back(0);
+
+    }
+
+
+
+    do
+    {
+        int framen=indexMax(numMatches);
+        if(sfmSequence[framen]==-1)
+        {
+            printf("this is impossible \n");
+        }
+        else
+        {
+            neighbourFrames.push_back(sfmSequence[framen]);
+        }
+        numMatches[framen]=0;
+
+
+    }
+    while(neighbourFrames.size()<2);
+
+
+    printf("best neighbours to frame %d are frames %d and %d with %d matches and %d matches respectively \n",frame,neighbourFrames[0],neighbourFrames[1],(*imSet).correspondencesPairWise[frame][neighbourFrames[0]].imIndices.size(),(*imSet).correspondencesPairWise[frame][neighbourFrames[1]].imIndices.size() );
+    return 0;
+}
+
+
+
+bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames)
+{
+    if(structureValid[feature]==0 || (*imSet).myTracks.validTrackEntry(feature,frame)==0)
+    {
+        return false;
+    }
+    if(neighbourFrames.size()!=2)
+    {
+        printf("neighbours didnt exist, thisis wrong\n");
+        return false;
+    }
+
+//find two nearest frames that are done
+    CvMat* point;
+    points1  = cvCreateMat(1,1,CV_32FC2);
+    CvMat* lines1;
+    CvMat* lines2;
+    lines1= cvCreateMat(1,1,CV_32FC3);
+    lines2= cvCreateMat(1,1,CV_32FC3);
+
+
+ CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(feature, frame);
+ CvPoint2D32f  curPtN1=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[0]);
+ CvPoint2D32f  curPtN2=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[1]);
+
+
+    point->data.fl[0]=curPtN1.x;
+    point->data.fl[1]=curPtN1.y;
+
+cvComputeCorrespondEpilines(point, 1, (*imSet).correspondencesPairWise[frame][neighbourFrames[0]].motion.MotionModel_F, lines1);
+
+
+    point->data.fl[0]=curPtN2.x;
+    point->data.fl[1]=curPtN2.y;
+
+cvComputeCorrespondEpilines(point, 1, (*imSet).correspondencesPairWise[frame][neighbourFrames[1]].motion.MotionModel_F, lines2);
+
+
+
+
+
+
+    cvReleaseMat(&point);
+    cvReleaseMat(&lines1);
+    cvReleaseMat(&lines2);
 }
 
 void HRStructure::DLTUpdateStructure()
@@ -374,11 +464,11 @@ void HRStructure::DLTUpdateStructure()
     }
     double err_beforesba=findReconstructionError();
     printf("reconstructed %d points\n",numReconstructed);
-    printf("error before sba=%f \t",err_beforesba);
+    printf("error before sba=%f \t\n",err_beforesba);
 
     // sba_driver_interface();
     double err_aftersba=findReconstructionError();
-    printf("error after sba=%f \t",err_aftersba);
+    printf("error after sba=%f \t\n",err_aftersba);
 
 
 
