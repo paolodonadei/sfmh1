@@ -4,7 +4,7 @@ INC = -I../../ -I'$(MINGW)\include'
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm   -lhighgui -lcxcore -lcv
 LDFLAGS=-L'$(OPENCV_HOME)\lib'
-SOURCES=funddraw.cpp
+SOURCES=funddraw.cpp funddrawutils.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=funddraw
 
