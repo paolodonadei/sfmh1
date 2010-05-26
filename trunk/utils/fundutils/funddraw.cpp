@@ -21,13 +21,25 @@ using namespace std;
 
 
 
+IplImage* img1;
+IplImage* img2 ;
+IplImage* img3 ;
+CvMat* MotionModel_temp_temp;
+CvMat* MotionModel;
+CvMat* MotionModel_tpose;
 
 
+
+char* fil_name1;
+char* fil_name2;
+
+MotionT MotionType;
 
 int main(int argc, char *argv[])
 {
-    points1  = cvCreateMat(1,1,CV_32FC2);
-    lines= cvCreateMat(1,1,CV_32FC3);
+
+
+
     img1 = 0;
     img2 = 0;
     IplImage* imgtemp=NULL ;
@@ -114,8 +126,34 @@ int main(int argc, char *argv[])
     int forward=1;
     int backward=2;
 
-    cvSetMouseCallback(fil_name1,imgclick,&forward);
-    cvSetMouseCallback(fil_name2,imgclick,&backward);
+    struct voidparam
+    {
+        IplImage* im1;
+        IplImage* im2;
+        int mydir;
+        char* pfil_name1;
+        char* pfil_name2;
+        CvMat* pMotionModel;
+        CvMat* pMotionModel_tpose;
+        MotionT pMotionType;
+    };
+    voidparam myparms_f;
+    voidparam myparms_b;
+
+    myparms_f.im1=img1;
+    myparms_f.im2=img2;
+    myparms_f.mydir=forward;
+    myparms_f.pfil_name1=fil_name1;
+    myparms_f.pfil_name2=fil_name2;
+    myparms_f.pMotionModel=MotionModel;
+    myparms_f.pMotionModel_tpose=MotionModel_tpose;
+    myparms_f.pMotionType=MotionType;
+
+    myparms_b=myparms_f;
+    myparms_b.mydir=backward;
+
+    cvSetMouseCallback(fil_name1,imgclick,&myparms_f);
+    cvSetMouseCallback(fil_name2,imgclick,&myparms_b);
     // wait for a key
     int key;
     while (1)
@@ -154,8 +192,8 @@ int main(int argc, char *argv[])
         cvReleaseMat(&MotionModel);
     }
 
-    cvReleaseMat(&points1);
-    cvReleaseMat(&lines);
+
+
 
     return 0;
 }

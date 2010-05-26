@@ -18,6 +18,7 @@ public:
     HRStructure();
     ~HRStructure();
 
+    bool matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames);
     int initializeKeyFrames(int frame1, int frame2);
     double bundleAdjust();
     int addFrame(int framenum);
@@ -32,10 +33,11 @@ public:
     string tempdir;
     int numImages;
     int initializeKeyFrames2(int frame1, int frame2);
-     int printSBAstyleData(string camFname, string ptFname);
-     int sba_driver_interface();
-     double findReconstructionError();
-     int decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t);
+    int printSBAstyleData(string camFname, string ptFname);
+    int sba_driver_interface();
+    double findReconstructionError();
+    int decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t);
+    int findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrames);
 };
 
 

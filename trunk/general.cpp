@@ -453,7 +453,7 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
     int n_cols = (*tmodel)->cols;
 
 
- //   printf("\nnumber of rows is %d and number of cols is %d and reading from file %s \n",n_rows,n_cols,mfname.c_str());
+//   printf("\nnumber of rows is %d and number of cols is %d and reading from file %s \n",n_rows,n_cols,mfname.c_str());
 //this function is not very error resilient, it will crash and burn if the data file is not the right format
     string fname(mfname);
 
@@ -495,30 +495,68 @@ void readCvMatFfromfile(CvMat** tmodel,const string& mfname)
 
 int indexMax(vector<double>& myvec)
 {
+    if(myvec.size()==0)
+    {
+        printf("vector empty\n");
+        return -1;
+    }
     int n=myvec.size();
-    int temp=-1;
+    int temp=0;
+    double maxv=myvec[0];
 
-    for(int x=0; x<n; x++)
+
+
+    for(int y=0; y<n; y++)
 
     {
 
-        for(int y=0; y<n-1; y++)
+        if(myvec[y]>maxv)
 
         {
 
-            if(myvec[y]>=myvec[y+1])
+            temp = y;
 
-            {
-
-                temp = y;
-
-
-
-            }
+            maxv=myvec[y];
 
         }
 
     }
+
+
+
+    return temp;
+
+}
+int indexMax(vector<int>& myvec)
+{
+
+    if(myvec.size()==0)
+    {
+        printf("vector empty\n");
+        return -1;
+    }
+    int n=myvec.size();
+    int temp=0;
+    int maxv=myvec[0];
+
+
+
+    for(int y=0; y<n; y++)
+
+    {
+
+        if(myvec[y]>maxv)
+
+        {
+
+            temp = y;
+
+            maxv=myvec[y];
+
+        }
+
+    }
+
 
 
     return temp;
@@ -728,3 +766,6 @@ void copyMatrix(CvMat* src,CvMat* dst)
     }
 
 }
+
+
+
