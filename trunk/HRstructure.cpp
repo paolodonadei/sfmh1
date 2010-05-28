@@ -218,7 +218,7 @@ int HRStructure::addFrame(int framenum)
 
     int numValidProjs= count;
     vector<int> goodMatchIndex;
-int numrejects=0;
+    int numrejects=0;
     for ( i = 0; i < maxlength; i++)
     {
         if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
@@ -232,7 +232,7 @@ int numrejects=0;
             {
                 printf("rejected point %d\n",i);
                 numrejects++;
-             //   (*imSet).showTrackNumberwithEpipolars(i);
+                //   (*imSet).showTrackNumberwithEpipolars(i);
             }
 
         }
@@ -240,7 +240,7 @@ int numrejects=0;
 
     int numGoodMatches=goodMatchIndex.size();
 
-printf("rejected %d points and using %d points\n ",numrejects,numGoodMatches);
+    printf("rejected %d points and using %d points\n ",numrejects,numGoodMatches);
     CvMat* imgPts=cvCreateMat(numGoodMatches,2,CV_64F);
     CvMat* objectPts=cvCreateMat(numGoodMatches,3,CV_64F);
     CvMat* rvec=cvCreateMat(3,1,CV_64F);
@@ -342,9 +342,7 @@ int HRStructure::findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrame
 bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames)
 {
 
-why is there still bad points after i do this this? load ground truth projections and see which bad points get passed
-gonna have to use mlesac or something
-weight down the importance with slope
+
 
     if(structureValid[feature]==0 || (*imSet).myTracks.validTrackEntry(feature,frame)==0)
     {
@@ -397,11 +395,11 @@ weight down the importance with slope
     if(dist>threshold)
     {
         printf("rejectig existing point is (%f, %f) and predicted is (%f,%f) distance was %f \n",curPt.x,curPt.y,ptProj.x,ptProj.y,dist );
-         return false;
+        return false;
     }
     else
     {
-         return true;
+        return true;
     }
 
 

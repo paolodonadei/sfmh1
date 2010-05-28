@@ -4,7 +4,7 @@ INC = -I../../ -I. -I'$(MINGW)\include' -Iutils/selfcalib/  -Iutils/fundutils/ -
 CFLAGS=$(INC) -c -g -Wall
 LIBS=-lm  -lsba -llevmar  -lhighgui -lcxcore -lcv -lboost_filesystem -lboost_system  -lgsl  -l5point -limage  -lmatrix -llapack   -lcblas -lblas  -lf2c  -lminpack
 LDFLAGS= -L'$(MINGW)\lib' -L'..\locallibs\lib'
-SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp HRstructure.cpp
+SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp HRstructure.cpp robust_est.cpp
 OBJECTS=$(SOURCES:.cpp=.o) utils/selfcalib/focallength.o utils/selfcalib/nonlinSClvm.o   utils/sbainterface/imgproj.o  utils/sbainterface/readparams.o  utils/sbainterface/eucsbademo.o utils/fundutils/funddrawutils.cpp
 EXECUTABLE=sfmh1
 PROJECT = libhrlib.a

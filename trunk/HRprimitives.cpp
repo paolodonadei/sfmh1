@@ -600,10 +600,17 @@ int MotionGeometry::findHMatrix(const vector<HRPointFeatures>&  hr1vec,const vec
     double error=0;
     // int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
 
-    cvFindHomography(	points1,points2,MotionModel_H,0,	1.5,(CvMat*)NULL);
+cvFindHomography(	points1,points2,MotionModel_H,CV_FM_RANSAC,	1.5,(CvMat*)NULL);
+//cvFindFundamentalMat( points1,points2,MotionModel_H, CV_FM_RANSAC,1.5,0.99,status );
+
 
     int numinliers=0;
     error= computeReprojErrorH( points1,points2, MotionModel_H, err_array ,1.5,&numinliers);
+
+
+
+
+
 
     motionError_H=error;
     numOutlier_H=numPoints-numinliers;
