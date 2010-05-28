@@ -212,7 +212,7 @@ void HRCorrespond2N::writeIndices()
 {
     string fname=TEMPDIR+string("/")+combineFnames(hr1ptr->filename,hr2ptr->filename,"_indices.txt");
 
-
+//cout<<"writing :"<<fname<<endl;
 
     fstream fp_out;
     fp_out.open(fname.c_str(), ios::out);

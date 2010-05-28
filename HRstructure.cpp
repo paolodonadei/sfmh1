@@ -61,9 +61,9 @@ void HRStructure::run()
     sfmSequence[1]=frame2;
 
 ///zzz remove this
-    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
-    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
+//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
 
 
 
@@ -218,7 +218,7 @@ int HRStructure::addFrame(int framenum)
 
     int numValidProjs= count;
     vector<int> goodMatchIndex;
-
+int numrejects=0;
     for ( i = 0; i < maxlength; i++)
     {
         if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
@@ -231,7 +231,8 @@ int HRStructure::addFrame(int framenum)
             else
             {
                 printf("rejected point %d\n",i);
-                (*imSet).showTrackNumberwithEpipolars(i);
+                numrejects++;
+             //   (*imSet).showTrackNumberwithEpipolars(i);
             }
 
         }
@@ -239,6 +240,7 @@ int HRStructure::addFrame(int framenum)
 
     int numGoodMatches=goodMatchIndex.size();
 
+printf("rejected %d points and using %d points\n ",numrejects,numGoodMatches);
     CvMat* imgPts=cvCreateMat(numGoodMatches,2,CV_64F);
     CvMat* objectPts=cvCreateMat(numGoodMatches,3,CV_64F);
     CvMat* rvec=cvCreateMat(3,1,CV_64F);
@@ -340,8 +342,9 @@ int HRStructure::findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrame
 bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames)
 {
 
-
-
+why is there still bad points after i do this this? load ground truth projections and see which bad points get passed
+gonna have to use mlesac or something
+weight down the importance with slope
 
     if(structureValid[feature]==0 || (*imSet).myTracks.validTrackEntry(feature,frame)==0)
     {
@@ -384,15 +387,23 @@ bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbou
     cvReleaseMat(&lines1);
     cvReleaseMat(&lines2);
 
-    printf("existing point is (%f, %f) and predicted is (%f,%f)\n",curPt.x,curPt.y,ptProj.x,ptProj.y );
-    double dist=((ptProj.x-curPt.x)*(ptProj.x-curPt.x))+((ptProj.y-curPt.y)*(ptProj.y-curPt.y));
 
-    double threshold=0.5;
+    double dist=sqrt((ptProj.x-curPt.x)*(ptProj.x-curPt.x))+((ptProj.y-curPt.y)*(ptProj.y-curPt.y));
+
+
+
+    double threshold=15;
 
     if(dist>threshold)
-        return false;
+    {
+        printf("rejectig existing point is (%f, %f) and predicted is (%f,%f) distance was %f \n",curPt.x,curPt.y,ptProj.x,ptProj.y,dist );
+         return false;
+    }
     else
-        return true;
+    {
+         return true;
+    }
+
 
 }
 
