@@ -228,6 +228,11 @@ int HRStructure::addFrame(int framenum)
             {
                 goodMatchIndex.push_back(i);
             }
+            else
+            {
+                printf("rejected point %d\n",i);
+                (*imSet).showTrackNumberwithEpipolars(i);
+            }
 
         }
     }
@@ -334,6 +339,10 @@ int HRStructure::findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrame
 
 bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames)
 {
+
+
+
+
     if(structureValid[feature]==0 || (*imSet).myTracks.validTrackEntry(feature,frame)==0)
     {
         return false;
@@ -345,38 +354,46 @@ bool HRStructure::matchThreeWayValid(int feature,int frame,vector<int>& neighbou
     }
 
 //find two nearest frames that are done
-    CvMat* point;
-    points1  = cvCreateMat(1,1,CV_32FC2);
-    CvMat* lines1;
-    CvMat* lines2;
-    lines1= cvCreateMat(1,1,CV_32FC3);
-    lines2= cvCreateMat(1,1,CV_32FC3);
 
-
- CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(feature, frame);
- CvPoint2D32f  curPtN1=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[0]);
- CvPoint2D32f  curPtN2=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[1]);
-
-
-    point->data.fl[0]=curPtN1.x;
-    point->data.fl[1]=curPtN1.y;
-
-cvComputeCorrespondEpilines(point, 1, (*imSet).correspondencesPairWise[frame][neighbourFrames[0]].motion.MotionModel_F, lines1);
-
-
-    point->data.fl[0]=curPtN2.x;
-    point->data.fl[1]=curPtN2.y;
-
-cvComputeCorrespondEpilines(point, 1, (*imSet).correspondencesPairWise[frame][neighbourFrames[1]].motion.MotionModel_F, lines2);
+    CvMat* lines1= cvCreateMat(1,1,CV_32FC3);
+    CvMat* lines2= cvCreateMat(1,1,CV_32FC3);
 
 
 
+    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(feature, frame);
+    CvPoint2D32f  curPtN1=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[0]);
+    CvPoint2D32f  curPtN2=(*imSet).myTracks.pointFromTrackloc(feature, neighbourFrames[1]);
 
 
 
-    cvReleaseMat(&point);
+    if((*imSet).EpilineFromTrackloc(feature,neighbourFrames[0] ,frame,lines1)==-1)
+    {
+        return false;
+    }
+
+
+    if((*imSet).EpilineFromTrackloc(feature,neighbourFrames[1] ,frame,lines2)==-1)
+    {
+        return false;
+    }
+
+
+
+    CvPoint2D32f ptProj=findIntersection(lines1,lines2);
+
     cvReleaseMat(&lines1);
     cvReleaseMat(&lines2);
+
+    printf("existing point is (%f, %f) and predicted is (%f,%f)\n",curPt.x,curPt.y,ptProj.x,ptProj.y );
+    double dist=((ptProj.x-curPt.x)*(ptProj.x-curPt.x))+((ptProj.y-curPt.y)*(ptProj.y-curPt.y));
+
+    double threshold=0.5;
+
+    if(dist>threshold)
+        return false;
+    else
+        return true;
+
 }
 
 void HRStructure::DLTUpdateStructure()

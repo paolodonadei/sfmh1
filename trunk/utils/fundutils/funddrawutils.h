@@ -22,10 +22,10 @@
 using namespace std;
 
 
-enum MotionT {FUNDAMENTAL, HOMOGRAPHY};
+enum MotionT {DFUNDAMENTAL, DHOMOGRAPHY};
 
 
-
+void drawLineonIMG(IplImage* img,CvMat* line);
 
 bool inBound(CvPoint2D32f inter, double width, double height);
 
@@ -40,7 +40,7 @@ void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 
 void imgclick(int event, int x, int y, int flags, void* param);
 
-
+void drawLineonIMG(IplImage* img,CvMat* line,CvScalar color );
 
 
 void readFfromfile(CvMat** tmodel,const string& mfname);

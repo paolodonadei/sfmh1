@@ -96,12 +96,12 @@ int main(int argc, char *argv[])
 
     if(atoi(argv[4])==1)
     {
-        MotionType=FUNDAMENTAL;
+        MotionType=DFUNDAMENTAL;
         cvTranspose( MotionModel, MotionModel_tpose );
     }
     else
     {
-        MotionType=HOMOGRAPHY;
+        MotionType=DHOMOGRAPHY;
         cvInvert( MotionModel, MotionModel_tpose );
     }
 

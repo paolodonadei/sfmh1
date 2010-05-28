@@ -111,15 +111,6 @@ int BuffertocvMatrix(double* buffer,CvMat** mat,int rows, int cols, int allocate
 }
 
 
-void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img )
-{
-    cvLine( img, cvPoint( center.x - d, center.y - d ),
-            cvPoint( center.x + d, center.y + d ), color, 1, 0 );
-    cvLine( img, cvPoint( center.x + d, center.y - d ),
-            cvPoint( center.x - d, center.y + d ), color, 1, 0 );
-}
-
-
 Image HRImagetoDLImage(HRImage& hr_im)
 {
     Image image;
@@ -767,5 +758,33 @@ void copyMatrix(CvMat* src,CvMat* dst)
 
 }
 
+CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2)
+{
+    CvPoint2D32f pt;
+    double a1=l1->data.fl[0];
+    double b1=l1->data.fl[1];
+    double c1=l1->data.fl[2];
 
+    double a2=l2->data.fl[0];
+    double b2=l2->data.fl[1];
+    double c2=l2->data.fl[2];
+
+
+    double det = a1*b2 - a2*b1;
+
+    if(det == 0)
+    {
+        pt.x=0;
+        pt.y=0;
+    }
+    else
+    {
+        pt.x = (b2*c1 - b1*c2)/det;
+        pt.y= (a1*c2 - a2*c1)/det;
+    }
+
+    return pt;
+
+
+}
 
