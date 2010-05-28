@@ -89,7 +89,6 @@ void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img )
     }
 }
 
-
 void imgclick(int event, int x, int y, int flags, void* param)
 {
     CvMat* points1;
@@ -121,7 +120,7 @@ void imgclick(int event, int x, int y, int flags, void* param)
 
 
 
-        if(MotionType==FUNDAMENTAL)
+        if(MotionType==DFUNDAMENTAL)
         {
             //   printf("clicked location %d , %d \n",x,y);
 
@@ -171,7 +170,7 @@ void imgclick(int event, int x, int y, int flags, void* param)
 
             cvLine( ((*direction==1)?pimg2:pimg1),cvPoint( start.x , start.y ), cvPoint( end.x , end.y  ), CV_RGB(0,255,0), 1, 0 );
         }
-        else if (MotionType==HOMOGRAPHY)
+        else if (MotionType==DHOMOGRAPHY)
         {
             const float* H = (*direction==1)?MotionModel_tpose->data.fl:MotionModel->data.fl;
 
@@ -242,5 +241,62 @@ void readFfromfile(CvMat** tmodel,const string& mfname)
 
 }
 
+
+
+
+//this uses the ax+by+c=0 representation of a line to draw
+void drawLineonIMG(IplImage* img,CvMat* line,CvScalar color )
+{
+CvPoint2D32f intersects[4];
+    int ptindex[3];
+    CvPoint2D32f start;
+    CvPoint2D32f end;
+
+    intersects[0].x=0;
+    intersects[0].y=givenXfindY(line->data.fl[0],line->data.fl[1], line->data.fl[2], intersects[0].x);
+
+    intersects[1].x=img->width-1;
+    intersects[1].y=givenXfindY(line->data.fl[0],line->data.fl[1], line->data.fl[2], intersects[1].x);
+
+    intersects[2].y=0;
+    intersects[2].x=givenYfindX(line->data.fl[0],line->data.fl[1], line->data.fl[2], intersects[2].y);
+
+
+    intersects[3].y=img->height-1;
+    intersects[3].x=givenYfindX(line->data.fl[0],line->data.fl[1], line->data.fl[2], intersects[3].y);
+
+    int j=0;
+    for (int i=0; i<4; i++)
+    {
+        if (inBound(intersects[i], img->width,img->height))
+        {
+            ptindex[j++]=i;
+        }
+        if (j==2) break;
+    }
+
+    if (j!=2) cout<<"not enough points clipped"<<endl;
+
+
+
+    start=intersects[ptindex[0]];
+    end=intersects[ptindex[1]];
+
+
+    // printf(" for point x=%f and y=%f calculated line with parameters a=%f b=%f c=%f and the intersections ended up being start.x=%f start.y=%f and end.x=%f end.y=%f \n", points1->data.fl[0],points1->data.fl[1],line->data.fl[0],line->data.fl[1],line->data.fl[2],start.x, start.y,end.x,end.y);
+
+
+
+
+    cvLine(img,cvPoint( start.x , start.y ), cvPoint( end.x , end.y  ),  color, 1, 0 );
+
+
+
+    return;
+}
+void drawLineonIMG(IplImage* img,CvMat* line)
+{
+ drawLineonIMG(img, line,CV_RGB(0,255,0) );
+}
 
 

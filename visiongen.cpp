@@ -12,7 +12,7 @@
 #include "visiongen.h"
 #include <highgui.h>
 #include "general.h"
-
+#include "funddrawutils.h"
 using namespace std;
 
 
@@ -531,10 +531,7 @@ int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K)
     cvReleaseMat(&Ptemp);
     cvReleaseMat(&Ttemp);
 }
-
-
-
-void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints)
+void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints,const  vector<vector<vector<CvMat*> > >& lines)
 {
 
     if(fnames.size()!= projPoints.size())
@@ -550,13 +547,42 @@ void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f>
     vector<string> winNames;
     vector<IplImage*> imagesCopy;
 
+    vector<vector<CvScalar> > colors;
+    colors.resize(numimg);
+    for(i=0; i<numimg; i++)
+    {
+        int numpts=projPoints[i].size();
+
+        for(j=0; j<numpts; j++)
+        {
+      double r1=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+            double r2=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+            double r3=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+            colors[i].push_back(CV_RGB(r1,r2,r3));
+
+          //  printf("color [%d][%d] = %f %f %f \n",i,j,colors[i][j].val[0],colors[i][j].val[1],colors[i][j].val[2]);
+        }
+    }
+
+
+
     for(i=0; i<numimg; i++)
     {
         IplImage* imgTemp=cvLoadImage(fnames[i].c_str());
         int numpts=projPoints[i].size();
         for(j=0; j<numpts; j++)
         {
-            draw_cross(projPoints[i][j], CV_RGB(255*(j%3==0?1:0),255*(j%3==1?1:0),255*(j%3==2?1:0)),4,imgTemp );
+            draw_cross(projPoints[i][j], colors[i][j],4,imgTemp );
+
+        }
+
+        for(int k=0; k<numimg; k++)
+        {
+            for(j=0; j<numpts; j++)
+            {
+                if(lines[k][i][j]!=NULL)
+                    drawLineonIMG(imgTemp,lines[k][i][j],colors[k][j]);
+            }
         }
 
         string winname=fnames[i].c_str();
@@ -582,6 +608,30 @@ void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f>
         cvReleaseImage(&imagesCopy[i]);
     }
 
+}
+
+void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints)
+{
+    int numimages=fnames.size();
+    int numpts=projPoints[0].size();  ///yyy i take rthe number of points to be that of the first frame, this might not always be the case
+
+    vector< vector< vector < CvMat* >  > > lines(numimages, vector< vector < CvMat*> > (numimages, vector<CvMat*>(numpts)) );
+
+
+    for(int k=0; k< lines.size() ; k++ )
+    {
+        for(int j=0; j< lines[k].size() ; j++ )
+        {
+            for(int m=0; m< lines[k][j].size() ; m++ )
+            {
+                lines[k][j][m]=NULL;
+
+            }
+        }
+
+    }
+
+showMatchAcross( fnames,  projPoints,lines);
 }
 
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint)

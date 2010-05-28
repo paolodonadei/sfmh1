@@ -155,6 +155,7 @@ private:
 class HRImageSet
 {
 public:
+int  EpilineFromTrackloc(int featurenum, int fram_src,int fram_dst,CvMat* line);
     vector<HRImagePtr> imageCollection;
     string dirName;
     int numImages;
@@ -193,6 +194,7 @@ public:
     void writeDistANDundistFeats();
     void showIMFeature(int imnumber,int featurenumber);
     void showTrackNumber(int featurenumber);
+    void showTrackNumberwithEpipolars(int featurenumber);
 
 };
 

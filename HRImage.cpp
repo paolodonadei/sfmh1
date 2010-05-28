@@ -16,6 +16,7 @@
 #define DEBUGLVL 0
 #include "general.h"
 #include "visiongen.h"
+#include "funddrawutils.h"
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN
 #endif
@@ -1534,6 +1535,28 @@ void HRImageSet::findEssentialMatrices()
     cvReleaseMat(&temp4);
 
 }
+
+//row is the feature number, colsrc is the src image frame, coldst is the destination image frame
+int  HRImageSet::EpilineFromTrackloc(int featurenum, int fram_src,int fram_dst,CvMat* line)
+{
+//first have to check if the feature nunber exists in the source image
+    if(myTracks.validTrackEntry(featurenum,fram_src)==0)
+    {
+        return -1;
+    }
+
+    CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenum, fram_src);
+
+ CvMat* point=cvCreateMat(1,1,CV_32FC2);
+
+    point->data.fl[0]=curPt.x;
+    point->data.fl[1]=curPt.y;
+    cvComputeCorrespondEpilines(point, 1, correspondencesPairWise[fram_src][fram_dst].motion.MotionModel_F, line);
+
+    cvReleaseMat(&point);
+
+}
+
 void HRImageSet::showTrackNumber(int featurenumber)
 {
 
@@ -1564,6 +1587,76 @@ void HRImageSet::showTrackNumber(int featurenumber)
     showMatchAcross(imagesNames, projPoints);
 
 }
+
+void HRImageSet::showTrackNumberwithEpipolars(int featurenumber)
+{
+
+    vector<string> imagesNames;
+
+    vector< vector<CvPoint2D32f> > projPoints;
+    vector< vector< vector<CvMat* >  > > lines;
+
+    int numPts=0;
+    for (int j = 0; j < imageCollection.size(); j++)
+    {
+        int curFrame=j;
+        if(myTracks.validTrackEntry(featurenumber,curFrame)!=0)
+        {
+
+            numPts++;
+
+            CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenumber, curFrame);
+
+            vector<CvPoint2D32f> temppoints;
+            temppoints.push_back(curPt);
+
+            projPoints.push_back(temppoints);
+            imagesNames.push_back(imageCollection[curFrame]->filename);
+
+
+            vector< vector<CvMat* >  >  curlines;
+
+            for (int k = 0; k < imageCollection.size(); k++)
+            {
+
+                vector<CvMat* > thisline;
+                CvMat* line=NULL;
+                if(k!=j && correspondencesPairWise[curFrame][k].imIndices.size()>20) //cant get epipolar line with itself and need at least 20 matches
+                {
+                    line= cvCreateMat(1,1,CV_32FC3);
+                    EpilineFromTrackloc(featurenumber, curFrame,k,line);
+                }
+                thisline.push_back(line);
+                curlines.push_back(thisline);
+
+            }
+            lines.push_back(curlines);
+        }
+    }
+
+    showMatchAcross(imagesNames, projPoints,lines);
+
+
+    for(int k=0; k< lines.size() ; k++ )
+    {
+        for(int j=0; j< lines[k].size() ; j++ )
+        {
+            for(int m=0; m< lines[k][j].size() ; m++ )
+            {
+                if(lines[k][j][m]!=NULL)
+                {
+                    cvReleaseMat(&lines[k][j][m]);
+
+                }
+            }
+        }
+
+    }
+
+}
+
+
+
 
 void HRImageSet::showTrackNumberwithReprojection(int featurenumber, CvPoint3D32f space)
 {
@@ -2101,6 +2194,8 @@ int FeatureTrack::validTrackEntry(int row, int col)
 
 
 }
+
+
 CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
 {
 

@@ -79,7 +79,7 @@ inline std::string stringify(const T& x)
 }
 
 IplImage* concatImagesVertical(IplImage* im1,IplImage* im2);
-void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
+
 bool checkTempPath();
 string combineFnames(const string& f1,const string& f2,string extension);
 int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int indexname);
@@ -95,4 +95,5 @@ void matrix_to_quaternion(CvMat* inRm, CvMat* inqm);
 void quaternion_to_matrix(CvMat* inqm,CvMat* inRm);
 void copyMatrix(CvMat* src,CvMat* dst);
 int indexMax(vector<int>& myvec);
+CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2);
 #endif //HRPRIMITIVES_HPP_INCLUDED
