@@ -146,7 +146,12 @@ string combineFnames(const string& f1,const string& f2,string extension)
     fs::path p1( f1, fs::native );
     fs::path p2( f2, fs::native );
 
+//cout<<p1.string() <<"\t"<< p2.string() <<endl;
+
     string fname=fs::basename(p1)+string("_")+fs::basename(p2)+extension;
+
+//cout<<fname<<endl;
+
     return fname;
 
 
@@ -763,11 +768,11 @@ CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2)
     CvPoint2D32f pt;
     double a1=l1->data.fl[0];
     double b1=l1->data.fl[1];
-    double c1=l1->data.fl[2];
+    double c1=-l1->data.fl[2];
 
     double a2=l2->data.fl[0];
     double b2=l2->data.fl[1];
-    double c2=l2->data.fl[2];
+    double c2=-l2->data.fl[2];
 
 
     double det = a1*b2 - a2*b1;
