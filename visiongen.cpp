@@ -555,12 +555,12 @@ void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f>
 
         for(j=0; j<numpts; j++)
         {
-      double r1=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
+            double r1=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
             double r2=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
             double r3=	255*(   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
             colors[i].push_back(CV_RGB(r1,r2,r3));
 
-          //  printf("color [%d][%d] = %f %f %f \n",i,j,colors[i][j].val[0],colors[i][j].val[1],colors[i][j].val[2]);
+            //  printf("color [%d][%d] = %f %f %f \n",i,j,colors[i][j].val[0],colors[i][j].val[1],colors[i][j].val[2]);
         }
     }
 
@@ -631,7 +631,7 @@ void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f>
 
     }
 
-showMatchAcross( fnames,  projPoints,lines);
+    showMatchAcross( fnames,  projPoints,lines);
 }
 
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint)
@@ -817,4 +817,40 @@ double findDepth(CvMat* P,CvPoint3D32f S)
     cvReleaseMat(&PTim);
 
     return depth;
+}
+
+
+int  findProjDLTMinimal(const CvMat* data,vector<CvMat*> models )
+{
+    // we are going to assume that the data is laid out like this:
+    //x1 x2 ...
+    //y1 y2 ...
+    //X1 X2 ...
+    //Y1 Y2 ...
+    //Z1 Z2 ...
+
+    // so each data is a single column, the image points is the first two rows, the space point is the next 3
+
+
+
+so the question is what to do with planar scenes, in those cases use the homography to weed out the outliers rather than using the ransac thing
+so check if the motion is a homography between the target frame and any reconstructed frames, and if yes use the H to root out outliers and then
+do the resectioning with opencv's find extrinsics,
+
+also experiment with the camera calibrate function , that might be able to refine your intrinsics but i dont thnk it can do planar scnees
+
+
+    CvMat* P=cvCreateMat(3,4,CV_64F);
+
+
+
+
+
+
+
+    for(int pp=0; pp<models.size(); pp++) cvReleaseMat(&models[pp]);
+    models.clear();
+
+    models.push_back(P);
+    return 1;
 }

@@ -793,3 +793,10 @@ CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2)
 
 }
 
+double random_uniform_0_1(void)
+{
+
+    return double(rand())/(double(RAND_MAX)+1);
+
+}
+

@@ -36,14 +36,14 @@
 #define INDEXFNAME "motionindex.txt"
 #define OXFORDMATCHES 0
 #define RECREATEFILES 0
-#define SIFTPCA 1
+#define SIFTPCA 0
 #define USEOXINTRINSIC 0
 
 using namespace std;
 
 class HRImage;
 
-
+double random_uniform_0_1(void);
 Image HRImagetoDLImage(HRImage& hr_im);
 
 class BadConversion : public std::runtime_error
