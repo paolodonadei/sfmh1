@@ -15,13 +15,13 @@
 const double eps=1e-20;
 vector<double> tempVector1;
 
-
-int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)(const CvMat* ,vector<CvMat*> models ),
-               double (*distanceFunctionPTR)(const CvMat* , const vector<CvMat*> ,vector<double>&), bool (*degenFunctionPTR)(CvMat*),
-               int s, double t, vector<bool>& inliers,CvMat* model,int maxTrials, int maxDataTrials)
+//this doesnt return a model, just the set of inliers which can be used later to do a final fit
+int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)(const CvMat* ,vector<CvMat*>& models ),
+               double (*distanceFunctionPTR)(const CvMat* , const CvMat* ,vector<double>&), bool (*degenFunctionPTR)( const CvMat*),
+               int s, double t, vector<bool>& inliers,int maxTrials, int maxDataTrials)
 
 {
-int i,j;
+    int i,j;
     const double p = 0.99; //probability
     int numModels=0;
     vector<int> rndSamples(s,0);
@@ -45,7 +45,7 @@ int i,j;
     int numInliers=0;
 
 
-   srand ( time(NULL) );
+    srand ( time(NULL) );
 
 
     while ( trialcount<N && trialcount <= maxTrials)
@@ -55,7 +55,7 @@ int i,j;
         while (degenerate==true && count<maxDataTrials)
         {
 
-                drawRandSampleMonteCarlo(rndSamples,aprioris,true);   //fill up our randsample array with random sample indices
+            drawRandSampleMonteCarlo(rndSamples,aprioris,true);   //fill up our randsample array with random sample indices
 
             extractCopySamples(rndSamples, rndSampleData, data); //this copies elements from data whose indices are in rndSamples
             degenerate=degenFunctionPTR(rndSampleData);
@@ -63,11 +63,13 @@ int i,j;
 
 
 
-            for(int pp=0;pp<m.size();pp++) cvReleaseMat(&m[pp]);
+            for(int pp=0; pp<m.size(); pp++) cvReleaseMat(&m[pp]);
             m.clear();
 
 
+
             numModels=fitFunctionPtr(rndSampleData,m);
+//            printf("feeeteeeeeeccceeng  %d models\n",m.size());
             if (numModels==0)
             {
                 degenerate=true;
@@ -81,21 +83,23 @@ int i,j;
             break;
         }
 
-
-
-        distanceFunctionPTR(data,m,residuals);
-
-        //   printf("_____________________________________________\n");
-        for (i=0;i<size;i++)
+        for(int pp=0; pp<m.size(); pp++)
         {
-            inliers[i]=(residuals[i]<=t)?true:false;
-            //    printf("%s: trial %d residual of point %d was %20.20f and threshold was %0.9f NUMBER OF INLIERS IS %d\n",(inliers[i])?"inlier":"outlier",trialcount ,i,residuals[i],t,countTrues(inliers));
 
-        }
 
-        numInliers=countTrues(inliers);
+            distanceFunctionPTR(data,m[pp],residuals);
 
-        score=numInliers; //maybe use another function to create the score
+            //   printf("_____________________________________________\n");
+            for (i=0; i<size; i++)
+            {
+                inliers[i]=(residuals[i]<=t)?true:false;
+                //    printf("%s: trial %d residual of point %d was %20.20f and threshold was %0.9f NUMBER OF INLIERS IS %d\n",(inliers[i])?"inlier":"outlier",trialcount ,i,residuals[i],t,countTrues(inliers));
+
+            }
+
+            numInliers=countTrues(inliers);
+
+            score=numInliers; //maybe use another function to create the score
 
 
             printf("score was %f and number of inliers was %d\n",score,numInliers);
@@ -103,25 +107,27 @@ int i,j;
 
 
 
-        if (score>bestscore)
-        {
-            rndSamplesBest= rndSamples ;
-            bestscore=score;
-            N=findTrialCount(numInliers,size, s, p); //this function finds the new max iteration count based on the new number of inliers
-            bestInliers=inliers;
-            numBestInliers=numInliers;
-             printf("trialcount %d best score found was %f number of inliers is %d\n",trialcount,score,numBestInliers);
+            if (score>bestscore)
+            {
+                rndSamplesBest= rndSamples ;
+                bestscore=score;
+                N=findTrialCount(numInliers,size, s, p); //this function finds the new max iteration count based on the new number of inliers
+                bestInliers=inliers;
+                numBestInliers=numInliers;
+                printf("trialcount %d best score found was %f number of inliers is %d\n",trialcount,score,numBestInliers);
 
 
-            chosenIteration=trialcount;
+                chosenIteration=trialcount;
 
+            }
         }
-
         trialcount = trialcount + 1;
 
 
     }
-
+//free the last model
+    for(int pp=0; pp<m.size(); pp++) cvReleaseMat(&m[pp]);
+    m.clear();
 
     if (numBestInliers<s)
     {
@@ -133,7 +139,7 @@ int i,j;
 
     if (trialcount > maxTrials)
     {
-      printf("ransac reached max trial counts!\n");
+        printf("ransac reached max trial counts!\n");
 
     }
 
@@ -167,9 +173,10 @@ int findTrialCount(int score,int size,int s,double p)
     //printf("number of inliers was %d , size of data was %d and number of min sampling was %d and p was %f = new N is %d\n",score, size, s,p,N);
 
     return N;
+
 }
 
-int countTrues(const vector<bool>& vec)
+int  countTrues(const vector<bool>& vec)
 {
 
     return (int) count (vec.begin(), vec.end(), true);
@@ -197,12 +204,12 @@ int extractCopySamples(vector<int>& rndSamples,CvMat* rndSampleData,const CvMat*
 
 
 //assume data points are each a single column, as assumed throughout the project
-    for (i=0;i<rndSamples.size();i++)
+    for (i=0; i<rndSamples.size(); i++)
     {
         if (rndSamples[i]<data->cols&& rndSamples[i]>=0)
         {
 
-            for (j=0;j<data->rows;j++)
+            for (j=0; j<data->rows; j++)
             {
                 cvmSet(rndSampleData,j,i,cvmGet(data,j,rndSamples[i]));
             }
@@ -245,7 +252,7 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
     probContinuum[0]=0;
     double p=0;
 
-    for (i=1;i<=size;i++)
+    for (i=1; i<=size; i++)
     {
         p=(MCS)?pvis[i-1]:((double)0.5);
         probContinuum[i]=p +probContinuum[i-1];
