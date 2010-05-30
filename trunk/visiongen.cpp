@@ -712,7 +712,7 @@ double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector
 
 }
 
-double projectionErrorSquared(CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt)
+double projectionErrorSquared(const CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt)
 {
     CvPoint2D32f im_proj_pt=project3DPoint(P, s_pt);
 
@@ -724,12 +724,12 @@ double projectionErrorSquared(CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt)
 
     deltaX = (double)(im_proj_pt.x-im_pt.x);
     deltaY = (double)(im_proj_pt.y-im_pt.y);
-    rep_error=((deltaX*deltaX)+(deltaY*deltaY));
+    rep_error=sqrt((deltaX*deltaX)+(deltaY*deltaY));
 
     return rep_error;
 }
 
-CvPoint2D32f project3DPoint(CvMat* P, CvPoint3D32f S)
+CvPoint2D32f project3DPoint(const CvMat* P, CvPoint3D32f S)
 {
     CvMat point3D;
     double point3D_dat[4];
@@ -820,7 +820,7 @@ double findDepth(CvMat* P,CvPoint3D32f S)
 }
 
 
-int  findProjDLTMinimal(const CvMat* data,vector<CvMat*> models )
+int  findProjDLTMinimal(const CvMat* data,vector<CvMat*>& models )
 {
     // we are going to assume that the data is laid out like this:
     //x1 x2 ...
@@ -830,21 +830,96 @@ int  findProjDLTMinimal(const CvMat* data,vector<CvMat*> models )
     //Z1 Z2 ...
 
     // so each data is a single column, the image points is the first two rows, the space point is the next 3
+//179 of zesserman
 
+//
+//
+//so the question is what to do with planar scenes, in those cases use the homography to weed out the outliers rather than using the ransac thing
+//so check if the motion is a homography between the target frame and any reconstructed frames, and if yes use the H to root out outliers and then
+//do the resectioning with opencv's find extrinsics,
+//
+//also experiment with the camera calibrate function , that might be able to refine your intrinsics but i dont thnk it can do planar scnees
 
-
-so the question is what to do with planar scenes, in those cases use the homography to weed out the outliers rather than using the ransac thing
-so check if the motion is a homography between the target frame and any reconstructed frames, and if yes use the H to root out outliers and then
-do the resectioning with opencv's find extrinsics,
-
-also experiment with the camera calibrate function , that might be able to refine your intrinsics but i dont thnk it can do planar scnees
-
-
+    int i,j;
     CvMat* P=cvCreateMat(3,4,CV_64F);
 
 
+    cvSetZero(P);
+
+    if(data->cols<6)
+    {
+        printf("\nnot enough points\n");
+        return -1;
+    }
+
+    CvMat* A=cvCreateMat(2*data->cols,12,CV_64F);
+    CvMat* U=cvCreateMat(2*data->cols,2*data->cols,CV_64F);
+    CvMat* V=cvCreateMat(12,12,CV_64F);
+    CvMat* W=cvCreateMat(2*data->cols,12,CV_64F);
 
 
+
+    for(int i=0; i<data->cols; i++)
+    {
+        int curRow=i*2;
+
+        double xp= cvmGet(data,0 ,i)  ;
+        double yp= cvmGet(data,1 ,i)  ;
+        double wp= 1.0  ;
+
+        double Xw= cvmGet(data,2 ,i)  ;
+        double Yw= cvmGet(data,3 ,i)  ;
+        double Zw= cvmGet(data,4 ,i)  ;
+        double Ww= 1.0;
+
+
+        //first row
+        cvmSet(A,curRow,0,0.0);
+        cvmSet(A,curRow,1,0.0);
+        cvmSet(A,curRow,2,0.0);
+        cvmSet(A,curRow,3,0.0);
+
+        cvmSet(A,curRow,4,-wp*Xw);
+        cvmSet(A,curRow,5,-wp*Yw);
+        cvmSet(A,curRow,6,-wp*Zw);
+        cvmSet(A,curRow,7,-wp*Ww);
+
+        cvmSet(A,curRow,8,yp*Xw);
+        cvmSet(A,curRow,9,yp*Yw);
+        cvmSet(A,curRow,10,yp*Zw);
+        cvmSet(A,curRow,11,yp*Ww);
+
+//second row
+
+
+        cvmSet(A,curRow+1,0,wp*Xw);
+        cvmSet(A,curRow+1,1,wp*Yw);
+        cvmSet(A,curRow+1,2,wp*Zw);
+        cvmSet(A,curRow+1,3,wp*Ww);
+
+        cvmSet(A,curRow+1,4,0.0);
+        cvmSet(A,curRow+1,5,0.0);
+        cvmSet(A,curRow+1,6,0.0);
+        cvmSet(A,curRow+1,7,0.0);
+
+        cvmSet(A,curRow+1,8,-xp*Xw);
+        cvmSet(A,curRow+1,9,-xp*Yw);
+        cvmSet(A,curRow+1,10,-xp*Zw);
+        cvmSet(A,curRow+1,11,-xp*Ww);
+    }
+
+
+
+    cvSVD( A,  W, U,  V,CV_SVD_MODIFY_A);
+
+    int k=0;
+    for(i=0; i<3; i++)
+    {
+        for(j=0; j<4; j++)
+        {
+            cvmSet(P,i,j,cvmGet(V,k++,11));
+        }
+    }
 
 
 
@@ -852,5 +927,81 @@ also experiment with the camera calibrate function , that might be able to refin
     models.clear();
 
     models.push_back(P);
+
+       cvReleaseMat(&A);
+       cvReleaseMat(&U);
+        cvReleaseMat(&V);
+        cvReleaseMat(&W);
     return 1;
+}
+
+double projError(const CvMat* data, const CvMat* P,vector<double>&  errors )
+{
+    if(errors.size()!=data->cols)
+    {
+        printf("why are teh errors not the same size\n");
+        errors.resize(data->cols);
+    }
+
+    int i;
+    double tot_error=0;
+    double numPts=data->cols;
+
+
+    for(i=0; i<data->cols; i++)
+    {
+
+        CvPoint3D32f  structure;
+        CvPoint2D32f  curPt;
+
+        curPt.x= cvmGet(data,0 ,i)  ;
+        curPt.y= cvmGet(data,1 ,i)  ;
+
+
+        structure.x= cvmGet(data,2 ,i)  ;
+        structure.y= cvmGet(data,3 ,i)  ;
+        structure.z= cvmGet(data,4 ,i)  ;
+
+
+        errors[i]= projectionErrorSquared( P,structure,curPt);
+//printf("the errorr for %d was %f \n",i,errors[i]);
+        tot_error+=errors[i];
+    }
+
+    tot_error/=numPts;
+
+    return tot_error;
+}
+
+
+bool scenePlanar(const CvMat* data)
+{
+    return false; //i need a way of finding planar scenes
+}
+
+
+int formDataMatrixRobustResectioning(CvMat** data, vector< CvPoint2D32f> impts,vector< CvPoint3D32f> wrldpts)
+{
+
+    if(impts.size()!=wrldpts.size())
+    {
+        printf("the size of the world points and image points is not the same\n");
+        return -1;
+    }
+
+    (*data)=    cvCreateMat(5,impts.size(),CV_64F);
+
+    for(int i=0; i<impts.size(); i++)
+    {
+
+        cvmSet((*data),0 ,i, impts[i].x)  ;
+        cvmSet((*data),1 ,i, impts[i].y)  ;
+
+
+        cvmSet((*data),2 ,i, wrldpts[i].x)  ;
+        cvmSet((*data),3 ,i, wrldpts[i].y)  ;
+        cvmSet((*data),4 ,i, wrldpts[i].z)  ;
+    }
+
+
 }

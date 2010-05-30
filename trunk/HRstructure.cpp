@@ -11,7 +11,7 @@
 
 #include "eucsbademo.h"
 #include "triangulate.h"
-
+#include "robust_est.h"
 
 namespace fs = boost::filesystem;
 
@@ -196,6 +196,7 @@ double HRStructure::bundleAdjust()
 int HRStructure::addFrame(int framenum)
 {
 
+
     vector<int> neighbours;
     findBestTwoNehgbourFrames( framenum,neighbours);
 
@@ -217,50 +218,87 @@ int HRStructure::addFrame(int framenum)
 
 
     int numValidProjs= count;
-    vector<int> goodMatchIndex;
+
     int numrejects=0;
+
+
+
+    vector< CvPoint2D32f> impts;
+    vector< CvPoint3D32f> wrldpts;
+    vector< double> prior;
+    vector< bool> inliers;
     for ( i = 0; i < maxlength; i++)
     {
         if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
         {
 
-            if(matchThreeWayValid(i,framenum,neighbours))
-            {
-                goodMatchIndex.push_back(i);
-            }
-            else
-            {
-                printf("rejected point %d\n",i);
-                numrejects++;
-                //   (*imSet).showTrackNumberwithEpipolars(i);
-            }
-
+            impts.push_back((*imSet).myTracks.pointFromTrackloc(i, framenum));
+            wrldpts.push_back(structure[i]);
+            prior.push_back(1.0);//at this point the prioris are teh same
+            inliers.push_back(false);
         }
     }
 
-    int numGoodMatches=goodMatchIndex.size();
 
-    printf("rejected %d points and using %d points\n ",numrejects,numGoodMatches);
+
+    //figure out what to do with these distances, i can use them as aprioris but make sure you weight them with the slope difference
+//    for ( i = 0; i < maxlength; i++)
+//    {
+//        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
+//        {
+//
+//            if(matchThreeWayValid(i,framenum,neighbours))
+//            {
+//                goodMatchIndex.push_back(i);
+//            }
+//            else
+//            {
+//                printf("rejected point %d\n",i);
+//                numrejects++;
+//                //   (*imSet).showTrackNumberwithEpipolars(i);
+//            }
+//
+//        }
+//    }
+
+
+    CvMat* A;
+    formDataMatrixRobustResectioning(&A,  impts, wrldpts);
+
+    ROBUST_EST(A,prior,findProjDLTMinimal,projError, scenePlanar, 6, 2.0,  inliers,2000, 20);
+
+
+//zzzz rempve tis
+//for ( j = 0; j < inliers.size(); j++) inliers[j]=1;
+
+    int numGoodMatches=0;
+    for ( j = 0; j < inliers.size(); j++)
+    {
+        if(inliers[j])
+        numGoodMatches++;
+    }
+
+    printf("rejected %d points and using %d points\n ",impts.size()-numGoodMatches,numGoodMatches);
     CvMat* imgPts=cvCreateMat(numGoodMatches,2,CV_64F);
     CvMat* objectPts=cvCreateMat(numGoodMatches,3,CV_64F);
     CvMat* rvec=cvCreateMat(3,1,CV_64F);
 
 
-
-    for ( j = 0; j < numGoodMatches; j++)
+int k=0;
+    for ( j = 0; j < impts.size(); j++)
     {
-        i=goodMatchIndex[j];
 
-        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, framenum);
+        if(inliers[j])
+        {
+            cvmSet(imgPts,k,0,impts[j].x );
+            cvmSet(imgPts,k,1,impts[j].y );
 
-        cvmSet(imgPts,j,0,curPt.x );
-        cvmSet(imgPts,j,1,curPt.y );
+            cvmSet(objectPts,k,0,wrldpts[j].x);
+            cvmSet(objectPts,k,1,wrldpts[j].y);
+            cvmSet(objectPts,k,2,wrldpts[j].z);
+            k++;
 
-        cvmSet(objectPts,j,0,structure[i].x);
-        cvmSet(objectPts,j,1,structure[i].y);
-        cvmSet(objectPts,j,2,structure[i].z);
-
-
+        }
 
 
     }
@@ -492,7 +530,7 @@ void HRStructure::DLTUpdateStructure()
     printf("reconstructed %d points\n",numReconstructed);
     printf("error before sba=%f \t\n",err_beforesba);
 
-    // sba_driver_interface();
+    sba_driver_interface();
     double err_aftersba=findReconstructionError();
     printf("error after sba=%f \t\n",err_aftersba);
 
@@ -564,7 +602,7 @@ double HRStructure::findReconstructionError()
             rep_error/=((double)numFrames);
             if(rep_error>1)
             {
-                //      printf("point %d had error %f \n",i,rep_error);
+              //     printf("point %d had error %f \n",i,rep_error);
                 numbads++;
             }
 

@@ -38,6 +38,12 @@ double findDepth(CvMat* P,CvPoint3D32f S);
 void  draw_cross(CvPoint2D32f center, CvScalar color, int d,IplImage* img );
 void showMatchAcross(vector<string>& fnames,const  vector< vector< CvPoint2D32f> >& projPoints);
 void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints,const  vector<vector<vector<CvMat*> > >& lines);
-CvPoint2D32f project3DPoint(CvMat* P, CvPoint3D32f S);
-double projectionErrorSquared(CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt);
+CvPoint2D32f project3DPoint(const CvMat* P, CvPoint3D32f S);
+double projectionErrorSquared(const CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt);
+
+int  findProjDLTMinimal(const CvMat* data,vector<CvMat*>& models );
+double projError(const CvMat* data, const CvMat* P,vector<double>&  errors );
+bool scenePlanar(const CvMat* data);
+int formDataMatrixRobustResectioning(CvMat** data, vector< CvPoint2D32f> impts,vector< CvPoint3D32f> wrldpts);
+
 #endif

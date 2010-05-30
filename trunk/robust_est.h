@@ -8,10 +8,9 @@
 
 using namespace std;
 
-int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)(const CvMat* ,vector<CvMat*> models ),
-               double (*distanceFunctionPTR)(const CvMat* , const vector<CvMat*> ,vector<double>&), bool (*degenFunctionPTR)(CvMat*),
-               int s, double t, vector<bool>& inliers,CvMat* model,int maxTrials, int maxDataTrials);
-
+int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)(const CvMat* ,vector<CvMat*>& models ),
+               double (*distanceFunctionPTR)(const CvMat* , const CvMat* ,vector<double>&), bool (*degenFunctionPTR)( const CvMat*),
+               int s, double t, vector<bool>& inliers,int maxTrials, int maxDataTrials);
 
 
 int findTrialCount(int score,int size,int s,double p);

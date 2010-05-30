@@ -58,6 +58,8 @@
 		</Unit>
 		<Unit filename="pgmutils.cpp" />
 		<Unit filename="pgmutils.hpp" />
+		<Unit filename="robust_est.cpp" />
+		<Unit filename="robust_est.h" />
 		<Unit filename="sift.cpp" />
 		<Unit filename="sift.h" />
 		<Unit filename="visiongen.cpp" />
