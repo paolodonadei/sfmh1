@@ -60,12 +60,6 @@ void HRStructure::run()
     frame2=1 ;
     sfmSequence[1]=frame2;
 
-///zzz remove this
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[0])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\001.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[1])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\002.P");
-//    readCvMatFfromfile(&((*((*imSet).imageCollection[2])).projectionMatrix),"C:\\Documents and Settings\\hrast019\\Desktop\\data\\euclidean\\merton1\\003.P");
-
-
 
 
     printf("key frames are %d and %d \n",frame1,frame2);
@@ -268,14 +262,13 @@ int HRStructure::addFrame(int framenum)
     ROBUST_EST(A,prior,findProjDLTMinimal,projError, scenePlanar, 6, 2.0,  inliers,2000, 20);
 
 
-//zzzz rempve tis
-//for ( j = 0; j < inliers.size(); j++) inliers[j]=1;
+
 
     int numGoodMatches=0;
     for ( j = 0; j < inliers.size(); j++)
     {
         if(inliers[j])
-        numGoodMatches++;
+            numGoodMatches++;
     }
 
     printf("rejected %d points and using %d points\n ",impts.size()-numGoodMatches,numGoodMatches);
@@ -284,7 +277,7 @@ int HRStructure::addFrame(int framenum)
     CvMat* rvec=cvCreateMat(3,1,CV_64F);
 
 
-int k=0;
+    int k=0;
     for ( j = 0; j < impts.size(); j++)
     {
 
@@ -602,7 +595,7 @@ double HRStructure::findReconstructionError()
             rep_error/=((double)numFrames);
             if(rep_error>1)
             {
-              //     printf("point %d had error %f \n",i,rep_error);
+                //     printf("point %d had error %f \n",i,rep_error);
                 numbads++;
             }
 
@@ -729,10 +722,6 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
     CvMat* Rident=cvCreateMat(3,3,CV_64F);
     CvMat* tzero=cvCreateMat(3,1,CV_64F);
-
-
-
-//zzz in the matlab file this is done differently , the image location is multiplied by inverse of K
 
 
 
@@ -1031,6 +1020,16 @@ void HRStructure::writeStructure(string fn)
 
     }
     fp_out.close();
+
+
+
+
+
+    string fname_outply=((fs::path( tempdir, fs::native )/fs::path( tempfilename, fs::native )).replace_extension("ply")).file_string();
+
+    writePlyFile(structure,structureValid,fname_outply);
+
+
 }
 ////////////////////////////////////////////////////////////////////
 

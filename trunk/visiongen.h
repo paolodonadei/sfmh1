@@ -40,7 +40,7 @@ void showMatchAcross(vector<string>& fnames,const  vector< vector< CvPoint2D32f>
 void showMatchAcross(vector<string>& fnames,  const  vector<vector<CvPoint2D32f> >& projPoints,const  vector<vector<vector<CvMat*> > >& lines);
 CvPoint2D32f project3DPoint(const CvMat* P, CvPoint3D32f S);
 double projectionErrorSquared(const CvMat* P, CvPoint3D32f s_pt,CvPoint2D32f im_pt);
-
+int writePlyFile(vector<CvPoint3D32f> & strucure,vector<int>& structureValid,string fname);
 int  findProjDLTMinimal(const CvMat* data,vector<CvMat*>& models );
 double projError(const CvMat* data, const CvMat* P,vector<double>&  errors );
 bool scenePlanar(const CvMat* data);
