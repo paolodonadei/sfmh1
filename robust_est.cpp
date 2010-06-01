@@ -54,7 +54,7 @@ int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)
         count=0;
         while (degenerate==true && count<maxDataTrials)
         {
-
+printf("we have %d samples\n",data->cols);
             drawRandSampleMonteCarlo(rndSamples,aprioris,true);   //fill up our randsample array with random sample indices
 
             extractCopySamples(rndSamples, rndSampleData, data); //this copies elements from data whose indices are in rndSamples
@@ -256,6 +256,7 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
     {
         p=(MCS)?pvis[i-1]:((double)0.5);
         probContinuum[i]=p +probContinuum[i-1];
+        printf("p  of %d is %f \t",i,probContinuum[i]);
 
     }
 
@@ -299,11 +300,11 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
         }
         while (flag == 1);
         rndSample[i] = newNum;
-        //printf(" %d ,",newNum);
+        printf(" %d ,",newNum);
 
     }
 
-    //    printf(" \n ,");
+        printf(" \n ,");
 
     return 1;
 }
