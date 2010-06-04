@@ -131,11 +131,13 @@ public:
     const vector<HRImagePtr>* trackImageCollection;
     FeatureTrack();
     CvPoint2D32f pointFromTrackloc(int row, int col,int undistorted=0);
+    int numFeatsinTrack(int tracknum);
     int validTrackEntry(int row, int col);
     int valueTrackEntry(int row, int col);
 
     int processPairMatchinTrack( HRCorrespond2N& corrs, int indexNumber, int rowsize);
     int findMatchinTrack( HRCorrespond2N& corrs, int indexNumber, vector<int>& matchedIndices);
+
     int pruneFeatureTrack();
     int calcFeatureTrackScores(const vector<vector<HRCorrespond2N> >& pairCorrespondences);
     vector<double> curScores;

@@ -108,7 +108,7 @@ Image ReadPGMFile(char *filename)
     */
     file = fopen (filename, "rb");
     if (! file)
-        FatalError("Could not open file: %s", filename);
+        FatalError("aCould not open file: %s", filename);
 
     return ReadPGM(file);
 }
@@ -264,7 +264,7 @@ Keypoint ReadKeyFile(char *filename)
 
     file = fopen (filename, "r");
     if (! file)
-        FatalError("Could not open file: %s", filename);
+        FatalError("fCould not open file: %s", filename);
 
     return ReadKeys(file);
 }

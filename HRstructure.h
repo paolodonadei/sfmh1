@@ -21,9 +21,12 @@ public:
     bool matchThreeWayValid(int feature,int frame,vector<int>& neighbourFrames);
     int initializeKeyFrames(int frame1, int frame2);
     double bundleAdjust();
+    int pruneBadPoints();
+    int findMatchescomminWithStructure(int framenum);
     int addFrame(int framenum);
     void run();
     vector<int> sfmSequence;
+    int findNextFrameAdd();
     vector<CvPoint3D32f> structure;
     vector<double> structureErrors;
     vector<int> structureValid;
@@ -32,6 +35,7 @@ public:
     HRImageSet* imSet;
     string tempdir;
     int numImages;
+    int frameReconstructed(int frame);
     int initializeKeyFrames2(int frame1, int frame2);
     int printSBAstyleData(string camFname, string ptFname);
     int sba_driver_interface();

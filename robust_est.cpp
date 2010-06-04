@@ -54,7 +54,7 @@ int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)
         count=0;
         while (degenerate==true && count<maxDataTrials)
         {
-printf("we have %d samples\n",data->cols);
+//printf("we have %d samples\n",data->cols);
             drawRandSampleMonteCarlo(rndSamples,aprioris,true);   //fill up our randsample array with random sample indices
 
             extractCopySamples(rndSamples, rndSampleData, data); //this copies elements from data whose indices are in rndSamples
@@ -102,7 +102,7 @@ printf("we have %d samples\n",data->cols);
             score=numInliers; //maybe use another function to create the score
 
 
-            printf("score was %f and number of inliers was %d\n",score,numInliers);
+//            printf("score was %f and number of inliers was %d\n",score,numInliers);
 
 
 
@@ -217,7 +217,7 @@ int extractCopySamples(vector<int>& rndSamples,CvMat* rndSampleData,const CvMat*
         }
         else
         {
-            printf("error, wrong index in extractcopy : %d , aborting\n",rndSamples[i]);
+            printf("error, wrong index in extractcopy : %d when we only have points up to %d , aborting\n",rndSamples[i],data->cols);
             abort();
         }
 
@@ -256,7 +256,7 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
     {
         p=(MCS)?pvis[i-1]:((double)0.5);
         probContinuum[i]=p +probContinuum[i-1];
-        printf("p  of %d is %f \t",i,probContinuum[i]);
+       // printf("p  of %d is %f \t",i,probContinuum[i]);
 
     }
 
@@ -300,11 +300,11 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
         }
         while (flag == 1);
         rndSample[i] = newNum;
-        printf(" %d ,",newNum);
+    //    printf(" %d ,",newNum);
 
     }
 
-        printf(" \n ,");
+     //   printf(" \n ,");
 
     return 1;
 }

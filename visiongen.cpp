@@ -1008,10 +1008,24 @@ int formDataMatrixRobustResectioning(CvMat** data, vector< CvPoint2D32f> impts,v
 int writePlyFile(vector<CvPoint3D32f> & strucure,vector<int>& structureValid,string fname)
 {
     FILE* fp;
+    int numpoints=0;
+    printf("ply file name is %s\n",fname.c_str());
     fp=fopen(fname.c_str(),"wt");
     fprintf(fp,"ply\n");
     fprintf(fp,"format ascii 1.0\n");
-    fprintf(fp,"element vertex 1606\n");
+
+    for(int i=0; i<strucure.size(); i++)
+    {
+        if(structureValid[i]>0)
+        {
+
+
+            numpoints++;
+        }
+    }
+
+
+    fprintf(fp,"element vertex %d\n",numpoints);
     fprintf(fp,"property float x\n");
     fprintf(fp,"property float y\n");
     fprintf(fp,"property float z\n");
