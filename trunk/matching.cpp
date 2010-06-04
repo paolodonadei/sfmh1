@@ -692,7 +692,7 @@ int readSIFTfile(vector<HRPointFeatures>& siftVector,string filename)
 
     fp = fopen (filename.c_str(), "r");
     if (! fp)
-        FatalError("Could not open file: %s", filename.c_str());
+        FatalError("dCould not open file: %s", filename.c_str());
 
 //
     int i, j, num, len, val;

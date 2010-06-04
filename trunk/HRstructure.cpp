@@ -70,20 +70,35 @@ void HRStructure::run()
 
     for(i=0; i<numImages; i++)
     {
-        if(i!=frame1 && i!=frame2)
-        {
-            addFrame(i);
-            printf("added frame %d \n",i);
-            DLTUpdateStructure();
-        }
+        int frametoAdd=findNextFrameAdd();
+        if(frametoAdd==-1)
+            break;
+        addFrame(frametoAdd);
+        printf("++added frame %d \n",frametoAdd);
+        DLTUpdateStructure();
+        writeStructure((string("structure") + stringify(i) +string(".txt")).c_str());
+
     }
 
 
 
-
+    DLTUpdateStructure(); //one last time
     writeStructure("structurelast.txt");
+    int numimgUsed=0;
+
+    printf("used frames: ");
+    for(i=0; i< sfmSequence.size(); i++)
+    {
+        if(sfmSequence[i]!=-1)
+        {
+            numimgUsed++;
+            printf("\t %d \t",sfmSequence[i]);
+        }
 
 
+    }
+    printf("\n ");
+    printf("used %d frames from a total of %d\n",numimgUsed,sfmSequence.size());
 }
 
 
@@ -258,8 +273,10 @@ int HRStructure::addFrame(int framenum)
 
     CvMat* A;
     formDataMatrixRobustResectioning(&A,  impts, wrldpts);
+    printf("size of A is %d and size of the aprioris is %d \n",A->cols,prior.size());
 
-    ROBUST_EST(A,prior,findProjDLTMinimal,projError, scenePlanar, 6, 2.0,  inliers,2000, 20);
+    double threshold=0.004*max((*imSet).imageCollection[framenum]->width,(*imSet).imageCollection[framenum]->height);//thisis due to snavely's paper
+    ROBUST_EST(A,prior,findProjDLTMinimal,projError, scenePlanar, 6, threshold,  inliers,2000, 20);
 
 
 
@@ -525,6 +542,7 @@ void HRStructure::DLTUpdateStructure()
 
     sba_driver_interface();
     double err_aftersba=findReconstructionError();
+    pruneBadPoints();
     printf("error after sba=%f \t\n",err_aftersba);
 
 
@@ -555,7 +573,7 @@ double HRStructure::findReconstructionError()
     int numValidProjs= count;
 
 
-
+    int threshold=0.004*max((*imSet).imageCollection[0]->width,(*imSet).imageCollection[0]->height);//thisis due to snavely's paper
 
     double x,y;
 
@@ -593,7 +611,7 @@ double HRStructure::findReconstructionError()
                 }
             }
             rep_error/=((double)numFrames);
-            if(rep_error>1)
+            if(rep_error>threshold)
             {
                 //     printf("point %d had error %f \n",i,rep_error);
                 numbads++;
@@ -610,6 +628,40 @@ double HRStructure::findReconstructionError()
 
     return rerror;
 }
+int HRStructure::pruneBadPoints()
+{
+
+    int i,j;
+    int numremoved=0;
+    int numtotal=0;
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+
+//i made this threshold larger, in photosynth its 4 but in this case i made it 5
+    double threshold=0.005*max((*imSet).imageCollection[0]->width,(*imSet).imageCollection[0]->height);//thisis due to snavely's paper
+
+
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+            numtotal++;
+            if(structureErrors[i]>threshold)
+            {
+                structureValid[i]=0;
+                numremoved++;
+                (*imSet).myTracks.eraseTrackMatRow(i);
+                printf("removing point %d with error %f and our thresh was %f\n",i,structureErrors[i], threshold);
+            }
+
+        }
+    }
+
+
+    printf("removed %d points from %d triangulated points\n", numremoved,numtotal );
+}
+
 int HRStructure::printSBAstyleData(string camFname, string ptFname)
 {
 
@@ -687,7 +739,86 @@ int HRStructure::printSBAstyleData(string camFname, string ptFname)
     return 0;
 
 }
+int HRStructure::frameReconstructed(int frame)
+{
+  for(int i=0; i< sfmSequence.size(); i++)
+    {
+        if(sfmSequence[i]==frame)
+        return 1;
+    }
 
+    return 0;
+}
+int HRStructure::findNextFrameAdd()
+{
+    int i;
+    vector<int> numMatches(sfmSequence.size(),0);
+
+
+    for(i=0; i< sfmSequence.size(); i++)
+    {
+
+        if(frameReconstructed(i)==1)
+            numMatches[i]=0;
+        else
+            numMatches[i]=findMatchescomminWithStructure(i);
+
+            printf("element %d is %d\n",i, numMatches[i]);
+
+    }
+
+//zzz this is where uyou should do the GRIC model selection score to make sure you are not adding a homographuy
+    int bestnextFrame=0;
+    int numbestMatches=0;
+    int bestIndex=0;
+    int counter=0;
+
+    do
+    {
+        counter++;
+        bestIndex=indexMax(numMatches);
+        numbestMatches=numMatches[bestIndex];
+        bestnextFrame=bestIndex;
+        numMatches[bestIndex]=0;
+        if(numbestMatches>20 && 1)//this is aplaceholder for checking other conditions
+        {
+            break;
+        }
+    }
+    while(counter<sfmSequence.size());
+
+
+    if(counter==sfmSequence.size())
+    {
+        return -1;
+    }
+    else
+    {
+        return   bestnextFrame;
+    }
+
+
+
+
+}
+int HRStructure::findMatchescomminWithStructure(int framenum)
+{
+    int numcommon=0;
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+
+    for (int  i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0 && (*imSet).myTracks.validTrackEntry(i,framenum)!=0)
+        {
+
+            numcommon++;
+        }
+    }
+
+    return numcommon;
+}
 int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t)
 {
     int i,j;
@@ -1007,8 +1138,14 @@ void HRStructure::writeStructure(string fn)
                 if(sfmSequence[j]!=-1)
                 {
                     int curFrame=sfmSequence[j];
-                    CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
-                    fp_out<< "\t" << curFrame << "\t" << curPt.x<< "\t" << curPt.y;
+                    if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
+                    {
+
+
+
+                        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+                        fp_out<< "\t" << curFrame<<"\t"<< curFrame << "\t" << curPt.x<< "\t" << curPt.y;
+                    }
                 }
 
             }
@@ -1173,7 +1310,7 @@ int HRStructure::sba_driver_interface()
         if(sfmSequence[j]!=-1)
         {
             int curFrame=sfmSequence[j];
-            printf("2 sba current frame is %d our j was %d\n",curFrame,j );
+
             CvMat* curK=(*((*imSet).imageCollection[curFrame])).intrinsicMatrix;
             CvMat* curR=(*((*imSet).imageCollection[curFrame])).camPose.Rm;
             CvMat* curt=(*((*imSet).imageCollection[curFrame])).camPose.tm;
@@ -1376,6 +1513,7 @@ int HRStructure::sba_driver_interface()
     initrot=initrot_copy;
 
 
+    if(1==0)
     {
 
 
@@ -1584,6 +1722,7 @@ int HRStructure::sba_driver_interface()
     motstruct=motstruct_copy;  //rewind pointer
     initrot=initrot_copy;
 
+    if(1==0)
     {
 
 

@@ -1,3 +1,28 @@
+
+
+
+- lens distortion parameters are not right when obtained from ba, maybe i need to initialize them to something
+- use flann for sift matching, correct approachj is not feasibler
+-check why sift pca is crashing for some sequences
+- test with some of my own images
+- for visualization do these mayve:
+    1) delauny triangulation of the point cloud
+    2) find more matches using correlati0on and the f matrix_to_quaternion
+    3) show the camera locations
+    4) use fukunaga's stuff to do 3d dense reconstruction
+
+- for pose estimation, mayeb i can use the distance from the cross (i have some functions to do the distance already) and weigh it by the
+angel of the crossing epipolar lines (so that parallel lines whose intersection is not precisely localized wouldnt affect the results)
+- still i am not using the initial framer based on the quality of self calibration, i was suppose to do this, this was the main topic under the investigation,
+maybe i can use covariance matrix
+- add camera center to the properties of hrimage, i dont remember why i needed this but it would be niceto have (at least for visualization of the camera locations)
+- maybe make a gui around the whole thing if you have time and put it on twiki
+
+
+
+
+
+______________________________________________________________________
 - make sure the oxford flag is off in the ReleaseCapture
 - make sure im not reading the projection matrices in the ReleaseCapture
 - the structure is whacked which means the 3D reconstruction is jacked, i suspect something is wrong with

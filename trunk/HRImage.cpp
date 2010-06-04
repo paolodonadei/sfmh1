@@ -1401,6 +1401,8 @@ int HRImageSet::readPoseOxford()
 
 int HRImageSet::SelfCalibrate()
 {
+
+    printf("SELF CALIB BEGIN:__________________________\n");
     confid.resize(imageCollection.size());
 
     for(int i=0; i<imageCollection.size(); i++)
@@ -1469,10 +1471,10 @@ int HRImageSet::SelfCalibrate()
     for (int i = 0; i < numFrames; ++i)
     {
         printf("confidence for K %d is %f, focal lengths are %f and %f \n",i,confid[i],cvmGet(intrinMatrix[i],0,0),cvmGet(intrinMatrix[i],1,1));
-        //   writeCVMatrix(cout,intrinMatrix[i]);
+        writeCVMatrix(cout,intrinMatrix[i]);
     }
 
-
+    printf("SELF CALIB END:__________________________\n");
 
 }
 void HRImageSet::findEssentialMatrices()
@@ -1547,7 +1549,7 @@ int  HRImageSet::EpilineFromTrackloc(int featurenum, int fram_src,int fram_dst,C
 
     CvPoint2D32f  curPt=myTracks.pointFromTrackloc(featurenum, fram_src);
 
- CvMat* point=cvCreateMat(1,1,CV_32FC2);
+    CvMat* point=cvCreateMat(1,1,CV_32FC2);
 
     point->data.fl[0]=curPt.x;
     point->data.fl[1]=curPt.y;
@@ -2141,6 +2143,8 @@ int FeatureTrack::eraseTrackMatRow(int index)
         return -1;
 
     }
+
+   // printf("removing track %d with %d points and %d images\n",index,numFeatsinTrack(index),getNumFrames() );
     inliersStates[index]=0;
 
 
@@ -2172,6 +2176,8 @@ int FeatureTrack::valueTrackEntry(int row, int col)
 
 
 }
+
+
 int FeatureTrack::validTrackEntry(int row, int col)
 {
     if (row>=trackMatrix.size())
@@ -2188,6 +2194,10 @@ int FeatureTrack::validTrackEntry(int row, int col)
     {
         return 0;
 
+    }
+    if(   inliersStates[row]==0)
+    {
+        return 0;
     }
 
     return 1;
@@ -2206,29 +2216,9 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
     temp.y=0;
 
 
-    if (row>=trackMatrix.size())
+    if(validTrackEntry( row,  col)==0)
     {
-        cout<<"1-calling on a nonexistent row, track this bug"<<endl;
-        printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
-        return temp;
-
-    }
-    if (col<0 || col>=(*trackImageCollection).size())
-    {
-        cout<<"2-calling on a nonexistent row, track this bug"<<endl;
-        return temp;
-    }
-    if (trackMatrix[row][col]==-1)
-    {
-        return temp;
-
-    }
-
-    if (trackMatrix[row][col]<0 || trackMatrix[row][col]>= (*trackImageCollection)[col]->HR2DVector.size())//this is becasue some columns will be -1
-    {
-        cout<<"3-calling on a nonexistent row, track this bug"<<endl;
-        printf("value of track matrix was %d\n",trackMatrix[row][col]);
-        printf("row num was %d and col num was %d, max row was %d and max col was %d\n",row,col,trackMatrix.size(),trackMatrix[row].size());
+        printf("request for bad track %d feature %d, returning nill \n",row,col);
         return temp;
     }
 
@@ -2247,6 +2237,28 @@ CvPoint2D32f FeatureTrack::pointFromTrackloc(int row, int col,int undistorted)
 
 
 
+}
+int FeatureTrack::numFeatsinTrack(int tracknum)
+{
+    int numfeats=0;
+    if (tracknum>=trackMatrix.size() || tracknum<1)
+    {
+        return 0;
+
+    }
+
+    for(int i=0; i<trackMatrix[tracknum].size(); i++)
+    {
+        if(trackMatrix[tracknum][i]!=-1)
+        {
+            numfeats++;
+        }
+
+    }
+
+
+
+    return numfeats;
 }
 void FeatureTrack::writeTrackMatrix(string fname)
 {
