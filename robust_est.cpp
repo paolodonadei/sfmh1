@@ -259,7 +259,7 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
        // printf("p  of %d is %f \t",i,probContinuum[i]);
 
     }
-
+ERRROR MOFO
 
     int minSize=rndSample.size();
 
@@ -301,6 +301,10 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
         while (flag == 1);
         rndSample[i] = newNum;
     //    printf(" %d ,",newNum);
+    if(newNum>=pvis.size())
+    {
+        printf("chose sample %d when we only had %d samples\n");
+    }
 
     }
 
