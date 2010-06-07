@@ -34,7 +34,9 @@ public:
     void writeStructure(string fn);
     HRImageSet* imSet;
     string tempdir;
+    int pruneBadTracks();
     int numImages;
+    int lastFrameReconstructed();
     int frameReconstructed(int frame);
     int initializeKeyFrames2(int frame1, int frame2);
     int printSBAstyleData(string camFname, string ptFname);

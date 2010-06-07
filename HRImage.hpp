@@ -144,6 +144,7 @@ public:
     vector<int> inliersStates;//this is different from the pairwise inlier variable, this is for when we remove a whole track
     int eraseTrackMatRow(int index);
     void writeTrackMatrix(string fname);
+    int eraseTrackelement(int rowindex, int frameindex);
     bool rowExistsinTrack(const vector<int>& indices, const vector<int>& newRow);
     int drawImageTrackMatches(const vector<HRImagePtr>& imCollection,string filname);
     bool displayTrackRow(int row);

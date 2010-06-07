@@ -1308,6 +1308,36 @@ int HRImageSet::exhaustiveSIFTMatching()
     }
 
 
+//this check is somewhat unnecessary, it just checks for invalid matches, if the other parts of the program are working right
+//this shouldnt be necessary
+    for (int i = 0; i < imageCollection.size(); ++i)
+    {
+
+        for (int j =0; j <imageCollection.size(); ++j)
+        {
+            if(i!=j)
+            {
+                for(int k=0; k<correspondencesPairWise[i][j].imIndices.size(); k++)
+                {
+                    if(correspondencesPairWise[i][j].imIndices[k].imindex1>=  imageCollection[i]->HR2DVector.size())
+                    {
+                        printf("wrong match between %d and %d at index %d when the size was only %d\n",i,j,correspondencesPairWise[i][j].imIndices[k].imindex1,imageCollection[i]->HR2DVector.size());
+                        printf("%s\n", imageCollection[i]->filename.c_str());
+                        printf("%s\n", imageCollection[j]->filename.c_str());
+                        exit(EXIT_FAILURE);
+                    }
+                    if(correspondencesPairWise[i][j].imIndices[k].imindex2>=  imageCollection[j]->HR2DVector.size())
+                    {
+                        printf("wrong match between %d and %d at index %d when the size was only %d\n",i,j,correspondencesPairWise[i][j].imIndices[k].imindex2,imageCollection[j]->HR2DVector.size());
+                        printf("%s\n", imageCollection[i]->filename.c_str());
+                        printf("%s\n", imageCollection[j]->filename.c_str());
+                        exit(EXIT_FAILURE);
+                    }
+                }
+            }
+        }
+    }
+
 }
 void HRImageSet::drawallMatches()
 {
@@ -1467,6 +1497,18 @@ int HRImageSet::SelfCalibrate()
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLE);
 
     cout<<" According to NONLINSIMPLE :"<<endl;
+
+//
+/////zzz remove this, i did this just for the valbone sequence XXX important
+// for (int i = 0; i < numFrames; ++i)
+//    {
+//       cvmSet(intrinMatrix[i],0,0,682);
+//        cvmSet(intrinMatrix[i],1,1,682);
+//            cvmSet(intrinMatrix[i],0,2,256);
+//               cvmSet(intrinMatrix[i],1,2,384);
+//    }
+//
+
 
     for (int i = 0; i < numFrames; ++i)
     {
@@ -2144,8 +2186,33 @@ int FeatureTrack::eraseTrackMatRow(int index)
 
     }
 
-   // printf("removing track %d with %d points and %d images\n",index,numFeatsinTrack(index),getNumFrames() );
+    // printf("removing track %d with %d points and %d images\n",index,numFeatsinTrack(index),getNumFrames() );
     inliersStates[index]=0;
+
+
+
+    return 0;
+}
+int FeatureTrack::eraseTrackelement(int rowindex, int frameindex)
+{
+
+
+
+
+    if ( rowindex<0 ||  rowindex>=inliersStates.size())
+    {
+        cout<<"wrong index used. quitting."<<endl;
+        return -1;
+
+    }
+
+    if (frameindex<0 || frameindex>=trackMatrix[ rowindex].size())
+    {
+
+        return 0;
+    }
+
+    trackMatrix[rowindex][frameindex]=-1;
 
 
 

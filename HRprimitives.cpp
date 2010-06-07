@@ -98,10 +98,24 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
     <<"\t"<<setw(11)<<"score"<<"\t"<<setw(11)<<"motion error"<<"\t"<<setw(11)<<"inlier"
     <<endl;
 
-
+    printf("number of matches is %d\n",ob.imIndices.size());
 
     for (int i=0; i<ob.imIndices.size(); i++)
     {
+
+        if(ob.imIndices[i].imindex1>ob.hr1ptr->HR2DVector.size() )
+        {
+            printf("***error in the match , writing a nonexistent match\n");
+            printf("***match 1 is %d and size of vec 1 is %d\n",ob.imIndices[i].imindex1, ob.hr1ptr->HR2DVector.size());
+            exit(1);
+        }
+        if(ob.imIndices[i].imindex2>ob.hr2ptr->HR2DVector.size() )
+        {
+            printf("***error in the match , writing a nonexistent match\n");
+            printf("***match 1 is %d and size of vec 1 is %d\n",ob.imIndices[i].imindex2, ob.hr2ptr->HR2DVector.size());
+            exit(1);
+        }
+
         x1=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.x;
         x2=ob.hr1ptr->HR2DVector[ob.imIndices[i].imindex1]->location.y;
         y1=ob.hr2ptr->HR2DVector[ob.imIndices[i].imindex2]->location.x;
@@ -110,6 +124,8 @@ ostream &operator<<(ostream &stream, const HRCorrespond2N& ob)
         cscore=ob.imIndices[i].score; //higher is better
         cmotionError=ob.imIndices[i].motionError;
         cinlier=ob.imIndices[i].inlier;
+
+
 
         stream <<i<<"\t\t"<<setw(10)<<fixed<<setprecision(5)<<x1 <<"\t"<<setw(11)<<y1<<"\t"<<setw(11)<<x2<<"\t" <<setw(11)<<y2 <<"\t"
         <<"\t"<<setw(11)<<cscore<<"\t"<<setw(11)<<cmotionError<<"\t"<<setw(11)<<cinlier
@@ -348,7 +364,7 @@ int HRCorrespond2N::findGeomtry()
 {
 
 
-printf(" f matrix [%d][%d] has left side image %d and right side %d \n",indexIm1,indexIm2,indexIm2,indexIm1);
+    printf(" f matrix [%d][%d] has left side image %d and right side %d \n",indexIm1,indexIm2,indexIm2,indexIm1);
     int num=motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  FUNDAMENTAL);
     motion.findMotionModels(hr1ptr->HR2DVector,hr2ptr->HR2DVector,imIndices,  HOMOGRAPHY);
 
@@ -600,7 +616,7 @@ int MotionGeometry::findHMatrix(const vector<HRPointFeatures>&  hr1vec,const vec
     double error=0;
     // int num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
 
-cvFindHomography(	points1,points2,MotionModel_H,CV_FM_RANSAC,	1.5,(CvMat*)NULL);
+    cvFindHomography(	points1,points2,MotionModel_H,CV_FM_RANSAC,	1.5,(CvMat*)NULL);
 //cvFindFundamentalMat( points1,points2,MotionModel_H, CV_FM_RANSAC,1.5,0.99,status );
 
 
@@ -683,12 +699,12 @@ int MotionGeometry::findFMatrix(const vector<HRPointFeatures>& hr1vec,const vect
     int pointsRejected=0;
     double error=0;
 
-int num=0;
+    int num=0;
 //no RANSAC if all the matches are ground truth
     if(OXFORDMATCHES==1)
-         num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_8POINT,1.0,0.99,status);
+        num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_8POINT,1.0,0.99,status);
     else
-         num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
+        num = cvFindFundamentalMat(points1,points2,MotionModel_F,CV_FM_RANSAC,1.0,0.99,status);
 
     error= computeReprojErrorF( points1,points2, MotionModel_F, err_array ,status);
 
