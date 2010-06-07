@@ -203,6 +203,11 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
             indexTemp.imindex1=i;
             indexTemp.imindex2=index;
             indexTemp.score=score;
+            if(i>= im1.HR2DVector.size() || index>=im2.HR2DVector.size())
+            {
+                printf("haaaaaa\n");
+                exit(0);
+            }
 
             hr_correspond.imIndices.push_back(indexTemp);
 

@@ -20,30 +20,45 @@ int main(int argc, char *argv[])
     printf("directory is %s \n",my_parms.dirName.c_str());
 
     {
+
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
+
+     printf("##### FEATURE DETECTION\n");
         imSet.featureDetectSift();
         //imSet.showOneByOneFeature();
 
+printf("##### FEATURE MATCHING\n");
         imSet.exhaustiveSIFTMatching();
 
 
-
+printf("##### multiple view geometry \n");
         imSet.multipleViewEstimate();
+
+        printf("##### draw matches \n");
         imSet.drawallMatches();
+
+           printf("##### create feature tracks \n");
         imSet.createFeatureTrackMatrix();
+
+              printf("##### self calibrate \n");
         imSet.SelfCalibrate();
+
+                   printf("##### find essential matrices \n");
         imSet.findEssentialMatrices();
 
 
-
+      printf("#####  write motion \n");
         imSet.writeMotions();
      //    imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
+            printf("#####  run SFM\n");
         mystruct.run();
       //  imSet.showOneByOneUndistorted();
-
+        printf("#####  print image parameters\n");
         imSet.printAllImageParams(); //imeplement this and try to figure out why the distortion paramrters look so whacked and the errrors so high
+
+               printf("#####  write undisroted image features\n");
         imSet.writeDistANDundistFeats();
     }
 

@@ -114,7 +114,7 @@ int ROBUST_EST(const CvMat* data,vector<double>& aprioris,int  (*fitFunctionPtr)
                 N=findTrialCount(numInliers,size, s, p); //this function finds the new max iteration count based on the new number of inliers
                 bestInliers=inliers;
                 numBestInliers=numInliers;
-                printf("trialcount %d best score found was %f number of inliers is %d\n",trialcount,score,numBestInliers);
+                printf("trialcount %d best score found was %f number of inliers is %d from a total of %d points with threshold %f\n",trialcount,score,numBestInliers,inliers.size(),t);
 
 
                 chosenIteration=trialcount;
@@ -256,10 +256,10 @@ int  drawRandSampleMonteCarlo(vector<int>& rndSample, const vector<double>& pvis
     {
         p=(MCS)?pvis[i-1]:((double)0.5);
         probContinuum[i]=p +probContinuum[i-1];
-       // printf("p  of %d is %f \t",i,probContinuum[i]);
+        // printf("p  of %d is %f \t",i,probContinuum[i]);
 
     }
-ERRROR MOFO
+
 
     int minSize=rndSample.size();
 
@@ -283,6 +283,12 @@ ERRROR MOFO
             }
 
             newNum=k-1;
+
+//            if(newNum>=size)
+//            {
+//            continue;
+//            }
+
             //printf("chose %d which is outlier %d\n",newNum,feat_corr[newNum].outlier);
 
             //Test this number to ensure it has not already been selected
@@ -300,15 +306,16 @@ ERRROR MOFO
         }
         while (flag == 1);
         rndSample[i] = newNum;
-    //    printf(" %d ,",newNum);
-    if(newNum>=pvis.size())
-    {
-        printf("chose sample %d when we only had %d samples\n");
-    }
+        //    printf(" %d ,",newNum);
+        if(newNum>=pvis.size())
+        {
+            printf("chose sample %d when we only had %d samples\n");
+            exit(1);
+        }
 
     }
 
-     //   printf(" \n ,");
+    //   printf(" \n ,");
 
     return 1;
 }

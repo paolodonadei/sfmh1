@@ -62,10 +62,12 @@ void HRStructure::run()
 
 
 
-    printf("key frames are %d and %d \n",frame1,frame2);
+    printf("key frames are %d and %d with %d matches\n",frame1,frame2,(*imSet).correspondencesPairWise[frame1][frame2].imIndices.size());
     initializeKeyFrames(frame1,  frame2);
 
     DLTUpdateStructure();
+    pruneBadTracks();
+
 
 
     for(i=0; i<numImages; i++)
@@ -76,6 +78,7 @@ void HRStructure::run()
         addFrame(frametoAdd);
         printf("++added frame %d \n",frametoAdd);
         DLTUpdateStructure();
+        pruneBadPoints();
         writeStructure((string("structure") + stringify(i) +string(".txt")).c_str());
 
     }
@@ -124,7 +127,7 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
 
     int maxlength=(*imSet).myTracks.getNumTracks();
 
-    printf("number of feature matches is %d and numframes is %d \n",(*imSet).myTracks.getNumTracks(),(*imSet).myTracks.getNumFrames());
+    printf("number of tracks is %d and numframes is %d \n",(*imSet).myTracks.getNumTracks(),(*imSet).myTracks.getNumFrames());
     structure.resize(maxlength);
 
 
@@ -169,27 +172,27 @@ int HRStructure::initializeKeyFrames(int frame1, int frame2)
     findProjfromcompon((*((*imSet).imageCollection[frame2])));
 
 
-
-
-
-    cout<<" R1 :"<<endl;
-
-    writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).camPose.Rm);
-
-    cout<<" T1 :"<<endl;
-
-    writeCVMatrix(cout,((*((*imSet).imageCollection[frame2])).camPose.tm));
-
-
-
-
-    cout<<" P0 :"<<endl;
-
-    writeCVMatrix(cout,(*((*imSet).imageCollection[frame1])).projectionMatrix);
-
-    cout<<" P1 :"<<endl;
-
-    writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
+//
+//
+//
+//    cout<<" R1 :"<<endl;
+//
+//    writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).camPose.Rm);
+//
+//    cout<<" T1 :"<<endl;
+//
+//    writeCVMatrix(cout,((*((*imSet).imageCollection[frame2])).camPose.tm));
+//
+//
+//
+//
+//    cout<<" P0 :"<<endl;
+//
+//    writeCVMatrix(cout,(*((*imSet).imageCollection[frame1])).projectionMatrix);
+//
+//    cout<<" P1 :"<<endl;
+//
+//    writeCVMatrix(cout,(*((*imSet).imageCollection[frame2])).projectionMatrix);
 
 
     cvReleaseMat(&Ttemp);
@@ -205,9 +208,6 @@ double HRStructure::bundleAdjust()
 int HRStructure::addFrame(int framenum)
 {
 
-
-    vector<int> neighbours;
-    findBestTwoNehgbourFrames( framenum,neighbours);
 
     int numCommonPts=0;
 
@@ -273,7 +273,7 @@ int HRStructure::addFrame(int framenum)
 
     CvMat* A;
     formDataMatrixRobustResectioning(&A,  impts, wrldpts);
-    printf("size of A is %d and size of the aprioris is %d \n",A->cols,prior.size());
+//    printf("size of A is %d and size of the aprioris is %d \n",A->cols,prior.size());
 
     double threshold=0.004*max((*imSet).imageCollection[framenum]->width,(*imSet).imageCollection[framenum]->height);//thisis due to snavely's paper
     ROBUST_EST(A,prior,findProjDLTMinimal,projError, scenePlanar, 6, threshold,  inliers,2000, 20);
@@ -542,7 +542,7 @@ void HRStructure::DLTUpdateStructure()
 
     sba_driver_interface();
     double err_aftersba=findReconstructionError();
-    pruneBadPoints();
+
     printf("error after sba=%f \t\n",err_aftersba);
 
 
@@ -631,6 +631,40 @@ double HRStructure::findReconstructionError()
 int HRStructure::pruneBadPoints()
 {
 
+
+    int i,j;
+    int numremoved=0;
+    int numtotal=0;
+
+    int maxlength=(*imSet).myTracks.getNumTracks();
+
+    int lastframe=lastFrameReconstructed();
+//i made this threshold larger, in photosynth its 4 but in this case i made it 5
+    double threshold=0.006*max((*imSet).imageCollection[0]->width,(*imSet).imageCollection[0]->height);//thisis due to snavely's paper
+
+
+    for ( i = 0; i < maxlength; i++)
+    {
+        if(structureValid[i]!=0)
+        {
+            numtotal++;
+            if(structureErrors[i]>threshold)
+            {
+
+                numremoved++;
+                (*imSet).myTracks.eraseTrackelement(i, lastframe);
+                printf("removing point %d in frame %d with error %f and our thresh was %f\n",i,lastframe,structureErrors[i], threshold);
+            }
+
+        }
+    }
+
+
+    printf("removed %d points from %d triangulated points\n", numremoved,numtotal );
+}
+int HRStructure::pruneBadTracks()
+{
+
     int i,j;
     int numremoved=0;
     int numtotal=0;
@@ -639,7 +673,7 @@ int HRStructure::pruneBadPoints()
 
 
 //i made this threshold larger, in photosynth its 4 but in this case i made it 5
-    double threshold=0.005*max((*imSet).imageCollection[0]->width,(*imSet).imageCollection[0]->height);//thisis due to snavely's paper
+    double threshold=0.006*max((*imSet).imageCollection[0]->width,(*imSet).imageCollection[0]->height);//thisis due to snavely's paper
 
 
     for ( i = 0; i < maxlength; i++)
@@ -661,7 +695,6 @@ int HRStructure::pruneBadPoints()
 
     printf("removed %d points from %d triangulated points\n", numremoved,numtotal );
 }
-
 int HRStructure::printSBAstyleData(string camFname, string ptFname)
 {
 
@@ -741,13 +774,30 @@ int HRStructure::printSBAstyleData(string camFname, string ptFname)
 }
 int HRStructure::frameReconstructed(int frame)
 {
-  for(int i=0; i< sfmSequence.size(); i++)
+    for(int i=0; i< sfmSequence.size(); i++)
     {
         if(sfmSequence[i]==frame)
-        return 1;
+            return 1;
     }
 
     return 0;
+}
+int HRStructure::lastFrameReconstructed()
+{
+    int framen=-1;
+    for(int i=0; i< sfmSequence.size(); i++)
+    {
+        if(sfmSequence[i]==-1)
+        {
+            return framen;
+        }
+        else
+        {
+            framen=sfmSequence[i];
+        }
+    }
+
+    return framen;
 }
 int HRStructure::findNextFrameAdd()
 {
@@ -763,7 +813,7 @@ int HRStructure::findNextFrameAdd()
         else
             numMatches[i]=findMatchescomminWithStructure(i);
 
-            printf("element %d is %d\n",i, numMatches[i]);
+        printf("matches of structure with frame %d is %d\n",i, numMatches[i]);
 
     }
 
@@ -874,7 +924,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
 
     copyMatrix(E,temp1);
-    writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
+  //  writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
     cvSVD( temp1, WW,  U, VT,CV_SVD_V_T );
 
 
@@ -952,12 +1002,12 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
     copyMatrix(PTemp,P4);
 
 ///////
-
-    writeCVMatrix(cout<<"porigin:"<<endl,POrigin);
-    writeCVMatrix(cout<<"P1:"<<endl,P1);
-    writeCVMatrix(cout<<"P2:"<<endl,P2);
-    writeCVMatrix(cout<<"P3:"<<endl,P3);
-    writeCVMatrix(cout<<"P4:"<<endl,P4);
+//
+//    writeCVMatrix(cout<<"porigin:"<<endl,POrigin);
+//    writeCVMatrix(cout<<"P1:"<<endl,P1);
+//    writeCVMatrix(cout<<"P2:"<<endl,P2);
+//    writeCVMatrix(cout<<"P3:"<<endl,P3);
+//    writeCVMatrix(cout<<"P4:"<<endl,P4);
 
 
 
@@ -981,7 +1031,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
         depth1=findDepth(POrigin,S1);
         depth2=findDepth(P1,S1);
 
-        printf("for P1 depth1 is %f and depth2 is %f\n",depth1,depth2);
+//        printf("for P1 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1006,7 +1056,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S2);
         depth2=findDepth(P2,S2);
-        printf("for P2 depth1 is %f and depth2 is %f\n",depth1,depth2);
+      //  printf("for P2 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1031,7 +1081,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S3);
         depth2=findDepth(P3,S3);
-        printf("for P3 depth1 is %f and depth2 is %f\n",depth1,depth2);
+    //    printf("for P3 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1056,7 +1106,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S4);
         depth2=findDepth(P4,S4);
-        printf("for P4 depth1 is %f and depth2 is %f\n",depth1,depth2);
+    //    printf("for P4 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1101,6 +1151,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 }
 void HRStructure::writeStructure(string fn)
 {
+    cout<<"writing \t"<< fn<<endl;
     int i,j;
     int maxlength=(*imSet).myTracks.getNumTracks();
 
@@ -1301,7 +1352,7 @@ int HRStructure::sba_driver_interface()
         exit(1);
     }
 
-    printf("num images is %d and size of sfm is %d \n",numImages,sfmSequence.size());
+
 
 
 
@@ -1596,8 +1647,8 @@ int HRStructure::sba_driver_interface()
     fputs("\n\n", stdout);
     fprintf(stdout, "SBA returned %d in %g iter, reason %g, error %g [initial %g], %d/%d func/fjac evals, %d lin. systems\n", n,
             info[5], info[6], info[1]/numprojs, info[0]/numprojs, (int)info[7], (int)info[8], (int)info[9]);
-    fprintf(stdout, "Elapsed time: %.2lf seconds, %.2lf msecs\n", ((double) (end_time - start_time)) / CLOCKS_PER_SEC,
-            ((double) (end_time - start_time)) / CLOCKS_PER_MSEC);
+//    fprintf(stdout, "Elapsed time: %.2lf seconds, %.2lf msecs\n", ((double) (end_time - start_time)) / CLOCKS_PER_SEC,
+//            ((double) (end_time - start_time)) / CLOCKS_PER_MSEC);
     fflush(stdout);
 
     /* refined motion and structure are now in motstruct */
