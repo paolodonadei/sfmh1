@@ -217,7 +217,6 @@ int matchTWOImagesNearestNeighbour( HRImage& im1, HRImage& im2,HRCorrespond2N& h
 
     /* Write result image to standard output. */
 
-    fprintf(stderr,"read Found %d matches.\n", count);
 
     hr_correspond.writeIndices();
 

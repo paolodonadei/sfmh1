@@ -8,7 +8,7 @@
 #include "boost/filesystem/path.hpp"
 #include "matrix.h"
 #include <sba.h>
-
+#include <highgui.h>
 #include "eucsbademo.h"
 #include "triangulate.h"
 #include "robust_est.h"
@@ -101,7 +101,19 @@ void HRStructure::run()
 
     }
     printf("\n ");
-    printf("used %d frames from a total of %d\n",numimgUsed,sfmSequence.size());
+    printf(" used %d frames from a total of %d ",numimgUsed,sfmSequence.size());
+
+    int numReconstructed=0;
+    for(i=0; i< maxlength; i++)
+    {
+        if(structureValid[i]>0)
+            numReconstructed++;
+    }
+
+    writePlyFileRGB(string("finalstructrgb.ply"));
+    double err_rcnstr=findReconstructionError();
+    printf("  and reconstructed %d points with error %f \n",numReconstructed,err_rcnstr);
+
 }
 
 
@@ -924,7 +936,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
 
     copyMatrix(E,temp1);
-  //  writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
+    //  writeCVMatrix(cout<<"essential matrix was:\n"<<endl,temp1);
     cvSVD( temp1, WW,  U, VT,CV_SVD_V_T );
 
 
@@ -1056,7 +1068,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S2);
         depth2=findDepth(P2,S2);
-      //  printf("for P2 depth1 is %f and depth2 is %f\n",depth1,depth2);
+        //  printf("for P2 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1081,7 +1093,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S3);
         depth2=findDepth(P3,S3);
-    //    printf("for P3 depth1 is %f and depth2 is %f\n",depth1,depth2);
+        //    printf("for P3 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1106,7 +1118,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 
         depth1=findDepth(POrigin,S4);
         depth2=findDepth(P4,S4);
-    //    printf("for P4 depth1 is %f and depth2 is %f\n",depth1,depth2);
+        //    printf("for P4 depth1 is %f and depth2 is %f\n",depth1,depth2);
 
         if(depth1>0 && depth2>0)
         {
@@ -1151,7 +1163,7 @@ int HRStructure::decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,Cv
 }
 void HRStructure::writeStructure(string fn)
 {
-    cout<<"writing \t"<< fn<<endl;
+
     int i,j;
     int maxlength=(*imSet).myTracks.getNumTracks();
 
@@ -1220,6 +1232,123 @@ void HRStructure::writeStructure(string fn)
 
 }
 ////////////////////////////////////////////////////////////////////
+int HRStructure::writePlyFileRGB(string fname)
+{
+    int i,j;
+    FILE* fp;
+    int numpoints=0;
+
+
+
+    string tempfilename=fname;
+    fs::path p( tempfilename, fs::native );
+
+
+
+    string fname_out=(fs::path( tempdir, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
+
+
+
+    printf("ply file name is %s\n",fname_out.c_str());
+    fp=fopen(fname_out.c_str(),"wt");
+    fprintf(fp,"ply\n");
+    fprintf(fp,"format ascii 1.0\n");
+
+    for( i=0; i<structureValid.size(); i++)
+    {
+        if(structureValid[i]>0)
+        {
+
+
+            numpoints++;
+        }
+    }
+
+
+//loading images in rgb
+    vector<IplImage*> imagevector(sfmSequence.size());
+
+    for(i=0; i< sfmSequence.size(); i++)
+    {
+        if(sfmSequence[i]!=-1)
+        {
+            //cout<<"loading image "<<(*imSet).imageCollection[sfmSequence[i]]->filename.c_str()<<endl;
+            imagevector[i]=cvLoadImage((*imSet).imageCollection[sfmSequence[i]]->filename.c_str());
+        }
+        else
+        {
+            imagevector[i]=NULL;
+        }
+
+
+    }
+
+
+
+
+
+    fprintf(fp,"element vertex %d\n",numpoints);
+    fprintf(fp,"property float x\n");
+    fprintf(fp,"property float y\n");
+    fprintf(fp,"property float z\n");
+    fprintf(fp, "property uchar diffuse_red\nproperty uchar diffuse_green\nproperty uchar diffuse_blue\n");
+    fprintf(fp, "comment format of each line is xyz RGB\n");
+    fprintf(fp,"end_header\n");
+    int R, B, G;
+
+    for(i=0; i<structure.size(); i++)
+    {
+        if(structureValid[i]>0)
+        {
+
+            R= B=G=0;
+            for ( j = 0; j < sfmSequence.size(); j++)
+            {
+                if(sfmSequence[j]!=-1)
+                {
+
+
+                    int curFrame=sfmSequence[j];
+                    if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
+                    {
+                        //     printf("trying to write structure %d\n",i);
+                        CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+                        int iRow=curPt.y;
+                        int iCol=curPt.x;
+                        uchar *aPixelIn = (uchar *)imagevector[j]->imageData;
+                        B = aPixelIn[ (iRow * imagevector[j]->widthStep) + (iCol * 3) + 0 ];
+                        G = aPixelIn[( iRow * imagevector[j]->widthStep )+ (iCol * 3) + 1 ];
+                        R = aPixelIn[ (iRow * imagevector[j]->widthStep )+ (iCol * 3) + 2 ];
+
+
+                        break;
+
+                    }
+                }
+            }
+
+            fprintf(fp,"%.6f %.6f %.6f %d %d %d\n",structure[i].x,structure[i].y,structure[i].z,R,B,G);
+        }
+    }
+    fclose(fp);
+
+
+    for(i=0; i< sfmSequence.size(); i++)
+    {
+        if(sfmSequence[i]!=-1)
+        {
+            cvReleaseImage(&imagevector[i] );
+
+        }
+
+
+
+    }
+
+
+    return 0;
+}
 
 /* interface for the Driver for sba_xxx_levmar */
 int HRStructure::sba_driver_interface()
