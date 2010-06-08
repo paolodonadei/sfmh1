@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "argproc.h"
 #include "HRImage.hpp"
 #include "HRstructure.h"
@@ -8,6 +9,11 @@
 
 int main(int argc, char *argv[])
 {
+    time_t start,end;
+
+    double dif;
+
+    time (&start);
 
     Parameters my_parms;
 
@@ -23,47 +29,50 @@ int main(int argc, char *argv[])
 
         HRImageSet imSet(my_parms.dirName,my_parms.tempdirname);
 
-     printf("##### FEATURE DETECTION\n");
+        printf("##### FEATURE DETECTION\n");
         imSet.featureDetectSift();
         //imSet.showOneByOneFeature();
 
-printf("##### FEATURE MATCHING\n");
+        printf("##### FEATURE MATCHING\n");
         imSet.exhaustiveSIFTMatching();
 
 
-printf("##### multiple view geometry \n");
+        printf("##### multiple view geometry \n");
         imSet.multipleViewEstimate();
 
         printf("##### draw matches \n");
         imSet.drawallMatches();
 
-           printf("##### create feature tracks \n");
+        printf("##### create feature tracks \n");
         imSet.createFeatureTrackMatrix();
 
-              printf("##### self calibrate \n");
+        printf("##### self calibrate \n");
         imSet.SelfCalibrate();
 
-                   printf("##### find essential matrices \n");
+        printf("##### find essential matrices \n");
         imSet.findEssentialMatrices();
 
 
-      printf("#####  write motion \n");
+        printf("#####  write motion \n");
         imSet.writeMotions();
-     //    imSet.showOneByOneFeatureMotions();
+        //    imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
-            printf("#####  run SFM\n");
+        printf("#####  run SFM\n");
         mystruct.run();
-      //  imSet.showOneByOneUndistorted();
+        //  imSet.showOneByOneUndistorted();
         printf("#####  print image parameters\n");
         imSet.printAllImageParams(); //imeplement this and try to figure out why the distortion paramrters look so whacked and the errrors so high
 
-               printf("#####  write undisroted image features\n");
+        printf("#####  write undisroted image features\n");
         imSet.writeDistANDundistFeats();
     }
 
 
 
+    time (&end);
+    dif = difftime (end,start);
+    printf ("It took you %.2lf seconds to carry out the SFM \n", dif );
 
 
 
