@@ -1,9 +1,9 @@
 CC=g++
-INC = -I../../ -I'$(MINGW)\include'
+INC = -I../../ -I'$(MINGW)\include' -I'..\..\..\locallibs\include'
 CFLAGS=$(INC) -c -g -Wall
 LIBS= -llevmar  -lhrlib  -lcxcore -lhighgui -lcv -lboost_filesystem -lboost_system -llapack -lblas -lf2c  -lgsl
-LDFLAGS=-L../../ -L'$(MINGW)\lib'
-SOURCES=selfcalib.cpp focallength.cpp nonlinSClvm.cpp
+LDFLAGS=-L../../ -L'$(MINGW)\lib' -L'..\..\..\locallibs\lib'
+SOURCES=selfcalib.cpp focallength.cpp nonlinSClvm.cpp ../fundutils/funddrawutils.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
 

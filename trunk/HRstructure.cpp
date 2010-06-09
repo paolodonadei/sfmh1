@@ -1313,15 +1313,18 @@ int HRStructure::writePlyFileRGB(string fname)
                     if((*imSet).myTracks.validTrackEntry(i,curFrame)!=0)
                     {
                         //     printf("trying to write structure %d\n",i);
+
                         CvPoint2D32f  curPt=(*imSet).myTracks.pointFromTrackloc(i, curFrame);
+
                         int iRow=curPt.y;
                         int iCol=curPt.x;
+
                         uchar *aPixelIn = (uchar *)imagevector[j]->imageData;
                         B = aPixelIn[ (iRow * imagevector[j]->widthStep) + (iCol * 3) + 0 ];
                         G = aPixelIn[( iRow * imagevector[j]->widthStep )+ (iCol * 3) + 1 ];
                         R = aPixelIn[ (iRow * imagevector[j]->widthStep )+ (iCol * 3) + 2 ];
 
-
+//  printf("point x=%d y=%d taken from image %d with %d channels RGB= (%d,%d,%d) \n", iCol, iRow,curFrame, imagevector[j]->nChannels,R,G,B);
                         break;
 
                     }
