@@ -4,7 +4,7 @@
 #include "argproc.h"
 #include "HRImage.hpp"
 #include "HRstructure.h"
-
+#include "hrpmvshandler.h"
 
 
 int main(int argc, char *argv[])
@@ -66,6 +66,10 @@ int main(int argc, char *argv[])
 
         printf("#####  write undisroted image features\n");
         imSet.writeDistANDundistFeats();
+//PMVS stuff for visualization
+        printf("#####  PMVS files\n");
+        HRpmvshandler pmvsHandler(imSet.outdirStemName,imSet.dirStemName ,&imSet);
+        pmvsHandler.runPMVS();
     }
 
 
