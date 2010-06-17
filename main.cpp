@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         imSet.writeDistANDundistFeats();
 //PMVS stuff for visualization
         printf("#####  PMVS files\n");
-        HRpmvshandler pmvsHandler(imSet.outdirStemName,imSet.dirStemName ,&imSet);
+        HRpmvshandler pmvsHandler(imSet.temporaryDir,imSet.dirName ,&imSet);
         pmvsHandler.runPMVS();
     }
 
