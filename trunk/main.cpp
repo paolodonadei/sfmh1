@@ -60,9 +60,6 @@ int main(int argc, char *argv[])
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         printf("#####  run SFM\n");
         mystruct.run();
-        //  imSet.showOneByOneUndistorted();
-        printf("#####  print image parameters\n");
-        imSet.printAllImageParams(); //imeplement this and try to figure out why the distortion paramrters look so whacked and the errrors so high
 
         printf("#####  write undisroted image features\n");
         imSet.writeDistANDundistFeats();
