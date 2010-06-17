@@ -157,17 +157,18 @@ HRImage::HRImage(const HRImage &img)
 
 
 }
-int HRImage::writeImageParams()
+
+int HRImage::writeImageParams(string pathName)
 {
-    //writing R
+//writing R
     {
-
+        fs::path basef( filename, fs::native );
         string tempfilename="";
-        fs::path p( filename, fs::native );
+        fs::path p( pathName, fs::native );
 
-        tempfilename=fs::basename(p)+"_R.txt";
+        tempfilename=(p / string( fs::basename(basef) + string("_R.txt"))).file_string();
 
-        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
 
         fstream file_cmin(tempfilename.c_str() ,ios::out);
         writeCVMatrix(file_cmin,camPose.Rm );
@@ -177,13 +178,13 @@ int HRImage::writeImageParams()
     }
     //writing T
     {
-
+        fs::path basef( filename, fs::native );
         string tempfilename="";
-        fs::path p( filename, fs::native );
+        fs::path p( pathName, fs::native );
 
-        tempfilename=fs::basename(p)+"_t.txt";
+        tempfilename=(p / string(fs::basename(basef) + string("_t.txt"))).file_string();
 
-        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+
 
         fstream file_cmin(tempfilename.c_str() ,ios::out);
         writeCVMatrix(file_cmin,camPose.tm );
@@ -194,13 +195,11 @@ int HRImage::writeImageParams()
 
     //distortion
     {
-
+        fs::path basef( filename, fs::native );
         string tempfilename="";
-        fs::path p( filename, fs::native );
+        fs::path p( pathName, fs::native );
 
-        tempfilename=fs::basename(p)+"_dist.txt";
-
-        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+        tempfilename=(p / string( fs::basename(basef) + string("_dist.txt"))).file_string();
 
         fstream file_cmin(tempfilename.c_str(),ios::out);
         writeCVMatrix(file_cmin,distortion );
@@ -211,13 +210,11 @@ int HRImage::writeImageParams()
 
     //intrinsics
     {
-
+        fs::path basef( filename, fs::native );
         string tempfilename="";
-        fs::path p( filename, fs::native );
+        fs::path p( pathName, fs::native );
 
-        tempfilename=fs::basename(p)+"_intrin.txt";
-
-        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
+        tempfilename=(p / string(fs::basename(basef) +  string("_intrin.txt"))).file_string();
 
         fstream file_cmin(tempfilename.c_str() ,ios::out);
         writeCVMatrix(file_cmin,intrinsicMatrix );
@@ -228,13 +225,12 @@ int HRImage::writeImageParams()
 
     //projection
     {
-
+        fs::path basef( filename, fs::native );
         string tempfilename="";
-        fs::path p( filename, fs::native );
+        fs::path p( pathName, fs::native );
 
-        tempfilename=fs::basename(p)+"_proj.txt";
+        tempfilename=(p / string(fs::basename(basef) +  string("_proj.txt"))).file_string();
 
-        tempfilename=(fs::path( TEMPDIR, fs::native )/fs::path( tempfilename, fs::native )).file_string();
 
         fstream file_cmin(tempfilename.c_str() ,ios::out);
         writeCVMatrix(file_cmin,projectionMatrix );
@@ -243,6 +239,16 @@ int HRImage::writeImageParams()
 
     }
 
+
+}
+
+
+
+int HRImage::writeImageParams()
+{
+
+    cout<<"path is " << fs::path( TEMPDIR, fs::native ).file_string()<<endl;
+    writeImageParams(fs::path( TEMPDIR, fs::native ).file_string());
 
 }
 int HRImage::undistortImage( IplImage** undistorted)
@@ -1247,15 +1253,10 @@ int HRImageSet::exhaustiveSIFTMatching()
 
 //deleting the index files, i should propbablyt find a better place for this
     string fname1=TEMPDIR+string("/")+string("F_")+string(INDEXFNAME);
-    if( remove( fname1.c_str() ) != 0 )
-        perror( "ignore this error - Error deleting file" );
-    else
-        puts( "File successfully deleted" );
+    if( remove( fname1.c_str() ) != 0 );
+
     string fname2=TEMPDIR+string("/")+string("H_")+string(INDEXFNAME);
-    if( remove( fname2.c_str() ) != 0 )
-        perror( "ignore this error - Error deleting file" );
-    else
-        puts( "File successfully deleted" );
+    if( remove( fname2.c_str() ) != 0 );
 //end of deleting index files, these files were necessary for self calibration
 
 
@@ -1516,6 +1517,8 @@ int HRImageSet::SelfCalibrate()
         writeCVMatrix(cout,intrinMatrix[i]);
     }
 
+    fs::path p(outdirStemName);
+    printAllImageParams((p/string("stage0")).file_string());
     printf("SELF CALIB END:__________________________\n");
 
 }
@@ -1785,12 +1788,29 @@ void HRImageSet::showparamsALL()
 void HRImageSet::printAllImageParams()
 {
 
+    printAllImageParams(outdirStemName);
+
+}
+void HRImageSet::printAllImageParams(string pathFname)
+{
+    fs::path temp_path(pathFname );
+    if ( !fs::exists(temp_path ) )
+    {
+        create_directories( temp_path );
+        if ( !fs::exists( temp_path ) )
+        {
+            cout<<"cant create directory, exiting"<<endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
 
     for (int i=0; i<imageCollection.size(); i++)
     {
 
 
-        (*imageCollection[i]).writeImageParams();
+        (*imageCollection[i]).writeImageParams(pathFname);
 
 
     }

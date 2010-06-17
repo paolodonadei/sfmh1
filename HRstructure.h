@@ -45,6 +45,7 @@ public:
     int decomposeEssential(CvMat* E, CvPoint2D32f p1,CvPoint2D32f p2,CvMat* K1, CvMat* K2, CvMat* R,CvMat* t);
     int findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrames);
      int writePlyFileRGB(string fname);
+     int  stagenum;
 };
 
 

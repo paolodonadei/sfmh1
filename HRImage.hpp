@@ -93,7 +93,9 @@ public:
     double confidenceSelfCalib;
     int undistortImage( IplImage** undistorted);
     int writeImageParams();
+    int writeImageParams(string pathName);
     int writeFeaturesANDundistorted();
+
 private:
 
     enum {BLACK=0,WHITE=255};
@@ -181,7 +183,7 @@ int  EpilineFromTrackloc(int featurenum, int fram_src,int fram_dst,CvMat* line);
     int writeMotions();
     FeatureTrack myTracks;
     string temporaryDir;
-
+  void printAllImageParams(string pathFname);
     int createFeatureTrackMatrix();
     void showOneByOneFeatureMotions();
     int SelfCalibrate();

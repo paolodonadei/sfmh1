@@ -17,6 +17,7 @@ namespace fs = boost::filesystem;
 
 HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
 {
+    stagenum=0;
     tempdir= pdir;
     int i;
     imSet=pimSet;
@@ -26,6 +27,7 @@ HRStructure::HRStructure(HRImageSet* pimSet,string pdir )
 }
 void HRStructure::run()
 {
+
     int i;
     vector<double> tempconf;
     tempconf.resize((*imSet).numImages);
@@ -109,6 +111,10 @@ void HRStructure::run()
         if(structureValid[i]>0)
             numReconstructed++;
     }
+
+    fs::path p((*imSet).outdirStemName);
+    (*imSet).printAllImageParams((p/string("finalstage")).file_string());
+
 
     writePlyFileRGB(string("finalstructrgb.ply"));
     double err_rcnstr=findReconstructionError();
@@ -471,7 +477,7 @@ void HRStructure::DLTUpdateStructure()
     int i,j;
 
 
-
+    stagenum++;
     double rerror=0;
     int numReconstructed=0;
 
@@ -559,8 +565,8 @@ void HRStructure::DLTUpdateStructure()
 
 
 
-
-
+    fs::path p((*imSet).outdirStemName);
+    (*imSet).printAllImageParams((p/string(string("stage")+stringify(stagenum))).file_string());
 
 }
 

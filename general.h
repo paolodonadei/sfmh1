@@ -36,7 +36,7 @@
 #define INDEXFNAME "motionindex.txt"
 #define OXFORDMATCHES 0
 #define RECREATEFILES 0
-#define SIFTPCA 1
+#define SIFTPCA 0
 #define USEOXINTRINSIC 0
 
 using namespace std;
