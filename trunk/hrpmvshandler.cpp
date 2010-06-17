@@ -11,14 +11,19 @@
 
 using namespace std;
 namespace fs = boost::filesystem;
-const string linuxExecName="PMVS2.exe";
-const string windowsExecName="pmvs2";
+const string linuxExecName="pmvs2";
+const string windowsExecName="PMVS2.exe";
 const string modelsFolder="models";
 const string imageFolder="visualize";
 const string projectionFolder="txt";
 const string optionFilename="option.txt";
 const string pmvsprefix="pmvs";
 const string projectionMatrHeader="CONTOUR";
+
+const string poissonSurfaceWin="PoissonRecon.32.exe";
+const string poissonSurfaceLin="PoissonRecon.32";
+const fs::path  execpathname="utils" ;
+
 
 HRpmvshandler::HRpmvshandler(string tempFolder, string origFolder , HRImageSet* pimSet)
 {
@@ -37,13 +42,13 @@ void HRpmvshandler::runPMVS()
     createPMVSFolder();
     copyImagesToPMVSFolder();
     copyProjectionsToPMVSFolder();
-
+    writeOptionFile();
 #ifdef OS_WIN
     runPMVSWindows();
 #else
     runPMVSLinux();
 #endif
-    writeOptionFile();
+
 
     cleanUpPMVS();
 }
@@ -55,7 +60,7 @@ void HRpmvshandler::createPMVSFolder()
 {
 
     string pmname=pmvsprefix + mimSet->dirStemName;
-    pmvsPath =( fs::system_complete( fs::path( tempFOLD, fs::native ) ) / pmname  );
+    pmvsPath =( fs::path( tempFOLD )  / fs::path(pmname ) );
 
 
     if ( fs::exists( pmvsPath ) )
@@ -94,7 +99,7 @@ void HRpmvshandler::createPMVSFolder()
         return;
     }
 
-    fs::path modelpath =( pmvsPath / modelsFolder  );
+    modelpath =( pmvsPath / modelsFolder  );
 
     create_directory( modelpath );
     if ( !fs::exists( modelpath  ) )
@@ -164,17 +169,111 @@ void HRpmvshandler::copyProjectionsToPMVSFolder()
 
 void HRpmvshandler::runPMVSLinux()
 {
+    fs::path execfilename= execpathname/ linuxExecName;
+    string optionfname=optionFilepath.leaf();
 
+
+    string commandc=execfilename.file_string()+string(" ")+  pmvsPath.file_string()+string("/ ")+optionfname;
+    if (system(NULL)==0)
+    {
+        cout<<"command processor not available , no features found"<<endl;
+        return ;
+
+    }
+    cout<<" command is: "<<commandc<<endl;
+    system (commandc.c_str());
+
+// poisson 3D shape reconstruct
+    fs::path poisonexecfilename= execpathname/ poissonSurfaceLin;
+    string pSetFile=optionFilepath.leaf()+string(".pset");
+    fs::path pSetfilepath= modelpath /pSetFile;
+    fs::path outputPath= modelpath /string(string( optionFilepath.leaf() )+string("_poisson.ply"));
+    string commandpoisson=poisonexecfilename.file_string()+string(" --in ")+ pSetfilepath.file_string()+string(" --out ")+ outputPath.file_string();
+    cout<<"command for poisson blending is "<< commandpoisson <<endl;
+    system (commandpoisson.c_str());
 }
 void HRpmvshandler::runPMVSWindows()
 {
+    fs::path execfilename= execpathname/ windowsExecName;
+    string optionfname=optionFilepath.leaf();
 
+
+    string commandc=execfilename.file_string()+string(" ")+  pmvsPath.file_string()+string("\\ ")+optionfname;
+    if (system(NULL)==0)
+    {
+        cout<<"command processor not available , no features found"<<endl;
+        return ;
+
+    }
+    cout<<" command is: "<<commandc<<endl;
+    system (commandc.c_str());
+// poisson 3D shape reconstruct
+    fs::path poisonexecfilename= execpathname/ poissonSurfaceWin;
+    string pSetFile=optionFilepath.leaf()+string(".pset");
+    fs::path pSetfilepath= modelpath /pSetFile;
+    fs::path outputPath= modelpath /string(string( optionFilepath.leaf() )+string("_poisson.ply"));
+    string commandpoisson=poisonexecfilename.file_string()+string(" --in ")+ pSetfilepath.file_string()+string(" --out ")+ outputPath.file_string();
+    cout<<"command for poisson blending is "<< commandpoisson <<endl;
+    system (commandpoisson.c_str());
 }
 void HRpmvshandler::cleanUpPMVS()
 {
 
+    if ( fs::is_directory( imagepath ) )
+    {
+
+        fs::directory_iterator end_iter;
+        for ( fs::directory_iterator dir_itr( imagepath);
+                dir_itr != end_iter;
+                ++dir_itr )
+        {
+            try
+            {
+
+                if ( fs::is_regular( dir_itr->status() ) )
+                {
+                    if (fs::extension(dir_itr->path())==".jpg")
+                    {
+
+                        remove(dir_itr->path());
+
+
+
+                    }
+
+
+                }
+
+            }
+            catch ( const exception & ex )
+            {
+
+                cout << dir_itr->path().leaf() << " " << ex.what() << endl;
+            }
+
+        }
+
+    }
 }
 void HRpmvshandler::writeOptionFile()
 {
 
+    string fname=mimSet->dirStemName+ optionFilename;
+    optionFilepath= pmvsPath/ fname;
+    fstream file_cmin(optionFilepath.file_string().c_str(),ios::out);
+
+    file_cmin<<"level 2"<<endl;
+    file_cmin<<"csize 2"<<endl;
+    file_cmin<<"threshold 0.7"<<endl;
+    file_cmin<<"wsize 7"<<endl;
+    file_cmin<<"minImageNum 2"<<endl;
+    //zzz i should probably write a function to use the visdata as well
+    file_cmin<<"useVisData 0"<<endl;
+    file_cmin<<"sequence -1"<<endl;
+    ///zzz what should the last number be?
+    file_cmin<<"timages -1 0 "<<mimSet->numImages<<endl;
+    file_cmin<<"oimages 0"<<endl;
+
+
+    file_cmin.close();
 }
