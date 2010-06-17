@@ -387,8 +387,10 @@ void writeCVMatrix(ostream &stream,const CvMat* M)
         for (int j = 0; j < n_cols; ++j)
         {
 
-
-            stream<< setw(17)<<setprecision(10)<<cvmGet( M,i,j ) << "     ";
+            if(j==0)
+                stream<< setprecision(10)<<cvmGet( M,i,j ) << "     ";
+            else
+                stream<< setw(17)<<setprecision(10)<<cvmGet( M,i,j ) << "     ";
         }
         stream << "\n";
 

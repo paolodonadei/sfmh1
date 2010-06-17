@@ -70,6 +70,8 @@ private:
     fs::path pmvsPath;
     fs::path imagepath ;
     fs::path txtpath;
+    fs::path optionFilepath;
+    fs::path modelpath;
 
 };
 
