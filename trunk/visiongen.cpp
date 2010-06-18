@@ -1044,3 +1044,27 @@ int writePlyFile(vector<CvPoint3D32f> & strucure,vector<int>& structureValid,str
     fclose(fp);
     return 0;
 }
+
+
+//given 2 points and their ground truth projection matrix , this function checks whether or not the point is an outlier
+
+bool matchIncorrect(CvPoint2D32f p1,CvPoint2D32f p2,const CvMat* proj1,const CvMat* proj2,double thresh )
+{
+
+//            vector<CvMat*> projMatrs;
+//        vector<CvPoint2D32f> projPoints;
+//
+//          projPoints.push_back(p1);
+//        projPoints.push_back(p2);
+//
+//        projMatrs.push_back(proj1);
+//        projMatrs.push_back(proj2);
+//
+//CvPoint3D32f pw;
+//
+// cvTriangulatePointsNframs(2, projMatrs,projPoints,structure[i] );
+//
+//
+
+
+}
