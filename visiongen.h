@@ -45,5 +45,5 @@ int  findProjDLTMinimal(const CvMat* data,vector<CvMat*>& models );
 double projError(const CvMat* data, const CvMat* P,vector<double>&  errors );
 bool scenePlanar(const CvMat* data);
 int formDataMatrixRobustResectioning(CvMat** data, vector< CvPoint2D32f> impts,vector< CvPoint3D32f> wrldpts);
-
+bool matchIncorrect(CvPoint2D32f p1,CvPoint2D32f p2,const CvMat* proj1,const CvMat* proj2,double thresh );
 #endif

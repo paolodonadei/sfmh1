@@ -54,12 +54,12 @@ void HRStructure::run()
 // this is all wrong, you need to find the best two frames and consecutively add more frames
 //zzz remove these
     int frame1=indexMax(tempconf);
-    frame1=0;
+    frame1=1;
     sfmSequence[0]=frame1;
     tempconf[frame1]=-1;
 
     int frame2=indexMax(tempconf);
-    frame2=1 ;
+    frame2=2 ;
     sfmSequence[1]=frame2;
 
 
@@ -1634,12 +1634,13 @@ int HRStructure::sba_driver_interface()
      * 0: all free, 1: skew fixed, 2: skew, ar fixed, 4: skew, ar, ppt fixed
      * Note that a value of 3 does not make sense
      */
+     ///zzz be careful with this, ideally this should be 1
     mglobs.nccalib=1; /* number of intrinsics to keep fixed, must be between 0 and 5 */
     //zzz this is important, maybe change this to 5
     fixedcal=0; /* varying intrinsics */
 
 
-    havedist=1; /* with distortion */
+    havedist=2; /* with distortion */
     //zzz unfix these distortion parameters, right now i keep 3 parameters fixed, wich 3 are these?
     mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
