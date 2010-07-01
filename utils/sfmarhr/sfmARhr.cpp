@@ -12,6 +12,14 @@
 // For compilers that support precompilation, includes "wx.h".
 #include "wx/wxprec.h"
 
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+using namespace std;
+
+
+#include "hrply.h"
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
@@ -21,28 +29,31 @@
 #endif
 
 #if !wxUSE_GLCANVAS
-    #error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
+#error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
 #endif
 
 #include "sfmARhr.h"
 #include "sample.xpm"
 
 #ifndef __WXMSW__     // for StopWatch, see remark below
-  #if defined(__WXMAC__) && !defined(__DARWIN__)
-    #include <utime.h>
-    #include <unistd.h>
-  #else
-    #include <sys/time.h>
-    #include <sys/unistd.h>
-  #endif
+#if defined(__WXMAC__) && !defined(__DARWIN__)
+#include <utime.h>
+#include <unistd.h>
+#else
+#include <sys/time.h>
+#include <sys/unistd.h>
+#endif
 #else
 #include <sys/timeb.h>
 #endif
 
-#define ID_NEW_WINDOW 10000
-#define ID_DEF_ROTATE_LEFT_KEY 10001
-#define ID_DEF_ROTATE_RIGHT_KEY 10002
-
+enum
+{
+    ID_NEW_WINDOW= wxID_HIGHEST + 1,
+    ID_DEF_ROTATE_LEFT_KEY,
+    ID_DEF_ROTATE_RIGHT_KEY,
+    ID_DEF_PLYOPEN
+};
 /*----------------------------------------------------------
   Control to get a keycode
   ----------------------------------------------------------*/
@@ -50,7 +61,7 @@ class ScanCodeCtrl : public wxTextCtrl
 {
 public:
     ScanCodeCtrl( wxWindow* parent, wxWindowID id, int code,
-        const wxPoint& pos, const wxSize& size );
+                  const wxPoint& pos, const wxSize& size );
 
     void OnChar( wxKeyEvent& WXUNUSED(event) )
     {
@@ -71,7 +82,7 @@ BEGIN_EVENT_TABLE( ScanCodeCtrl, wxTextCtrl )
 END_EVENT_TABLE()
 
 ScanCodeCtrl::ScanCodeCtrl( wxWindow* parent, wxWindowID id, int code,
-    const wxPoint& pos, const wxSize& size )
+                            const wxPoint& pos, const wxSize& size )
     : wxTextCtrl( parent, id, wxEmptyString, pos, size )
 {
     SetValue( wxString::Format(wxT("0x%04x"), code) );
@@ -90,7 +101,7 @@ class ScanCodeDialog : public wxDialog
 {
 public:
     ScanCodeDialog( wxWindow* parent, wxWindowID id, const int code,
-        const wxString &descr, const wxString& title );
+                    const wxString &descr, const wxString& title );
     int GetValue();
 
 private:
@@ -100,22 +111,22 @@ private:
 };
 
 ScanCodeDialog::ScanCodeDialog( wxWindow* parent, wxWindowID id,
-    const int code, const wxString &descr, const wxString& title )
+                                const int code, const wxString &descr, const wxString& title )
     : wxDialog( parent, id, title, wxDefaultPosition, wxSize(96*2,76*2) )
 {
     new wxStaticText( this, wxID_ANY, _T("Scancode"), wxPoint(4*2,3*2),
-        wxSize(31*2,12*2) );
+                      wxSize(31*2,12*2) );
     m_ScanCode = new ScanCodeCtrl( this, wxID_ANY, code, wxPoint(37*2,6*2),
-        wxSize(53*2,14*2) );
+                                   wxSize(53*2,14*2) );
 
     new wxStaticText( this, wxID_ANY, _T("Description"), wxPoint(4*2,24*2),
-        wxSize(32*2,12*2) );
+                      wxSize(32*2,12*2) );
     m_Description = new wxTextCtrl( this, wxID_ANY, descr, wxPoint(37*2,27*2),
-        wxSize(53*2,14*2) );
+                                    wxSize(53*2,14*2) );
 
     new wxButton( this, wxID_OK, _T("Ok"), wxPoint(20*2,50*2), wxSize(20*2,13*2) );
     new wxButton( this, wxID_CANCEL, _T("Cancel"), wxPoint(44*2,50*2),
-        wxSize(25*2,13*2) );
+                  wxSize(25*2,13*2) );
 }
 
 int ScanCodeDialog::GetValue()
@@ -133,29 +144,29 @@ int ScanCodeDialog::GetValue()
 -----------------------------------------------------------------------*/
 unsigned long StopWatch( unsigned long *sec_base )
 {
-  unsigned long secs,msec;
+    unsigned long secs,msec;
 
 #if defined(__WXMSW__)
-  struct timeb tb;
-  ftime( &tb );
-  secs = tb.time;
-  msec = tb.millitm;
+    struct timeb tb;
+    ftime( &tb );
+    secs = tb.time;
+    msec = tb.millitm;
 #elif defined(__WXMAC__) && !defined(__DARWIN__)
-  wxLongLong tl = wxGetLocalTimeMillis();
-  secs = (unsigned long) (tl.GetValue() / 1000);
-  msec = (unsigned long) (tl.GetValue() - secs*1000);
+    wxLongLong tl = wxGetLocalTimeMillis();
+    secs = (unsigned long) (tl.GetValue() / 1000);
+    msec = (unsigned long) (tl.GetValue() - secs*1000);
 #else
-  // think every unice has gettimeofday
-  struct timeval tv;
-  gettimeofday( &tv, (struct timezone *)NULL );
-  secs = tv.tv_sec;
-  msec = tv.tv_usec/1000;
+    // think every unice has gettimeofday
+    struct timeval tv;
+    gettimeofday( &tv, (struct timezone *)NULL );
+    secs = tv.tv_sec;
+    msec = tv.tv_usec/1000;
 #endif
 
-  if( *sec_base == 0 )
-    *sec_base = secs;
+    if( *sec_base == 0 )
+        *sec_base = secs;
 
-  return( (secs-*sec_base)*1000 + msec );
+    return( (secs-*sec_base)*1000 + msec );
 }
 
 /*----------------------------------------------------------------
@@ -177,7 +188,7 @@ unsigned long  TestGLCanvas::m_xsynct;
 unsigned long  TestGLCanvas::m_gsynct;
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
-    const wxPoint& pos, const wxSize& size, long style, const wxString& name)
+                           const wxPoint& pos, const wxSize& size, long style, const wxString& name)
     : wxGLCanvas(parent, (wxGLCanvas*) NULL, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE , name )
 {
     m_init = false;
@@ -187,8 +198,8 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
 }
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
-    wxWindowID id, const wxPoint& pos, const wxSize& size, long style,
-    const wxString& name )
+                           wxWindowID id, const wxPoint& pos, const wxSize& size, long style,
+                           const wxString& name )
     : wxGLCanvas(parent, other->GetContext(), id, pos, size, style|wxFULL_REPAINT_ON_RESIZE , name)
 {
     m_init = false;
@@ -232,28 +243,40 @@ void TestGLCanvas::Render()
         /* draw six faces of a cube */
         glBegin(GL_QUADS);
         glNormal3f( 0.0f, 0.0f, 1.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f); glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f,-0.5f, 0.5f); glVertex3f( 0.5f,-0.5f, 0.5f);
+        glVertex3f( 0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f,-0.5f, 0.5f);
+        glVertex3f( 0.5f,-0.5f, 0.5f);
 
         glNormal3f( 0.0f, 0.0f,-1.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f); glVertex3f(-0.5f, 0.5f,-0.5f);
-        glVertex3f( 0.5f, 0.5f,-0.5f); glVertex3f( 0.5f,-0.5f,-0.5f);
+        glVertex3f(-0.5f,-0.5f,-0.5f);
+        glVertex3f(-0.5f, 0.5f,-0.5f);
+        glVertex3f( 0.5f, 0.5f,-0.5f);
+        glVertex3f( 0.5f,-0.5f,-0.5f);
 
         glNormal3f( 0.0f, 1.0f, 0.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f); glVertex3f( 0.5f, 0.5f,-0.5f);
-        glVertex3f(-0.5f, 0.5f,-0.5f); glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f( 0.5f, 0.5f, 0.5f);
+        glVertex3f( 0.5f, 0.5f,-0.5f);
+        glVertex3f(-0.5f, 0.5f,-0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
 
         glNormal3f( 0.0f,-1.0f, 0.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f); glVertex3f( 0.5f,-0.5f,-0.5f);
-        glVertex3f( 0.5f,-0.5f, 0.5f); glVertex3f(-0.5f,-0.5f, 0.5f);
+        glVertex3f(-0.5f,-0.5f,-0.5f);
+        glVertex3f( 0.5f,-0.5f,-0.5f);
+        glVertex3f( 0.5f,-0.5f, 0.5f);
+        glVertex3f(-0.5f,-0.5f, 0.5f);
 
         glNormal3f( 1.0f, 0.0f, 0.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f); glVertex3f( 0.5f,-0.5f, 0.5f);
-        glVertex3f( 0.5f,-0.5f,-0.5f); glVertex3f( 0.5f, 0.5f,-0.5f);
+        glVertex3f( 0.5f, 0.5f, 0.5f);
+        glVertex3f( 0.5f,-0.5f, 0.5f);
+        glVertex3f( 0.5f,-0.5f,-0.5f);
+        glVertex3f( 0.5f, 0.5f,-0.5f);
 
         glNormal3f(-1.0f, 0.0f, 0.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f); glVertex3f(-0.5f,-0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f); glVertex3f(-0.5f, 0.5f,-0.5f);
+        glVertex3f(-0.5f,-0.5f,-0.5f);
+        glVertex3f(-0.5f,-0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f, 0.5f);
+        glVertex3f(-0.5f, 0.5f,-0.5f);
         glEnd();
 
         glEndList();
@@ -296,7 +319,7 @@ void TestGLCanvas::OnSize(wxSizeEvent& event)
 
 void TestGLCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 {
-  // Do nothing, to avoid flashing.
+    // Do nothing, to avoid flashing.
 }
 
 void TestGLCanvas::InitGL()
@@ -322,22 +345,22 @@ void TestGLCanvas::InitGL()
 
 GLfloat TestGLCanvas::CalcRotateSpeed( unsigned long acceltime )
 {
-  GLfloat t,v;
+    GLfloat t,v;
 
-  t = ((GLfloat)acceltime) / 1000.0f;
+    t = ((GLfloat)acceltime) / 1000.0f;
 
-  if( t < 0.5f )
-    v = t;
-  else if( t < 1.0f )
-    v = t * (2.0f - t);
-  else
-    v = 0.75f;
+    if( t < 0.5f )
+        v = t;
+    else if( t < 1.0f )
+        v = t * (2.0f - t);
+    else
+        v = 0.75f;
 
-  return(v);
+    return(v);
 }
 
 GLfloat TestGLCanvas::CalcRotateAngle( unsigned long lasttime,
-                                  unsigned long acceltime )
+                                       unsigned long acceltime )
 {
     GLfloat t,s1,s2;
 
@@ -356,7 +379,7 @@ void TestGLCanvas::Action( long code, unsigned long lasttime,
     if (code == m_rleft)
         Rotate( angle );
     else if (code == m_rright)
-            Rotate( -angle );
+        Rotate( -angle );
 }
 
 void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
@@ -428,11 +451,13 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU( ID_NEW_WINDOW, MyFrame::OnNewWindow)
     EVT_MENU( ID_DEF_ROTATE_LEFT_KEY, MyFrame::OnDefRotateLeftKey)
     EVT_MENU( ID_DEF_ROTATE_RIGHT_KEY, MyFrame::OnDefRotateRightKey)
+    EVT_MENU( ID_DEF_PLYOPEN, MyFrame::OnOpenPlyFile)
+
 END_EVENT_TABLE()
 
 // My frame constructor
 MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
-    const wxSize& size, long style)
+                 const wxSize& size, long style)
     : wxFrame(parent, wxID_ANY, title, pos, size, style)
 {
     m_canvas = NULL;
@@ -452,14 +477,23 @@ void MyFrame::OnExit( wxCommandEvent& WXUNUSED(event) )
     if (isCloneWindow) str += wxT(" - Clone");
 
     MyFrame *frame = new MyFrame(NULL, str, wxDefaultPosition,
-        wxSize(400, 300));
+                                 wxSize(400, 300));
 
     // Make a menubar
+
+
+
+    wxMenuBar *menuBar = new wxMenuBar;
     wxMenu *winMenu = new wxMenu;
+
+    winMenu->Append(ID_DEF_PLYOPEN, _T("&Open Ply"));
+    menuBar->Append(winMenu, _T("&File"));
+
+    winMenu = new wxMenu;
 
     winMenu->Append(wxID_EXIT, _T("&Close"));
     winMenu->Append(ID_NEW_WINDOW, _T("&New") );
-    wxMenuBar *menuBar = new wxMenuBar;
+
     menuBar->Append(winMenu, _T("&Window"));
 
     winMenu = new wxMenu;
@@ -467,17 +501,19 @@ void MyFrame::OnExit( wxCommandEvent& WXUNUSED(event) )
     winMenu->Append(ID_DEF_ROTATE_RIGHT_KEY, _T("Rotate &right"));
     menuBar->Append(winMenu, _T("&Key"));
 
+
+
     frame->SetMenuBar(menuBar);
 
     if (parentFrame)
     {
         frame->m_canvas = new TestGLCanvas( frame, parentFrame->m_canvas,
-            wxID_ANY, wxDefaultPosition, wxDefaultSize );
+                                            wxID_ANY, wxDefaultPosition, wxDefaultSize );
     }
     else
     {
         frame->m_canvas = new TestGLCanvas(frame, wxID_ANY,
-            wxDefaultPosition, wxDefaultSize);
+                                           wxDefaultPosition, wxDefaultSize);
     }
 
     // Show the frame
@@ -494,7 +530,7 @@ void MyFrame::OnNewWindow( wxCommandEvent& WXUNUSED(event) )
 void MyFrame::OnDefRotateLeftKey( wxCommandEvent& WXUNUSED(event) )
 {
     ScanCodeDialog dial( this, wxID_ANY, m_canvas->m_rleft,
-        wxString(_T("Left")), _T("Define key") );
+                         wxString(_T("Left")), _T("Define key") );
 
     int result = dial.ShowModal();
 
@@ -505,14 +541,36 @@ void MyFrame::OnDefRotateLeftKey( wxCommandEvent& WXUNUSED(event) )
 void MyFrame::OnDefRotateRightKey( wxCommandEvent& WXUNUSED(event) )
 {
     ScanCodeDialog dial( this, wxID_ANY, m_canvas->m_rright,
-        wxString(_T("Right")), _T("Define key") );
+                         wxString(_T("Right")), _T("Define key") );
 
     int result = dial.ShowModal();
 
     if( result == wxID_OK )
         m_canvas->m_rright = dial.GetValue();
 }
+void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
+{
+    wxString mystring;
+    wxFileDialog* OpenDialog = new wxFileDialog(
+        this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
+        _("Text files (*.ply)|*.ply"),
+        wxFD_OPEN, wxDefaultPosition);
 
+    // Creates a "open file" dialog with 4 file types
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+    {
+
+        mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
+    }
+
+    // Clean up after ourselves
+    OpenDialog->Destroy();
+    HRply myply(mystring.mb_str());
+    ofstream outfile ("test.txt");
+    myply.printPlyPts(cout);
+    outfile.close();
+
+}
 /*------------------------------------------------------------------
   Application object ( equivalent to main() )
 ------------------------------------------------------------------ */

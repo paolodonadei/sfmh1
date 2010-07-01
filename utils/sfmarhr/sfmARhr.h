@@ -33,7 +33,7 @@ public:
     void OnNewWindow(wxCommandEvent& event);
     void OnDefRotateLeftKey(wxCommandEvent& event);
     void OnDefRotateRightKey(wxCommandEvent& event);
-
+void OnOpenPlyFile(wxCommandEvent& event);
 private:
 
     MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
