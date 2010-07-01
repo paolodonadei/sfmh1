@@ -5,5 +5,6 @@
 		<Project filename="utils/decompose/Makesfmh1.cbp" />
 		<Project filename="utils/fundutils/fundutils.cbp" />
 		<Project filename="utils/selfcalib/selfcalib.cbp" />
+		<Project filename="utils/sfmarhr/sfmARhrlin.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

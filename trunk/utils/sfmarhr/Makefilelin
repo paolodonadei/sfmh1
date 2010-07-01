@@ -1,0 +1,26 @@
+INC = `wx-config --cxxflags`
+CC=g++
+CFLAGS=$(INC) -c -g -Wall
+LIBS=
+LDFLAGS= `wx-config --libs gl,core,base`
+SOURCES= sfmARhr.cpp hrply.cpp
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=sfmarhr
+
+
+
+
+all: $(EXECUTABLE)
+
+
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
+
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+clean:
+	rm -f *.o core *.core $(EXECUTABLE) *~ $(PROJECT)
