@@ -16,7 +16,7 @@
 		</MakeCommands>
 		<Build>
 			<Target title="all">
-				<Option output="sfmh1" prefix_auto="1" extension_auto="1" />
+				<Option output="sfmarhr" prefix_auto="1" extension_auto="1" />
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
