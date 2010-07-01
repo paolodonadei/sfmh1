@@ -36,7 +36,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Makefile" />
+		<Unit filename="Makefilewin" />
 		<Unit filename="hrply.cpp" />
 		<Unit filename="hrply.h" />
 		<Unit filename="sfmARhr.cpp" />

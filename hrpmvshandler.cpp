@@ -4,6 +4,7 @@
 #include "boost/filesystem/path.hpp"
 #include "highgui.h"
 #include "hrpmvshandler.h"
+#include <fstream>
 
 #if defined(_WIN32) || defined(WIN32) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__BORLANDC__)
 #define OS_WIN

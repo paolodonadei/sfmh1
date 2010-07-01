@@ -565,7 +565,9 @@ void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
 
     // Clean up after ourselves
     OpenDialog->Destroy();
-    HRply myply(mystring.mb_str());
+    char buf[100];
+    strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
+    HRply myply(buf);
     ofstream outfile ("test.txt");
     myply.printPlyPts(cout);
     outfile.close();
