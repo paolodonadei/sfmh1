@@ -2395,16 +2395,6 @@ stats findStatsArray(const vector<double>& argarray)
     int i;
     vector<double> array;
 
-
-//printing the content
-//    for (i=0; i<argarray.size(); i++)
-//    {
-//        printf("element %d is %f\n",i,argarray[i]);
-//    }
-
-
-
-
     for (i=0; i<argarray.size(); i++)
     {
         if (isnan(argarray[i])==false)

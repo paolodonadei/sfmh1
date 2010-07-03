@@ -8,6 +8,13 @@
 #include <stdlib.h>
 #include <iomanip>
 #include <sstream>
+#include "wx/glcanvas.h"
+
+#include "wx/wx.h"
+#include <GL/glut.h>    // Header File For The GLUT Library
+#include <GL/gl.h>	// Header File For The OpenGL32 Library
+#include <GL/glu.h>	//
+
 using namespace std;
 
 
@@ -15,6 +22,7 @@ HRply::HRply(string fname)
 {
     filename=fname;
     readPlyfile();
+    normalized=0;
 }
 
 HRply::~HRply()
@@ -101,5 +109,160 @@ int HRply::readPlyfile()
     }
 
     printf("read %d points \n",numPts);
+
+}
+
+void HRply::renderpoints()
+{
+    if(normalized!=1)
+    {
+        //printf("cant render since points are not normalized to fit viewing frustum\n");
+        return ;
+    }
+//    int i;
+    for(int i=0; i<points.size(); i++)
+    {
+
+    }
+
+}
+void HRply::normalizePts(double pmin, double pmax)
+{
+    int i;
+    normalized=1;
+    if(points.size()==0)
+    {
+        printf("not normalizing because there are no points available\n");
+        return ;
+    }
+
+    double rangex;
+    double rangey;
+    double rangez;
+
+    double xmin, xmax, ymin, ymax, zmin, zmax;
+
+
+    double x,y,z;
+
+    xmin= xmax=points[0].loc.x  ;
+    ymin= ymax=points[0].loc.y  ;
+    zmin= zmax=points[0].loc.z  ;
+
+    for(i=0; i<points.size(); i++)
+    {
+        x=points[i].loc.x;
+        y=points[i].loc.y;
+        z=points[i].loc.z;
+
+        if(x>xmax) xmax=x;
+        if(x<xmin) xmin=x;
+
+        if(y>ymax) ymax=y;
+        if(y<ymin) ymin=y;
+
+        if(z>zmax) zmax=z;
+        if(z<zmin) zmin=z;
+    }
+
+    rangex=xmax-xmin;
+    rangey=ymax-ymin;
+    rangez=zmax-zmin;
+
+    double offset;
+    double rangemultiple;
+
+    change this so the max is the max between the maxes and same with miniumum
+    if(rangex > rangey && rangex > rangez)
+    {
+        offset=xmin;
+        rangemultiple= (pmax-pmin)/rangex;
+    }
+    else if(rangey > rangex && rangey > rangez)
+    {
+        offset=ymin;
+        rangemultiple= (pmax-pmin)/rangey;
+    }
+    else
+    {
+        offset=zmin;
+        rangemultiple= (pmax-pmin)/rangez;
+    }
+
+
+
+//////////
+    points_normalized.resize(points.size());
+
+    for(i=0; i<points.size(); i++)
+    {
+        points_normalized[i]=points[i];
+
+        x=points[i].loc.x;
+        y=points[i].loc.y;
+        z=points[i].loc.z;
+
+        x=((x-offset)*rangemultiple)+pmin;
+        y=((y-offset)*rangemultiple)+pmin;
+        z=((z-offset)*rangemultiple)+pmin;
+
+
+
+        points_normalized[i].loc.x=x;
+        points_normalized[i].loc.y=y;
+        points_normalized[i].loc.z=z;
+
+    }
+    /////
+          xmin= xmax=points[0].loc.x  ;
+    ymin= ymax=points[0].loc.y  ;
+    zmin= zmax=points[0].loc.z  ;
+
+    for(i=0; i<points_normalized.size(); i++)
+    {
+        x=points[i].loc.x;
+        y=points[i].loc.y;
+        z=points[i].loc.z;
+
+        if(x>xmax) xmax=x;
+        if(x<xmin) xmin=x;
+
+        if(y>ymax) ymax=y;
+        if(y<ymin) ymin=y;
+
+        if(z>zmax) zmax=z;
+        if(z<zmin) zmin=z;
+    }
+
+    cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
+    cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
+    cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
+
+
+    xmin= xmax=points_normalized[0].loc.x  ;
+    ymin= ymax=points_normalized[0].loc.y  ;
+    zmin= zmax=points_normalized[0].loc.z  ;
+
+    for(i=0; i<points_normalized.size(); i++)
+    {
+        x=points_normalized[i].loc.x;
+        y=points_normalized[i].loc.y;
+        z=points_normalized[i].loc.z;
+
+        if(x>xmax) xmax=x;
+        if(x<xmin) xmin=x;
+
+        if(y>ymax) ymax=y;
+        if(y<ymin) ymin=y;
+
+        if(z>zmax) zmax=z;
+        if(z<zmin) zmin=z;
+    }
+
+    cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
+    cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
+    cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
+
+
 
 }

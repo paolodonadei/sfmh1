@@ -40,10 +40,14 @@ class HRply
 {
 public:
     vector<plyPt> points;
+    vector<plyPt> points_normalized;
     int numPts;
     int readPlyfile();
+      void normalizePts(double min, double max);
+    void renderpoints();
     void printPlyPts(ostream &stream);
     string filename;
+    int normalized;
     /** Default constructor */
     HRply(string fname);
     /** Default destructor */

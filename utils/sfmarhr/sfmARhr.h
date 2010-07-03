@@ -78,7 +78,7 @@ public:
         unsigned long acceltime );
     void Action( long code, unsigned long lasttime,
         unsigned long acceltime );
-
+HRply* myply;
 private:
     bool   m_init;
     GLuint m_gllist;
