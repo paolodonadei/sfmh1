@@ -6,6 +6,6 @@
 		<Project filename="utils/fundutils/winMakesfundutils.cbp" />
 		<Project filename="utils/selfcalib/winMakesfmh1.cbp" />
 		<Project filename="utils/sbainterface/winMakesfmh1.cbp" />
-		<Project filename="utils/sfmarhr/sfmARhr.cbp" active="1" />
+		<Project filename="utils/sfmarhr/sfmARhrwin.cbp" active="1" />
 	</Workspace>
 </CodeBlocks_workspace_file>
