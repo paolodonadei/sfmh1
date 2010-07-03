@@ -169,28 +169,30 @@ void HRply::normalizePts(double pmin, double pmax)
     rangey=ymax-ymin;
     rangez=zmax-zmin;
 
-    double offset;
+
     double rangemultiple;
 
-    change this so the max is the max between the maxes and same with miniumum
+
     if(rangex > rangey && rangex > rangez)
     {
-        offset=xmin;
+
         rangemultiple= (pmax-pmin)/rangex;
     }
     else if(rangey > rangex && rangey > rangez)
     {
-        offset=ymin;
+
         rangemultiple= (pmax-pmin)/rangey;
     }
     else
     {
-        offset=zmin;
+
         rangemultiple= (pmax-pmin)/rangez;
     }
 
 
-
+    double xoffset= -((pmax-pmin)/(xmax-xmin))/2.0;
+    double yoffset=-( (pmax-pmin)/(ymax-ymin))/2.0;
+    double zoffset=-((pmax-pmin)/(zmax-zmin))/2.0;
 //////////
     points_normalized.resize(points.size());
 
@@ -202,9 +204,9 @@ void HRply::normalizePts(double pmin, double pmax)
         y=points[i].loc.y;
         z=points[i].loc.z;
 
-        x=((x-offset)*rangemultiple)+pmin;
-        y=((y-offset)*rangemultiple)+pmin;
-        z=((z-offset)*rangemultiple)+pmin;
+        x=((x-xmin)*rangemultiple)+xoffset;
+        y=((y-ymin)*rangemultiple)+yoffset;
+        z=((z-zmin)*rangemultiple)+zoffset;
 
 
 
@@ -214,7 +216,7 @@ void HRply::normalizePts(double pmin, double pmax)
 
     }
     /////
-          xmin= xmax=points[0].loc.x  ;
+    xmin= xmax=points[0].loc.x  ;
     ymin= ymax=points[0].loc.y  ;
     zmin= zmax=points[0].loc.z  ;
 

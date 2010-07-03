@@ -195,6 +195,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
     m_gllist = 0;
     m_rleft = WXK_LEFT;
     m_rright = WXK_RIGHT;
+    myply=NULL;
 }
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
@@ -206,6 +207,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
     m_gllist = other->m_gllist; // share display list
     m_rleft = WXK_LEFT;
     m_rright = WXK_RIGHT;
+    myply=NULL;
 }
 
 TestGLCanvas::~TestGLCanvas()
@@ -284,6 +286,10 @@ void TestGLCanvas::Render()
     else
     {
         glCallList(m_gllist);
+    }
+    if(myply!=NULL)
+    {
+        myply->renderpoints();
     }
 
     glFlush();
@@ -468,6 +474,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
 void MyFrame::OnExit( wxCommandEvent& WXUNUSED(event) )
 {
     // true is to force the frame to close
+    delete m_canvas->myply;
     Close(true);
 }
 
@@ -560,17 +567,16 @@ void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
     {
 
-        mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
+        mystring=OpenDialog->GetPath().clone(); // Set the Title to reflect the file open
     }
 
     // Clean up after ourselves
     OpenDialog->Destroy();
     char buf[100];
+
     strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
-    HRply myply(buf);
-    ofstream outfile ("test.txt");
-    myply.printPlyPts(cout);
-    outfile.close();
+    m_canvas->myply=new HRply(string(buf));
+    m_canvas->myply->normalizePts(-.5,05);
 
 }
 /*------------------------------------------------------------------
