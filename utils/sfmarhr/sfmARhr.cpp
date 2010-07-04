@@ -47,6 +47,8 @@ using namespace std;
 #include <sys/timeb.h>
 #endif
 
+
+
 enum
 {
     ID_NEW_WINDOW= wxID_HIGHEST + 1,
@@ -567,16 +569,16 @@ void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
     {
 
-        mystring=OpenDialog->GetPath().clone(); // Set the Title to reflect the file open
+        mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
     }
 
     // Clean up after ourselves
     OpenDialog->Destroy();
-    char buf[100];
+    char buf[300];
 
     strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
     m_canvas->myply=new HRply(string(buf));
-    m_canvas->myply->normalizePts(-.5,05);
+    m_canvas->myply->normalizePts(-.5,0.5);
 
 }
 /*------------------------------------------------------------------

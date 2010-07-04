@@ -164,6 +164,10 @@ void HRply::normalizePts(double pmin, double pmax)
         if(z>zmax) zmax=z;
         if(z<zmin) zmin=z;
     }
+        cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
+    cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
+    cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
+
 
     rangex=xmax-xmin;
     rangey=ymax-ymin;
@@ -190,9 +194,9 @@ void HRply::normalizePts(double pmin, double pmax)
     }
 
 
-    double xoffset= -((pmax-pmin)/(xmax-xmin))/2.0;
-    double yoffset=-( (pmax-pmin)/(ymax-ymin))/2.0;
-    double zoffset=-((pmax-pmin)/(zmax-zmin))/2.0;
+    double xoffset= -((xmax-xmin)*(rangemultiple))/2.0;
+    double yoffset=-( (ymax-ymin)*(rangemultiple))/2.0;
+    double zoffset=-((zmax-zmin)*(rangemultiple))/2.0;
 //////////
     points_normalized.resize(points.size());
 
@@ -216,30 +220,6 @@ void HRply::normalizePts(double pmin, double pmax)
 
     }
     /////
-    xmin= xmax=points[0].loc.x  ;
-    ymin= ymax=points[0].loc.y  ;
-    zmin= zmax=points[0].loc.z  ;
-
-    for(i=0; i<points_normalized.size(); i++)
-    {
-        x=points[i].loc.x;
-        y=points[i].loc.y;
-        z=points[i].loc.z;
-
-        if(x>xmax) xmax=x;
-        if(x<xmin) xmin=x;
-
-        if(y>ymax) ymax=y;
-        if(y<ymin) ymin=y;
-
-        if(z>zmax) zmax=z;
-        if(z<zmin) zmin=z;
-    }
-
-    cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
-    cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
-    cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
-
 
     xmin= xmax=points_normalized[0].loc.x  ;
     ymin= ymax=points_normalized[0].loc.y  ;
