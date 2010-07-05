@@ -79,6 +79,7 @@ public:
     void Action( long code, unsigned long lasttime,
         unsigned long acceltime );
 HRply* myply;
+double rangeBound;
 private:
     bool   m_init;
     GLuint m_gllist;

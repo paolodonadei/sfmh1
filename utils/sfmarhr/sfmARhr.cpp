@@ -198,6 +198,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
     m_rleft = WXK_LEFT;
     m_rright = WXK_RIGHT;
     myply=NULL;
+    rangeBound=0.5;
 }
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
@@ -210,6 +211,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
     m_rleft = WXK_LEFT;
     m_rright = WXK_RIGHT;
     myply=NULL;
+    rangeBound=0.5;
 }
 
 TestGLCanvas::~TestGLCanvas()
@@ -240,55 +242,55 @@ void TestGLCanvas::Render()
     /* clear color and depth buffers */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if( m_gllist == 0 )
-    {
-        m_gllist = glGenLists( 1 );
-        glNewList( m_gllist, GL_COMPILE_AND_EXECUTE );
-        /* draw six faces of a cube */
-        glBegin(GL_QUADS);
-        glNormal3f( 0.0f, 0.0f, 1.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f,-0.5f, 0.5f);
-        glVertex3f( 0.5f,-0.5f, 0.5f);
-
-        glNormal3f( 0.0f, 0.0f,-1.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f);
-        glVertex3f(-0.5f, 0.5f,-0.5f);
-        glVertex3f( 0.5f, 0.5f,-0.5f);
-        glVertex3f( 0.5f,-0.5f,-0.5f);
-
-        glNormal3f( 0.0f, 1.0f, 0.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f);
-        glVertex3f( 0.5f, 0.5f,-0.5f);
-        glVertex3f(-0.5f, 0.5f,-0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-
-        glNormal3f( 0.0f,-1.0f, 0.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f);
-        glVertex3f( 0.5f,-0.5f,-0.5f);
-        glVertex3f( 0.5f,-0.5f, 0.5f);
-        glVertex3f(-0.5f,-0.5f, 0.5f);
-
-        glNormal3f( 1.0f, 0.0f, 0.0f);
-        glVertex3f( 0.5f, 0.5f, 0.5f);
-        glVertex3f( 0.5f,-0.5f, 0.5f);
-        glVertex3f( 0.5f,-0.5f,-0.5f);
-        glVertex3f( 0.5f, 0.5f,-0.5f);
-
-        glNormal3f(-1.0f, 0.0f, 0.0f);
-        glVertex3f(-0.5f,-0.5f,-0.5f);
-        glVertex3f(-0.5f,-0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f, 0.5f);
-        glVertex3f(-0.5f, 0.5f,-0.5f);
-        glEnd();
-
-        glEndList();
-    }
-    else
-    {
-        glCallList(m_gllist);
-    }
+//    if( m_gllist == 0 )
+//    {
+//        m_gllist = glGenLists( 1 );
+//        glNewList( m_gllist, GL_COMPILE_AND_EXECUTE );
+//        /* draw six faces of a cube */
+//        glBegin(GL_QUADS);
+//        glNormal3f( 0.0f, 0.0f, 1.0f);
+//        glVertex3f( 0.5f, 0.5f, 0.5f);
+//        glVertex3f(-0.5f, 0.5f, 0.5f);
+//        glVertex3f(-0.5f,-0.5f, 0.5f);
+//        glVertex3f( 0.5f,-0.5f, 0.5f);
+//
+//        glNormal3f( 0.0f, 0.0f,-1.0f);
+//        glVertex3f(-0.5f,-0.5f,-0.5f);
+//        glVertex3f(-0.5f, 0.5f,-0.5f);
+//        glVertex3f( 0.5f, 0.5f,-0.5f);
+//        glVertex3f( 0.5f,-0.5f,-0.5f);
+//
+//        glNormal3f( 0.0f, 1.0f, 0.0f);
+//        glVertex3f( 0.5f, 0.5f, 0.5f);
+//        glVertex3f( 0.5f, 0.5f,-0.5f);
+//        glVertex3f(-0.5f, 0.5f,-0.5f);
+//        glVertex3f(-0.5f, 0.5f, 0.5f);
+//
+//        glNormal3f( 0.0f,-1.0f, 0.0f);
+//        glVertex3f(-0.5f,-0.5f,-0.5f);
+//        glVertex3f( 0.5f,-0.5f,-0.5f);
+//        glVertex3f( 0.5f,-0.5f, 0.5f);
+//        glVertex3f(-0.5f,-0.5f, 0.5f);
+//
+//        glNormal3f( 1.0f, 0.0f, 0.0f);
+//        glVertex3f( 0.5f, 0.5f, 0.5f);
+//        glVertex3f( 0.5f,-0.5f, 0.5f);
+//        glVertex3f( 0.5f,-0.5f,-0.5f);
+//        glVertex3f( 0.5f, 0.5f,-0.5f);
+//
+//        glNormal3f(-1.0f, 0.0f, 0.0f);
+//        glVertex3f(-0.5f,-0.5f,-0.5f);
+//        glVertex3f(-0.5f,-0.5f, 0.5f);
+//        glVertex3f(-0.5f, 0.5f, 0.5f);
+//        glVertex3f(-0.5f, 0.5f,-0.5f);
+//        glEnd();
+//
+//        glEndList();
+//    }
+//    else
+//    {
+//        glCallList(m_gllist);
+//    }
     if(myply!=NULL)
     {
         myply->renderpoints();
@@ -393,7 +395,27 @@ void TestGLCanvas::Action( long code, unsigned long lasttime,
 void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
 {
     long evkey = event.GetKeyCode();
+
+
+    if(myply!=NULL)
+    {
+
+
+        if(evkey == WXK_PAGEUP)
+        {
+            rangeBound+=0.1;
+           myply->normalizePts(-rangeBound,rangeBound);
+            Refresh(false);
+        }
+        if(evkey ==WXK_PAGEDOWN)
+        {
+            rangeBound-=0.1;
+           myply->normalizePts(-rangeBound,rangeBound);
+            Refresh(false);
+        }
+    }
     if (evkey == 0) return;
+    cout<<evkey<<endl;
 
     if (!m_TimeInitialized)
     {
@@ -578,7 +600,7 @@ void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
 
     strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
     m_canvas->myply=new HRply(string(buf));
-    m_canvas->myply->normalizePts(-.5,0.5);
+    m_canvas->myply->normalizePts(-m_canvas->rangeBound,m_canvas->rangeBound);
 
 }
 /*------------------------------------------------------------------
