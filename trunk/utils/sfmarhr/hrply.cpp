@@ -120,11 +120,28 @@ void HRply::renderpoints()
         return ;
     }
 //    int i;
+    double x,y,z;
+    double R,G,B;
+    glPointSize(2);
+
+    glBegin(GL_POINTS);
+
+
     for(int i=0; i<points.size(); i++)
     {
+        x=points_normalized[i].loc.x;
+        y=points_normalized[i].loc.y;
+        z=points_normalized[i].loc.z;
 
+        R=points_normalized[i].col.R/255.0f;
+        G=points_normalized[i].col.G/255.0f;
+        B=points_normalized[i].col.B/255.0f;
+
+        glColor3f(R,G, B);
+
+        glVertex3f(x,y,z);
     }
-
+    glEnd();
 }
 void HRply::normalizePts(double pmin, double pmax)
 {
@@ -164,7 +181,7 @@ void HRply::normalizePts(double pmin, double pmax)
         if(z>zmax) zmax=z;
         if(z<zmin) zmin=z;
     }
-        cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
+    cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
     cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
     cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
 
@@ -240,7 +257,7 @@ void HRply::normalizePts(double pmin, double pmax)
         if(z>zmax) zmax=z;
         if(z<zmin) zmin=z;
     }
-
+    cout<<"new range "<<endl;
     cout<<"x: "<<xmin<<"\t" <<xmax<<endl;
     cout<<"y: "<<ymin<<"\t" <<ymax<<endl;
     cout<<"z: "<<zmin<<"\t" <<zmax<<endl;
