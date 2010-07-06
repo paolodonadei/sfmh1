@@ -43,6 +43,10 @@ void HRply::printPlyPts(ostream &stream)
 
 int HRply::readPlyfile()
 {
+    points_normalized.clear();
+    points.clear();
+    mytriangles.clear();
+
     char str[2000];
     fstream fp_in;
     fp_in.open(filename.c_str(), ios::in);
@@ -111,7 +115,31 @@ int HRply::readPlyfile()
     printf("read %d points \n",numPts);
 
 }
+void HRply::rendertriangles()
+{
+    double R,G,B;
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glBegin(GL_TRIANGLES);
 
+
+    for(int i=0; i<points.size(); i++)
+    {
+
+
+        R=mytriangles[i].col.R;
+        G=mytriangles[i].col.G;
+        B=mytriangles[i].col.B;
+
+        glColor3f(R,G, B);
+
+        glVertex3f(mytriangles[i].v1.x,mytriangles[i].v1.y,mytriangles[i].v1.z);
+        glVertex3f(mytriangles[i].v2.x,mytriangles[i].v2.y,mytriangles[i].v2.z);
+        glVertex3f(mytriangles[i].v3.x,mytriangles[i].v3.y,mytriangles[i].v3.z);
+    }
+    glEnd();
+
+
+}
 void HRply::renderpoints()
 {
     if(normalized!=1)
@@ -122,8 +150,8 @@ void HRply::renderpoints()
 //    int i;
     double x,y,z;
     double R,G,B;
-    glPointSize(2);
-
+    glPointSize(7);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glBegin(GL_POINTS);
 
 
@@ -143,6 +171,59 @@ void HRply::renderpoints()
     }
     glEnd();
 }
+
+void HRply::formTriangles(double size)
+{
+    int i;
+    double x,y,z,xn,yn,zn;
+    double R,G,B;
+
+
+
+    for(int i=0; i<points_normalized.size(); i++)
+    {
+        x=points_normalized[i].loc.x;
+        y=points_normalized[i].loc.y;
+        z=points_normalized[i].loc.z;
+
+        R=points_normalized[i].col.R/255.0f;
+        G=points_normalized[i].col.G/255.0f;
+        B=points_normalized[i].col.B/255.0f;
+
+        xn=points_normalized[i].pnorm.xn;
+        yn=points_normalized[i].pnorm.yn;
+        zn=points_normalized[i].pnorm.zn;
+
+        mtriangles cur_triangle;
+
+        cur_triangle.col.R=R;
+        cur_triangle.col.G=G;
+        cur_triangle.col.B=B;
+
+        cur_triangle.pnorm.xn=xn ;
+        cur_triangle.pnorm.xn=yn ;
+        cur_triangle.pnorm.xn= zn;
+
+//        cur_triangle.v1.x= ;
+//        cur_triangle.v1.y= ;
+//        cur_triangle.v1.z= ;
+//
+//
+//        cur_triangle.v2.x= ;
+//        cur_triangle.v2.y= ;
+//        cur_triangle.v2.z= ;
+//
+//
+//        cur_triangle.v3.x= ;
+//        cur_triangle.v3.y= ;
+//        cur_triangle.v3.z= ;
+
+        mytriangles.push_back(cur_triangle);
+    }
+
+
+}
+
 void HRply::normalizePts(double pmin, double pmax)
 {
     int i;
@@ -264,4 +345,126 @@ void HRply::normalizePts(double pmin, double pmax)
 
 
 
+}
+
+mtriangles formTriangle(plynormal pn,pt3D loc,double radius)
+{
+    mtriangles mytri;
+    double vnorm=0;
+
+    pt3D v1;
+    pt3D v2;
+    pt3D v3;
+
+    pt3D tempV;
+    pt3D tempV2;
+
+    v1=loc; //first point is the point itself
+
+    double nxrightside=(pn.xn*loc.x)+(pn.yn*loc.y)+(pn.zn*loc.z);
+
+
+    if(pn.xn>0.00001)
+    {
+        tempV.y=1.0;
+        tempV.z=1.0;
+
+        tempV.x=(nxrightside-(pn.yn*tempV.y)-(pn.zn*tempV.z))/pn.xn;
+    }
+    else if(pn.yn>0.00001)
+    {
+        tempV.x=1.0;
+        tempV.z=1.0;
+
+        tempV.y=(nxrightside-(pn.zn*tempV.z)-(pn.xn*tempV.x))/pn.yn;
+    }
+    else if(pn.zn>0.00001)
+    {
+        tempV.x=1.0;
+        tempV.y=1.0;
+
+        tempV.z=(nxrightside-(pn.xn*tempV.x)-(pn.yn*tempV.y))/pn.zn;
+    }
+    else
+    {
+        cout<<"none of the normals are large enough, this cant be"<<endl;
+        exit(1);
+    }
+
+
+
+
+    tempV2.x=tempV.x-v1.x;
+    tempV2.y=tempV.y-v1.y;
+    tempV2.z=tempV.z-v1.z;
+
+    vnorm=sqrt( (tempV2.x*tempV2.x)+(tempV2.y*tempV2.y)+(tempV2.z*tempV2.z));
+
+    tempV2.x/=vnorm;
+    tempV2.y/=vnorm;
+    tempV2.z/=vnorm;
+
+    v2.x=v1.x+(radius*tempV2.x);
+    v2.y=v1.y+(radius*tempV2.y);
+    v2.z=v1.z+(radius*tempV2.z);
+
+//////////
+    tempV.x = (v2.y * v1.z) - (v2.z * v1.y);
+    tempV.y = (v2.z * v1.x) - (v2.x * v1.z);
+    tempV.z = (v2.x * v1.y) - (v2.y * v1.x);
+
+
+
+
+
+    tempV2.x=tempV.x-v1.x;
+    tempV2.y=tempV.y-v1.y;
+    tempV2.z=tempV.z-v1.z;
+
+    vnorm=sqrt( (tempV2.x*tempV2.x)+(tempV2.y*tempV2.y)+(tempV2.z*tempV2.z));
+
+    tempV2.x/=vnorm;
+    tempV2.y/=vnorm;
+    tempV2.z/=vnorm;
+
+    v3.x=v1.x+(radius*tempV2.x);
+    v3.y=v1.y+(radius*tempV2.y);
+    v3.z=v1.z+(radius*tempV2.z);
+
+//////////
+pt3D centroid;
+
+centroid.x=(v1.x+v2.x+v3.x)/3.0;
+centroid.y=(v1.y+v2.y+v3.y)/3.0;
+centroid.z=(v1.z+v2.z+v3.z)/3.0;
+
+
+    tempV2.x=centroid.x-v1.x;
+    tempV2.y=centroid.y-v1.y;
+    tempV2.z=centroid.z-v1.z;
+
+ vnorm=sqrt( (tempV2.x*tempV2.x)+(tempV2.y*tempV2.y)+(tempV2.z*tempV2.z));
+
+    tempV2.x/=vnorm;
+    tempV2.y/=vnorm;
+    tempV2.z/=vnorm;
+
+
+    v1.x+= tempV2.x;
+    v1.y+= tempV2.y;
+    v1.z+= tempV2.z;
+
+
+    v2.x+= tempV2.x;
+    v2.y+= tempV2.y;
+    v2.z+= tempV2.z;
+
+
+
+
+    v3.x+= tempV2.x;
+    v3.y+= tempV2.y;
+    v3.z+= tempV2.z;
+
+    return mytri;
 }

@@ -242,55 +242,6 @@ void TestGLCanvas::Render()
     /* clear color and depth buffers */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    if( m_gllist == 0 )
-//    {
-//        m_gllist = glGenLists( 1 );
-//        glNewList( m_gllist, GL_COMPILE_AND_EXECUTE );
-//        /* draw six faces of a cube */
-//        glBegin(GL_QUADS);
-//        glNormal3f( 0.0f, 0.0f, 1.0f);
-//        glVertex3f( 0.5f, 0.5f, 0.5f);
-//        glVertex3f(-0.5f, 0.5f, 0.5f);
-//        glVertex3f(-0.5f,-0.5f, 0.5f);
-//        glVertex3f( 0.5f,-0.5f, 0.5f);
-//
-//        glNormal3f( 0.0f, 0.0f,-1.0f);
-//        glVertex3f(-0.5f,-0.5f,-0.5f);
-//        glVertex3f(-0.5f, 0.5f,-0.5f);
-//        glVertex3f( 0.5f, 0.5f,-0.5f);
-//        glVertex3f( 0.5f,-0.5f,-0.5f);
-//
-//        glNormal3f( 0.0f, 1.0f, 0.0f);
-//        glVertex3f( 0.5f, 0.5f, 0.5f);
-//        glVertex3f( 0.5f, 0.5f,-0.5f);
-//        glVertex3f(-0.5f, 0.5f,-0.5f);
-//        glVertex3f(-0.5f, 0.5f, 0.5f);
-//
-//        glNormal3f( 0.0f,-1.0f, 0.0f);
-//        glVertex3f(-0.5f,-0.5f,-0.5f);
-//        glVertex3f( 0.5f,-0.5f,-0.5f);
-//        glVertex3f( 0.5f,-0.5f, 0.5f);
-//        glVertex3f(-0.5f,-0.5f, 0.5f);
-//
-//        glNormal3f( 1.0f, 0.0f, 0.0f);
-//        glVertex3f( 0.5f, 0.5f, 0.5f);
-//        glVertex3f( 0.5f,-0.5f, 0.5f);
-//        glVertex3f( 0.5f,-0.5f,-0.5f);
-//        glVertex3f( 0.5f, 0.5f,-0.5f);
-//
-//        glNormal3f(-1.0f, 0.0f, 0.0f);
-//        glVertex3f(-0.5f,-0.5f,-0.5f);
-//        glVertex3f(-0.5f,-0.5f, 0.5f);
-//        glVertex3f(-0.5f, 0.5f, 0.5f);
-//        glVertex3f(-0.5f, 0.5f,-0.5f);
-//        glEnd();
-//
-//        glEndList();
-//    }
-//    else
-//    {
-//        glCallList(m_gllist);
-//    }
     if(myply!=NULL)
     {
         myply->renderpoints();
@@ -348,9 +299,16 @@ void TestGLCanvas::InitGL()
     glRotatef(30.0f, 1.0f, 0.0f, 0.0f);
     glRotatef(30.0f, 0.0f, 1.0f, 0.0f);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+
+  //  glEnable(GL_LIGHTING);
+ //   glEnable(GL_LIGHT0);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
+    glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
+    glDepthFunc(GL_LESS);			        // The Type Of Depth Test To Do
+    glEnable(GL_DEPTH_TEST);		        // Enables Depth Testing
+    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+
 }
 
 GLfloat TestGLCanvas::CalcRotateSpeed( unsigned long acceltime )
@@ -404,13 +362,13 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
         if(evkey == WXK_PAGEUP)
         {
             rangeBound+=0.1;
-           myply->normalizePts(-rangeBound,rangeBound);
+            myply->normalizePts(-rangeBound,rangeBound);
             Refresh(false);
         }
         if(evkey ==WXK_PAGEDOWN)
         {
             rangeBound-=0.1;
-           myply->normalizePts(-rangeBound,rangeBound);
+            myply->normalizePts(-rangeBound,rangeBound);
             Refresh(false);
         }
     }
