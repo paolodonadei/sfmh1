@@ -36,18 +36,28 @@ struct plyPt
     pt3D loc;
 };
 
+struct mtriangles
+{
+    pt3D v1,v2,v3;
+    plynormal pnorm;
+     plycolor col;
+};
+
 class HRply
 {
 public:
     vector<plyPt> points;
     vector<plyPt> points_normalized;
+        vector<mtriangles> mytriangles;
     int numPts;
     int readPlyfile();
       void normalizePts(double min, double max);
     void renderpoints();
+     void rendertriangles();
     void printPlyPts(ostream &stream);
     string filename;
     int normalized;
+    void formTriangles(double size);
     /** Default constructor */
     HRply(string fname);
     /** Default destructor */
