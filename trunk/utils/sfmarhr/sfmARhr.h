@@ -33,7 +33,7 @@ public:
     void OnNewWindow(wxCommandEvent& event);
     void OnDefRotateLeftKey(wxCommandEvent& event);
     void OnDefRotateRightKey(wxCommandEvent& event);
-void OnOpenPlyFile(wxCommandEvent& event);
+    void OnOpenPlyFile(wxCommandEvent& event);
 private:
 
     MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
@@ -52,14 +52,14 @@ class TestGLCanvas: public wxGLCanvas
     friend class MyFrame;
 public:
     TestGLCanvas( wxWindow *parent, wxWindowID id = wxID_ANY,
-        const wxPoint& pos = wxDefaultPosition,
-        const wxSize& size = wxDefaultSize,
-        long style = 0, const wxString& name = _T("TestGLCanvas") );
+                  const wxPoint& pos = wxDefaultPosition,
+                  const wxSize& size = wxDefaultSize,
+                  long style = 0, const wxString& name = _T("TestGLCanvas") );
 
     TestGLCanvas( wxWindow *parent, const TestGLCanvas *other,
-        wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
-        const wxSize& size = wxDefaultSize, long style = 0,
-        const wxString& name = _T("TestGLCanvas") );
+                  wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
+                  const wxSize& size = wxDefaultSize, long style = 0,
+                  const wxString& name = _T("TestGLCanvas") );
 
     ~TestGLCanvas();
 
@@ -75,11 +75,12 @@ public:
     void Rotate(GLfloat deg);
     static GLfloat CalcRotateSpeed(unsigned long acceltime);
     static GLfloat CalcRotateAngle( unsigned long lasttime,
-        unsigned long acceltime );
+                                    unsigned long acceltime );
     void Action( long code, unsigned long lasttime,
-        unsigned long acceltime );
-HRply* myply;
-double rangeBound;
+                 unsigned long acceltime );
+    HRply* myply;
+    double rangeBound;
+    int trinum;
 private:
     bool   m_init;
     GLuint m_gllist;
@@ -96,7 +97,7 @@ private:
     unsigned long  m_LastTime;
     unsigned long  m_LastRedraw;
 
-DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // #if wxUSE_GLCANVAS
