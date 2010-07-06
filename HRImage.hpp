@@ -89,6 +89,7 @@ public:
     CvMat*  intrinsicMatrix;
     CvMat*  projectionMatrix;
     CvMat* distortion;
+    void getCamCenterfromProj(CvMat* camCenter);
     int undistortPoints();
     double confidenceSelfCalib;
     int undistortImage( IplImage** undistorted);

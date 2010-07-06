@@ -62,6 +62,8 @@ public:
     HRply(string fname);
     /** Default destructor */
     virtual ~HRply();
+    mtriangles formTriangle(plynormal pn,pt3D loc,double radius);
+    void rendertrianglesingle( int trinum);
 protected:
 private:
 };

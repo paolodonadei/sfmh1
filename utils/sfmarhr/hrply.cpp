@@ -114,15 +114,18 @@ int HRply::readPlyfile()
 
     printf("read %d points \n",numPts);
 
+
+
 }
 void HRply::rendertriangles()
 {
     double R,G,B;
+    double x,y,z;
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    int cursize=mytriangles.size();
     glBegin(GL_TRIANGLES);
 
-
-    for(int i=0; i<points.size(); i++)
+    for(int i=0; i<cursize; i++)
     {
 
 
@@ -130,16 +133,87 @@ void HRply::rendertriangles()
         G=mytriangles[i].col.G;
         B=mytriangles[i].col.B;
 
+        R=R/255.0;
+        G=G/255.0;
+        B=B/255.0;
+
         glColor3f(R,G, B);
 
         glVertex3f(mytriangles[i].v1.x,mytriangles[i].v1.y,mytriangles[i].v1.z);
         glVertex3f(mytriangles[i].v2.x,mytriangles[i].v2.y,mytriangles[i].v2.z);
         glVertex3f(mytriangles[i].v3.x,mytriangles[i].v3.y,mytriangles[i].v3.z);
+
+
     }
     glEnd();
 
 
+
 }
+
+void HRply::rendertrianglesingle( int trinum)
+{
+    double R,G,B;
+    double x,y,z;
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    int cursize=1;
+
+    int i=trinum;
+
+    glBegin(GL_TRIANGLES);
+
+
+
+
+    R=mytriangles[i].col.R;
+    G=mytriangles[i].col.G;
+    B=mytriangles[i].col.B;
+
+    R=R/255.0;
+    G=G/255.0;
+    B=B/255.0;
+
+    glColor3f(R,G, B);
+
+    glVertex3f(mytriangles[i].v1.x,mytriangles[i].v1.y,mytriangles[i].v1.z);
+    glVertex3f(mytriangles[i].v2.x,mytriangles[i].v2.y,mytriangles[i].v2.z);
+    glVertex3f(mytriangles[i].v3.x,mytriangles[i].v3.y,mytriangles[i].v3.z);
+
+    glEnd();
+
+    glLineWidth(2);
+
+    glBegin(GL_LINES);
+
+
+    x=points_normalized[i].loc.x;
+    y=points_normalized[i].loc.y;
+    z=points_normalized[i].loc.z;
+
+    R=mytriangles[i].col.R;
+    G=mytriangles[i].col.G;
+    B=mytriangles[i].col.B;
+
+    R=R/255.0;
+    G=G/255.0;
+    B=B/255.0;
+
+    glColor3f(G, B,R);
+
+    glVertex3f(x,y,z);
+    x=x+6*points_normalized[i].pnorm.xn;
+    y=y+6*points_normalized[i].pnorm.yn;
+    z=z+6*points_normalized[i].pnorm.zn;
+
+    glVertex3f(x,y,z);
+
+
+    glEnd();
+
+
+}
+
+
 void HRply::renderpoints()
 {
     if(normalized!=1)
@@ -178,7 +252,7 @@ void HRply::formTriangles(double size)
     double x,y,z,xn,yn,zn;
     double R,G,B;
 
-
+// mytriangles.clear();
 
     for(int i=0; i<points_normalized.size(); i++)
     {
@@ -186,15 +260,17 @@ void HRply::formTriangles(double size)
         y=points_normalized[i].loc.y;
         z=points_normalized[i].loc.z;
 
-        R=points_normalized[i].col.R/255.0f;
-        G=points_normalized[i].col.G/255.0f;
-        B=points_normalized[i].col.B/255.0f;
+        R=(points_normalized[i].col.R);
+        G=(points_normalized[i].col.G);
+        B=(points_normalized[i].col.B);
 
         xn=points_normalized[i].pnorm.xn;
         yn=points_normalized[i].pnorm.yn;
         zn=points_normalized[i].pnorm.zn;
 
-        mtriangles cur_triangle;
+        mtriangles cur_triangle=formTriangle(points_normalized[i].pnorm,points_normalized[i].loc,size);
+
+
 
         cur_triangle.col.R=R;
         cur_triangle.col.G=G;
@@ -202,7 +278,7 @@ void HRply::formTriangles(double size)
 
         cur_triangle.pnorm.xn=xn ;
         cur_triangle.pnorm.xn=yn ;
-        cur_triangle.pnorm.xn= zn;
+        cur_triangle.pnorm.xn=zn;
 
 //        cur_triangle.v1.x= ;
 //        cur_triangle.v1.y= ;
@@ -347,7 +423,7 @@ void HRply::normalizePts(double pmin, double pmax)
 
 }
 
-mtriangles formTriangle(plynormal pn,pt3D loc,double radius)
+mtriangles HRply::formTriangle(plynormal pn,pt3D loc,double radius)
 {
     mtriangles mytri;
     double vnorm=0;
@@ -364,21 +440,21 @@ mtriangles formTriangle(plynormal pn,pt3D loc,double radius)
     double nxrightside=(pn.xn*loc.x)+(pn.yn*loc.y)+(pn.zn*loc.z);
 
 
-    if(pn.xn>0.00001)
+    if(fabs(pn.xn)>0.00001)
     {
         tempV.y=1.0;
         tempV.z=1.0;
 
         tempV.x=(nxrightside-(pn.yn*tempV.y)-(pn.zn*tempV.z))/pn.xn;
     }
-    else if(pn.yn>0.00001)
+    else if(fabs(pn.yn)>0.00001)
     {
         tempV.x=1.0;
         tempV.z=1.0;
 
         tempV.y=(nxrightside-(pn.zn*tempV.z)-(pn.xn*tempV.x))/pn.yn;
     }
-    else if(pn.zn>0.00001)
+    else if(fabs(pn.zn)>0.00001)
     {
         tempV.x=1.0;
         tempV.y=1.0;
@@ -388,10 +464,14 @@ mtriangles formTriangle(plynormal pn,pt3D loc,double radius)
     else
     {
         cout<<"none of the normals are large enough, this cant be"<<endl;
+        printf("nx = %f  ny= %f  nz= %f \n",pn.xn,pn.yn,pn.zn);
         exit(1);
     }
 
-
+//    {
+//        double dotp=((tempV.x-loc.x)*pn.xn)+((tempV.y-loc.y)*pn.yn)+((tempV.z-loc.z)*pn.zn);
+//        printf("dot should be zero but it is %f \n",dotp);
+//    }
 
 
     tempV2.x=tempV.x-v1.x;
@@ -409,45 +489,49 @@ mtriangles formTriangle(plynormal pn,pt3D loc,double radius)
     v2.z=v1.z+(radius*tempV2.z);
 
 //////////
-    tempV.x = (v2.y * v1.z) - (v2.z * v1.y);
-    tempV.y = (v2.z * v1.x) - (v2.x * v1.z);
-    tempV.z = (v2.x * v1.y) - (v2.y * v1.x);
+    pt3D tv1;
+    pt3D tv2;
+
+    tv1.x=v2.x-v1.x;
+    tv1.y=v2.y-v1.y;
+    tv1.z=v2.z-v1.z;
+
+    tv2.x=pn.xn;
+    tv2.y=pn.yn;
+    tv2.z=pn.zn;
+
+
+
+    tempV.x = (tv2.y * tv1.z) - (tv2.z * tv1.y);
+    tempV.y = (tv2.z * tv1.x) - (tv2.x * tv1.z);
+    tempV.z = (tv2.x * tv1.y) - (tv2.y * tv1.x);
 
 
 
 
 
-    tempV2.x=tempV.x-v1.x;
-    tempV2.y=tempV.y-v1.y;
-    tempV2.z=tempV.z-v1.z;
 
-    vnorm=sqrt( (tempV2.x*tempV2.x)+(tempV2.y*tempV2.y)+(tempV2.z*tempV2.z));
+    vnorm=sqrt( (tempV.x*tempV.x)+(tempV.y*tempV.y)+(tempV.z*tempV.z));
 
-    tempV2.x/=vnorm;
-    tempV2.y/=vnorm;
-    tempV2.z/=vnorm;
+    tempV.x/=vnorm;
+    tempV.y/=vnorm;
+    tempV.z/=vnorm;
 
-    v3.x=v1.x+(radius*tempV2.x);
-    v3.y=v1.y+(radius*tempV2.y);
-    v3.z=v1.z+(radius*tempV2.z);
+    v3.x=v1.x+(radius*tempV.x);
+    v3.y=v1.y+(radius*tempV.y);
+    v3.z=v1.z+(radius*tempV.z);
 
 //////////
-pt3D centroid;
+    pt3D centroid;
 
-centroid.x=(v1.x+v2.x+v3.x)/3.0;
-centroid.y=(v1.y+v2.y+v3.y)/3.0;
-centroid.z=(v1.z+v2.z+v3.z)/3.0;
+    centroid.x=(v1.x+v2.x+v3.x)/3.0;
+    centroid.y=(v1.y+v2.y+v3.y)/3.0;
+    centroid.z=(v1.z+v2.z+v3.z)/3.0;
 
 
-    tempV2.x=centroid.x-v1.x;
-    tempV2.y=centroid.y-v1.y;
-    tempV2.z=centroid.z-v1.z;
-
- vnorm=sqrt( (tempV2.x*tempV2.x)+(tempV2.y*tempV2.y)+(tempV2.z*tempV2.z));
-
-    tempV2.x/=vnorm;
-    tempV2.y/=vnorm;
-    tempV2.z/=vnorm;
+    tempV2.x=v1.x-centroid.x;
+    tempV2.y=v1.y-centroid.y;
+    tempV2.z=v1.z-centroid.z;
 
 
     v1.x+= tempV2.x;
@@ -465,6 +549,10 @@ centroid.z=(v1.z+v2.z+v3.z)/3.0;
     v3.x+= tempV2.x;
     v3.y+= tempV2.y;
     v3.z+= tempV2.z;
+
+    mytri.v1=v1;
+    mytri.v2=v2;
+    mytri.v3=v3;
 
     return mytri;
 }

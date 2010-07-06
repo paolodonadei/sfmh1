@@ -199,6 +199,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
     m_rright = WXK_RIGHT;
     myply=NULL;
     rangeBound=0.5;
+    trinum=0;
 }
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
@@ -212,6 +213,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
     m_rright = WXK_RIGHT;
     myply=NULL;
     rangeBound=0.5;
+    trinum=0;
 }
 
 TestGLCanvas::~TestGLCanvas()
@@ -244,7 +246,10 @@ void TestGLCanvas::Render()
 
     if(myply!=NULL)
     {
-        myply->renderpoints();
+        //myply->renderpoints();
+        myply->rendertriangles();
+     //   myply-> rendertrianglesingle( trinum);
+
     }
 
     glFlush();
@@ -300,8 +305,8 @@ void TestGLCanvas::InitGL()
     glRotatef(30.0f, 0.0f, 1.0f, 0.0f);
 
 
-  //  glEnable(GL_LIGHTING);
- //   glEnable(GL_LIGHT0);
+    //  glEnable(GL_LIGHTING);
+//   glEnable(GL_LIGHT0);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
     glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
@@ -363,12 +368,19 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
         {
             rangeBound+=0.1;
             myply->normalizePts(-rangeBound,rangeBound);
+          myply->formTriangles(0.015);
             Refresh(false);
         }
         if(evkey ==WXK_PAGEDOWN)
         {
             rangeBound-=0.1;
             myply->normalizePts(-rangeBound,rangeBound);
+            myply->formTriangles(0.015);
+            Refresh(false);
+        }
+        if(evkey == WXK_SPACE)
+        {
+            trinum++;
             Refresh(false);
         }
     }
@@ -559,6 +571,8 @@ void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
     strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
     m_canvas->myply=new HRply(string(buf));
     m_canvas->myply->normalizePts(-m_canvas->rangeBound,m_canvas->rangeBound);
+    m_canvas->myply->formTriangles(0.015);
+                Refresh(false);
 
 }
 /*------------------------------------------------------------------

@@ -456,6 +456,18 @@ void HRImage::incrementPixel(int y,int x)
 
 
 }
+void HRImage::getCamCenterfromProj(CvMat* camCenter)
+{
+    CvMat* R=cvCreateMat(3,3,CV_64F);
+
+    CvMat* K=cvCreateMat(3,3,CV_64F);
+
+    cvDecomposeProjectionMatrix(projectionMatrix, K, R, camCenter, NULL,NULL, NULL, NULL);
+
+    cvReleaseMat(&R);
+    cvReleaseMat(&K);
+}
+
 void HRImage::setPixel(int y,int x,int pixValue)
 {
 
