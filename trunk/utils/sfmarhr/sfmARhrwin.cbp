@@ -38,10 +38,14 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefilewin" />
+		<Unit filename="MyProject1SFMMainfram.cpp" />
+		<Unit filename="MyProject1SFMMainfram.h" />
 		<Unit filename="hrply.cpp" />
 		<Unit filename="hrply.h" />
 		<Unit filename="sfmARhr.cpp" />
 		<Unit filename="sfmARhr.h" />
+		<Unit filename="sfmMainFram.cpp" />
+		<Unit filename="sfmMainFram.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
