@@ -54,6 +54,7 @@ public:
       void normalizePts(double min, double max);
     void renderpoints();
      void rendertriangles();
+      void rendernormals();
     void printPlyPts(ostream &stream);
     string filename;
     int normalized;

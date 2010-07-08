@@ -1,17 +1,7 @@
-/////////////////////////////////////////////////////////////////////////////
-// Name:        cube.cpp
-// Purpose:     wxGLCanvas demo program
-// Author:      Julian Smart
-// Modified by:
-// Created:     04/01/98
-// RCS-ID:      $Id: cube.cpp 35650 2005-09-23 12:56:45Z MR $
-// Copyright:   (c) Julian Smart
-// Licence:     wxWindows licence
-/////////////////////////////////////////////////////////////////////////////
 
 // For compilers that support precompilation, includes "wx.h".
 #include "wx/wxprec.h"
-
+#include "MyProject1SFMMainfram.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -47,97 +37,6 @@ using namespace std;
 #include <sys/timeb.h>
 #endif
 
-
-
-enum
-{
-    ID_NEW_WINDOW= wxID_HIGHEST + 1,
-    ID_DEF_ROTATE_LEFT_KEY,
-    ID_DEF_ROTATE_RIGHT_KEY,
-    ID_DEF_PLYOPEN
-};
-/*----------------------------------------------------------
-  Control to get a keycode
-  ----------------------------------------------------------*/
-class ScanCodeCtrl : public wxTextCtrl
-{
-public:
-    ScanCodeCtrl( wxWindow* parent, wxWindowID id, int code,
-                  const wxPoint& pos, const wxSize& size );
-
-    void OnChar( wxKeyEvent& WXUNUSED(event) )
-    {
-        // Do nothing
-    }
-
-    void OnKeyDown(wxKeyEvent& event);
-
-private:
-
-    // Any class wishing to process wxWidgets events must use this macro
-    DECLARE_EVENT_TABLE()
-};
-
-BEGIN_EVENT_TABLE( ScanCodeCtrl, wxTextCtrl )
-    EVT_CHAR( ScanCodeCtrl::OnChar )
-    EVT_KEY_DOWN( ScanCodeCtrl::OnKeyDown )
-END_EVENT_TABLE()
-
-ScanCodeCtrl::ScanCodeCtrl( wxWindow* parent, wxWindowID id, int code,
-                            const wxPoint& pos, const wxSize& size )
-    : wxTextCtrl( parent, id, wxEmptyString, pos, size )
-{
-    SetValue( wxString::Format(wxT("0x%04x"), code) );
-}
-
-void ScanCodeCtrl::OnKeyDown( wxKeyEvent& event )
-{
-    SetValue( wxString::Format(wxT("0x%04x"), event.GetKeyCode()) );
-}
-
-/*------------------------------------------------------------------
- Dialog for defining a keypress
--------------------------------------------------------------------*/
-
-class ScanCodeDialog : public wxDialog
-{
-public:
-    ScanCodeDialog( wxWindow* parent, wxWindowID id, const int code,
-                    const wxString &descr, const wxString& title );
-    int GetValue();
-
-private:
-
-    ScanCodeCtrl       *m_ScanCode;
-    wxTextCtrl         *m_Description;
-};
-
-ScanCodeDialog::ScanCodeDialog( wxWindow* parent, wxWindowID id,
-                                const int code, const wxString &descr, const wxString& title )
-    : wxDialog( parent, id, title, wxDefaultPosition, wxSize(96*2,76*2) )
-{
-    new wxStaticText( this, wxID_ANY, _T("Scancode"), wxPoint(4*2,3*2),
-                      wxSize(31*2,12*2) );
-    m_ScanCode = new ScanCodeCtrl( this, wxID_ANY, code, wxPoint(37*2,6*2),
-                                   wxSize(53*2,14*2) );
-
-    new wxStaticText( this, wxID_ANY, _T("Description"), wxPoint(4*2,24*2),
-                      wxSize(32*2,12*2) );
-    m_Description = new wxTextCtrl( this, wxID_ANY, descr, wxPoint(37*2,27*2),
-                                    wxSize(53*2,14*2) );
-
-    new wxButton( this, wxID_OK, _T("Ok"), wxPoint(20*2,50*2), wxSize(20*2,13*2) );
-    new wxButton( this, wxID_CANCEL, _T("Cancel"), wxPoint(44*2,50*2),
-                  wxSize(25*2,13*2) );
-}
-
-int ScanCodeDialog::GetValue()
-{
-    int code;
-    wxString buf = m_ScanCode->GetValue();
-    wxSscanf( buf.c_str(), _T("%i"), &code );
-    return code;
-}
 
 /*----------------------------------------------------------------------
   Utility function to get the elapsed time (in msec) since a given point
@@ -248,7 +147,8 @@ void TestGLCanvas::Render()
     {
         //myply->renderpoints();
         myply->rendertriangles();
-     //   myply-> rendertrianglesingle( trinum);
+        myply->rendernormals();
+        //   myply-> rendertrianglesingle( trinum);
 
     }
 
@@ -347,7 +247,10 @@ GLfloat TestGLCanvas::CalcRotateAngle( unsigned long lasttime,
 void TestGLCanvas::Action( long code, unsigned long lasttime,
                            unsigned long acceltime )
 {
+
     GLfloat angle = CalcRotateAngle( lasttime, acceltime );
+
+    printf("action %f\n",angle);
 
     if (code == m_rleft)
         Rotate( angle );
@@ -358,7 +261,7 @@ void TestGLCanvas::Action( long code, unsigned long lasttime,
 void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
 {
     long evkey = event.GetKeyCode();
-
+ printf("hi %ld\n",evkey);
 
     if(myply!=NULL)
     {
@@ -368,7 +271,7 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
         {
             rangeBound+=0.1;
             myply->normalizePts(-rangeBound,rangeBound);
-          myply->formTriangles(0.015);
+            myply->formTriangles(0.015);
             Refresh(false);
         }
         if(evkey ==WXK_PAGEDOWN)
@@ -384,6 +287,7 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
             Refresh(false);
         }
     }
+
     if (evkey == 0) return;
     cout<<evkey<<endl;
 
@@ -442,149 +346,13 @@ void TestGLCanvas::Rotate( GLfloat deg )
 }
 
 
-/* -----------------------------------------------------------------------
-  Main Window
--------------------------------------------------------------------------*/
-
-BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_MENU(wxID_EXIT, MyFrame::OnExit)
-    EVT_MENU( ID_NEW_WINDOW, MyFrame::OnNewWindow)
-    EVT_MENU( ID_DEF_ROTATE_LEFT_KEY, MyFrame::OnDefRotateLeftKey)
-    EVT_MENU( ID_DEF_ROTATE_RIGHT_KEY, MyFrame::OnDefRotateRightKey)
-    EVT_MENU( ID_DEF_PLYOPEN, MyFrame::OnOpenPlyFile)
-
-END_EVENT_TABLE()
-
-// My frame constructor
-MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
-                 const wxSize& size, long style)
-    : wxFrame(parent, wxID_ANY, title, pos, size, style)
-{
-    m_canvas = NULL;
-    SetIcon(wxIcon(sample_xpm));
-}
-
-// Intercept menu commands
-void MyFrame::OnExit( wxCommandEvent& WXUNUSED(event) )
-{
-    // true is to force the frame to close
-    delete m_canvas->myply;
-    Close(true);
-}
-
-/*static*/ MyFrame *MyFrame::Create(MyFrame *parentFrame, bool isCloneWindow)
-{
-    wxString str = wxT("wxWidgets OpenGL Cube Sample");
-    if (isCloneWindow) str += wxT(" - Clone");
-
-    MyFrame *frame = new MyFrame(NULL, str, wxDefaultPosition,
-                                 wxSize(400, 300));
-
-    // Make a menubar
-
-
-
-    wxMenuBar *menuBar = new wxMenuBar;
-    wxMenu *winMenu = new wxMenu;
-
-    winMenu->Append(ID_DEF_PLYOPEN, _T("&Open Ply"));
-    menuBar->Append(winMenu, _T("&File"));
-
-    winMenu = new wxMenu;
-
-    winMenu->Append(wxID_EXIT, _T("&Close"));
-    winMenu->Append(ID_NEW_WINDOW, _T("&New") );
-
-    menuBar->Append(winMenu, _T("&Window"));
-
-    winMenu = new wxMenu;
-    winMenu->Append(ID_DEF_ROTATE_LEFT_KEY, _T("Rotate &left"));
-    winMenu->Append(ID_DEF_ROTATE_RIGHT_KEY, _T("Rotate &right"));
-    menuBar->Append(winMenu, _T("&Key"));
-
-
-
-    frame->SetMenuBar(menuBar);
-
-    if (parentFrame)
-    {
-        frame->m_canvas = new TestGLCanvas( frame, parentFrame->m_canvas,
-                                            wxID_ANY, wxDefaultPosition, wxDefaultSize );
-    }
-    else
-    {
-        frame->m_canvas = new TestGLCanvas(frame, wxID_ANY,
-                                           wxDefaultPosition, wxDefaultSize);
-    }
-
-    // Show the frame
-    frame->Show(true);
-
-    return frame;
-}
-
-void MyFrame::OnNewWindow( wxCommandEvent& WXUNUSED(event) )
-{
-    (void) Create(this, true);
-}
-
-void MyFrame::OnDefRotateLeftKey( wxCommandEvent& WXUNUSED(event) )
-{
-    ScanCodeDialog dial( this, wxID_ANY, m_canvas->m_rleft,
-                         wxString(_T("Left")), _T("Define key") );
-
-    int result = dial.ShowModal();
-
-    if( result == wxID_OK )
-        m_canvas->m_rleft = dial.GetValue();
-}
-
-void MyFrame::OnDefRotateRightKey( wxCommandEvent& WXUNUSED(event) )
-{
-    ScanCodeDialog dial( this, wxID_ANY, m_canvas->m_rright,
-                         wxString(_T("Right")), _T("Define key") );
-
-    int result = dial.ShowModal();
-
-    if( result == wxID_OK )
-        m_canvas->m_rright = dial.GetValue();
-}
-void MyFrame::OnOpenPlyFile( wxCommandEvent& WXUNUSED(event) )
-{
-    wxString mystring;
-    wxFileDialog* OpenDialog = new wxFileDialog(
-        this, _("Choose a file to open"), wxEmptyString, wxEmptyString,
-        _("Text files (*.ply)|*.ply"),
-        wxFD_OPEN, wxDefaultPosition);
-
-    // Creates a "open file" dialog with 4 file types
-    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
-    {
-
-        mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
-    }
-
-    // Clean up after ourselves
-    OpenDialog->Destroy();
-    char buf[300];
-
-    strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
-    m_canvas->myply=new HRply(string(buf));
-    m_canvas->myply->normalizePts(-m_canvas->rangeBound,m_canvas->rangeBound);
-    m_canvas->myply->formTriangles(0.015);
-                Refresh(false);
-
-}
-/*------------------------------------------------------------------
-  Application object ( equivalent to main() )
------------------------------------------------------------------- */
 
 IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
 {
     // Create the main frame window
-    (void) MyFrame::Create(NULL);
-
+    MyProject1SFMMainfram* myfram=new MyProject1SFMMainfram(NULL);
+    myfram->Show(true);
     return true;
 }

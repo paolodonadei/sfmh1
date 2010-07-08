@@ -13,7 +13,7 @@
 #define _WX_CUBE_H_
 
 #include "wx/glcanvas.h"
-
+#include "hrply.h"
 // Define a new application type
 class MyApp: public wxApp
 {
@@ -24,26 +24,6 @@ public:
 // Define a new frame type
 class TestGLCanvas;
 
-class MyFrame: public wxFrame
-{
-public:
-    static MyFrame *Create(MyFrame *parentFrame, bool isCloneWindow = false);
-
-    void OnExit(wxCommandEvent& event);
-    void OnNewWindow(wxCommandEvent& event);
-    void OnDefRotateLeftKey(wxCommandEvent& event);
-    void OnDefRotateRightKey(wxCommandEvent& event);
-    void OnOpenPlyFile(wxCommandEvent& event);
-private:
-
-    MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos,
-            const wxSize& size, long style = wxDEFAULT_FRAME_STYLE);
-
-
-    TestGLCanvas *m_canvas;
-
-    DECLARE_EVENT_TABLE()
-};
 
 #if wxUSE_GLCANVAS
 
