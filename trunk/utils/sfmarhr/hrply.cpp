@@ -123,6 +123,7 @@ void HRply::rendertriangles()
     double x,y,z;
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     int cursize=mytriangles.size();
+
     glBegin(GL_TRIANGLES);
 
     for(int i=0; i<cursize; i++)
@@ -150,7 +151,54 @@ void HRply::rendertriangles()
 
 
 }
+void HRply::rendernormals()
+{
+    double R,G,B;
+    double x,y,z;
 
+    int cursize=mytriangles.size();
+
+
+    glLineWidth(2);
+    glBegin(GL_LINES);
+
+
+    for(int i=0; i<cursize; i++)
+    {
+
+
+        R=mytriangles[i].col.R;
+        G=mytriangles[i].col.G;
+        B=mytriangles[i].col.B;
+
+        R=R/255.0;
+        G=G/255.0;
+        B=B/255.0;
+        glColor3f(R,G, B);
+
+        x=points_normalized[i].loc.x;
+        y=points_normalized[i].loc.y;
+        z=points_normalized[i].loc.z;
+
+
+
+        glVertex3f(x,y,z);
+        x=x+6*points_normalized[i].pnorm.xn;
+        y=y+6*points_normalized[i].pnorm.yn;
+        z=z+6*points_normalized[i].pnorm.zn;
+
+        glVertex3f(x,y,z);
+
+
+    }
+    glEnd();
+
+
+
+
+
+
+}
 void HRply::rendertrianglesingle( int trinum)
 {
     double R,G,B;
@@ -252,7 +300,7 @@ void HRply::formTriangles(double size)
     double x,y,z,xn,yn,zn;
     double R,G,B;
 
-// mytriangles.clear();
+mytriangles.clear();
 
     for(int i=0; i<points_normalized.size(); i++)
     {
