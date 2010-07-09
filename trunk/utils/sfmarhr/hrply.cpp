@@ -183,9 +183,9 @@ void HRply::rendernormals()
 
 
         glVertex3f(x,y,z);
-        x=x+6*points_normalized[i].pnorm.xn;
-        y=y+6*points_normalized[i].pnorm.yn;
-        z=z+6*points_normalized[i].pnorm.zn;
+        x=x+0.5*points_normalized[i].pnorm.xn;
+        y=y+0.5*points_normalized[i].pnorm.yn;
+        z=z+0.5*points_normalized[i].pnorm.zn;
 
         glVertex3f(x,y,z);
 
@@ -300,7 +300,7 @@ void HRply::formTriangles(double size)
     double x,y,z,xn,yn,zn;
     double R,G,B;
 
-mytriangles.clear();
+    mytriangles.clear();
 
     for(int i=0; i<points_normalized.size(); i++)
     {
@@ -603,4 +603,30 @@ mtriangles HRply::formTriangle(plynormal pn,pt3D loc,double radius)
     mytri.v3=v3;
 
     return mytri;
+}
+
+ void  HRply::draw_axis( float scale )
+{
+ // glPushMatrix();
+ // glDisable(GL_LIGHTING);
+ // glDisable(GL_TEXTURE_2D);
+
+   glLineWidth(scale);
+  glBegin( GL_LINES );
+
+  glColor3f( 1.0, 0.0, 0.0 );
+  glVertex3f( .8f, 0.05f, 0.0 );  glVertex3f( 1.0, 0.25f, 0.0 ); // Letter X
+  glVertex3f( 0.8f, .25f, 0.0 );  glVertex3f( 1.0, 0.05f, 0.0 );
+  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 1.0, 0.0, 0.0 );     // X axis
+
+  glColor3f( 0.0, 1.0, 0.0 );
+  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 1.0, 0.0 );	 // Y axis
+
+  glColor3f( 0.0, 0.0, 1.0 );
+  glVertex3f( 0.0, 0.0, 0.0 );  glVertex3f( 0.0, 0.0, 1.0 );	 // Z axis
+  glEnd();
+ // glEnable(GL_LIGHTING);
+ // glEnable(GL_TEXTURE_2D);
+ // glPopMatrix();
+
 }

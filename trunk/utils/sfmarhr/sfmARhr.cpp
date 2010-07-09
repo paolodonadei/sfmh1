@@ -23,7 +23,7 @@ using namespace std;
 #endif
 
 #include "sfmARhr.h"
-#include "sample.xpm"
+
 
 #ifndef __WXMSW__     // for StopWatch, see remark below
 #if defined(__WXMAC__) && !defined(__DARWIN__)
@@ -148,6 +148,7 @@ void TestGLCanvas::Render()
         //myply->renderpoints();
         myply->rendertriangles();
         myply->rendernormals();
+        myply->draw_axis( 3 );
         //   myply-> rendertrianglesingle( trinum);
 
     }
@@ -261,7 +262,7 @@ void TestGLCanvas::Action( long code, unsigned long lasttime,
 void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
 {
     long evkey = event.GetKeyCode();
- printf("hi %ld\n",evkey);
+    printf("hi %ld\n",evkey);
 
     if(myply!=NULL)
     {
@@ -284,6 +285,7 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
         if(evkey == WXK_SPACE)
         {
             trinum++;
+               glTranslatef(0.0f, 0.0f, -.5f);
             Refresh(false);
         }
     }
