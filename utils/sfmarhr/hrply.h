@@ -40,21 +40,22 @@ struct mtriangles
 {
     pt3D v1,v2,v3;
     plynormal pnorm;
-     plycolor col;
+    plycolor col;
 };
 
 class HRply
 {
 public:
+ void draw_axis( float scale );
     vector<plyPt> points;
     vector<plyPt> points_normalized;
-        vector<mtriangles> mytriangles;
+    vector<mtriangles> mytriangles;
     int numPts;
     int readPlyfile();
-      void normalizePts(double min, double max);
+    void normalizePts(double min, double max);
     void renderpoints();
-     void rendertriangles();
-      void rendernormals();
+    void rendertriangles();
+    void rendernormals();
     void printPlyPts(ostream &stream);
     string filename;
     int normalized;

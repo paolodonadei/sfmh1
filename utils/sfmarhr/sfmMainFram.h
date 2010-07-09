@@ -26,30 +26,52 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SFMMainfram
 ///////////////////////////////////////////////////////////////////////////////
-class SFMMainfram : public wxFrame 
+class SFMMainfram : public wxFrame
 {
-	private:
-	
-	protected:
-		wxStatusBar* m_statusBar1;
-		wxMenuBar* m_menubar1;
-		wxMenu* m_menu1;
-		wxMenu* m_menu3;
-		wxMenu* m_menu2;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void framCharPressed( wxKeyEvent& event ){ event.Skip(); }
-		virtual void framKeyPressed( wxKeyEvent& event ){ event.Skip(); }
-		virtual void framMouseClicked( wxMouseEvent& event ){ event.Skip(); }
-		virtual void OpenPlyFile( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OpenCamCenter( wxCommandEvent& event ){ event.Skip(); }
-		virtual void ExitFunc( wxCommandEvent& event ){ event.Skip(); }
-		
-	
-	public:
-		SFMMainfram( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SFM AR toolkit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~SFMMainfram();
-	
+private:
+
+protected:
+    wxStatusBar* m_statusBar1;
+    wxMenuBar* m_menubar1;
+    wxMenu* m_menu1;
+    wxMenu* m_menu3;
+    wxMenu* m_menu2;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void framCharPressed( wxKeyEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void framKeyPressed( wxKeyEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void framMouseClicked( wxMouseEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OpenPlyFile( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OpenCamCenter( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void openOBJ( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void ExitFunc( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+
+
+public:
+    SFMMainfram( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SFM AR toolkit"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+    ~SFMMainfram();
+
 };
 
 #endif //__sfmMainFram__

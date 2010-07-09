@@ -14,6 +14,7 @@
 
 #include "wx/glcanvas.h"
 #include "hrply.h"
+#include "hrmodel.h"
 // Define a new application type
 class MyApp: public wxApp
 {
@@ -34,7 +35,7 @@ public:
     TestGLCanvas( wxWindow *parent, wxWindowID id = wxID_ANY,
                   const wxPoint& pos = wxDefaultPosition,
                   const wxSize& size = wxDefaultSize,
-                  long style = 0, const wxString& name = _T("TestGLCanvas") );
+                  long style = wxWANTS_CHARS, const wxString& name = _T("TestGLCanvas") );
 
     TestGLCanvas( wxWindow *parent, const TestGLCanvas *other,
                   wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
@@ -59,6 +60,7 @@ public:
     void Action( long code, unsigned long lasttime,
                  unsigned long acceltime );
     HRply* myply;
+    HRModel* objmodel;
     double rangeBound;
     int trinum;
 private:
