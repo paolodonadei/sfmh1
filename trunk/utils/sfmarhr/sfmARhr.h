@@ -54,6 +54,7 @@ public:
     void Render();
     void InitGL();
     void Rotate(GLfloat deg);
+       void Rotatez(GLfloat deg);
     static GLfloat CalcRotateSpeed(unsigned long acceltime);
     static GLfloat CalcRotateAngle( unsigned long lasttime,
                                     unsigned long acceltime );
@@ -68,7 +69,8 @@ private:
     GLuint m_gllist;
     long   m_rleft;
     long   m_rright;
-
+    long  m_rup;
+    long  m_rdown;
     static unsigned long  m_secbase;
     static int            m_TimeInitialized;
     static unsigned long  m_xsynct;

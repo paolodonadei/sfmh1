@@ -121,7 +121,7 @@ void HRply::rendertriangles()
 {
     double R,G,B;
     double x,y,z;
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
     int cursize=mytriangles.size();
 
     glBegin(GL_TRIANGLES);
@@ -203,7 +203,7 @@ void HRply::rendertrianglesingle( int trinum)
 {
     double R,G,B;
     double x,y,z;
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
     int cursize=1;
 
     int i=trinum;
@@ -273,7 +273,7 @@ void HRply::renderpoints()
     double x,y,z;
     double R,G,B;
     glPointSize(7);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
     glBegin(GL_POINTS);
 
 

@@ -96,7 +96,10 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
     m_gllist = 0;
     m_rleft = WXK_LEFT;
     m_rright = WXK_RIGHT;
+    m_rup = WXK_UP;
+    m_rdown = WXK_DOWN;
     myply=NULL;
+    objmodel=NULL;
     rangeBound=0.5;
     trinum=0;
 }
@@ -113,6 +116,7 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
     myply=NULL;
     rangeBound=0.5;
     trinum=0;
+    objmodel=NULL;
 }
 
 TestGLCanvas::~TestGLCanvas()
@@ -149,10 +153,15 @@ void TestGLCanvas::Render()
         myply->rendertriangles();
         myply->rendernormals();
         myply->draw_axis( 3 );
+
         //   myply-> rendertrianglesingle( trinum);
 
     }
-
+    if(objmodel!=NULL)
+    {
+        printf("render object\n");
+        objmodel->drawOBJ();
+    }
     glFlush();
     SwapBuffers();
 }
@@ -211,9 +220,11 @@ void TestGLCanvas::InitGL()
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
     glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
-    glDepthFunc(GL_LESS);			        // The Type Of Depth Test To Do
-    glEnable(GL_DEPTH_TEST);		        // Enables Depth Testing
-    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+//    glDepthFunc(GL_LESS);			        // The Type Of Depth Test To Do
+//    glEnable(GL_DEPTH_TEST);		        // Enables Depth Testing
+//    glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+//glEnable(GL_TEXTURE_2D);
+
 
 }
 
@@ -257,12 +268,16 @@ void TestGLCanvas::Action( long code, unsigned long lasttime,
         Rotate( angle );
     else if (code == m_rright)
         Rotate( -angle );
+    else if (code == m_rup)
+        Rotatez( -angle );
+    else if (code == m_rdown)
+        Rotatez( -angle );
 }
 
 void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
 {
     long evkey = event.GetKeyCode();
-    printf("hi %ld\n",evkey);
+
 
     if(myply!=NULL)
     {
@@ -285,7 +300,7 @@ void TestGLCanvas::OnKeyDown( wxKeyEvent& event )
         if(evkey == WXK_SPACE)
         {
             trinum++;
-               glTranslatef(0.0f, 0.0f, -.5f);
+            glTranslatef(0.0f, 0.0f, -.5f);
             Refresh(false);
         }
     }
@@ -346,7 +361,14 @@ void TestGLCanvas::Rotate( GLfloat deg )
     glRotatef((GLfloat)deg, 0.0f, 0.0f, 1.0f);
     Refresh(false);
 }
+void TestGLCanvas::Rotatez( GLfloat deg )
+{
+    SetCurrent();
 
+    glMatrixMode(GL_MODELVIEW);
+    glRotatef((GLfloat)deg, 0.0f,  1.0f, 0.0f);
+    Refresh(false);
+}
 
 
 IMPLEMENT_APP(MyApp)
