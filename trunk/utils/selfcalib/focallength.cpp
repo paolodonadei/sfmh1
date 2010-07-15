@@ -45,17 +45,17 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
     vector< vector<CvMat*> > FV;
     FV.resize(numFrames);
 
-     for (int i = 0; i < numFrames; ++i)
-     {
-         confs[i]=0;
-
-     }
     for (int i = 0; i < numFrames; ++i)
     {
-       FV[i].resize(numFrames);
+        confs[i]=0;
+
+    }
+    for (int i = 0; i < numFrames; ++i)
+    {
+        FV[i].resize(numFrames);
     }
 
- for (int i = 0; i < numFrames; ++i)
+    for (int i = 0; i < numFrames; ++i)
     {
 
         for (int j = 0; j < numFrames; ++j)
@@ -65,7 +65,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
     }
 
 
-    printf("input fundamental matrices are:\n");
+    // printf("input fundamental matrices are:\n");
 
     //here im fi
     for (int i = 0; i < numFrames; ++i)
@@ -198,6 +198,13 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     }
 
+
+    if (method==NONLINSIMPLEMULTISTEP)
+    {
+        HRSelfCalibtwoFrameNonlinMULTIStep(FV,  KV , width, height,confs);
+
+
+    }
 
     if (method==HARTLEY)
     {

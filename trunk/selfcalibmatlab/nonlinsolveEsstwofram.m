@@ -24,7 +24,7 @@ xinit=w/2;
 yinit=h/2;
 numtries=200;
 
-fvari=50;
+fvari=70;
 xvari=50;
 yvari=50;
 
@@ -63,7 +63,7 @@ for i=1:numtries
      curscore=detScore;   
     
    % disp(['iteration ' num2str(i) ' started from f= ' num2str(x0(1,1)) ' x= ' num2str(x0(1,2)) ' and y= ' num2str(x0(1,3))]);   
-    disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
+   % disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
        
        scorearray(i,1)=curscore;
    if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
@@ -124,44 +124,6 @@ ylabel('y coordinates of optical centers');
 zlabel('value of focal length ');
 figure
 
-numclusts=10;
-X=[ ffinals  xfinals   yfinals];
-[idx,ctrs] = kmeans(X,numclusts,'Replicates',5);
-
-scatter3(X(:,1),X(:,2),X(:,3),100,idx,'filled');
-title(['scatter plot of all the results found using my method and those found by sweeping the peter sturm algorithm']);
-hold
-count=0;
-for i=230:350
-for j=230:350
-    count=count+1;
-[ x, centerloc ] = PeterSturmSelfmoreparams( TF, i, j );
-XF(count,1)=x(1,1);
-XF(count,2)=i;
-XF(count,3)=j;
-end
-end
-scatter3(XF(:,1),XF(:,2),XF(:,3),100,'r','filled');
-hold
-
-
-maxnumclusts=0;
-maxnumclustsF=0;
-maxnumclustsX=0;
-maxnumclustsY=0;
-
-for i=1:numclusts
-    cursize=sum(idx==i);
-    
-    if(cursize>maxnumclusts)
-        maxnumclusts=cursize;
-        maxnumclustsF=ctrs(i,1);
-        maxnumclustsX=ctrs(i,2);
-        maxnumclustsY=ctrs(i,3);
-    end
-end
-
-
 figure
 
 
@@ -180,7 +142,7 @@ display(['mean of f was ' num2str(mean(ffinals)) ' median of f was ' num2str(med
 display(['mean of x was ' num2str(mean(xfinals)) ' median of x was ' num2str(median(xfinals)) ' variance of x was ' num2str(var(xfinals))]);
 display(['mean of y was ' num2str(mean(yfinals)) ' median of y was ' num2str(median(yfinals)) ' variance of y was ' num2str(var(yfinals))]);
 display(['best f is ' num2str(bestf) ' and best x is ' num2str(bestx) ' and best y is ' num2str(besty)]);
-display([' the highest cluster number was ' num2str(maxnumclusts) ' whose f is  ' num2str(maxnumclustsF) ' X is  ' num2str(maxnumclustsX) ' Y is  ' num2str( maxnumclustsY)  ]);
+
 
 
 

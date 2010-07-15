@@ -96,4 +96,8 @@ void quaternion_to_matrix(CvMat* inqm,CvMat* inRm);
 void copyMatrix(CvMat* src,CvMat* dst);
 int indexMax(vector<int>& myvec);
 CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2);
+double random_normal_0_1(void);
+double random_gaussian(double mean, double std);
+double random_uniform(double min, double max);
+double random_gaussian2(double mean, double std,double mmin,double mmax);
 #endif //HRPRIMITIVES_HPP_INCLUDED

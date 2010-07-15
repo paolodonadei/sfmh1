@@ -6,19 +6,143 @@
 // image from a file, inverts it, and displays the result.
 //
 ////////////////////////////////////////////////////////////////////////
+
 #include <math.h>
 #include "levmar.h"
 
 #include <iostream>
 #include "nonlinSClvm.h"
-#define NONLINPARMS 4
+
+#define NONLINPARMS 3
 #define CONSTPARAMS 1
 #include "general.h"
+#include "focallength.h"
 using namespace std;
 
 
 
-int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+{
+    int i,j,k;
+    int numFrames=KV.size();
+//so now we have initial points from Sturm
+    HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+//copy solutins to temporary place
+
+    vector<CvMat* > tempMats;
+    tempMats.resize(numFrames);
+    for(i=0; i<numFrames; i++)
+    {
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(tempMats[i],i,j,cvmGet(KV[i],i,j));
+            }
+        }
+
+    }
+
+    vector<CvMat* > bestKs;
+    bestKs.resize(numFrames);
+    for(i=0; i<numFrames; i++)
+    {
+        bestKs[i]=cvCreateMat(3,3, CV_64F);
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(bestKs[i],i,j,cvmGet(KV[i],i,j));
+            }
+        }
+
+    }
+///////////multi step optimization
+    int numtries=100;
+    double fvariance=70;
+    double xvariance=30;
+    double yvariance=30;
+    double ARvariance=0.05;
+    double skewvariance=0.05;
+
+    double maxScore=100000;
+    double curScore=0;
+
+
+    for(i=0; i<numtries; i++)
+    {
+
+        for(int q=0; q<numFrames; q++)
+        {
+            cvmSet(tempMats[q], 0, 0, random_gaussian2(cvmGet(KV[q],0,0), fvariance,200,2000));
+            cvmSet(tempMats[q], 0, 2,random_gaussian2(cvmGet(KV[q],0,2), xvariance,(width/2)-(width/5),(width/2)+(width/5)));
+            cvmSet(tempMats[q], 1, 2,random_gaussian2(cvmGet(KV[q],1,2), yvariance,(height/2)-(height/5),(height/2)+(height/5)));
+            cvmSet(tempMats[q], 0, 1,random_gaussian2(cvmGet(KV[q],0,1), skewvariance,-2,6));
+            cvmSet(tempMats[q], 1, 1,random_gaussian2(1, ARvariance,0.8,1.2)*cvmGet(tempMats[q],0,0));
+
+
+//            writeCVMatrix(cout<<"before:"<<endl,KV[q]);
+//            writeCVMatrix(cout<<"after:"<<endl,tempMats[q]);
+
+        }
+
+
+
+        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs);
+
+     //   printf("++++++++cur score was %f\n",curScore);
+        if(curScore<maxScore)
+        {
+            for(int q=0; q<numFrames; q++)
+            {
+
+                for(j=0; j<3; j++)
+                {
+                    for(k=0; k<3; k++)
+                    {
+                        cvmSet(bestKs[q],j,k,cvmGet(tempMats[q],j,k));
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
+
+
+    for(int q=0; q<numFrames; q++)
+    {
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(KV[q],j,k,cvmGet(bestKs[q],j,k));
+            }
+        }
+
+    }
+
+
+
+
+    for(i=0; i<numFrames; i++)
+    {
+        cvReleaseMat(&bestKs[i]);
+        cvReleaseMat(&tempMats[i]);
+
+    }
+
+}
+
+
+//in this function, the KV is used to store the output but it is also assumed to contain some initial values
+double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
 
 
@@ -61,7 +185,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
         if(NONLINPARMS>0)
         {
             //focal length
-            p[(i*NONLINPARMS)+j]=width;
+            p[(i*NONLINPARMS)+j]= cvmGet(KV[i], 0, 0);
             lb[(i*NONLINPARMS)+j]=100;
             ub[(i*NONLINPARMS)+j]=2000;
             j++;
@@ -70,7 +194,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
 
         if(NONLINPARMS>1)  //X CENTER
         {
-            p[(i*NONLINPARMS)+j]=width/2;
+            p[(i*NONLINPARMS)+j]=cvmGet(KV[i], 0, 2);
             lb[(i*NONLINPARMS)+j]=(width/2)-(width/5);
             ub[(i*NONLINPARMS)+j]=(width/2)+(width/5);
             j++;
@@ -80,7 +204,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
         if(NONLINPARMS>2)
         {
             //Y center
-            p[(i*NONLINPARMS)+j]=height/2;
+            p[(i*NONLINPARMS)+j]=cvmGet(KV[i], 1, 2);
             lb[(i*NONLINPARMS)+j]=(height/2)-(height/5);
             ub[(i*NONLINPARMS)+j]=(height/2)+(height/5);
             j++;
@@ -89,7 +213,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
         if(NONLINPARMS>3)
         {
             //aspect ratio
-            p[(i*NONLINPARMS)+j]=1.0;
+            p[(i*NONLINPARMS)+j]=cvmGet(KV[i], 1, 1)/cvmGet(KV[i], 0, 0);
             lb[(i*NONLINPARMS)+j]=0.8;
             ub[(i*NONLINPARMS)+j]=1.2;
             j++;
@@ -97,7 +221,7 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
         if(NONLINPARMS>4)
         {
             //skew
-            p[(i*NONLINPARMS)+j++]=0.0;
+            p[(i*NONLINPARMS)+j++]=cvmGet(KV[i], 0, 1);
             lb[(i*NONLINPARMS)+j]=-8;
             ub[(i*NONLINPARMS)+j]=8;
             j++;
@@ -231,6 +355,33 @@ int HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*
         cvReleaseMat(&tempMats[i]);
     }
     free(work);
+    return info[1];
+}
+double HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+{
+
+
+
+
+    int i,j,ret;
+
+    int numFrames=KV.size();
+
+    for(i=0; i<numFrames; i++)
+    {
+
+
+        j=0;
+        cvmSet(KV[i], 0, 0, width);
+        cvmSet(KV[i], 1, 1, width);
+        cvmSet(KV[i], 0, 2,width/2.0);
+        cvmSet(KV[i], 1, 2,height/2.0);
+        cvmSet(KV[i], 0, 1,0.0);
+
+    }
+    return HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs);
+
+
 
 }
 
@@ -348,6 +499,7 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
     totEr=totEr/(count);
     for (int i=0; i<n; i++)
         hx[i]=totEr;
+
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
