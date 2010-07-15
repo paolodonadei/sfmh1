@@ -794,11 +794,94 @@ CvPoint2D32f findIntersection(CvMat* l1,CvMat* l2)
 
 
 }
+double random_uniform(void)
+{
+
+    return (double(rand())/(double(RAND_MAX)+1)-0.5);
+}
+
 
 double random_uniform_0_1(void)
 {
 
     return double(rand())/(double(RAND_MAX)+1);
 
+}
+
+double random_uniform(double min, double max)
+{
+
+    double val = random_uniform_0_1();
+    double range = max-min;
+    val*=range;
+    val+=min;
+
+    return val;
+
+
+}
+
+
+double random_gaussian(double mean, double std)
+{
+    double random = random_normal_0_1();
+
+    if ( ((random+mean)/std) > 1.0)
+        return 1.0;
+    else
+    {
+        if ( ((random+mean)/std) < -1.0)
+            return -1.0;
+        else
+            return (random+mean)/std;
+
+    }
+}
+
+double random_gaussian2(double mean, double std,double mmin,double mmax)
+{
+    int countermax=100;
+
+    int curCount=0;
+    double random ;
+    do
+    {
+        curCount++;
+
+        random = (((random_normal_0_1()-0.5)*2.0)*std)+mean;
+        if(curCount>countermax)
+        {
+            printf("counter exceeded limit \n");
+            break;
+        }
+    }
+    while(random>mmax || random<mmin);
+//printf("mean of %f and std of %f gave %f\n",mean,std,random);
+    return random;
+}
+
+
+
+
+double random_normal_0_1(void)
+{
+
+
+
+    double U1,U2,V1,V2;
+
+    double S = 2;
+
+    while (S>=1)
+    {
+        U1 = random_uniform_0_1();
+        U2 = random_uniform_0_1();
+        V1 = 2.0*U1 - 1.0;
+        V2 = 2.0*U2 - 1.0;
+        S = pow(V1, 2) + pow(V2, 2);
+    }
+    double X1 = V1*sqrt((-2.0*log(S))/S);
+
+    return X1;
 }
 

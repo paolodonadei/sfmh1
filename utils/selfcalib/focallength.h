@@ -1,3 +1,5 @@
+#ifndef FOCALLENGTH_HPP_INCLUDED
+#define FOCALLENGTH_HPP_INCLUDED
 ////////////////////////////////////////////////////////////////////////
 //
 // hello-world.cpp
@@ -18,7 +20,7 @@
 #include <sstream>
 //#include "nonlinSClvm.h"
 
-enum SELFCALIBMETHOD {STRUM, POLLEFEY, HARTLEY,POLLEFEYVISUAL,NONLINSIMPLE};
+enum SELFCALIBMETHOD {STRUM, POLLEFEY, HARTLEY,POLLEFEYVISUAL,NONLINSIMPLE,NONLINSIMPLEMULTISTEP};
 
 
 using namespace std;
@@ -49,3 +51,4 @@ int solveFfromUVWHoumanMAPLE(double& F1, double& F2, const CvMat* pU,const CvMat
 int  solveFfromUVWL1(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
 int  solveFfromUVWL2(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
 int  solveFfromUVWLQ(double& F1, double& F2, const CvMat* pU,const CvMat* pV,const CvMat* pW);
+#endif

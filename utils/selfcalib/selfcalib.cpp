@@ -268,6 +268,17 @@ int main(int argc, char *argv[])
 
 
 
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
+
+    cout<<" According to MULTI STEP:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
+
+
+
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
 
     cout<<" According to POLLEFEY:"<<endl;

@@ -18,24 +18,22 @@
 % iesteban@science.uva.nl
 % isaac.esteban@tno.nl
 
-
 function [PXcam] = getCameraMatrix(E)
 
 
     % SVD of E
     [U,S,V] = svd(E);
-    U(:,3)=U(:,3)*-1;
+    
     % Matrix W
     W = [0,-1,0;1,0,0;0,0,1];
         
     % Compute 4 possible solutions (p259)
     PXcam = zeros(3,4,4);
-    PXcam(:,:,1) = [U*W*V',U(:,3)];
-    PXcam(:,:,2) = [U*W*V',-U(:,3)];
-    PXcam(:,:,3) = [U*W'*V',U(:,3)];
-    PXcam(:,:,4) = [U*W'*V',-U(:,3)];
+    PXcam(:,:,1) = [U*W*V',U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,2) = [U*W*V',-U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,3) = [U*W'*V',U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,4) = [U*W'*V',-U(:,3)./max(abs(U(:,3)))];
    
-    
     
     
     
