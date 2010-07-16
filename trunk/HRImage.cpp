@@ -1334,6 +1334,7 @@ int HRImageSet::exhaustiveSIFTMatching()
                 {
                     if(correspondencesPairWise[i][j].imIndices[k].imindex1>=  imageCollection[i]->HR2DVector.size())
                     {
+                        printf("index number was %d\n", k);
                         printf("wrong match between %d and %d at index %d when the size was only %d\n",i,j,correspondencesPairWise[i][j].imIndices[k].imindex1,imageCollection[i]->HR2DVector.size());
                         printf("%s\n", imageCollection[i]->filename.c_str());
                         printf("%s\n", imageCollection[j]->filename.c_str());
