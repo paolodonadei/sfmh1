@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 3
+#define NONLINPARMS 4
 #define CONSTPARAMS 1
 #include "general.h"
 #include "focallength.h"
@@ -23,6 +23,8 @@ using namespace std;
 
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
+
+
     int i,j,k;
     int numFrames=KV.size();
 //so now we have initial points from Sturm
@@ -31,6 +33,8 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
     vector<CvMat* > tempMats;
     tempMats.resize(numFrames);
+
+
     for(i=0; i<numFrames; i++)
     {
         tempMats[i]=cvCreateMat(3,3, CV_64F);
@@ -39,11 +43,12 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
         {
             for(k=0; k<3; k++)
             {
-                cvmSet(tempMats[i],i,j,cvmGet(KV[i],i,j));
+                cvmSet(tempMats[i],j,k,cvmGet(KV[i],j,k));
             }
         }
 
     }
+
 
     vector<CvMat* > bestKs;
     bestKs.resize(numFrames);
@@ -55,11 +60,13 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
         {
             for(k=0; k<3; k++)
             {
-                cvmSet(bestKs[i],i,j,cvmGet(KV[i],i,j));
+                cvmSet(bestKs[i],j,k,cvmGet(KV[i],j,k));
             }
         }
 
     }
+
+
 ///////////multi step optimization
     int numtries=100;
     double fvariance=70;
@@ -70,6 +77,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
     double maxScore=100000;
     double curScore=0;
+
 
 
     for(i=0; i<numtries; i++)
