@@ -1635,7 +1635,7 @@ int HRStructure::sba_driver_interface()
      * Note that a value of 3 does not make sense
      */
      ///zzz be careful with this, ideally this should be 1
-    mglobs.nccalib=2; /* number of intrinsics to keep fixed, must be between 0 and 5 */
+    mglobs.nccalib=1; /* number of intrinsics to keep fixed, must be between 0 and 5 */
     //zzz this is important, maybe change this to 5
     fixedcal=0; /* varying intrinsics */
 
