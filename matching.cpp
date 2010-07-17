@@ -43,7 +43,9 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
     string tempfilename1="";
     fs::path p1( im1.filename, fs::native );
 
-    tempfilename1=basename(p1);
+    tempfilename1=extractDigits(basename(p1));
+
+    cout<<"basename is : "<< tempfilename1<<endl;
 
     istringstream ss1;
     ss1.str(tempfilename1);
@@ -52,7 +54,7 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
     string tempfilename2="";
     fs::path p2( im2.filename, fs::native );
 
-    tempfilename2=basename(p2);
+    tempfilename2=extractDigits(basename(p2));
 
     istringstream ss2;
     ss2.str(tempfilename2);
@@ -60,7 +62,7 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
 
 
 
-//printf(" col1 is %d for filename %s and cxol2 is %d for filename %s\n",numcol1,im1.filename.c_str(),numcol2,im2.filename.c_str());
+printf(" col1 is %d for filename %s and cxol2 is %d for filename %s\n",numcol1,im1.filename.c_str(),numcol2,im2.filename.c_str());
 
     string matchfile="";
     fs::path p( im1.filename, fs::native );
@@ -76,12 +78,12 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
         exit(1);
     }
 
-    char str[2000];
+    char str[4000];
 
     int numImages=-1;
     while (!file_cm.eof())
     {
-        file_cm.getline(str,2000);
+        file_cm.getline(str,3000);
         num++;
 
         if (numImages==-1)//if we havnt foudn the number of images in the sequence
@@ -119,8 +121,8 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
     while (!file_cm.eof() && i<(num)) //second check is redundant, being safe
     {
         i++;
-        file_cm.getline(str,2000);
-
+        file_cm.getline(str,3000);
+    //    cout<<str<<endl;
         string s(str);
         string out;
         istringstream ss;
@@ -150,7 +152,7 @@ int matchTWOImagesOxford( HRImage& im1, HRImage& im2,HRCorrespond2N& hr_correspo
             indexTemp.imindex1=matchindex[numcol1];
             indexTemp.imindex2=matchindex[numcol2];
             indexTemp.score=1;
-
+         //   printf("match from %d -> %d has indices %d and %d\n",numcol1, numcol2,matchindex[numcol1],matchindex[numcol2] );
             hr_correspond.imIndices.push_back(indexTemp);
         }
 
@@ -675,7 +677,7 @@ int  readOxfordFeatures( HRImage& image)
         HRPointFeatures newfeature( new HRFeature);
         ss >> newfeature->location.x;
         ss >> newfeature->location.y;
-        //     printf("feature %d is x=%f and y=%f \n",i,newfeature->location.x,newfeature->location.x);
+        // printf("%s feature %d is x=%f and y=%f  \n",image.filename.c_str() ,i,newfeature->location.x,newfeature->location.y);
 
         image.HR2DVector.push_back(newfeature);
 
