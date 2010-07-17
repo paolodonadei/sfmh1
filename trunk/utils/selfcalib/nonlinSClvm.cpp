@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 4
+#define NONLINPARMS 3
 #define CONSTPARAMS 1
 #include "general.h"
 #include "focallength.h"
@@ -258,9 +258,9 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
     covar=work+LM_DIF_WORKSZ(m, n);
 
     opts[0]=LM_INIT_MU;
-    opts[1]=1E-15;
-    opts[2]=1E-15;
-    opts[3]=1E-20;
+    opts[1]=1E-18;
+    opts[2]=1E-18;
+    opts[3]=1E-28;
     opts[4]= LM_DIFF_DELTA;
 
 

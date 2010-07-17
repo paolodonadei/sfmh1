@@ -884,4 +884,17 @@ double random_normal_0_1(void)
 
     return X1;
 }
+string extractDigits(string mystr)
+{
 
+    string outp="";
+    for( std::string::size_type i(0); i != mystr.size(); ++i )
+    {
+        if (  isdigit(mystr[i]) )
+        {
+            outp+=mystr[i];
+
+        }
+    }
+return outp;
+}

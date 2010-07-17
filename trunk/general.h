@@ -100,4 +100,6 @@ double random_normal_0_1(void);
 double random_gaussian(double mean, double std);
 double random_uniform(double min, double max);
 double random_gaussian2(double mean, double std,double mmin,double mmax);
+
+string extractDigits(string mystr);
 #endif //HRPRIMITIVES_HPP_INCLUDED

@@ -17,7 +17,7 @@
 #include <iomanip>
 #include <sstream>
 #include "nonlinSClvm.h"
-//#include <gsl/gsl_linalg.h>
+
 
 #include "general.h"
 
