@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 3
+#define NONLINPARMS 1
 #define CONSTPARAMS 1
 #include "general.h"
 #include "focallength.h"
@@ -68,7 +68,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 
 ///////////multi step optimization
-    int numtries=100;
+    int numtries=200;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -101,9 +101,11 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
         curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs);
 
-     //   printf("++++++++cur score was %f\n",curScore);
+
         if(curScore<maxScore)
         {
+            printf("%d  -> cur score was %0.29f for focal length %0.9f\n",i,curScore,cvmGet(tempMats[0],0,0));
+            maxScore=curScore;
             for(int q=0; q<numFrames; q++)
             {
 
@@ -137,7 +139,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
     }
 
 
-
+printf("best score was %0.29f\n",maxScore);
 
     for(i=0; i<numFrames; i++)
     {
