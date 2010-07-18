@@ -10,11 +10,11 @@ lowsearchrange=0;
 
 if(lowsearchrange==1)
 
-    tolx=1e-7;
-    tolf=1e-7;
+    tolx=1e-17;
+    tolf=1e-17;
 else
-    tolx=1e-10;
-    tolf=1e-10;
+    tolx=1e-20;
+    tolf=1e-20;
 end
 
 

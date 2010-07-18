@@ -1640,7 +1640,7 @@ int HRStructure::sba_driver_interface()
     fixedcal=0; /* varying intrinsics */
 
 
-    havedist=2; /* with distortion */
+    havedist=1; /* with distortion */
     //zzz unfix these distortion parameters, right now i keep 3 parameters fixed, wich 3 are these?
     mglobs.ncdist=5; /* number of distortion params to keep fixed, must be between 0 and 5 */
 
