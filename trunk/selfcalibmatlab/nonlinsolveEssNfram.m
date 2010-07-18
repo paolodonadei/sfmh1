@@ -233,7 +233,7 @@ if(bestf>200 && bestf<1600 && imag(bestf)==0)
 else
     bestf=w+h;
 end
-
+bestf=median(ffinals);
 
 fcl=[ bestf bestf];
 xcen=bestx;

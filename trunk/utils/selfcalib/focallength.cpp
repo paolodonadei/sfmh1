@@ -157,6 +157,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 //////////////////////////////////// DONE ERROR CHECKING ////////////////////////////
     if (method==STRUM)
     {
+        printf("SELF CALIBRATE WITH STURM METHOD\n");
         double foc;
         vector<double > focs;
 
@@ -179,9 +180,9 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
         {
             cvSetIdentity(KV[i]);
 
-
-            cvmSet(KV[i], 0, 0, myfocstats.median);
-            cvmSet(KV[i], 1, 1, myfocstats.median);
+//zzz these next two should be medians not means, this is gonna make it worse
+            cvmSet(KV[i], 0, 0, myfocstats.mean);
+            cvmSet(KV[i], 1, 1, myfocstats.mean);
             cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
             cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
 
@@ -193,6 +194,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==NONLINSIMPLE)
     {
+        printf("SELF CALIBRATE WITH NONLINSIMPLE METHOD\n");
         HRSelfCalibtwoFrameNonlin(FV,  KV , width, height,confs);
 
 
@@ -201,6 +203,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==NONLINSIMPLEMULTISTEP)
     {
+            printf("SELF CALIBRATE WITH NONLINSIMPLEMULTISTEP METHOD\n");
         HRSelfCalibtwoFrameNonlinMULTIStep(FV,  KV , width, height,confs);
 
 
@@ -208,6 +211,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==HARTLEY)
     {
+         printf("SELF CALIBRATE WITH HARTLEY METHOD\n");
         double foc2,foc1;
         int counter=0;
         for(i=0; i<numFrames; i++)

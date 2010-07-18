@@ -8,7 +8,7 @@ if (nargin == 1)
 end
 %TF=TF*10000;
 plotting=0;
-numtries=10;
+numtries=200;
  clear focs xcentrs ycentrs scrs bestFfinal bestXfinal bestYfinal;
  [focs, xcentrs, ycentrs, ars,scrs, bestFfinal, bestXfinal, bestYfinal,bestARfinal] =  findBestsolsrepeatmore(numtries, TF, w,h);
  
