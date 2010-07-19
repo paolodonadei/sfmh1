@@ -1,4 +1,4 @@
-function [fcl, centerloc] = nonlinsolveEssNfram(TF,w,h)
+function [fcl, centerloc] = nonlinsolveEssNframuniform(TF,w,h)
 %this function , given a camera center and a focal length and a series of fundamental
 %matrices computes the error with respect to a fundamental matrix
 %tic
@@ -78,25 +78,26 @@ updatelimit=ceil(numtries/5);
 countnoupdate=0;
 for i=1:numtries
     countnoupdate=countnoupdate+1;
-    initbeginF=(randn()*fvari)+finit;
+    initbeginF=(rand()*1300)+200;
     
     while(initbeginF<200 || initbeginF>1500)
-        initbeginF=(randn()*fvari)+finit;
+        initbeginF= (rand()*1300)+200;
     end
 
     
-    x0=[ initbeginF  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
+    x0=[ initbeginF  ((rand()*120)-60)+(w/2)  ((rand()*120)-60)+(h/2) ];
     
     
     %[x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-    [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-(fvari/2) ((w/2)-60) ((h/2)-60) ],[finit+(fvari/2) ((w/2)+60) ((h/2)+60)],optionslsqnonlin);
+    [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[0 0 0 ],[2000 w h],optionslsqnonlin);
     ffinals(i,1)=x(1);
     xfinals(i,1)=x(2);
     yfinals(i,1)=x(3);
     
-    curscore=sum(abs(fval));
+        %disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
     
-    %disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
+        curscore=sum(abs(fval));
+    
     %[svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
     %          curscore=EssScore;
     
@@ -104,7 +105,7 @@ for i=1:numtries
   %  disp(['iteration ' num2str(i) ' best f is ' num2str(x(1)) ' and best x = ' num2str(x(2)) ' and best y is ' num2str(x(3)) ' and score was ' num2str(curscore) ' det score was ' num2str(detScore) ' SV score was ' num2str(svScore) ' and ess score was ' num2str(EssScore) ' IA score is ' num2str( EssScoreIA)]);
     
     scorearray(i,1)=curscore;
-    if(curscore<bestscore && imag(x(1))==0 && x(1)>200 && x(1)<1600 )
+    if(curscore<bestscore && imag(x(1))==0 && x(1)>0 && x(1)<2000 )
         countnoupdate=0;
         bestscore=curscore;
         %  disp(['iteration ' num2str(i)]);
@@ -229,7 +230,7 @@ end
 
 
 %toc
-if(bestf>200 && bestf<1600 && imag(bestf)==0)
+if(bestf>0 && bestf<2000 && imag(bestf)==0)
     bestf=bestf;
 else
     bestf=w+h;
