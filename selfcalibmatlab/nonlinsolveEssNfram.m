@@ -96,7 +96,7 @@ for i=1:numtries
     
     curscore=sum(abs(fval));
     
-    %disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
+    disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
     %[svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
     %          curscore=EssScore;
     

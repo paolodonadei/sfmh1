@@ -181,8 +181,8 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
             cvSetIdentity(KV[i]);
 
 //zzz these next two should be medians not means, this is gonna make it worse
-            cvmSet(KV[i], 0, 0, myfocstats.mean);
-            cvmSet(KV[i], 1, 1, myfocstats.mean);
+            cvmSet(KV[i], 0, 0, myfocstats.median);
+            cvmSet(KV[i], 1, 1, myfocstats.median);
             cvmSet(KV[i], 0, 2, ((double)(width/2.00)));
             cvmSet(KV[i], 1, 2, ((double)(height/2.00)));
 
