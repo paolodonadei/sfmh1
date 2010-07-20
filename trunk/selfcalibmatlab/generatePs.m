@@ -46,6 +46,7 @@ for i=1:numps
 
     if(numps==2)  %this might not make sense, but for 2 frames i dont want the focal length difference to be a random variable
         curentF=abs(prevF+(fdiff));
+        prevF=curentF;
     else
         curentF=abs(prevF+((rand()*fdiff)-(fdiff/2)));
         while(curentF<200 || curentF>1600)

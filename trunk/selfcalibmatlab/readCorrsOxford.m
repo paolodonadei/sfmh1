@@ -1,5 +1,5 @@
 function [corrs, IMS, P,K, F, E] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames)
-
+IMS={}
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
 
@@ -68,10 +68,10 @@ end
 
 
 count=0;
-for i=1:m
-    count=count+1;
-    IMS{1,count}=imread([path imdirs(i,1).name]);
-end
+% for i=1:m
+%     count=count+1;
+%     IMS{1,count}=imread([path imdirs(i,1).name]);
+% end
 
 
 

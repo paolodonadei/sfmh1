@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 1
+#define NONLINPARMS 3
 #define CONSTPARAMS 1
 #include "general.h"
 #include "focallength.h"
@@ -196,7 +196,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
         {
             //focal length
             p[(i*NONLINPARMS)+j]= cvmGet(KV[i], 0, 0);
-            lb[(i*NONLINPARMS)+j]=100;
+            lb[(i*NONLINPARMS)+j]=200;
             ub[(i*NONLINPARMS)+j]=2000;
             j++;
 
@@ -501,11 +501,12 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
         for ( j = 0; j < i; ++j)
         {
+            this is buggy right here doesnt take all Fs into consideration
             totEr=totEr+findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
             count=count+1.0;
         }
     }
-
+printf("num frames was %d\n",numFrames);
     totEr=totEr/(count);
     for (int i=0; i<n; i++)
         hx[i]=totEr;

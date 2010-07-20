@@ -94,7 +94,7 @@ for i=1:numtries
     xfinals(i,1)=x(2);
     yfinals(i,1)=x(3);
     
-        %disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
+        disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
     
         curscore=sum(abs(fval));
     
