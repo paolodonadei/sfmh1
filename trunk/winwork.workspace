@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
-		<Project filename="winMakesfmh1.cbp" />
+		<Project filename="winMakesfmh1.cbp" active="1" />
 		<Project filename="utils/decompose/winMakesfmh1.cbp" />
 		<Project filename="utils/fundutils/winMakesfundutils.cbp" />
-		<Project filename="utils/selfcalib/winMakesfmh1.cbp" active="1" />
+		<Project filename="utils/selfcalib/winMakesfmh1.cbp" />
 		<Project filename="utils/sbainterface/winMakesfmh1.cbp" />
 		<Project filename="utils/sfmarhr/sfmARhrwin.cbp" />
 	</Workspace>

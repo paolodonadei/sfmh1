@@ -20,6 +20,7 @@ double  HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<Cv
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat);
 double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
+void errnonLinFunctionSelfCalib2(double *p, double *hx, int m, int n, void *adata);
 struct SCinputs
 {
    int width;
