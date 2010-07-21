@@ -1508,21 +1508,22 @@ int HRImageSet::SelfCalibrate()
     }
 
     cout<<"start"<<endl;
-     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLEMULTISTEP);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLEMULTISTEP);
     //HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
     cout<<"end"<<endl;
     cout<<" According to NONLINSIMPLE :"<<endl;
 
 //
 /////zzz remove this, i did this just for the valbone sequence XXX important
-// for (int i = 0; i < numFrames; ++i)
-//    {
-//       cvmSet(intrinMatrix[i],0,0,682);
-//        cvmSet(intrinMatrix[i],1,1,682);
-//            cvmSet(intrinMatrix[i],0,2,256);
-//               cvmSet(intrinMatrix[i],1,2,384);
-//    }
-//
+    for (int i = 0; i < numFrames; ++i)
+    {
+        cvSetIdentity(intrinMatrix[i]);
+        cvmSet(intrinMatrix[i],0,0,500);
+        cvmSet(intrinMatrix[i],1,1,500);
+        cvmSet(intrinMatrix[i],0,2,272);
+        cvmSet(intrinMatrix[i],1,2,279);
+    }
+
 
 
     for (int i = 0; i < numFrames; ++i)

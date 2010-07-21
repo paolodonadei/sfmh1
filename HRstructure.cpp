@@ -1363,6 +1363,7 @@ int HRStructure::writePlyFileRGB(string fname)
 int HRStructure::sba_driver_interface()
 {
 
+
     int cnp=16, /* 3 rot params + 3 trans params */
             pnp=3, /* euclidean 3D points */
                 mnp=2; /* image points are 2D */
