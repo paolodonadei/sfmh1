@@ -41,6 +41,11 @@ void MyProject1SFMMainfram::OpenPlyFile( wxCommandEvent& event )
 
         mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
     }
+        else
+    {
+        OpenDialog->Destroy();
+        return ;
+    }
 
     // Clean up after ourselves
     OpenDialog->Destroy();
@@ -49,7 +54,8 @@ void MyProject1SFMMainfram::OpenPlyFile( wxCommandEvent& event )
     strcpy( buf, (const char*)mystring.mb_str(wxConvUTF8) );
     m_canvas->myply=new HRply(string(buf));
     m_canvas->myply->normalizePts(-m_canvas->rangeBound,m_canvas->rangeBound);
-    m_canvas->myply->formTriangles(0.015);
+    m_canvas->myply->formTriangles(m_canvas->triangleSize);
+    m_canvas->rendertriangles=1;
     Refresh(false);
 }
 
@@ -76,6 +82,11 @@ void MyProject1SFMMainfram::openOBJ( wxCommandEvent& event )
 
         mystring=OpenDialog->GetPath(); // Set the Title to reflect the file open
     }
+    else
+    {
+        OpenDialog->Destroy();
+        return ;
+    }
 
     // Clean up after ourselves
     OpenDialog->Destroy();
@@ -85,4 +96,55 @@ void MyProject1SFMMainfram::openOBJ( wxCommandEvent& event )
     m_canvas->objmodel=new HRModel(string(buf));
     m_canvas->objmodel->openOBJ();
     Refresh(false);
+}
+void MyProject1SFMMainfram::toggleTriangles( wxCommandEvent& event )
+{
+	m_canvas->rendertriangles=(m_canvas->rendertriangles==0?1:0);
+
+  Refresh(false);
+
+
+}
+
+void MyProject1SFMMainfram::toggleNormals( wxCommandEvent& event )
+{
+m_canvas->shownormals=(m_canvas->shownormals==0?1:0);
+  Refresh(false);
+}
+
+void MyProject1SFMMainfram::togglePointCloud( wxCommandEvent& event )
+{
+m_canvas->renderpoints=(m_canvas->renderpoints==0?1:0);
+  Refresh(false);
+}
+
+void MyProject1SFMMainfram::toggleAxis( wxCommandEvent& event )
+{
+m_canvas->showaxis=(m_canvas->showaxis==0?1:0);
+  Refresh(false);
+}
+
+void MyProject1SFMMainfram::increasePtSize( wxCommandEvent& event )
+{
+
+m_canvas->pointSize++;
+  Refresh(false);
+}
+void MyProject1SFMMainfram::decreasePtSize( wxCommandEvent& event )
+{
+m_canvas->pointSize--;
+  Refresh(false);
+}
+void MyProject1SFMMainfram::increaseTriSize( wxCommandEvent& event )
+{
+
+m_canvas->triangleSize=m_canvas->triangleSize+0.005;
+    m_canvas->myply->formTriangles(m_canvas->triangleSize);
+  Refresh(false);
+}
+void MyProject1SFMMainfram::decreaseTriSize( wxCommandEvent& event )
+{
+m_canvas->triangleSize=m_canvas->triangleSize-0.005;
+    m_canvas->myply->formTriangles(m_canvas->triangleSize);
+  Refresh(false);
 }

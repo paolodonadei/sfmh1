@@ -102,6 +102,15 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, wxWindowID id,
     objmodel=NULL;
     rangeBound=0.5;
     trinum=0;
+
+    shownormals=0;
+    showaxis=0;
+
+    rendertriangles=0;
+    renderpoints=0;
+
+    pointSize=7;
+    triangleSize=0.015;
 }
 
 TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
@@ -117,6 +126,14 @@ TestGLCanvas::TestGLCanvas(wxWindow *parent, const TestGLCanvas *other,
     rangeBound=0.5;
     trinum=0;
     objmodel=NULL;
+
+    shownormals=0;
+    showaxis=0;
+    rendertriangles=0;
+    renderpoints=0;
+
+    pointSize=7;
+    triangleSize=0.015;
 }
 
 TestGLCanvas::~TestGLCanvas()
@@ -147,16 +164,19 @@ void TestGLCanvas::Render()
     /* clear color and depth buffers */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(myply!=NULL)
-    {
-        //myply->renderpoints();
-        myply->rendertriangles();
-        myply->rendernormals();
-        myply->draw_axis( 3 );
 
-        //   myply-> rendertrianglesingle( trinum);
 
-    }
+
+    if(shownormals) myply->rendernormals();
+    if(showaxis)      myply->draw_axis( 3 );
+
+    if(rendertriangles)  myply->rendertriangles();
+    if( renderpoints)  myply->renderpoints(pointSize);
+
+
+
+
+
     if(objmodel!=NULL)
     {
         printf("render object\n");

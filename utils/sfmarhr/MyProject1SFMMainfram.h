@@ -20,6 +20,17 @@ protected:
     void OpenCamCenter( wxCommandEvent& event );
     void ExitFunc( wxCommandEvent& event );
     void openOBJ( wxCommandEvent& event );
+    	void toggleTriangles( wxCommandEvent& event );
+	void toggleNormals( wxCommandEvent& event );
+	void togglePointCloud( wxCommandEvent& event );
+	void toggleAxis( wxCommandEvent& event );
+	void increasePtSize( wxCommandEvent& event );
+	void decreasePtSize( wxCommandEvent& event );
+
+		void increaseTriSize( wxCommandEvent& event );
+	void decreaseTriSize( wxCommandEvent& event );
+
+
     TestGLCanvas *m_canvas;
 public:
     /** Constructor */
