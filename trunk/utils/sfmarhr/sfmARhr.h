@@ -64,6 +64,13 @@ public:
     HRModel* objmodel;
     double rangeBound;
     int trinum;
+    int shownormals;
+int showaxis;
+int rendertriangles;
+int renderpoints;
+double pointSize;
+double triangleSize;
+
 private:
     bool   m_init;
     GLuint m_gllist;

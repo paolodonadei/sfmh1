@@ -262,7 +262,7 @@ void HRply::rendertrianglesingle( int trinum)
 }
 
 
-void HRply::renderpoints()
+void HRply::renderpoints(int ptsize)
 {
     if(normalized!=1)
     {
@@ -272,7 +272,7 @@ void HRply::renderpoints()
 //    int i;
     double x,y,z;
     double R,G,B;
-    glPointSize(7);
+    glPointSize(ptsize);
 
     glBegin(GL_POINTS);
 

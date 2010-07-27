@@ -53,7 +53,7 @@ public:
     int numPts;
     int readPlyfile();
     void normalizePts(double min, double max);
-    void renderpoints();
+    void renderpoints(int ptsize);
     void rendertriangles();
     void rendernormals();
     void printPlyPts(ostream &stream);
