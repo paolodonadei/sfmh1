@@ -200,6 +200,13 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     }
 
+   if (method==MESTIMATOR)
+    {
+        printf("SELF CALIBRATE WITH MESTIMATOR METHOD\n");
+        HRSelfCalibtwoFrameNonlinMEstimator(FV,  KV , width, height,confs);
+
+   }
+
 
     if (method==NONLINSIMPLEMULTISTEP)
     {

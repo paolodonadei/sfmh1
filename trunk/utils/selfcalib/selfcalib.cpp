@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     int mode=0;
 
-    int i,j,k;
+    int i,j;
 
     if (argc<5)
     {
@@ -233,6 +233,9 @@ int main(int argc, char *argv[])
     }
 
 
+//for(i=0;i<3;i++)
+//for(j=0;j<3;j++)
+//cvmSet(funMatrix[1][0],i,j,rand());
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
 
@@ -266,7 +269,14 @@ int main(int argc, char *argv[])
         writeCVMatrix(cout,intrinMatrix[i]);
     }
 
+   HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
 
+    cout<<" According to MESTIMATOR:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+    }
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
 
@@ -287,6 +297,8 @@ int main(int argc, char *argv[])
     {
         writeCVMatrix(cout,intrinMatrix[i]);
     }
+
+
 
 
 
