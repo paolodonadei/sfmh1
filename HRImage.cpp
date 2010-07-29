@@ -1515,14 +1515,14 @@ int HRImageSet::SelfCalibrate()
 
 //
 /////zzz remove this, i did this just for the valbone sequence XXX important
-    for (int i = 0; i < numFrames; ++i)
-    {
-        cvSetIdentity(intrinMatrix[i]);
-        cvmSet(intrinMatrix[i],0,0,500);
-        cvmSet(intrinMatrix[i],1,1,500);
-        cvmSet(intrinMatrix[i],0,2,272);
-        cvmSet(intrinMatrix[i],1,2,279);
-    }
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        cvSetIdentity(intrinMatrix[i]);
+//        cvmSet(intrinMatrix[i],0,0,500);
+//        cvmSet(intrinMatrix[i],1,1,500);
+//        cvmSet(intrinMatrix[i],0,2,272);
+//        cvmSet(intrinMatrix[i],1,2,279);
+//    }
 
 
 

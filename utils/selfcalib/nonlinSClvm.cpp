@@ -68,7 +68,9 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 
 ///////////multi step optimization
-    int numtries=200;
+
+///zzz change this maybe
+    int numtries=20;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -78,6 +80,15 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
     double maxScore=100000;
     double curScore=0;
 
+    vector< vector<double> > Weights;
+
+    Weights.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        Weights[i].resize(numFrames);
+
+    for(int m=0; m<numFrames; m++)
+        for(int n=0; n<numFrames; n++)
+            Weights[m][n]=1;
 
 
     for(i=0; i<numtries; i++)
@@ -99,9 +110,10 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 
 
-        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs);
 
+        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs,Weights);
 
+        printf("iteration %d score %f focal %f\n",i,curScore,cvmGet(tempMats[0],0,0));
         if(curScore<maxScore)
         {
             printf("%d  -> cur score was %0.29f for focal length %0.9f\n",i,curScore,cvmGet(tempMats[0],0,0));
@@ -152,7 +164,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 
 //in this function, the KV is used to store the output but it is also assumed to contain some initial values
-double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs,vector< vector<double> >& Weights, void (*func)(double *p, double *hx, int m, int n, void *adata))
 {
 
 
@@ -167,8 +179,8 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
     m=NONLINPARMS*unKnownframes;
 
 
-    n=m;
-    // n=(int)(((numFrames)*(numFrames-1))/2);
+    n=(int)(((numFrames)*(numFrames-1))/2);
+   // printf("the number of parameters is %d and the number of measurements is %d \n",m,n);
 
     double p[m+1], x[n+1];
     double lb[m+1], ub[m+1];
@@ -271,12 +283,14 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
     mySCinputs.height=height;
     mySCinputs.funds=&FV;
     mySCinputs.intrin=&KV;
+    mySCinputs.Weights=&Weights;
+    mySCinputs.confidences=&confs;
     mySCinputs.tempMat=&tempMats;
     mySCinputs.numFrames=numFrames;
     mySCinputs.numParams=NONLINPARMS;
     mySCinputs.numunknownframes=unKnownframes;
 
-    ret=dlevmar_bc_dif(errnonLinFunctionSelfCalib,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
+    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
 
 
 //putting the p back into KV
@@ -377,36 +391,136 @@ double HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvM
 
     int numFrames=KV.size();
 
-    for(i=0; i<numFrames; i++)
-    {
+    HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+
+    vector< vector<double> > Weights;
+
+    Weights.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        Weights[i].resize(numFrames);
+
+    for(int m=0; m<numFrames; m++)
+        for(int n=0; n<numFrames; n++)
+            Weights[m][n]=1;
 
 
-        j=0;
-        cvmSet(KV[i], 0, 0, width);
-        cvmSet(KV[i], 1, 1, width);
-        cvmSet(KV[i], 0, 2,width/2.0);
-        cvmSet(KV[i], 1, 2,height/2.0);
-        cvmSet(KV[i], 0, 1,0.0);
-
-    }
-    return HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs);
+    return HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs, Weights);
 
 
 
 }
 
-void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata)
+double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
 
-    SCinputs* mySCinputs=(SCinputs*)adata;
+    if( remove( "weights.csv" ) != 0 )
+        perror( "Error deleting file" );
 
-//    printf("m is %d and n is %d :\n",m,n);
-//    printf("params are :\n");
-//    for (int i=0; i<m; i++)
-//        printf("p %d is %f\n",i,p[i]);
 
-    //  printf(".");
 
+    if( remove( "errors.csv" ) != 0 )
+        perror( "Error deleting file" );
+
+
+ FILE *fpw;
+    FILE *fpe;
+
+    if((fpw=fopen("weights.csv", "w")) == NULL)
+    {
+        printf("Cannot open file.\n");
+        exit(1);
+    }
+    if((fpe=fopen("errors.csv", "w")) == NULL)
+    {
+        printf("Cannot open file.\n");
+        exit(1);
+    }
+
+    int i,j,ret;
+
+    int numFrames=KV.size();
+    int MAXITER=10;
+    int itercounter=0;
+    double threshold;
+
+
+
+    vector<CvMat* > tempMats;
+    tempMats.resize(4);
+    for(i=0; i<4; i++)
+    {
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+        cvSetZero(tempMats[i]);
+    }
+
+//how should i start the weights? should i get some info from the matching like mendonca does?
+    vector< vector<double> > Weights;
+
+    Weights.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        Weights[i].resize(numFrames);
+
+    for(int m=0; m<numFrames; m++)
+        for(int n=0; n<numFrames; n++)
+            Weights[m][n]=1;
+
+
+///zzz change this, a hardcoded threshold is not a good diea
+    threshold=0.005;
+    while(itercounter<MAXITER)
+    {
+        itercounter++;
+
+
+        HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+
+        HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator );
+
+        for(int q=0; q<4; q++)
+        {
+
+            cvSetZero(tempMats[q]);
+        }
+
+
+        for(int m=0; m<numFrames; m++)
+        {
+            for(int n=0; n<m; n++)
+            {
+                double curError=findSVDerror(KV[n],KV[m],FV[m][n],&tempMats);
+
+                if(curError>threshold)
+                {
+                    Weights[m][n]=0;
+                }
+                else
+                {
+                    Weights[m][n]=pow((1.0-(pow((curError/threshold),2))),2);
+                }
+
+                fprintf(fpe,"   %f,   ",curError);
+                fprintf(fpw,"   %f,   ",Weights[m][n]);
+                // printf("(%d, %d) %f w-> %f e \t",m,n,Weights[m][n],curError);
+            }
+            // printf(" \n");
+        }
+        //  printf(" _________________________________\n");
+        fprintf(fpe," \n");
+        fprintf(fpw," \n");
+    }
+
+    fclose(fpe);
+    fclose(fpw);
+    for(i=0; i<4; i++)
+    {
+        cvReleaseMat(&tempMats[i]);
+    }
+
+}
+
+
+void transferIntrinsicBufferToMatrices(SCinputs* mySCinputs,double *p)
+{
     int i,j;
     int width=0;//figure thesed out
     int height=0;
@@ -488,182 +602,97 @@ void errnonLinFunctionSelfCalib(double *p, double *hx, int m, int n, void *adata
 
     }
 
-///////////////////// now calculating errors
 
-//    for(i=0; i<numFrames; i++)
-//          writeCVMatrix(cout,(*pintrin)[i]);
+}
+
+
+void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, void *adata)
+{
+
+    SCinputs* mySCinputs=(SCinputs*)adata;
+
+
+    int i,j;
+
+    int numFrames=0;
+
+
+
+    numFrames=mySCinputs->numFrames;
+
+    vector< vector<CvMat*> > *FMat=(vector< vector<CvMat*> >*)mySCinputs->funds;
+
+    vector< vector<double> >* myWeights=(vector< vector<double> >*)mySCinputs->Weights;
+
+    vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
+
+    vector<CvMat* > *pintrin= (vector< CvMat* >*)mySCinputs->intrin;
+
+    transferIntrinsicBufferToMatrices(mySCinputs,p);
 
 
     double count=0;
     double totEr=0;
+    vector<double> errorvec(numFrames,0.0);
+    double curError=0;
+
+    double sumweights=0;
+
+    for (int i=0; i<n; i++)
+    {
+        hx[i]=0;
+    }
+
     for ( i = 0; i < numFrames; ++i)
     {
 
         for ( j = 0; j < i; ++j)
         {
-
-            totEr=totEr+findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
-            count=count+1.0;
+            sumweights+=(*myWeights)[i][j];
         }
     }
-   // printf("num frames was %d\n",numFrames);
-    totEr=totEr*1000.00;
-    for (int i=0; i<n; i++)
-        hx[i]=totEr;
 
+    int numfr;
+    int counter=0;
+    for ( i = 0; i < numFrames; ++i)
+    {
+
+        for ( j = 0; j < i; ++j)
+        {
+            curError=(((*myWeights)[i][j])*findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx))/sumweights;
+            totEr=totEr+curError;
+            count=count+1.0;
+            errorvec[i]+=curError;
+            errorvec[j]+=curError;
+
+            //  printf("error %d -> %d was %f\n",i,j,curError);
+
+            hx[counter]=curError;
+            counter++;
+
+        }
+    }
+//printf("number of measurements was %d \n",counter-1);
+
+    // printf("num frames was %d\n",numFrames);
+
+    ///zzz should i sum these errors or leave them as they are in hx
+    totEr=0;
+    for (int i=0; i<n; i++)
+    {
+        totEr = hx[i];
+    }
+
+
+//this is to sum all the errors
+//    for (int i=0; i<n; i++)
+//    {
+//        hx[i]=totEr;
+//    }
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
 //        printf("hx %d is %f\n",i,hx[i]);
-
-}
-
-void errnonLinFunctionSelfCalib2(double *p, double *hx, int m, int n, void *adata)
-{
-
-    SCinputs* mySCinputs=(SCinputs*)adata;
-
-//    printf("m is %d and n is %d :\n",m,n);
-//    printf("params are :\n");
-//    for (int i=0; i<m; i++)
-//        printf("p %d is %f\n",i,p[i]);
-
-    //  printf(".");
-
-    int i,j;
-    int width=0;//figure thesed out
-    int height=0;
-    int numFrames=0;
-    int numParams=0;
-    int unKnownFrames=0;
-
-    numFrames=mySCinputs->numFrames;
-    numParams=mySCinputs->numParams;
-    width=mySCinputs->width;
-    height=mySCinputs->height;
-    unKnownFrames=mySCinputs->numunknownframes;
-
-    vector< vector<CvMat*> > *FMat=(vector< vector<CvMat*> >*)mySCinputs->funds;
-    vector<CvMat* > *pintrin= (vector< CvMat* >*)mySCinputs->intrin;
-    vector<CvMat* > *tempMtx=  (vector< CvMat* >*) mySCinputs->tempMat;
-
-
-///////////////////// done putting F back into matrices
-
-
-    int numfr=0;
-    for(i=0; i<numFrames; i++)
-    {
-
-        j=0;
-        numfr=(CONSTPARAMS==0?i:0);
-
-        cvSetIdentity((*pintrin)[i]);
-
-
-
-
-        if(NONLINPARMS>0)
-        {
-
-            //focal length
-            cvmSet((*pintrin)[i], 0, 0, p[(numfr*NONLINPARMS)+j]);
-            cvmSet((*pintrin)[i], 1, 1, p[(numfr*NONLINPARMS)+j]);
-            cvmSet((*pintrin)[i], 0, 2, ((double)(width/2.00)));
-            cvmSet((*pintrin)[i], 1, 2, ((double)(height/2.00)));
-            cvmSet((*pintrin)[i], 0, 1, 0.0);
-
-
-            j++;
-
-        }
-
-        if(NONLINPARMS>1)  //X CENTER
-        {
-
-            cvmSet((*pintrin)[i], 0, 2, p[(numfr*NONLINPARMS)+j]);
-            j++;
-        }
-
-
-        if(NONLINPARMS>2)
-        {
-            //Y center
-            cvmSet((*pintrin)[i], 1, 2, p[(numfr*NONLINPARMS)+j]);
-            j++;
-        }
-
-        if(NONLINPARMS>3)
-        {
-            //aspect ratio
-            //Y center
-            cvmSet((*pintrin)[i], 1, 1, cvmGet((*pintrin)[i],0,0)*p[(numfr*NONLINPARMS)+j]);
-            j++;
-
-        }
-        if(NONLINPARMS>4)
-        {
-            //skew
-            cvmSet((*pintrin)[i], 0, 1, p[(numfr*NONLINPARMS)+j]);
-            j++;
-
-        }
-
-    }
-
-///////////////////// now calculating errors
-
-//    for(i=0; i<numFrames; i++)
-//          writeCVMatrix(cout,(*pintrin)[i]);
-
-
-    double count=0;
-    double totEr=0;
-
-    for (int i=0; i<n; i++)
-        hx[i]=0;
-
-    double curError=0;
-
-printf("num frames is %d\n",numFrames);
-printf("constant frame parameters is %d\n",CONSTPARAMS);
-printf("number of nonlinear params is %d\n",NONLINPARMS);
-
-    for ( i = 0; i < numFrames; ++i)
-    {
-
-        for ( j = 0; j < i; ++j)
-        {
-
-            curError=totEr+findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx);
-            count=count+1.0;
-
-printf("error %d -> %d was %f\n",i,j,curError);
-
-            numfr=(CONSTPARAMS==0?i:0);
-            for(int q=0; q<NONLINPARMS; q++)
-            {
-                hx[(numfr*NONLINPARMS)+q]+=curError;
-               printf("for i=%d we have index %d\n",i,(numfr*NONLINPARMS)+q);
-            }
-            numfr=(CONSTPARAMS==0?j:0);
-            for(int q=0; q<NONLINPARMS; q++)
-            {
-                hx[(numfr*NONLINPARMS)+q]+=curError;
-               printf("for j=%d we have index %d\n",j,(numfr*NONLINPARMS)+q);
-            }
-
-
-
-        }
-    }
-
-
-
-
-  //  printf("errrs are :\n");
-  //  for (int i=0; i<n; i++)
-     //   printf("hx %d is %f\n",i,hx[i]);
 
 }
 
@@ -687,9 +716,13 @@ double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
     cvSVD( temp1, temp2,  temp3, temp4,CV_SVD_MODIFY_A|CV_SVD_U_T |CV_SVD_V_T );  //change all of the below back to U
 
 
-
     err=(cvmGet(temp2,0,0)-cvmGet(temp2,1,1))/cvmGet(temp2,1,1);
-    err*=10000.0;
+
+//   writeCVMatrix(cout<<"K1"<<endl,k1);
+//writeCVMatrix(cout<<"K2"<<endl,k2);
+//writeCVMatrix(cout<<"F"<<endl,F);
+//printf("Error was %f \n",err);
+
     return err;
 }
 
