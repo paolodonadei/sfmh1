@@ -28,18 +28,7 @@ struct pose
 
 };
 
-struct stats
-{
-    double s_deviation;
-    double var;
-    double mean;
-    double max;
-    double min;
-    double count;
-    double accuracy;
-    double median;
-};
-stats findStatsArray(const vector<double>& argarray);
+
 
 
 class HRImage

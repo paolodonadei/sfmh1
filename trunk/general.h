@@ -43,6 +43,17 @@ using namespace std;
 
 class HRImage;
 
+struct stats
+{
+    double s_deviation;
+    double var;
+    double mean;
+    double max;
+    double min;
+    double count;
+    double accuracy;
+    double median;
+};
 double random_uniform_0_1(void);
 Image HRImagetoDLImage(HRImage& hr_im);
 
@@ -100,6 +111,7 @@ double random_normal_0_1(void);
 double random_gaussian(double mean, double std);
 double random_uniform(double min, double max);
 double random_gaussian2(double mean, double std,double mmin,double mmax);
-
+stats findStatsArray(const vector<double>& argarray);
 string extractDigits(string mystr);
+double mediaAbsoluteDev(vector<double>& nums);
 #endif //HRPRIMITIVES_HPP_INCLUDED
