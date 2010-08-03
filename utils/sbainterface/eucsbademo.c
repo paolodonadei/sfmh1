@@ -1419,7 +1419,7 @@ void img_projsKDS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcs
 //  double *motstruct, *motstruct_copy, *imgpts, *covimgpts, *initrot;
 //  double K[9], ical[5]; // intrinsic calibration matrix & temp. storage for its params
 //  char *vmask, tbuf[32];
-//  double opts[SBA_OPTSSZ], info[SBA_INFOSZ], phi;
+//  double opts[SBA_OPTSSZ], پژوهشیinfo[SBA_INFOSZ], phi;
 //  int howto, expert, analyticjac, fixedcal, havedist, n, prnt, verbose=0;
 //  int nframes, numpts3D, numprojs, nvars;
 //  const int nconstframes=0;

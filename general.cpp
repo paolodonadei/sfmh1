@@ -896,5 +896,98 @@ string extractDigits(string mystr)
 
         }
     }
-return outp;
+    return outp;
+}
+
+double mediaAbsoluteDev(vector<double>& nums)
+{
+    int i;
+    stats mystat=findStatsArray(nums);
+    vector<double> intermediatev(nums.size(),0);
+
+    for (i=0; i<nums.size(); i++)
+    {
+
+        intermediatev[i]=fabs(mystat.median-nums[i]);
+
+    }
+
+    stats mystatinter=findStatsArray(intermediatev);
+    double normalizationConstant=0.6745; //as shown in page 5 of robust stats book by maronna
+    double NMAD= (mystatinter.median/normalizationConstant);
+    printf("%d elements, median was %f and returned %f \n",nums.size(),mystatinter.median,NMAD);
+    return NMAD;
+}
+
+
+stats findStatsArray(const vector<double>& argarray)
+{
+
+    int i;
+    vector<double> array;
+
+    for (i=0; i<argarray.size(); i++)
+    {
+        if (isnan(argarray[i])==false)
+        {
+            array.push_back(argarray[i]);
+        }
+    }
+
+
+    int size=array.size();
+
+
+    stats mystats;
+
+    mystats.s_deviation=0;
+    mystats.var=0;
+    mystats.mean=0;
+    mystats.max=0;
+
+    mystats.count=0;
+
+    mystats.count=size;
+
+    if (size==0)
+    {
+        return mystats;
+    }
+
+    mystats.max=mystats.min=array[0];
+    double dsize=size;
+
+    for (i=0; i<size; i++)
+    {
+        mystats.mean+=array[i];
+
+        if (array[i]>mystats.max) mystats.max=array[i];
+        if (array[i]<mystats.min) mystats.min=array[i];
+    }
+
+    mystats.mean/=dsize;
+
+
+
+    for (i=0; i<size; i++)
+    {
+        mystats.var+=((array[i]-mystats.mean)*(array[i]-mystats.mean));
+    }
+
+    mystats.var/=dsize;
+
+    mystats.s_deviation=sqrt(mystats.var);
+
+    sort(array.begin(), array.end());
+
+    if(size%2==1)
+        mystats.median=array[(size+1)/2];
+    else
+        mystats.median=(array[(size/2)]+array[(size/2)-1]  )/2.0F;
+
+
+
+    return mystats;
+
+
 }

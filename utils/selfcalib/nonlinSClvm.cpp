@@ -180,7 +180,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
 
     n=(int)(((numFrames)*(numFrames-1))/2);
-   // printf("the number of parameters is %d and the number of measurements is %d \n",m,n);
+    // printf("the number of parameters is %d and the number of measurements is %d \n",m,n);
 
     double p[m+1], x[n+1];
     double lb[m+1], ub[m+1];
@@ -422,7 +422,7 @@ double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  
         perror( "Error deleting file" );
 
 
- FILE *fpw;
+    FILE *fpw;
     FILE *fpe;
 
     if((fpw=fopen("weights.csv", "w")) == NULL)
@@ -467,6 +467,8 @@ double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  
 
 ///zzz change this, a hardcoded threshold is not a good diea
     threshold=0.005;
+    vector<double> residuals;
+
     while(itercounter<MAXITER)
     {
         itercounter++;
@@ -482,6 +484,20 @@ double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  
             cvSetZero(tempMats[q]);
         }
 
+        residuals.clear();
+
+        for(int m=0; m<numFrames; m++)
+        {
+            for(int n=0; n<m; n++)
+            {
+                double curError=findSVDerror(KV[n],KV[m],FV[m][n],&tempMats);
+                residuals.push_back(curError);
+
+            }
+        }
+//this is tukey's bisquare tuning parameter
+        threshold= mediaAbsoluteDev(residuals)*4.685;
+        printf("residual was %f\n",threshold);
 
         for(int m=0; m<numFrames; m++)
         {
