@@ -233,9 +233,9 @@ int main(int argc, char *argv[])
     }
 
 
-for(i=0;i<3;i++)
-for(j=0;j<3;j++)
-cvmSet(funMatrix[1][0],i,j,rand());
+//for(i=0;i<3;i++)
+//for(j=0;j<3;j++)
+//cvmSet(funMatrix[1][0],i,j,rand());
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
 
