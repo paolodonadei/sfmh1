@@ -1508,7 +1508,7 @@ int HRImageSet::SelfCalibrate()
     }
 
     cout<<"start"<<endl;
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,NONLINSIMPLEMULTISTEP);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,MESTIMATOR);
     //HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height, confid,STRUM);
     cout<<"end"<<endl;
     cout<<" According to NONLINSIMPLE :"<<endl;

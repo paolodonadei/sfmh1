@@ -6,7 +6,7 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
 #include "argproc.h"
-
+#include <cv.h>
 #include <highgui.h>
 
 
@@ -990,4 +990,85 @@ stats findStatsArray(const vector<double>& argarray)
     return mystats;
 
 
+}
+
+int normalizeMatrix( CvMat* in)
+{
+    if (in == 0)
+    {
+        printf("parameters is a NULL pointer3!");
+        return false;
+    }
+
+    if (!CV_IS_MAT(in))
+    {
+        printf("Input parameter must be a matrix!");
+        return false;
+    }
+
+    int h = in->rows;
+
+    int w = in->cols;
+    double s=cvmGet(in,h-1,w-1);
+    if (fabs(s)<=0.00000000001)
+    {
+        printf("cant normalize matridx if last element is zero\n");
+        return 0;
+    }
+    else
+    {
+        scaleMatrix( in, ((double)1.00)/s);
+    }
+
+}
+
+void scaleMatrix(CvMat* in,double s)
+{
+    if (in == 0)
+    {
+        printf("parameters is a NULL pointer4!");
+        return ;
+    }
+
+    if (!CV_IS_MAT(in))
+    {
+        printf("Input parameter must be a matrix!");
+        return ;
+    }
+
+    int h = in->rows;
+
+    int w = in->cols;
+
+    int i,j;
+
+
+
+    for (i=0; i<h; i++)
+    {
+        for (j=0; j<w; j++)
+        {
+            double t=cvmGet(in,i,j);
+            cvmSet(in,i,j,t*s);
+
+        }
+
+    }
+
+}
+
+
+void decomposeP_GetK(CvMat* P,CvMat* K)
+{
+    CvMat* R=cvCreateMat(3,3,CV_64F);
+
+    CvMat* t=cvCreateMat(4,1,CV_64F);
+
+    cvDecomposeProjectionMatrix(P, K, R,t, NULL,NULL, NULL, NULL);
+ normalizeMatrix(K);
+    cvmSet(K,0,0,fabs(cvmGet(K,0,0)));
+    cvmSet(K,1,1,fabs(cvmGet(K,1,1)));
+  cvmSet(K,0,1,0);
+    cvReleaseMat(&t);
+    cvReleaseMat(&R);
 }
