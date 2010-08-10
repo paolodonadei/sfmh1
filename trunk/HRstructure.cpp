@@ -225,8 +225,11 @@ double HRStructure::bundleAdjust()
 }
 int HRStructure::addFrame(int framenum)
 {
+    ///zzz remove this
 
 
+    CvMat* dltK=cvCreateMat(3,3,CV_64F);
+    vector<CvMat*> tempPDLT;
     int numCommonPts=0;
 
     int count=0;
@@ -252,6 +255,11 @@ int HRStructure::addFrame(int framenum)
 
     vector< CvPoint2D32f> impts;
     vector< CvPoint3D32f> wrldpts;
+
+    vector< CvPoint2D32f> impts_inliers;
+    vector< CvPoint3D32f> wrldpts_inliers;
+
+
     vector< double> prior;
     vector< bool> inliers;
     for ( i = 0; i < maxlength; i++)
@@ -324,6 +332,10 @@ int HRStructure::addFrame(int framenum)
             cvmSet(objectPts,k,0,wrldpts[j].x);
             cvmSet(objectPts,k,1,wrldpts[j].y);
             cvmSet(objectPts,k,2,wrldpts[j].z);
+
+            impts_inliers.push_back(impts[j]);
+            wrldpts_inliers.push_back(wrldpts[j]);
+
             k++;
 
         }
@@ -332,10 +344,34 @@ int HRStructure::addFrame(int framenum)
     }
 
 
+//stuff for calculating K from the DLT computer P
+    //this will substitute the K from DLT for the K from self calibzzz
+
+    if(1==1)
+    {
+
+
+        writeCVMatrix(cout<<"%%%%%% K from selfcalib "<<endl,(*((*imSet).imageCollection[framenum])).intrinsicMatrix);
+        cvReleaseMat(&A);
+        formDataMatrixRobustResectioning(&A,  impts_inliers, wrldpts_inliers);
+        findProjDLTMinimal(A,tempPDLT );
+        normalizeMatrix(tempPDLT[0]);
+        vector<double>  perrors;
+        double per=projError(A, tempPDLT[0],perrors );
+        decomposeP_GetK(tempPDLT[0],(*((*imSet).imageCollection[framenum])).intrinsicMatrix);
+        writeCVMatrix(cout<<"%%%%%% K from DLT "<<endl,(*((*imSet).imageCollection[framenum])).intrinsicMatrix);
+        printf("p error was %f \n",per);
+    }
+
 
 
     cvFindExtrinsicCameraParams2(objectPts, imgPts,(*((*imSet).imageCollection[framenum])).intrinsicMatrix, (*((*imSet).imageCollection[framenum])).distortion, rvec, (*((*imSet).imageCollection[framenum])).camPose.tm);
+
+
+
     cvRodrigues2(rvec, (*((*imSet).imageCollection[framenum])).camPose.Rm);
+
+
 
     findProjfromcompon((*((*imSet).imageCollection[framenum])));
 
@@ -349,7 +385,7 @@ int HRStructure::addFrame(int framenum)
     cvReleaseMat(&imgPts);
     cvReleaseMat(&objectPts);
     cvReleaseMat(&rvec);
-
+    cvReleaseMat(&A);
     for(i=0; i< numImages; i++)
     {
         if(sfmSequence[i]==-1)
@@ -359,8 +395,13 @@ int HRStructure::addFrame(int framenum)
         }
     }
 
+    for(i=0; i<tempPDLT.size(); i++)
+    {
+        cvReleaseMat(&tempPDLT[i]);
 
+    }
 
+    cvReleaseMat(&dltK);
 }
 //this finds the best closes neighbour frames whose pose has been estimated
 int HRStructure::findBestTwoNehgbourFrames(int frame,vector<int>& neighbourFrames)
@@ -1635,7 +1676,7 @@ int HRStructure::sba_driver_interface()
      * 0: all free, 1: skew fixed, 2: skew, ar fixed, 4: skew, ar, ppt fixed
      * Note that a value of 3 does not make sense
      */
-     ///zzz be careful with this, ideally this should be 1
+    ///zzz be careful with this, ideally this should be 1
     mglobs.nccalib=1; /* number of intrinsics to keep fixed, must be between 0 and 5 */
     //zzz this is important, maybe change this to 5
     fixedcal=0; /* varying intrinsics */

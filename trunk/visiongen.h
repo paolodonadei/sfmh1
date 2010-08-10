@@ -30,8 +30,8 @@ int skewSymmetrify(const CvMat *in, CvMat *out);
 int FfromProjectionMatrices(const CvMat* P1,const CvMat* P2, CvMat* F);
 int findCameraCenter(const CvMat* P, CvMat* C);
 int findPseudoInverse_3x4(const CvMat* in,CvMat* out);
-void scaleMatrix(CvMat* in,double s);
-int normalizeMatrix( CvMat* in);
+
+
 int findProjfromcompon(CvMat* P,CvMat* R,CvMat* t,CvMat* K);
 double cvTriangulatePointsNframs(int numframes, vector<CvMat*>& projMatrs,vector<CvPoint2D32f>& projPoints,CvPoint3D32f& spPoint);
 double findDepth(CvMat* P,CvPoint3D32f S);

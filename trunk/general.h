@@ -34,7 +34,7 @@
 
 //some general definitions go here
 #define INDEXFNAME "motionindex.txt"
-#define OXFORDMATCHES 1
+#define OXFORDMATCHES 0
 #define RECREATEFILES 0
 #define SIFTPCA 0
 #define USEOXINTRINSIC 0
@@ -114,4 +114,7 @@ double random_gaussian2(double mean, double std,double mmin,double mmax);
 stats findStatsArray(const vector<double>& argarray);
 string extractDigits(string mystr);
 double mediaAbsoluteDev(vector<double>& nums);
+int normalizeMatrix( CvMat* in);
+void scaleMatrix(CvMat* in,double s);
+void decomposeP_GetK(CvMat* P,CvMat* K);
 #endif //HRPRIMITIVES_HPP_INCLUDED
