@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
         printf("##### multiple view geometry \n");
         imSet.multipleViewEstimate();
 
-        printf("##### draw matches \n");
-        imSet.drawallMatches();
+       // printf("##### draw matches \n");
+      //  imSet.drawallMatches();
 
         printf("##### create feature tracks \n");
         imSet.createFeatureTrackMatrix();
