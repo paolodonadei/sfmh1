@@ -40,10 +40,15 @@ HRpmvshandler::~HRpmvshandler()
 }
 void HRpmvshandler::runPMVS()
 {
+
     createPMVSFolder();
+
     copyImagesToPMVSFolder();
+
     copyProjectionsToPMVSFolder();
+
     writeOptionFile();
+
 #ifdef OS_WIN
     runPMVSWindows();
 #else
@@ -59,15 +64,18 @@ void HRpmvshandler::runPMVS()
 
 void HRpmvshandler::createPMVSFolder()
 {
-
+    //printf("what the fuck0\n");
     string pmname=pmvsprefix + mimSet->dirStemName;
+    //printf("the components are %s and %s\n",tempFOLD,pmname );
     pmvsPath =( fs::path( tempFOLD )  / fs::path(pmname ) );
-
+   // printf("removing %s\n",pmvsPath.string() );
+   // printf("what the fuck1\n");
 
     if ( fs::exists( pmvsPath ) )
     {
+     //   printf("removing %s\n",pmvsPath.string() );
         remove_all( pmvsPath);
-
+        assert( !exists( pmvsPath ) );
     }
 
     if ( !fs::exists( pmvsPath ) )

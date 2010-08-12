@@ -12,6 +12,14 @@ extern "C" {
 
 using namespace std;
 
+struct intrinsicFamily
+{
+    vector<double> fx;
+    vector<double> fy;
+    vector<double> s;
+    vector<double> ux;
+    vector<double> uy;
+}
 
 struct SCinputs
 {
