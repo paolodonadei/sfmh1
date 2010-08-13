@@ -19,6 +19,9 @@ struct intrinsicFamily
     vector<double> s;
     vector<double> ux;
     vector<double> uy;
+    vector<double> score;
+    vector<double> index_left;
+    vector<double> index_right;
 }
 
 struct SCinputs

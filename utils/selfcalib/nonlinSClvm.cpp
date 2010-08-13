@@ -14,16 +14,104 @@
 #include "nonlinSClvm.h"
 
 #define NONLINPARMS 3
-#define CONSTPARAMS 1
+
+
+#define CONSTPARAMS 0
 #include "general.h"
 #include "focallength.h"
 using namespace std;
 
 
 
-double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
+    int numtries=100;
+    int i,j,k,m,n;
+    int numFrames=KV.size();
 
+    vector<intrinsicFamily>  K_clusters;
+
+    K_clusters.resize(numFrames);
+
+    vector<CvMat* > tempMats;
+    tempMats.resize(2);
+
+    vector<CvMat* > tempMats2;
+    tempMats2.resize(2);
+
+    //matrix for 2 frame self calibration
+    vector< vector<CvMat*> > funMatrix;
+    funMatrix.resize(2);
+    for (int i = 0; i < 2; ++i)
+    {
+        funMatrix[i].resize(numFrames);
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+        tempMats2[i]=cvCreateMat(3,3, CV_64F);
+    }
+
+    for (int i = 0; i < 2; ++i)
+    {
+        for (int j = 0; j < 2; ++j)
+        {
+            funMatrix[i][j]=cvCreateMat(3,3, CV_64F);
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+    for(int m=0; m<numFrames; m++)
+    {
+        for(int n=0; n<m; n++)
+        {
+            copyMatrix(FV[m][n],funMatrix[0][1]);
+            cvTranspose(funMatrix[0][1], funMatrix[1][0]);
+
+            HRSelfCalibtwoFrame(funMatrix, tempMats2 ,width, height, confs,STRUM);
+
+            for(i=0; i<numtries; i++)
+            {
+
+                for(int q=0; q<2; q++)
+                {
+                    cvmSet(tempMats[q], 0, 0, random_gaussian2(cvmGet(tempMats2[q],0,0), fvariance,200,2000));
+                    cvmSet(tempMats[q], 0, 2,random_gaussian2(cvmGet(tempMats2[q],0,2), xvariance,(width/2)-(width/5),(width/2)+(width/5)));
+                    cvmSet(tempMats[q], 1, 2,random_gaussian2(cvmGet(tempMats2[q],1,2), yvariance,(height/2)-(height/5),(height/2)+(height/5)));
+                    cvmSet(tempMats[q], 0, 1,random_gaussian2(cvmGet(tempMats2[q],0,1), skewvariance,-2,6));
+                    cvmSet(tempMats[q], 1, 1,random_gaussian2(1, ARvariance,0.8,1.2)*cvmGet(tempMats[q],0,0));
+
+                }xxxxxxxx
+            }
+
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+    for (int i = 0; i < 2; ++i)
+    {
+
+        cvReleaseMat(&tempMats[i]);
+        cvReleaseMat(&tempMats2[i]);
+        for (int j = 0; j < 2; ++j)
+        {
+            cvReleaseMat(&funMatrix[i][j]);
+
+        }
+    }
 }
 
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
