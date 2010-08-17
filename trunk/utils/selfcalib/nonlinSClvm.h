@@ -22,7 +22,7 @@ struct intrinsicFamily
     vector<double> score;
     vector<double> index_left;
     vector<double> index_right;
-}
+};
 
 struct SCinputs
 {
@@ -50,6 +50,6 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 void transferIntrinsicBufferToMatrices(SCinputs* mySCinputs,double *p);
 double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
-
+double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 
 #endif

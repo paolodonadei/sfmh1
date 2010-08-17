@@ -25,7 +25,13 @@ using namespace std;
 
 double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
-    int numtries=100;
+    int numtries=200;
+    double fvariance=70;
+    double xvariance=30;
+    double yvariance=30;
+    double ARvariance=0.05;
+    double skewvariance=0.05;
+    double  curScore;
     int i,j,k,m,n;
     int numFrames=KV.size();
 
@@ -58,7 +64,15 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
         }
     }
 
+    vector< vector<double> > Weights;
 
+    Weights.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        Weights[i].resize(numFrames);
+
+    for(int m=0; m<numFrames; m++)
+        for(int n=0; n<numFrames; n++)
+            Weights[m][n]=1;
 
 
 
@@ -86,7 +100,27 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                     cvmSet(tempMats[q], 0, 1,random_gaussian2(cvmGet(tempMats2[q],0,1), skewvariance,-2,6));
                     cvmSet(tempMats[q], 1, 1,random_gaussian2(1, ARvariance,0.8,1.2)*cvmGet(tempMats[q],0,0));
 
-                }xxxxxxxx
+                }
+
+                curScore=HRSelfCalibtwoFrameNonlinInitGuess(funMatrix, tempMats , width, height, confs,Weights);
+
+
+//first frame
+                K_clusters[m].fx.push_back(cvmGet(tempMats[1],0,0));
+                K_clusters[m].fy.push_back(cvmGet(tempMats[1],1,1));
+                K_clusters[m].s.push_back(cvmGet(tempMats[1],0,1));
+                K_clusters[m].ux.push_back(cvmGet(tempMats[1],0,2));
+                K_clusters[m].uy.push_back(cvmGet(tempMats[1],1,2));
+                K_clusters[m].index_left.push_back(m);
+                K_clusters[m].index_right.push_back(n);
+//second frame
+                K_clusters[n].fx.push_back(cvmGet(tempMats[0],0,0));
+                K_clusters[n].fy.push_back(cvmGet(tempMats[0],1,1));
+                K_clusters[n].s.push_back(cvmGet(tempMats[0],0,1));
+                K_clusters[n].ux.push_back(cvmGet(tempMats[0],0,2));
+                K_clusters[n].uy.push_back(cvmGet(tempMats[0],1,2));
+                K_clusters[n].index_left.push_back(m);
+                K_clusters[n].index_right.push_back(n);
             }
 
 
@@ -99,7 +133,24 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-
+    for(int m=0; m<numFrames; m++)
+    {
+        for(i=0; i<K_clusters[m].fx.size(); i++)
+        {
+            printf(" %d , %d ,  %f , %f , %f  , %f  , %f  \n",m,i,
+                   K_clusters[m].fx[i],K_clusters[m].fy[i],
+                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i] );
+        }
+        printf("_____________________________________\n");
+    }
+    printf("_____________________________________\n");
+    printf("_____________________________________\n");
+    printf("_____________________________________\n");
+    for(int m=0; m<numFrames; m++)
+    {
+        stats mystat=findStatsArray(K_clusters[m].fx);
+        printf("for frame %d the average fx is %f and the median is %f\n",m,mystat.mean,mystat.median );
+    }
 
     for (int i = 0; i < 2; ++i)
     {
@@ -163,7 +214,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 ///////////multi step optimization
 
 ///zzz change this maybe
-    int numtries=20;
+    int numtries=5;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -271,8 +322,10 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
     m=NONLINPARMS*unKnownframes;
 
+//read my comment in the error function to see why im doing this
+    // n=(int)(((numFrames)*(numFrames-1))/2);
 
-    n=(int)(((numFrames)*(numFrames-1))/2);
+    n=m;
     // printf("the number of parameters is %d and the number of measurements is %d \n",m,n);
 
     double p[m+1], x[n+1];
@@ -383,7 +436,12 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
     mySCinputs.numParams=NONLINPARMS;
     mySCinputs.numunknownframes=unKnownframes;
 
+
+//constrained
     ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
+
+    //no constraints
+    //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
 
 
 //putting the p back into KV
@@ -763,6 +821,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 
     int numfr;
     int counter=0;
+    totEr=0;
     for ( i = 0; i < numFrames; ++i)
     {
 
@@ -776,7 +835,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 
             //  printf("error %d -> %d was %f\n",i,j,curError);
 
-            hx[counter]=curError;
+            totEr+=curError;
             counter++;
 
         }
@@ -785,19 +844,18 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 
     // printf("num frames was %d\n",numFrames);
 
-    ///zzz should i sum these errors or leave them as they are in hx
-    totEr=0;
-    for (int i=0; i<n; i++)
-    {
-        totEr = hx[i];
-    }
-
+//the errors in hx are a source of confusion
+//the right way to do this is to assign the difference in the svd of each fundamental matrix
+//to one element inside the vector hx, but that would make levmar not work sometimes if the
+//number of fundamental matrices is not large enough , so if n<m you get an error from the function
+//also you might think i am messing mestimator by putting all errors into one but the reality is that
+///the real errros aref found in the calling function
 
 //this is to sum all the errors
-//    for (int i=0; i<n; i++)
-//    {
-//        hx[i]=totEr;
-//    }
+    for (int i=0; i<n; i++)
+    {
+        hx[i]=totEr;
+    }
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
