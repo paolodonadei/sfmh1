@@ -245,6 +245,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
 
@@ -256,6 +257,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
 
@@ -267,15 +269,17 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
-   HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
 
     cout<<" According to MESTIMATOR:"<<endl;
 
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
@@ -285,6 +289,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
 
@@ -296,9 +301,19 @@ int main(int argc, char *argv[])
     for (int i = 0; i < numFrames; ++i)
     {
         writeCVMatrix(cout,intrinMatrix[i]);
+
     }
 
 
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, CLUSTERING);
+
+    cout<<" According to CLUSTERING:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+
+    }
 
 
 
@@ -308,6 +323,7 @@ int main(int argc, char *argv[])
         for (int j = 0; j < numFrames; ++j)
         {
             cvReleaseMat(&funMatrix[i][j]);
+
         }
     }
 

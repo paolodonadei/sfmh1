@@ -49,7 +49,7 @@ for i=1:numps
         prevF=curentF;
     else
         curentF=abs(prevF+((rand()*fdiff)-(fdiff/2)));
-        while(curentF<200 || curentF>1600)
+        while(curentF<100 || curentF>2000)
             curentF=abs(prevF+((rand()*fdiff)-(fdiff/2)));
         end
     end
