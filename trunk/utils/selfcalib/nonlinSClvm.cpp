@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 3
+#define NONLINPARMS 1
 
 
 #define CONSTPARAMS 0
@@ -102,23 +102,32 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
                 }
 
+
+
                 curScore=HRSelfCalibtwoFrameNonlinInitGuess(funMatrix, tempMats , width, height, confs,Weights);
 
 
+//
+//                printf("for F[%d][%d] \n",m,n);
+//
+//                writeCVMatrix(cout<<"after mat 1"<<endl,tempMats[0]);
+//                writeCVMatrix(cout<<"after mat 2"<<endl,tempMats[1]);
+
+
 //first frame
-                K_clusters[m].fx.push_back(cvmGet(tempMats[1],0,0));
-                K_clusters[m].fy.push_back(cvmGet(tempMats[1],1,1));
-                K_clusters[m].s.push_back(cvmGet(tempMats[1],0,1));
-                K_clusters[m].ux.push_back(cvmGet(tempMats[1],0,2));
-                K_clusters[m].uy.push_back(cvmGet(tempMats[1],1,2));
+                K_clusters[m].fx.push_back(cvmGet(tempMats[0],0,0));
+                K_clusters[m].fy.push_back(cvmGet(tempMats[0],1,1));
+                K_clusters[m].s.push_back(cvmGet(tempMats[0],0,1));
+                K_clusters[m].ux.push_back(cvmGet(tempMats[0],0,2));
+                K_clusters[m].uy.push_back(cvmGet(tempMats[0],1,2));
                 K_clusters[m].index_left.push_back(m);
                 K_clusters[m].index_right.push_back(n);
 //second frame
-                K_clusters[n].fx.push_back(cvmGet(tempMats[0],0,0));
-                K_clusters[n].fy.push_back(cvmGet(tempMats[0],1,1));
-                K_clusters[n].s.push_back(cvmGet(tempMats[0],0,1));
-                K_clusters[n].ux.push_back(cvmGet(tempMats[0],0,2));
-                K_clusters[n].uy.push_back(cvmGet(tempMats[0],1,2));
+                K_clusters[n].fx.push_back(cvmGet(tempMats[1],0,0));
+                K_clusters[n].fy.push_back(cvmGet(tempMats[1],1,1));
+                K_clusters[n].s.push_back(cvmGet(tempMats[1],0,1));
+                K_clusters[n].ux.push_back(cvmGet(tempMats[1],0,2));
+                K_clusters[n].uy.push_back(cvmGet(tempMats[1],1,2));
                 K_clusters[n].index_left.push_back(m);
                 K_clusters[n].index_right.push_back(n);
             }
@@ -131,7 +140,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-
+  CvMat* clustering_data=cvCreateMat(K_clusters[0].fx.size(),NONLINPARMS,CV_64F);
 
     for(int m=0; m<numFrames; m++)
     {
@@ -140,7 +149,18 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
             printf(" %d , %d ,  %f , %f , %f  , %f  , %f  \n",m,i,
                    K_clusters[m].fx[i],K_clusters[m].fy[i],
                    K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i] );
+
+
+          if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
+          if(NONLINPARMS>1) cvmSet(clustering_data,i,1,K_clusters[m].ux[i] );
+          if(NONLINPARMS>2) cvmSet(clustering_data,i,2,K_clusters[m].uy[i] );
+          if(NONLINPARMS>3) cvmSet(clustering_data,i,3,K_clusters[m].fy[i] );
+          if(NONLINPARMS>4) cvmSet(clustering_data,i,4,K_clusters[m].s[i] );
+
         }
+
+
+
         printf("_____________________________________\n");
     }
     printf("_____________________________________\n");
@@ -151,6 +171,16 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
         stats mystat=findStatsArray(K_clusters[m].fx);
         printf("for frame %d the average fx is %f and the median is %f\n",m,mystat.mean,mystat.median );
     }
+
+
+
+/// clustering
+
+
+double kout=kmeans(const Mat& samples, int clusterCount, Mat& labels, TermCriteria termcrit, int attempts, int flags, Mat* centers);
+
+
+zzzz
 
     for (int i = 0; i < 2; ++i)
     {
@@ -163,6 +193,8 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
         }
     }
+
+      cvReleaseMat(&clustering_data);
 }
 
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
@@ -438,7 +470,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
 
 //constrained
-    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 1000, opts, info, work, covar, (void*)&mySCinputs);
+    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 3000, opts, info, work, covar, (void*)&mySCinputs);
 
     //no constraints
     //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
