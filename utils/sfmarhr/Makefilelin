@@ -1,9 +1,13 @@
-INC = `wx-config --cxxflags`
+LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs/
+
+INC = `wx-config --cxxflags` -I../../ -I$(LOCALLIBS)/include
 CC=g++
 CFLAGS=$(INC) -c -g -Wall
-LIBS=
-LDFLAGS= `wx-config --libs gl,core,base`
-SOURCES= sfmARhr.cpp hrply.cpp
+LIBS=-lglm -ljpeg
+LDFLAGS= `wx-config --libs gl,core,base` -L$(LOCALLIBS)/lib
+
+SOURCES=sfmARhr.cpp hrply.cpp MyProject1SFMMainfram.cpp sfmMainFram.cpp hrmodel.cpp
+
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=sfmarhr
 

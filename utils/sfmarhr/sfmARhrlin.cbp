@@ -38,10 +38,16 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefilelin" />
+		<Unit filename="MyProject1SFMMainfram.cpp" />
+		<Unit filename="MyProject1SFMMainfram.h" />
+		<Unit filename="hrmodel.cpp" />
+		<Unit filename="hrmodel.h" />
 		<Unit filename="hrply.cpp" />
 		<Unit filename="hrply.h" />
 		<Unit filename="sfmARhr.cpp" />
 		<Unit filename="sfmARhr.h" />
+		<Unit filename="sfmMainFram.cpp" />
+		<Unit filename="sfmMainFram.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

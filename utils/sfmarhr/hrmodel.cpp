@@ -1,7 +1,8 @@
 #include "hrmodel.h"
 #include "glm.h"
 #include <stdio.h>
-#include <conio.h>
+
+
 #include <stdlib.h>
 HRModel::HRModel(string fname)
 {
