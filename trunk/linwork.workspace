@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="Workspace">
-		<Project filename="sfmh1.cbp" />
+		<Project filename="sfmh1.cbp" active="1" />
 		<Project filename="utils/decompose/Makesfmh1.cbp" />
 		<Project filename="utils/fundutils/fundutils.cbp" />
 		<Project filename="utils/selfcalib/selfcalib.cbp" />
-		<Project filename="utils/sfmarhr/sfmARhrlin.cbp" active="1" />
+		<Project filename="utils/sfmarhr/sfmARhrlin.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
