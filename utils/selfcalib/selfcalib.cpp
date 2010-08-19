@@ -237,19 +237,19 @@ int main(int argc, char *argv[])
 //for(j=0;j<3;j++)
 //cvmSet(funMatrix[1][0],i,j,rand());
 
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
-
-
-    cout<<" According to Hartley :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
-
-
-
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
+//
+//
+//    cout<<" According to Hartley :"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//
+//    }
+//
+//
+//
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, STRUM);
 
     cout<<" According to Sturm :"<<endl;
@@ -259,9 +259,9 @@ int main(int argc, char *argv[])
         writeCVMatrix(cout,intrinMatrix[i]);
 
     }
-
-
-
+//
+//
+//
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
 
     cout<<" According to NONLINSIMPLE :"<<endl;
@@ -271,38 +271,38 @@ int main(int argc, char *argv[])
         writeCVMatrix(cout,intrinMatrix[i]);
 
     }
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
-
-    cout<<" According to MESTIMATOR:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
-
-    cout<<" According to MULTI STEP:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
-
-
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
-
-    cout<<" According to POLLEFEY:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
+//
+//    cout<<" According to MESTIMATOR:"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//
+//    }
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
+//
+//    cout<<" According to MULTI STEP:"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//
+//    }
+//
+//
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
+//
+//    cout<<" According to POLLEFEY:"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//
+//    }
 
 
     HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, CLUSTERING);

@@ -200,17 +200,17 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     }
 
-   if (method==MESTIMATOR)
+    if (method==MESTIMATOR)
     {
         printf("SELF CALIBRATE WITH MESTIMATOR METHOD\n");
         HRSelfCalibtwoFrameNonlinMEstimator(FV,  KV , width, height,confs);
 
-   }
+    }
 
 
     if (method==NONLINSIMPLEMULTISTEP)
     {
-            printf("SELF CALIBRATE WITH NONLINSIMPLEMULTISTEP METHOD\n");
+        printf("SELF CALIBRATE WITH NONLINSIMPLEMULTISTEP METHOD\n");
         HRSelfCalibtwoFrameNonlinMULTIStep(FV,  KV , width, height,confs);
 
 
@@ -218,7 +218,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==CLUSTERING)
     {
-            printf("SELF CALIBRATE WITH CLUSTERING METHOD\n");
+        printf("SELF CALIBRATE WITH CLUSTERING METHOD\n");
         HRSelfCalibtwoFrameNonlinCluster(FV,  KV , width, height,confs);
 
 
@@ -227,7 +227,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
     if (method==HARTLEY)
     {
-         printf("SELF CALIBRATE WITH HARTLEY METHOD\n");
+        printf("SELF CALIBRATE WITH HARTLEY METHOD\n");
         double foc2,foc1;
         int counter=0;
         for(i=0; i<numFrames; i++)

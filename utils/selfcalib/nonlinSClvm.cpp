@@ -15,6 +15,8 @@
 
 #define NONLINPARMS 1
 
+#include "cxcore.h"
+#include "highgui.h"
 
 #define CONSTPARAMS 0
 #include "general.h"
@@ -25,7 +27,7 @@ using namespace std;
 
 double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
-    int numtries=200;
+    int numtries=10;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -80,7 +82,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-    for(int m=0; m<numFrames; m++)
+    for(int m=0; m<=1; m++)
     {
         for(int n=0; n<m; n++)
         {
@@ -140,25 +142,55 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-  CvMat* clustering_data=cvCreateMat(K_clusters[0].fx.size(),NONLINPARMS,CV_64F);
+    int numClusts=10;
+    CvMat* clustering_data=cvCreateMat(K_clusters[0].fx.size(),NONLINPARMS,CV_32F);
+    CvMat* zclusters = cvCreateMat( K_clusters[0].fx.size(), 1, CV_32SC1 );
+    CvMat* clusters_centers = cvCreateMat( numClusts, NONLINPARMS, CV_32F );
 
-    for(int m=0; m<numFrames; m++)
+
+
+    double *compactness = new double [numClusts];
+
+    for(int m=0; m<1; m++)
     {
+
+        cvSetZero(clustering_data);
         for(i=0; i<K_clusters[m].fx.size(); i++)
         {
-            printf(" %d , %d ,  %f , %f , %f  , %f  , %f  \n",m,i,
+            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d  \n",m,i,
                    K_clusters[m].fx[i],K_clusters[m].fy[i],
-                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i] );
+                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i],
+                   K_clusters[m].index_left[i],K_clusters[m].index_right[i]     );
 
 
-          if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
-          if(NONLINPARMS>1) cvmSet(clustering_data,i,1,K_clusters[m].ux[i] );
-          if(NONLINPARMS>2) cvmSet(clustering_data,i,2,K_clusters[m].uy[i] );
-          if(NONLINPARMS>3) cvmSet(clustering_data,i,3,K_clusters[m].fy[i] );
-          if(NONLINPARMS>4) cvmSet(clustering_data,i,4,K_clusters[m].s[i] );
+            if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
+            if(NONLINPARMS>1) cvmSet(clustering_data,i,1,K_clusters[m].ux[i] );
+            if(NONLINPARMS>2) cvmSet(clustering_data,i,2,K_clusters[m].uy[i] );
+            if(NONLINPARMS>3) cvmSet(clustering_data,i,3,K_clusters[m].fy[i] );
+            if(NONLINPARMS>4) cvmSet(clustering_data,i,4,K_clusters[m].s[i] );
 
         }
 
+
+       double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers,compactness);
+
+
+        int numClusWinner=findClusWinner(zclusters,numClusts);
+
+        cvSetIdentity(KV[m]);
+        if(NONLINPARMS>0) cvmSet(KV[m],0,0,cvmGet(clusters_centers,numClusWinner,0) );
+
+
+        //setting default values
+        cvmSet(KV[m],1,1,cvmGet(clusters_centers,numClusWinner,0) );
+        cvmSet(KV[m],0,2,width/2 );
+        cvmSet(KV[m],1,2,height/2 );
+        cvmSet(KV[m],0,1,0);
+
+        if(NONLINPARMS>1)  cvmSet(KV[m],0,2,cvmGet(clusters_centers,numClusWinner,1) );
+        if(NONLINPARMS>2)  cvmSet(KV[m],1,2,cvmGet(clusters_centers,numClusWinner,2) );
+        if(NONLINPARMS>3)  cvmSet(KV[m],1,1,cvmGet(clusters_centers,numClusWinner,3) );
+        if(NONLINPARMS>4)  cvmSet(KV[m],0,1,cvmGet(clusters_centers,numClusWinner,4) );
 
 
         printf("_____________________________________\n");
@@ -171,16 +203,17 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
         stats mystat=findStatsArray(K_clusters[m].fx);
         printf("for frame %d the average fx is %f and the median is %f\n",m,mystat.mean,mystat.median );
     }
+    printf("_____________________________________\n");
+    printf("_____________________________________\n");
+    printf("_____________________________________\n");
+
+    for(int m=0; m<numFrames; m++)
+    {
+        printf("for frame %d the average fx is %f and ux is %f and uy is %f \n",m,cvmGet(KV[m],0,0),cvmGet(KV[m],0,2),cvmGet(KV[m],1,2));
+    }
 
 
 
-/// clustering
-
-
-double kout=kmeans(const Mat& samples, int clusterCount, Mat& labels, TermCriteria termcrit, int attempts, int flags, Mat* centers);
-
-
-zzzz
 
     for (int i = 0; i < 2; ++i)
     {
@@ -193,10 +226,61 @@ zzzz
 
         }
     }
-
-      cvReleaseMat(&clustering_data);
+    cvReleaseMat( &zclusters );
+    cvReleaseMat(&clustering_data);
+    delete [] compactness;
 }
 
+int findClusWinner(CvMat* myclusterlabels,int numClusts)
+{
+    if (myclusterlabels==NULL)
+    {
+        printf("parameters is a NULL pointer1!");
+        return -1;
+    }
+
+    if (!CV_IS_MAT(myclusterlabels))
+    {
+        printf("Input parameter must be a matrix!");
+        return -1;
+    }
+
+    if(myclusterlabels->cols!=1  )
+    {
+        printf("wrong dimensions!");
+        return -1;
+
+    }
+
+    vector<int> clustLabels(numClusts,0);
+
+
+    for(int i=0; i<myclusterlabels->rows; i++)
+    {
+
+        int curElement=CV_MAT_ELEM( *myclusterlabels, int, i, 0 );
+
+       // printf("i is %d and result is %d \n",i,curElement);
+        clustLabels[curElement]++;
+
+    }
+
+    int WinIndex=-1;
+
+    int maxNums=-100;
+    for(int i=0; i<numClusts; i++)
+    {
+        if(clustLabels[i]>maxNums)
+        {
+            maxNums=  clustLabels[i];
+            WinIndex=i;
+        }
+
+
+    }
+
+    return WinIndex;
+}
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
 
@@ -470,7 +554,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
 
 //constrained
-    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 3000, opts, info, work, covar, (void*)&mySCinputs);
+    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 8000, opts, info, work, covar, (void*)&mySCinputs);
 
     //no constraints
     //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
