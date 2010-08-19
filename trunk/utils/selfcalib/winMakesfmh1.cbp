@@ -22,7 +22,7 @@
 				<Option object_output="." />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="..\..\temporary\wadhamsfmh\F_motionindex.txt 1024 768 2" />
+				<Option parameters=" ..\..\selfcalibmatlab\currentProj\F_index.txt 512 512 2" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
