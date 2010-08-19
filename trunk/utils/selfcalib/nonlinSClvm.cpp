@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 1
+#define NONLINPARMS 3
 
 #include "cxcore.h"
 #include "highgui.h"
@@ -21,6 +21,8 @@
 #define CONSTPARAMS 0
 #include "general.h"
 #include "focallength.h"
+#define MINF 200
+#define MAXF 2000
 using namespace std;
 
 
@@ -38,6 +40,8 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
     int numFrames=KV.size();
 
     vector<intrinsicFamily>  K_clusters;
+
+    vector<vector<intrinsicFamily> >  K_clusters_individual;
 
     K_clusters.resize(numFrames);
 
@@ -67,10 +71,15 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
     }
 
     vector< vector<double> > Weights;
+    K_clusters_individual.resize(numFrames);
 
     Weights.resize(numFrames);
     for (int i = 0; i < numFrames; ++i)
+    {
         Weights[i].resize(numFrames);
+        K_clusters_individual[i].resize(numFrames);
+    }
+
 
     for(int m=0; m<numFrames; m++)
         for(int n=0; n<numFrames; n++)
@@ -82,7 +91,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-    for(int m=0; m<=1; m++)
+    for(int m=0; m<numFrames; m++)
     {
         for(int n=0; n<m; n++)
         {
@@ -117,21 +126,51 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 //first frame
-                K_clusters[m].fx.push_back(cvmGet(tempMats[0],0,0));
-                K_clusters[m].fy.push_back(cvmGet(tempMats[0],1,1));
-                K_clusters[m].s.push_back(cvmGet(tempMats[0],0,1));
-                K_clusters[m].ux.push_back(cvmGet(tempMats[0],0,2));
-                K_clusters[m].uy.push_back(cvmGet(tempMats[0],1,2));
-                K_clusters[m].index_left.push_back(m);
-                K_clusters[m].index_right.push_back(n);
+                if(cvmGet(tempMats[0],0,0)>MINF && cvmGet(tempMats[0],0,0)<MAXF)
+                {
+
+
+                    K_clusters[m].fx.push_back(cvmGet(tempMats[0],0,0));
+                    K_clusters[m].fy.push_back(cvmGet(tempMats[0],1,1));
+                    K_clusters[m].s.push_back(cvmGet(tempMats[0],0,1));
+                    K_clusters[m].ux.push_back(cvmGet(tempMats[0],0,2));
+                    K_clusters[m].uy.push_back(cvmGet(tempMats[0],1,2));
+                    K_clusters[m].index_left.push_back(m);
+                    K_clusters[m].index_right.push_back(n);
 //second frame
-                K_clusters[n].fx.push_back(cvmGet(tempMats[1],0,0));
-                K_clusters[n].fy.push_back(cvmGet(tempMats[1],1,1));
-                K_clusters[n].s.push_back(cvmGet(tempMats[1],0,1));
-                K_clusters[n].ux.push_back(cvmGet(tempMats[1],0,2));
-                K_clusters[n].uy.push_back(cvmGet(tempMats[1],1,2));
-                K_clusters[n].index_left.push_back(m);
-                K_clusters[n].index_right.push_back(n);
+                    K_clusters_individual[m][n].fx.push_back(cvmGet(tempMats[0],0,0));
+                    K_clusters_individual[m][n].fy.push_back(cvmGet(tempMats[0],1,1));
+                    K_clusters_individual[m][n].s.push_back(cvmGet(tempMats[0],0,1));
+                    K_clusters_individual[m][n].ux.push_back(cvmGet(tempMats[0],0,2));
+                    K_clusters_individual[m][n].uy.push_back(cvmGet(tempMats[0],1,2));
+                    K_clusters_individual[m][n].index_left.push_back(m);
+                    K_clusters_individual[m][n].index_right.push_back(n);
+
+                }
+
+
+                if(cvmGet(tempMats[1],0,0)>MINF && cvmGet(tempMats[1],0,0)<MAXF)
+                {
+                    K_clusters[n].fx.push_back(cvmGet(tempMats[1],0,0));
+                    K_clusters[n].fy.push_back(cvmGet(tempMats[1],1,1));
+                    K_clusters[n].s.push_back(cvmGet(tempMats[1],0,1));
+                    K_clusters[n].ux.push_back(cvmGet(tempMats[1],0,2));
+                    K_clusters[n].uy.push_back(cvmGet(tempMats[1],1,2));
+                    K_clusters[n].index_left.push_back(m);
+                    K_clusters[n].index_right.push_back(n);
+
+                    K_clusters_individual[n][m].fx.push_back(cvmGet(tempMats[1],0,0));
+                    K_clusters_individual[n][m].fy.push_back(cvmGet(tempMats[1],1,1));
+                    K_clusters_individual[n][m].s.push_back(cvmGet(tempMats[1],0,1));
+                    K_clusters_individual[n][m].ux.push_back(cvmGet(tempMats[1],0,2));
+                    K_clusters_individual[n][m].uy.push_back(cvmGet(tempMats[1],1,2));
+                    K_clusters_individual[n][m].index_left.push_back(m);
+                    K_clusters_individual[n][m].index_right.push_back(n);
+
+
+                }
+
+
             }
 
 
@@ -141,26 +180,22 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-
     int numClusts=10;
-    CvMat* clustering_data=cvCreateMat(K_clusters[0].fx.size(),NONLINPARMS,CV_32F);
-    CvMat* zclusters = cvCreateMat( K_clusters[0].fx.size(), 1, CV_32SC1 );
+
     CvMat* clusters_centers = cvCreateMat( numClusts, NONLINPARMS, CV_32F );
 
 
 
     double *compactness = new double [numClusts];
 
-    for(int m=0; m<1; m++)
+    for(int m=0; m<numFrames; m++)
     {
-
+        CvMat* clustering_data=cvCreateMat(K_clusters[m].fx.size(),NONLINPARMS,CV_32F);
+        CvMat* zclusters = cvCreateMat( K_clusters[m].fx.size(), 1, CV_32SC1 );
         cvSetZero(clustering_data);
+        printf("size of frame %d was %d\n",m, K_clusters[m].fx.size());
         for(i=0; i<K_clusters[m].fx.size(); i++)
         {
-            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d  \n",m,i,
-                   K_clusters[m].fx[i],K_clusters[m].fy[i],
-                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i],
-                   K_clusters[m].index_left[i],K_clusters[m].index_right[i]     );
 
 
             if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
@@ -171,11 +206,22 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
         }
 
+        printf("before k meaens\n");
+        double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers,compactness);
+        printf("after k meaens\n");
 
-       double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers,compactness);
 
 
         int numClusWinner=findClusWinner(zclusters,numClusts);
+
+        for(i=0; i<K_clusters[m].fx.size(); i++)
+        {
+            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d , %d , %s \n",m,i,
+                   K_clusters[m].fx[i],K_clusters[m].fy[i],
+                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i],
+                   K_clusters[m].index_left[i],K_clusters[m].index_right[i] , CV_MAT_ELEM( *zclusters, int, i, 0 ) , (CV_MAT_ELEM( *zclusters, int, i, 0 )==numClusWinner)?"*": " "   );
+
+        }
 
         cvSetIdentity(KV[m]);
         if(NONLINPARMS>0) cvmSet(KV[m],0,0,cvmGet(clusters_centers,numClusWinner,0) );
@@ -194,6 +240,11 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
         printf("_____________________________________\n");
+
+        cvReleaseMat( &zclusters );
+        cvReleaseMat(&clustering_data);
+
+
     }
     printf("_____________________________________\n");
     printf("_____________________________________\n");
@@ -209,10 +260,42 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
     for(int m=0; m<numFrames; m++)
     {
-        printf("for frame %d the average fx is %f and ux is %f and uy is %f \n",m,cvmGet(KV[m],0,0),cvmGet(KV[m],0,2),cvmGet(KV[m],1,2));
+        printf("for frame %d the clusterint fx is %f and ux is %f and uy is %f \n",m,cvmGet(KV[m],0,0),cvmGet(KV[m],0,2),cvmGet(KV[m],1,2));
     }
 
+////////////////////////////end of clustering, the rest determines the weights
+    double threshold=100;
 
+
+    for(int m=0; m<numFrames; m++)
+    {
+
+        for(int n=0; n<numFrames; n++)
+        {
+            if(m!=n)
+            {
+                intrinsicFamily fam;
+
+                fam.fx.push_back(cvmGet(KV[m],0,0));
+                fam.ux.push_back(cvmGet(KV[m],0,2));
+                fam.uy.push_back(cvmGet(KV[m],1,2));
+                fam.fy.push_back(cvmGet(KV[m],1,1));
+                fam.s.push_back(cvmGet(KV[m],0,1));
+
+                double distCluster=findDistanceClosestVectorPt(K_clusters_individual[m][n] ,fam,NONLINPARMS);
+
+                printf("distance [%d][%d]=%f \n",m,n,distCluster);
+                if(distCluster>threshold )
+                {
+                    Weights[m][n]=0;
+                    Weights[n][m]=0;
+                    printf("setting weights [%d][%d]=0 \n",m,n);
+                }
+            }
+        }
+    }
+HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+  HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator );
 
 
     for (int i = 0; i < 2; ++i)
@@ -226,11 +309,34 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
         }
     }
-    cvReleaseMat( &zclusters );
-    cvReleaseMat(&clustering_data);
+
     delete [] compactness;
 }
 
+
+double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,int numValus)
+{
+    double curDist=0;
+    double minDist=1000000;
+    for(int i=0; i<myvec.fx.size(); i++)
+    {
+        curDist=0;
+        if(NONLINPARMS>0) curDist+=((myvec.fx[i]-val.fx[0])*(myvec.fx[i]-val.fx[0]));
+        if(NONLINPARMS>1) curDist+=((myvec.ux[i]-val.ux[0])*(myvec.ux[i]-val.ux[0]));
+        if(NONLINPARMS>2) curDist+=((myvec.uy[i]-val.uy[0])*(myvec.uy[i]-val.uy[0]));
+        if(NONLINPARMS>3) curDist+=((myvec.fy[i]-val.fy[0])*(myvec.fy[i]-val.fy[0]));
+        if(NONLINPARMS>4) curDist+=(50*((myvec.s[i]-val.s[0])*(myvec.s[i]-val.s[0])));
+
+        curDist=sqrt(curDist);
+
+        if(curDist<minDist)
+        {
+            minDist=curDist;
+        }
+    }
+
+    return minDist;
+}
 int findClusWinner(CvMat* myclusterlabels,int numClusts)
 {
     if (myclusterlabels==NULL)
@@ -260,7 +366,7 @@ int findClusWinner(CvMat* myclusterlabels,int numClusts)
 
         int curElement=CV_MAT_ELEM( *myclusterlabels, int, i, 0 );
 
-       // printf("i is %d and result is %d \n",i,curElement);
+        // printf("i is %d and result is %d \n",i,curElement);
         clustLabels[curElement]++;
 
     }
@@ -470,8 +576,8 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
         {
             //focal length
             p[(i*NONLINPARMS)+j]= cvmGet(KV[i], 0, 0);
-            lb[(i*NONLINPARMS)+j]=200;
-            ub[(i*NONLINPARMS)+j]=2000;
+            lb[(i*NONLINPARMS)+j]=MINF;
+            ub[(i*NONLINPARMS)+j]=MAXF;
             j++;
 
         }
@@ -775,10 +881,12 @@ double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  
                 if(curError>threshold)
                 {
                     Weights[m][n]=0;
+                    Weights[n][m]=0;
                 }
                 else
                 {
                     Weights[m][n]=pow((1.0-(pow((curError/threshold),2))),2);
+                    Weights[n][m]=pow((1.0-(pow((curError/threshold),2))),2);
                 }
 
                 fprintf(fpe,"   %f,   ",curError);

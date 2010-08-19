@@ -41,7 +41,7 @@ struct SCinputs
 
 int cvCholesky(CvMat* inM,CvMat* outM);
 
-
+double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,int numValus);
 void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, void *adata);
 double  HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat);
