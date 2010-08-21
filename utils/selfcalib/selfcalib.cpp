@@ -216,6 +216,15 @@ int main(int argc, char *argv[])
     }
 
 
+    for(i=0; i<3; i++)
+    {
+        for(j=0; j<3; j++)
+        {
+            cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)/100.0));
+        }
+
+    }
+
     for(i=0; i<numFrames; i++)
     {
 
@@ -232,10 +241,21 @@ int main(int argc, char *argv[])
 
     }
 
+    for(i=0; i<numFrames; i++)
+    {
 
-//for(i=0;i<3;i++)
-//for(j=0;j<3;j++)
-//cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)/100.0));
+        for(j=0; j<numFrames; j++)
+        {
+            if(i!=j)
+            {
+                writeCVMatrix(cout<<"matrix "<<i<<" and "<<j<<" is"<<endl,funMatrix[i][j]);
+            }
+        }
+
+    }
+
+
+
 
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, HARTLEY);
 //
