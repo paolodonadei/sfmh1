@@ -17,7 +17,7 @@
 
 #include "cxcore.h"
 #include "highgui.h"
-
+#define FLT_EPSILON    1.192092896e-07F
 #define CONSTPARAMS 0
 #include "general.h"
 #include "focallength.h"
@@ -214,14 +214,14 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
         int numClusWinner=findClusWinner(zclusters,numClusts);
 
-        for(i=0; i<K_clusters[m].fx.size(); i++)
-        {
-            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d , %d , %s \n",m,i,
-                   K_clusters[m].fx[i],K_clusters[m].fy[i],
-                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i],
-                   K_clusters[m].index_left[i],K_clusters[m].index_right[i] , CV_MAT_ELEM( *zclusters, int, i, 0 ) , (CV_MAT_ELEM( *zclusters, int, i, 0 )==numClusWinner)?"*": " "   );
-
-        }
+//        for(i=0; i<K_clusters[m].fx.size(); i++)
+//        {
+//            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d , %d , %s \n",m,i,
+//                   K_clusters[m].fx[i],K_clusters[m].fy[i],
+//                   K_clusters[m].ux[i],K_clusters[m].uy[i],K_clusters[m].s[i],
+//                   K_clusters[m].index_left[i],K_clusters[m].index_right[i] , CV_MAT_ELEM( *zclusters, int, i, 0 ) , (CV_MAT_ELEM( *zclusters, int, i, 0 )==numClusWinner)?"*": " "   );
+//
+//        }
 
         cvSetIdentity(KV[m]);
         if(NONLINPARMS>0) cvmSet(KV[m],0,0,cvmGet(clusters_centers,numClusWinner,0) );
@@ -264,7 +264,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
     }
 
 ////////////////////////////end of clustering, the rest determines the weights
-    double threshold=100;
+    double threshold=200;
 
 
     for(int m=0; m<numFrames; m++)
@@ -294,8 +294,9 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
             }
         }
     }
-HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
-  HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator );
+
+    HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+    HRSelfCalibtwoFrameNonlinInitGuess(FV, KV , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator );
 
 
     for (int i = 0; i < 2; ++i)
@@ -1046,12 +1047,21 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
     int numfr;
     int counter=0;
     totEr=0;
+    printf("number of frames is %d \n",numFrames);
     for ( i = 0; i < numFrames; ++i)
     {
 
         for ( j = 0; j < i; ++j)
         {
-            curError=(((*myWeights)[i][j])*findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx))/sumweights;
+            curError=0;
+            if((*myWeights)[i][j]>FLT_EPSILON)
+            {
+                curError=(((*myWeights)[i][j])*findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx))/sumweights;
+            }
+
+            printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
+            writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
+
             totEr=totEr+curError;
             count=count+1.0;
             errorvec[i]+=curError;
@@ -1080,6 +1090,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
     {
         hx[i]=totEr;
     }
+    printf("error was %f \n",totEr );
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
@@ -1113,6 +1124,8 @@ double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
 //writeCVMatrix(cout<<"K2"<<endl,k2);
 //writeCVMatrix(cout<<"F"<<endl,F);
 //printf("Error was %f \n",err);
+if (isinf(err) || isnan(err))
+     err=100;
 
     return err;
 }
