@@ -40,7 +40,7 @@ struct SCinputs
 };
 
 int cvCholesky(CvMat* inM,CvMat* outM);
-
+int findClusWinner2(CvMat* data, CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,vector<int>& members,int numframes);
 double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,int numValus);
 void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, void *adata);
 double  HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);

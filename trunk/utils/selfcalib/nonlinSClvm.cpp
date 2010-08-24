@@ -190,6 +190,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
     for(int m=0; m<numFrames; m++)
     {
+        vector<int> memberships(K_clusters[m].fx.size(),-1);
         CvMat* clustering_data=cvCreateMat(K_clusters[m].fx.size(),NONLINPARMS,CV_32F);
         CvMat* zclusters = cvCreateMat( K_clusters[m].fx.size(), 1, CV_32SC1 );
         cvSetZero(clustering_data);
@@ -197,6 +198,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
         for(i=0; i<K_clusters[m].fx.size(); i++)
         {
 
+            memberships[i]=(K_clusters[m].index_left[i]*numFrames)+K_clusters[m].index_right[i];
 
             if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
             if(NONLINPARMS>1) cvmSet(clustering_data,i,1,K_clusters[m].ux[i] );
@@ -210,9 +212,10 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
         double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers,compactness);
         printf("after k meaens\n");
 
+        //      int numClusWinner=findClusWinner(zclusters,numClusts);
+        int numClusWinner=findClusWinner2(clustering_data,zclusters,numClusts,clusters_centers , compactness,memberships,numFrames);
 
 
-        int numClusWinner=findClusWinner(zclusters,numClusts);
 
 //        for(i=0; i<K_clusters[m].fx.size(); i++)
 //        {
@@ -337,6 +340,79 @@ double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,in
     }
 
     return minDist;
+}
+int findClusWinner2(CvMat* data, CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,vector<int>& members,int numFrames)
+{
+  int numFs=rint((numFrames*(numFrames-1))/2);
+    vector< vector<int> > memberArray;
+    memberArray.resize(clusterscenters->rows);
+
+
+
+    for (int i = 0; i < clusterscenters->rows; ++i)
+    {
+        memberArray[i].resize(numFs,0);
+
+    }
+
+    for(int i=0; i<clusterlabels->rows; i++)
+    {
+        printf("i is %d cluster label is %d and member is %d\n",i,CV_MAT_ELEM( *clusterlabels, int, i, 0 ),members[i] );
+
+        memberArray[CV_MAT_ELEM( *clusterlabels, int, i, 0 )][members[i] ]++;
+    }
+
+    printf("memberships are:\n");
+    for (int i = 0; i < clusterscenters->rows; ++i)
+    {
+        for (int j = 0; j < numFs; ++j)
+        {
+            printf("\t %d \t",memberArray[i][j]);
+
+        }
+        printf("\n");
+    }
+
+    int numpeaks=0;
+
+    int memberThresh=0;
+    int bestbestCluster=0;
+    while(numpeaks>1)
+    {
+        memberThresh++;
+        vector<int>  clustScores(clusterscenters->rows ,0);
+
+
+        for (int i = 0; i < clusterscenters->rows; ++i)
+        {
+            int tempS=0;
+            for (int j = 0; j < numFs; ++j)
+            {
+
+                if(memberArray[i][j]>memberThresh)
+                {
+                    tempS++;
+                }
+
+            }
+            clustScores[i]=tempS;
+
+        }
+
+        int bestClust= indexMax(clustScores);
+
+        for (int i = 0; i < clusterscenters->rows; ++i)
+        {
+            if(clustScores[i]>=clustScores[bestClust])
+            {
+                numpeaks++;
+            }
+
+        }
+
+        bestbestCluster= bestClust;
+    }
+    return bestbestCluster;
 }
 int findClusWinner(CvMat* myclusterlabels,int numClusts)
 {
@@ -1047,7 +1123,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
     int numfr;
     int counter=0;
     totEr=0;
-    printf("number of frames is %d \n",numFrames);
+    //printf("number of frames is %d \n",numFrames);
     for ( i = 0; i < numFrames; ++i)
     {
 
@@ -1059,8 +1135,8 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
                 curError=(((*myWeights)[i][j])*findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx))/sumweights;
             }
 
-            printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
-            writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
+            //  printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
+            //  writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
 
             totEr=totEr+curError;
             count=count+1.0;
@@ -1090,7 +1166,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
     {
         hx[i]=totEr;
     }
-    printf("error was %f \n",totEr );
+    //  printf("error was %f \n",totEr );
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
@@ -1124,8 +1200,8 @@ double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
 //writeCVMatrix(cout<<"K2"<<endl,k2);
 //writeCVMatrix(cout<<"F"<<endl,F);
 //printf("Error was %f \n",err);
-if (isinf(err) || isnan(err))
-     err=100;
+    if (isinf(err) || isnan(err))
+        err=100;
 
     return err;
 }
