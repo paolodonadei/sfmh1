@@ -90,7 +90,7 @@ inline std::string stringify(const T& x)
 }
 
 IplImage* concatImagesVertical(IplImage* im1,IplImage* im2);
-
+int indexMin(vector<double>& myvec);
 bool checkTempPath();
 string combineFnames(const string& f1,const string& f2,string extension);
 int printLine(const HRImage& im1,const HRImage& im2, CvPoint p1, CvPoint p2, int indexname);

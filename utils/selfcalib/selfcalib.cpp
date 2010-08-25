@@ -217,14 +217,14 @@ int main(int argc, char *argv[])
 
 
 //remove this bro
-//    for(i=0; i<3; i++)
-//    {
-//        for(j=0; j<3; j++)
-//        {
-//            cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)/100.0));
-//        }
-//
-//    }
+    for(i=0; i<3; i++)
+    {
+        for(j=0; j<3; j++)
+        {
+            cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)));
+        }
+
+    }
 
     for(i=0; i<numFrames; i++)
     {
