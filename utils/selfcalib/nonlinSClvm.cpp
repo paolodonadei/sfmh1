@@ -29,7 +29,7 @@ using namespace std;
 
 double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
-    int numtries=200;
+    int numtries=80;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -128,7 +128,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 //first frame
-                  if(cvmGet(tempMats[0],0,0)>MINF && cvmGet(tempMats[0],0,0)<MAXF)
+                if(cvmGet(tempMats[0],0,0)>MINF && cvmGet(tempMats[0],0,0)<MAXF)
                 {
 
 
@@ -152,7 +152,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                 }
 
 
-                    if(cvmGet(tempMats[1],0,0)>MINF && cvmGet(tempMats[1],0,0)<MAXF)
+                if(cvmGet(tempMats[1],0,0)>MINF && cvmGet(tempMats[1],0,0)<MAXF)
                 {
                     K_clusters[n].fx.push_back(cvmGet(tempMats[1],0,0));
                     K_clusters[n].fy.push_back(cvmGet(tempMats[1],1,1));
@@ -176,7 +176,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
             }
-         //   printf("got %d from [%d][%d] \n",K_clusters[n].fx.size(),m,n);
+            //   printf("got %d from [%d][%d] \n",K_clusters[n].fx.size(),m,n);
 
 
         }
@@ -191,21 +191,25 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
 
 
-    double *frameScores = new double [numClusts];
-    double *compactness = new double [numClusts];
+    double *frameScores = new double [numClusts+5];
+
 
     for(int m=0; m<numFrames; m++)
     {
-        vector<int> memberships(K_clusters[m].fx.size(),-1);
+        double *compactness = new double [K_clusters[m].fx.size()+5];
+        for(int bb=0; bb<K_clusters[m].fx.size() ; bb++)
+        {
+            compactness[bb]=0;
+        }
+
+
         CvMat* clustering_data=cvCreateMat(K_clusters[m].fx.size(),NONLINPARMS,CV_32F);
         CvMat* zclusters = cvCreateMat( K_clusters[m].fx.size(), 1, CV_32SC1 );
         cvSetZero(clustering_data);
         cvSetZero(zclusters);
-        printf("size of frame %d was %d\n",m, K_clusters[m].fx.size());
+        //  printf("size of frame %d was %d\n",m, K_clusters[m].fx.size());
         for(i=0; i<K_clusters[m].fx.size(); i++)
         {
-
-            memberships[i]=(K_clusters[m].index_left[i]*(numFrames-1))+K_clusters[m].index_right[i]-1;
 
             if(NONLINPARMS>0) cvmSet(clustering_data,i,0,K_clusters[m].fx[i] );
             if(NONLINPARMS>1) cvmSet(clustering_data,i,1,K_clusters[m].ux[i] );
@@ -215,21 +219,46 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
         }
 
-        printf("before k meaens\n");
-        double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers,compactness);
+        double kout=cvKMeans2(clustering_data, numClusts, zclusters, cvTermCriteria( CV_TERMCRIT_ITER, 40, 1.0 ), 2, 0,0, clusters_centers);
 
-     for(int yy=0;yy<numClusts;yy++)
-     {
-         printf("compactness for %d was %f \n",compactness[yy]);
+        for(int yy=0; yy<zclusters->rows; yy++)
+        {
+            for(int bb=0; bb<zclusters->cols ; bb++)
+            {
+                compactness[yy]+=fabs(cvmGet(clustering_data,yy,bb)-cvmGet(clusters_centers,CV_MAT_ELEM( *zclusters, int, yy, 0 ),bb));
+            }
+        }
 
-     }
-        printf("after k meaens\n");
 
         //      int numClusWinner=findClusWinner(zclusters,numClusts);
-        int numClusWinner=findClusWinner2(K_clusters[m],zclusters,numClusts,clusters_centers , compactness,memberships,numFrames);
+        int numClusWinner=findClusWinner2(K_clusters[m],zclusters,numClusts,clusters_centers , compactness,numFrames);
 
-frameScores[m]=compactness[numClusWinner];
+        vector<double> clustScores(numClusts,0);
+        vector<double> clustMemberNumber(numClusts,0);
 
+        for(int yy=0; yy<zclusters->rows; yy++)
+        {
+
+            // printf("compactness for point %d belonging to cluster %d is %f \n",yy,CV_MAT_ELEM( *zclusters, int, yy, 0 ),compactness[yy]);
+            clustMemberNumber[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustMemberNumber[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+1;
+            clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+compactness[yy];
+        }
+        for(int yy=0; yy<numClusts; yy++)
+        {
+            clustScores[yy]/=clustMemberNumber[yy];
+        }
+
+
+
+        frameScores[m]=clustScores[numClusWinner];
+        for(int yy=0; yy<numClusts; yy++)
+        {
+
+
+
+            printf("compactness for %d was %f and number in the cluster is %f and %s\n",yy,clustScores[yy],clustMemberNumber[yy],(yy==numClusWinner)?"WINNER":" ");
+
+        }
 //        for(i=0; i<K_clusters[m].fx.size(); i++)
 //        {
 //            printf(" %d , %d ,  %f , %f , %f  , %f  , %f , %d , %d , %d , %s \n",m,i,
@@ -259,7 +288,7 @@ frameScores[m]=compactness[numClusWinner];
 
         cvReleaseMat( &zclusters );
         cvReleaseMat(&clustering_data);
-
+        delete [] compactness;
 
     }
     printf("_____________________________________\n");
@@ -276,7 +305,7 @@ frameScores[m]=compactness[numClusWinner];
 
     for(int m=0; m<numFrames; m++)
     {
-        printf("for frame %d the clusterint fx is %f and ux is %f and uy is %f and copactness is %f \n",m,cvmGet(KV[m],0,0),cvmGet(KV[m],0,2),cvmGet(KV[m],1,2),frameScores[m]);
+        printf("for frame %d the clusterint fx is %f and ux is %f and uy is %f and score is %f \n",m,cvmGet(KV[m],0,0),cvmGet(KV[m],0,2),cvmGet(KV[m],1,2),frameScores[m]);
     }
 
 
@@ -329,8 +358,8 @@ frameScores[m]=compactness[numClusWinner];
         }
     }
 
-    delete [] compactness;
-      delete [] frameScores;
+
+    delete [] frameScores;
 }
 
 
@@ -357,7 +386,7 @@ double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,in
 
     return minDist;
 }
-int findClusWinner2(intrinsicFamily& datafamily, CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,vector<int>& members,int numFrames)
+int findClusWinner2(intrinsicFamily& datafamily, CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,int numFrames)
 {
     int numFs=rint((numFrames*(numFrames-1))/2);
     vector< vector<int> > memberArray;
