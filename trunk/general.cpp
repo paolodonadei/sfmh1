@@ -525,6 +525,44 @@ int indexMax(vector<double>& myvec)
     return temp;
 
 }
+
+
+int indexMin(vector<double>& myvec)
+{
+    if(myvec.size()==0)
+    {
+        printf("vector empty\n");
+        return -1;
+    }
+    int n=myvec.size();
+    int temp=0;
+    double minv=myvec[0];
+
+
+
+    for(int y=0; y<n; y++)
+
+    {
+
+        if(myvec[y]<=maxv)
+
+        {
+
+            temp = y;
+
+            maxv=myvec[y];
+
+        }
+
+    }
+
+
+
+    return temp;
+
+}
+
+
 int indexMax(vector<int>& myvec)
 {
 

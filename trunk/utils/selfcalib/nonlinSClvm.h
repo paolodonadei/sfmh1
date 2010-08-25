@@ -22,6 +22,7 @@ struct intrinsicFamily
     vector<double> score;
     vector<int> index_left;
     vector<int> index_right;
+    vector<int> F_index; //this is assigning an integer id to every single f matrix
 };
 
 struct SCinputs
@@ -40,7 +41,7 @@ struct SCinputs
 };
 
 int cvCholesky(CvMat* inM,CvMat* outM);
-int findClusWinner2(CvMat* data, CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,vector<int>& members,int numframes);
+int findClusWinner2(intrinsicFamily& datafamily , CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,vector<int>& members,int numframes);
 double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,int numValus);
 void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, void *adata);
 double  HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
