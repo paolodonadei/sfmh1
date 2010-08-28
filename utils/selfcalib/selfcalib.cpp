@@ -217,14 +217,14 @@ int main(int argc, char *argv[])
 
 
 //remove this bro
-    for(i=0; i<3; i++)
-    {
-        for(j=0; j<3; j++)
-        {
-            cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)));
-        }
-
-    }
+//    for(i=0; i<3; i++)
+//    {
+//        for(j=0; j<3; j++)
+//        {
+//            cvmSet(funMatrix[1][0],i,j,cvmGet(funMatrix[1][0],i,j)*((rand()/RAND_MAX)));
+//        }
+//
+//    }
 
     for(i=0; i<numFrames; i++)
     {
@@ -270,42 +270,32 @@ int main(int argc, char *argv[])
 //    }
 //
 //
+//////
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, STRUM);
 //
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, STRUM);
-
-    cout<<" According to Sturm :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
+//    cout<<" According to Sturm :"<<endl;
 //
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
 //
+//    }
+////
+////
+////
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
 //
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
-
-    cout<<" According to NONLINSIMPLE :"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
+//    cout<<" According to NONLINSIMPLE :"<<endl;
 //
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
-
-    cout<<" According to MESTIMATOR:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
 //
-//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
+//    }
+////
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
 //
-//    cout<<" According to MULTI STEP:"<<endl;
+//    cout<<" According to MESTIMATOR:"<<endl;
 //
 //    for (int i = 0; i < numFrames; ++i)
 //    {
@@ -313,6 +303,25 @@ int main(int argc, char *argv[])
 //
 //    }
 //
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
+
+    cout<<" According to MULTI STEP:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+
+    }
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP2);
+
+    cout<<" According to MULTI STEP2:"<<endl;
+
+    for (int i = 0; i < numFrames; ++i)
+    {
+        writeCVMatrix(cout,intrinMatrix[i]);
+
+    }
+
 //
 //
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
@@ -325,16 +334,16 @@ int main(int argc, char *argv[])
 //
 //    }
 
-
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, CLUSTERING);
-
-    cout<<" According to CLUSTERING:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
+//
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, CLUSTERING);
+//
+//    cout<<" According to CLUSTERING:"<<endl;
+//
+//    for (int i = 0; i < numFrames; ++i)
+//    {
+//        writeCVMatrix(cout,intrinMatrix[i]);
+//
+//    }
 
 
 

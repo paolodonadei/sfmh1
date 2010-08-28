@@ -215,7 +215,13 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
 
     }
+    if (method==NONLINSIMPLEMULTISTEP2)
+    {
+        printf("SELF CALIBRATE WITH NONLINSIMPLEMULTISTEP2 METHOD\n");
+        HRSelfCalibtwoFrameNonlinMULTIStep2(FV,  KV , width, height,confs);
 
+
+    }
     if (method==CLUSTERING)
     {
         printf("SELF CALIBRATE WITH CLUSTERING METHOD\n");
