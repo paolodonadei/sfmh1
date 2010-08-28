@@ -116,8 +116,8 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                 }
 
 
-
-                curScore=HRSelfCalibtwoFrameNonlinInitGuess(funMatrix, tempMats , width, height, confs,Weights);
+                double covtr=0;
+                curScore=HRSelfCalibtwoFrameNonlinInitGuess(funMatrix, tempMats , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator ,&covtr);
 
 
 //
@@ -140,6 +140,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                     K_clusters[m].index_left.push_back(m);
                     K_clusters[m].index_right.push_back(n);
                     K_clusters[m].F_index.push_back(cur_Index);
+                    K_clusters[m].score.push_back(covtr);
 //second frame
                     K_clusters_individual[m][n].fx.push_back(cvmGet(tempMats[0],0,0));
                     K_clusters_individual[m][n].fy.push_back(cvmGet(tempMats[0],1,1));
@@ -148,7 +149,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                     K_clusters_individual[m][n].uy.push_back(cvmGet(tempMats[0],1,2));
                     K_clusters_individual[m][n].index_left.push_back(m);
                     K_clusters_individual[m][n].index_right.push_back(n);
-
+                    K_clusters_individual[m][n].score.push_back(covtr);
                 }
 
 
@@ -162,6 +163,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                     K_clusters[n].index_left.push_back(m);
                     K_clusters[n].index_right.push_back(n);
                     K_clusters[n].F_index.push_back(cur_Index);
+                    K_clusters[n].score.push_back(covtr);
 
                     K_clusters_individual[n][m].fx.push_back(cvmGet(tempMats[1],0,0));
                     K_clusters_individual[n][m].fy.push_back(cvmGet(tempMats[1],1,1));
@@ -170,7 +172,7 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
                     K_clusters_individual[n][m].uy.push_back(cvmGet(tempMats[1],1,2));
                     K_clusters_individual[n][m].index_left.push_back(m);
                     K_clusters_individual[n][m].index_right.push_back(n);
-
+                    K_clusters_individual[n][m].score.push_back(covtr);
 
                 }
 
@@ -241,7 +243,9 @@ double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vec
 
             // printf("compactness for point %d belonging to cluster %d is %f \n",yy,CV_MAT_ELEM( *zclusters, int, yy, 0 ),compactness[yy]);
             clustMemberNumber[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustMemberNumber[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+1;
-            clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+compactness[yy];
+
+            clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+K_clusters[m].score[yy];
+            //clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]=clustScores[CV_MAT_ELEM( *zclusters, int, yy, 0 )]+compactness[yy];
         }
         for(int yy=0; yy<numClusts; yy++)
         {
@@ -569,7 +573,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 ///////////multi step optimization
 
 ///zzz change this maybe
-    int numtries=5;
+    int numtries=50;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -608,11 +612,158 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
         }
 
 
+        double covtr=0;
+
+        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator ,&covtr);
+
+        printf("iteration %d score %f  cov %f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
+        if(curScore<maxScore)
+        {
+            printf("%d  -> cur score was %0.29f for focal length:  ",i,curScore);
+            for(int q=0; q<numFrames; q++)
+            {
+                printf("\t %f \t",cvmGet(tempMats[q],0,0));
+            }
+            printf("\n");
+            maxScore=curScore;
+            for(int q=0; q<numFrames; q++)
+            {
+
+                for(j=0; j<3; j++)
+                {
+                    for(k=0; k<3; k++)
+                    {
+                        cvmSet(bestKs[q],j,k,cvmGet(tempMats[q],j,k));
+                    }
+                }
+
+            }
+        }
+
+    }
 
 
-        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs,Weights);
 
-        printf("iteration %d score %f focal %f\n",i,curScore,cvmGet(tempMats[0],0,0));
+
+    for(int q=0; q<numFrames; q++)
+    {
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(KV[q],j,k,cvmGet(bestKs[q],j,k));
+            }
+        }
+
+    }
+
+
+    printf("best score was %0.29f\n",maxScore);
+
+    for(i=0; i<numFrames; i++)
+    {
+        cvReleaseMat(&bestKs[i]);
+        cvReleaseMat(&tempMats[i]);
+
+    }
+
+}
+double HRSelfCalibtwoFrameNonlinMULTIStep2(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+{
+
+
+    int i,j,k;
+    int numFrames=KV.size();
+//so now we have initial points from Sturm
+    HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
+//copy solutins to temporary place
+
+    vector<CvMat* > tempMats;
+    tempMats.resize(numFrames);
+
+
+    for(i=0; i<numFrames; i++)
+    {
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(tempMats[i],j,k,cvmGet(KV[i],j,k));
+            }
+        }
+
+    }
+
+
+    vector<CvMat* > bestKs;
+    bestKs.resize(numFrames);
+    for(i=0; i<numFrames; i++)
+    {
+        bestKs[i]=cvCreateMat(3,3, CV_64F);
+
+        for(j=0; j<3; j++)
+        {
+            for(k=0; k<3; k++)
+            {
+                cvmSet(bestKs[i],j,k,cvmGet(KV[i],j,k));
+            }
+        }
+
+    }
+
+
+///////////multi step optimization
+
+///zzz change this maybe
+    int numtries=50;
+    double fvariance=70;
+    double xvariance=30;
+    double yvariance=30;
+    double ARvariance=0.05;
+    double skewvariance=0.05;
+
+    double maxScore=100000;
+    double curScore=0;
+
+    vector< vector<double> > Weights;
+
+    Weights.resize(numFrames);
+    for (int i = 0; i < numFrames; ++i)
+        Weights[i].resize(numFrames);
+
+    for(int m=0; m<numFrames; m++)
+        for(int n=0; n<numFrames; n++)
+            Weights[m][n]=1;
+
+
+    for(i=0; i<numtries; i++)
+    {
+
+        for(int q=0; q<numFrames; q++)
+        {
+            cvmSet(tempMats[q], 0, 0, random_gaussian2(cvmGet(KV[q],0,0), fvariance,200,2000));
+            cvmSet(tempMats[q], 0, 2,random_gaussian2(cvmGet(KV[q],0,2), xvariance,(width/2)-(width/5),(width/2)+(width/5)));
+            cvmSet(tempMats[q], 1, 2,random_gaussian2(cvmGet(KV[q],1,2), yvariance,(height/2)-(height/5),(height/2)+(height/5)));
+            cvmSet(tempMats[q], 0, 1,random_gaussian2(cvmGet(KV[q],0,1), skewvariance,-2,6));
+            cvmSet(tempMats[q], 1, 1,random_gaussian2(1, ARvariance,0.8,1.2)*cvmGet(tempMats[q],0,0));
+
+
+//            writeCVMatrix(cout<<"before:"<<endl,KV[q]);
+//            writeCVMatrix(cout<<"after:"<<endl,tempMats[q]);
+
+        }
+
+
+        double covtr=0;
+
+        curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator ,&covtr);
+
+        curScore=covtr;
+
+        printf("iteration %d score %f  cov %f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
         if(curScore<maxScore)
         {
             printf("%d  -> cur score was %0.29f for focal length %0.9f\n",i,curScore,cvmGet(tempMats[0],0,0));
@@ -661,9 +812,8 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 
 }
 
-
 //in this function, the KV is used to store the output but it is also assumed to contain some initial values
-double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs,vector< vector<double> >& Weights, void (*func)(double *p, double *hx, int m, int n, void *adata))
+double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs,vector< vector<double> >& Weights, void (*func)(double *p, double *hx, int m, int n, void *adata),double* covtr)
 {
 
 
@@ -878,14 +1028,28 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 //    }
 //    printf("\n");
 
+    if(covtr!=NULL)
+    {
 
 
+        double traceCov=0;
+        //finding trace of the covariance
+        for(i=0; i<m; ++i)
+        {
+            j=i;
+            traceCov+=fabs(covar[i*m+j]);
+        }
+        (*covtr)= traceCov;
+    }
     for(i=0; i<4; i++)
     {
         cvReleaseMat(&tempMats[i]);
     }
     free(work);
+
+
     return info[1];
+
 }
 double HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {

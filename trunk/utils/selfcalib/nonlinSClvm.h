@@ -20,6 +20,7 @@ struct intrinsicFamily
     vector<double> ux;
     vector<double> uy;
     vector<double> score;
+
     vector<int> index_left;
     vector<int> index_right;
     vector<int> F_index; //this is assigning an integer id to every single f matrix
@@ -46,8 +47,9 @@ double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,in
 void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, void *adata);
 double  HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat);
-double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs,vector< vector<double> >& Weights,void (*func)(double *p, double *hx, int m, int n, void *adata)=errnonLinFunctionSelfCalibmestimator);
+double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs,vector< vector<double> >& Weights,void (*func)(double *p, double *hx, int m, int n, void *adata)=errnonLinFunctionSelfCalibmestimator,double* covtr=NULL);
 double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
+double HRSelfCalibtwoFrameNonlinMULTIStep2(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
 
 void transferIntrinsicBufferToMatrices(SCinputs* mySCinputs,double *p);
 double HRSelfCalibtwoFrameNonlinMEstimator(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs);
