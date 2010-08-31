@@ -573,7 +573,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
 ///////////multi step optimization
 
 ///zzz change this maybe
-    int numtries=50;
+    int numtries=20;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -605,18 +605,29 @@ double HRSelfCalibtwoFrameNonlinMULTIStep(vector< vector<CvMat*> > const &FV,  v
             cvmSet(tempMats[q], 0, 1,random_gaussian2(cvmGet(KV[q],0,1), skewvariance,-2,6));
             cvmSet(tempMats[q], 1, 1,random_gaussian2(1, ARvariance,0.8,1.2)*cvmGet(tempMats[q],0,0));
 
+//            if(q==0)  readCvMatFfromfile(&tempMats[q],"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_1.txt");
+//            if(q==1)  readCvMatFfromfile(&tempMats[q],"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_2.txt");
+//            if(q==2)  readCvMatFfromfile(&tempMats[q],"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_3.txt");
+//            if(q==3)  readCvMatFfromfile(&tempMats[q],"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_4.txt");
+//            if(q==4)  readCvMatFfromfile(&tempMats[q],"C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_5.txt");
+
 
 //            writeCVMatrix(cout<<"before:"<<endl,KV[q]);
 //            writeCVMatrix(cout<<"after:"<<endl,tempMats[q]);
 
         }
-
+        double svder1=findSVDerrorSequence(FV,  tempMats );
+        printf("error before nonlin is %f \n",svder1);
 
         double covtr=0;
 
         curScore=HRSelfCalibtwoFrameNonlinInitGuess(FV, tempMats , width, height, confs,Weights,errnonLinFunctionSelfCalibmestimator ,&covtr);
 
-        printf("iteration %d score %f  cov %f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
+        double svder2=findSVDerrorSequence(FV,  tempMats );
+        printf("error after nonlin is %f \n",svder2);
+
+
+        printf("iteration %d score %10.10f  cov %10.10f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
         if(curScore<maxScore)
         {
             printf("%d  -> cur score was %0.29f for focal length:  ",i,curScore);
@@ -718,7 +729,7 @@ double HRSelfCalibtwoFrameNonlinMULTIStep2(vector< vector<CvMat*> > const &FV,  
 ///////////multi step optimization
 
 ///zzz change this maybe
-    int numtries=50;
+    int numtries=20;
     double fvariance=70;
     double xvariance=30;
     double yvariance=30;
@@ -763,7 +774,8 @@ double HRSelfCalibtwoFrameNonlinMULTIStep2(vector< vector<CvMat*> > const &FV,  
 
         curScore=covtr;
 
-        printf("iteration %d score %f  cov %f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
+        printf("iteration %d score %10.10f  cov %10.10f focal %f\n",i,curScore,covtr,cvmGet(tempMats[0],0,0));
+
         if(curScore<maxScore)
         {
             printf("%d  -> cur score was %0.29f for focal length %0.9f\n",i,curScore,cvmGet(tempMats[0],0,0));
@@ -894,7 +906,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
         if(NONLINPARMS>4)
         {
             //skew
-            p[(i*NONLINPARMS)+j++]=cvmGet(KV[i], 0, 1);
+            p[(i*NONLINPARMS)+j]=cvmGet(KV[i], 0, 1);
             lb[(i*NONLINPARMS)+j]=-8;
             ub[(i*NONLINPARMS)+j]=8;
             j++;
@@ -924,7 +936,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
     opts[0]=LM_INIT_MU;
     opts[1]=1E-18;
-    opts[2]=1E-18;
+    opts[2]=1E-28;
     opts[3]=1E-28;
     opts[4]= LM_DIFF_DELTA;
 
@@ -948,6 +960,12 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
     //no constraints
     //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
 
+//  printf("Levenberg-Marquardt returned %d in %g iter, reason %g\nSolution: ", ret, info[5], info[6]);
+//
+//  printf("\n\nMinimization info:\n");
+//  for(i=0; i<LM_INFO_SZ; ++i)
+//    printf("%d : %g \n",i, info[i]);
+//  printf("\n");
 
 //putting the p back into KV
     int numfr=0;
@@ -1321,7 +1339,7 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 
     double count=0;
     double totEr=0;
-    vector<double> errorvec(numFrames,0.0);
+
     double curError=0;
 
     double sumweights=0;
@@ -1353,20 +1371,14 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
             if((*myWeights)[i][j]>FLT_EPSILON)
             {
                 curError=(((*myWeights)[i][j])*findSVDerror((*pintrin)[j],(*pintrin)[i],(*FMat)[i][j],tempMtx))/sumweights;
+                totEr=totEr+curError;
             }
 
-            //  printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
+            //   printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
             //  writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
 
-            totEr=totEr+curError;
-            count=count+1.0;
-            errorvec[i]+=curError;
-            errorvec[j]+=curError;
 
-            //  printf("error %d -> %d was %f\n",i,j,curError);
 
-            totEr+=curError;
-            counter++;
 
         }
     }
@@ -1386,14 +1398,41 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
     {
         hx[i]=totEr;
     }
-    //  printf("error was %f \n",totEr );
+ //printf("error was %f \n",totEr );
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
 //        printf("hx %d is %f\n",i,hx[i]);
 
 }
+double findSVDerrorSequence(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV )
+{
+    double sumSVDerr=0;
 
+    int numFrames=KV.size();
+
+    vector<CvMat* > tempMats;
+    tempMats.resize(4);
+    for(int i=0; i<4; i++)
+    {
+        tempMats[i]=cvCreateMat(3,3, CV_64F);
+        cvSetZero(tempMats[i]);
+    }
+
+    for(int m=0; m<numFrames; m++)
+    {
+        for(int n=0; n<m; n++)
+        {
+            sumSVDerr+=findSVDerror(KV[n],KV[m],FV[m][n],&tempMats);
+        }
+    }
+
+    for(int i=0; i<4; i++)
+    {
+        cvReleaseMat(&tempMats[i]);
+    }
+    return sumSVDerr;
+}
 double findSVDerror(CvMat* k1,CvMat* k2,CvMat* F,vector<CvMat* > *tempMat)
 {
     double    err=0;

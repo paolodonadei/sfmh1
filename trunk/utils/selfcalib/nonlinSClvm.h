@@ -40,7 +40,7 @@ struct SCinputs
     int numunknownframes;
 
 };
-
+double findSVDerrorSequence(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV );
 int cvCholesky(CvMat* inM,CvMat* outM);
 int findClusWinner2(intrinsicFamily& datafamily , CvMat* clusterlabels,int numClusts,CvMat* clusterscenters , double* compact,int numframes);
 double findDistanceClosestVectorPt(intrinsicFamily myvec ,intrinsicFamily val,int numValus);
