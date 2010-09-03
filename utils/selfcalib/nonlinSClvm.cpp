@@ -25,7 +25,30 @@
 #define MAXF 2000
 using namespace std;
 
+void DrawEnergyf(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
+{
+    int numFrames=KV.size();
 
+    for(int q=0; q<numFrames; q++)
+    {
+
+
+        readCvMatFfromfile(&KV[q],string( string("C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_") +stringify(q+1) +string(".txt")).c_str());
+
+    }
+
+
+    double svder2=findSVDerrorSequence(FV,  KV);
+    printf("error for ground truth is %f \n",svder2);
+
+
+    HRSelfCalibtwoFrameNonlin(FV, KV , width, height,confs);
+
+
+    double svder1=findSVDerrorSequence(FV,  KV );
+    printf("objective function  is measured at %f \n",svder1);
+
+}
 
 double HRSelfCalibtwoFrameNonlinCluster(vector< vector<CvMat*> > const &FV,  vector<CvMat*>  &KV ,int width, int height,vector<double>& confs)
 {
@@ -955,17 +978,17 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
 
 //constrained
-    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 8000, opts, info, work, covar, (void*)&mySCinputs);
+    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 3000, opts, info, work, covar, (void*)&mySCinputs);
 
     //no constraints
     //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
 
-//  printf("Levenberg-Marquardt returned %d in %g iter, reason %g\nSolution: ", ret, info[5], info[6]);
-//
-//  printf("\n\nMinimization info:\n");
-//  for(i=0; i<LM_INFO_SZ; ++i)
-//    printf("%d : %g \n",i, info[i]);
-//  printf("\n");
+    printf("Levenberg-Marquardt returned %d in %g iter, reason %g\nSolution: ", ret, info[5], info[6]);
+
+    printf("\n\nMinimization info:\n");
+    for(i=0; i<LM_INFO_SZ; ++i)
+        printf("%d : %g \n",i, info[i]);
+    printf("\n");
 
 //putting the p back into KV
     int numfr=0;
@@ -1393,12 +1416,16 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 //also you might think i am messing mestimator by putting all errors into one but the reality is that
 ///the real errros aref found in the calling function
 
+// this scaling is important to make sure we dont stop because of a small dp
+//double mult=1;
+double mult=1000000.0;
 //this is to sum all the errors
+totEr=totEr*mult;
     for (int i=0; i<n; i++)
     {
-        hx[i]=totEr;
+        hx[i]=(totEr);
     }
- //printf("error was %f \n",totEr );
+//printf("error was %f \n",totEr );
 
 //    printf("errrs are :\n");
 //    for (int i=0; i<n; i++)
