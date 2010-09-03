@@ -544,13 +544,13 @@ int indexMin(vector<double>& myvec)
 
     {
 
-        if(myvec[y]<=maxv)
+        if(myvec[y]<=minv)
 
         {
 
             temp = y;
 
-            maxv=myvec[y];
+            minv=myvec[y];
 
         }
 
@@ -1095,6 +1095,40 @@ void scaleMatrix(CvMat* in,double s)
 
 }
 
+void absMatrix(CvMat* in)
+{
+    if (in == 0)
+    {
+        printf("parameters is a NULL pointer4!");
+        return ;
+    }
+
+    if (!CV_IS_MAT(in))
+    {
+        printf("Input parameter must be a matrix!");
+        return ;
+    }
+
+    int h = in->rows;
+
+    int w = in->cols;
+
+    int i,j;
+
+
+
+    for (i=0; i<h; i++)
+    {
+        for (j=0; j<w; j++)
+        {
+            double t=fabs(cvmGet(in,i,j));
+            cvmSet(in,i,j,t);
+
+        }
+
+    }
+
+}
 
 void decomposeP_GetK(CvMat* P,CvMat* K)
 {

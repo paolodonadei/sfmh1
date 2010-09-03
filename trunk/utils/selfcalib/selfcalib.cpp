@@ -60,7 +60,44 @@ void printmat(void* mat)
 
 MotionType MotionType;
 
+void reportRes(ostream &stream, int mode,vector<CvMat*>  &KV)
+{
+    int i;
+    int numFrames=KV.size();
 
+    if(mode==1)
+    {
+        for (int i = 0; i < numFrames; ++i)
+        {
+            writeCVMatrix(cout,KV[i]);
+
+        }
+    }
+    else
+    {
+        printf("Matrix errors are \n");
+        CvMat* Ktemp1 = cvCreateMat(3,3, CV_64F);
+        CvMat* Ktemp2 = cvCreateMat(3,3, CV_64F);
+        for(int q=0; q<numFrames; q++)
+        {
+
+
+            readCvMatFfromfile(&Ktemp1,string( string("C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_") +stringify(q+1) +string(".txt")).c_str());
+
+
+            cvSub(KV[q], Ktemp1, Ktemp2);      // Ma-Mb   -> Mc
+            absMatrix(Ktemp2);
+            writeCVMatrix(cout,Ktemp2);
+            cout<<endl;
+
+        }
+        cvReleaseMat(&Ktemp1);
+        cvReleaseMat(&Ktemp2);
+    }
+
+
+
+}
 
 int main(int argc, char *argv[])
 {
@@ -263,11 +300,7 @@ int main(int argc, char *argv[])
 //
 //    cout<<" According to Hartley :"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//
-//    }
+//     reportRes(cout,mode,intrinMatrix);
 //
 //
 //////
@@ -275,11 +308,7 @@ int main(int argc, char *argv[])
 //
 //    cout<<" According to Sturm :"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//
-//    }
+//     reportRes(cout,mode,intrinMatrix);
 ////
 ////
 ////
@@ -287,63 +316,44 @@ int main(int argc, char *argv[])
 //
 //    cout<<" According to NONLINSIMPLE :"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//
-//    }
+//     reportRes(cout,mode,intrinMatrix);
 ////
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
 //
 //    cout<<" According to MESTIMATOR:"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
+//     reportRes(cout,mode,intrinMatrix);
 //
-//    }
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
 //
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP);
+//    cout<<" According to MULTI STEP:"<<endl;
+//
+//    reportRes(cout,mode,intrinMatrix);
+//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP2);
+//
+//    cout<<" According to MULTI STEP2:"<<endl;
+//
+//     reportRes(cout,mode,intrinMatrix);
 
-    cout<<" According to MULTI STEP:"<<endl;
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, TEST);
 
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
+    cout<<" test:"<<endl;
 
-    }
-    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLEMULTISTEP2);
-
-    cout<<" According to MULTI STEP2:"<<endl;
-
-    for (int i = 0; i < numFrames; ++i)
-    {
-        writeCVMatrix(cout,intrinMatrix[i]);
-
-    }
-
+    reportRes(cout,mode,intrinMatrix);
 //
 //
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, POLLEFEY);
 //
 //    cout<<" According to POLLEFEY:"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//
-//    }
+//    reportRes(cout,mode,intrinMatrix);
 
 //
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, CLUSTERING);
 //
 //    cout<<" According to CLUSTERING:"<<endl;
 //
-//    for (int i = 0; i < numFrames; ++i)
-//    {
-//        writeCVMatrix(cout,intrinMatrix[i]);
-//
-//    }
+//     reportRes(cout,mode,intrinMatrix);
 
 
 

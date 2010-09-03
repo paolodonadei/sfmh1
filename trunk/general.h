@@ -88,7 +88,7 @@ inline std::string stringify(const T& x)
                             + typeid(x).name() + ")");
     return o.str();
 }
-
+void absMatrix(CvMat* in);
 IplImage* concatImagesVertical(IplImage* im1,IplImage* im2);
 int indexMin(vector<double>& myvec);
 bool checkTempPath();
