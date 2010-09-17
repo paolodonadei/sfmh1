@@ -75,6 +75,9 @@ void reportRes(ostream &stream, int mode,vector<CvMat*>  &KV)
     }
     else
     {
+        double ferror=0;
+        double ocerror=0;
+        double numF=0;
         printf("Matrix errors are \n");
         CvMat* Ktemp1 = cvCreateMat(3,3, CV_64F);
         CvMat* Ktemp2 = cvCreateMat(3,3, CV_64F);
@@ -90,7 +93,13 @@ void reportRes(ostream &stream, int mode,vector<CvMat*>  &KV)
             writeCVMatrix(cout,Ktemp2);
             cout<<endl;
 
+            numF=numF+1.0;
+            ferror+=((fabs(cvmGet( Ktemp2, 0,0 ) )+fabs(cvmGet( Ktemp2, 1,1 )))/2.0);
+            ocerror+=((fabs(cvmGet( Ktemp2, 0,2 ) )+fabs(cvmGet( Ktemp2, 1,2 )))/2.0);
         }
+        ferror/= numF ;
+        ocerror/= numF ;
+        printf("***total error: f=%f  OC=%f\n",ferror ,ocerror );
         cvReleaseMat(&Ktemp1);
         cvReleaseMat(&Ktemp2);
     }

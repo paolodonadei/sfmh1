@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 3
+#define NONLINPARMS 1
 
 #include "cxcore.h"
 #include "highgui.h"
@@ -978,7 +978,7 @@ double HRSelfCalibtwoFrameNonlinInitGuess(vector< vector<CvMat*> > const &FV,  v
 
 
 //constrained
-    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 3000, opts, info, work, covar, (void*)&mySCinputs);
+    ret=dlevmar_bc_dif(func,  p, x, m, n, lb, ub, 100, opts, info, work, covar, (void*)&mySCinputs);
 
     //no constraints
     //ret=dlevmar_dif(func,  p, x, m, n,  1000, opts, info, work, covar, (void*)&mySCinputs);
