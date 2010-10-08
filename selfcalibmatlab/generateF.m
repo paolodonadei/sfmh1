@@ -1,8 +1,9 @@
-function [ F, ks,ps , badpoints,corrs ] = generateF( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs )
+function [ F, ks,ps , badpoints,corrs, FFormatted, corrsFormatted ] = generateF( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs )
 
 writefiles=1;
 numCorrs=200;
-
+FFormatted=cell(number,number);
+corrsFormatted=cell(number,number);
 badpoints=zeros(numCorrs,((number*(number-1))/2) );
 
 
@@ -133,8 +134,15 @@ for i=1:number
             
             corrs{1,count}=x1;
             corrs{2,count}=x2;
+            
+           corrsFormatted{i,j}=[x1 ; x2]  ;
+           corrsFormatted{j,i}=[x2 ; x1]  ;
+              
             [F{count}, e1, e2] = fundmatrix(x1, x2);
             
+            FFormatted{i,j}=fundmatrix(x1, x2);
+            FFormatted{j,i}=fundmatrix(x1, x2)';
+                
             if(writefiles==1)
                 GG=F{count};
                 fname=['F' num2str(i-1) '_' num2str(j-1) '.txt'];
