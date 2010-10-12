@@ -26,7 +26,7 @@ unknownFrames=numFrames;
 if(framesconstant==1)
     unknownFrames=1;
 else
-     unknownFrames=numFrames;
+    unknownFrames=numFrames;
 end
 
 
@@ -54,10 +54,10 @@ end
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
-iterMax=2000;
+iterMax= 100;
 x=zeros(m,1);
 
-options=[1E-03, 1E-15, 1E-15, 1E-20, 1E-06];
+options=[1E-03, 1E-18, 1E-28, 1E-28, 1E-06];
 
 s=cell(8,1);
 s{1,1}= TF;
