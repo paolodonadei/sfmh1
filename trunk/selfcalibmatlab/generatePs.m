@@ -69,7 +69,7 @@ for i=1:numps
 
     P=K*[R -R*T];
 
-    ps{1,i}=P;
+    ps{1,i}=P/norm(P);
     ks{1,i}=K;
 
 
