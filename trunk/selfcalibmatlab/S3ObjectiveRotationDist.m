@@ -28,7 +28,7 @@ for i=1:data{4,1}
                 count=count+1;
                 erdist(count)=0;
 
-                erdist(count)=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
+                [ erdist(count), errot(count)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
                 y=y+ erdist(count);
             end
         end
@@ -36,12 +36,14 @@ for i=1:data{4,1}
 end
 
 
+
+
 [m,n]=size(p);
 x=(ones(m,n)*x*1000000.0)/count;
 
 x;
 end
-function x = errorthreeFdist(Ki,Kj,Kk,Fij,Fjk,Fik,Xij,Xjk,Xik)
+function [x,q] = errorthreeFdist(Ki,Kj,Kk,Fij,Fjk,Fik,Xij,Xjk,Xik)
 
 Eij=(Kj')*Fij*Ki;
 Ejk=(Kk')*Fjk*Kj;
@@ -58,6 +60,10 @@ Eik=(Kk')*Fik*Ki;
 [KOij, Rij, tij] = vgg_KR_from_P(Pij);
 [KOjk, Rjk, tjk] = vgg_KR_from_P(Pjk);
 [KOik, Rik, tik] = vgg_KR_from_P(Pik);
+
+[qij] = rotmat2quat(Rij);
+[qjk] = rotmat2quat(Rjk);
+[qik] = rotmat2quat(Rik);
 
 x=0;
 end
