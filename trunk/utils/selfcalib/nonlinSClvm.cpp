@@ -13,7 +13,7 @@
 #include <iostream>
 #include "nonlinSClvm.h"
 
-#define NONLINPARMS 1
+#define NONLINPARMS 3
 
 #include "cxcore.h"
 #include "highgui.h"
@@ -1104,6 +1104,8 @@ double HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvM
 
     HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
 
+
+
     vector< vector<double> > Weights;
 
     Weights.resize(numFrames);
@@ -1397,8 +1399,8 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
                 totEr=totEr+curError;
             }
 
-            //   printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
-            //  writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
+         //    printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
+          //    writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
 
 
 
