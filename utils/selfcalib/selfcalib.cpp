@@ -88,8 +88,18 @@ void reportRes(ostream &stream, int mode,vector<CvMat*>  &KV)
             readCvMatFfromfile(&Ktemp1,string( string("C:\\Documents and Settings\\hrast019\\Desktop\\sfmh1\\selfcalibmatlab\\currentProj\\K_") +stringify(q+1) +string(".txt")).c_str());
 
 
-            cvSub(KV[q], Ktemp1, Ktemp2);      // Ma-Mb   -> Mc
-            absMatrix(Ktemp2);
+//this will determine if we write the errors or the actual results
+            if(1==0)
+            {
+                cvSub(KV[q], Ktemp1, Ktemp2);      // Ma-Mb   -> Mc
+                absMatrix(Ktemp2);
+            }
+            else
+            {
+                copyMatrix(KV[q], Ktemp2);
+
+            }
+
             writeCVMatrix(cout,Ktemp2);
             cout<<endl;
 
@@ -321,11 +331,11 @@ int main(int argc, char *argv[])
 ////
 ////
 ////
-//    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
-//
-//    cout<<" According to NONLINSIMPLE :"<<endl;
-//
-//     reportRes(cout,mode,intrinMatrix);
+    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, NONLINSIMPLE);
+
+    cout<<" According to NONLINSIMPLE :"<<endl;
+
+    reportRes(cout,mode,intrinMatrix);
 ////
 //    HRSelfCalibtwoFrame(funMatrix, intrinMatrix, width, height,confidences, MESTIMATOR);
 //

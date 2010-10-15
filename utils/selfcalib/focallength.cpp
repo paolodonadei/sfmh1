@@ -229,7 +229,7 @@ int HRSelfCalibtwoFrame(vector< vector<CvMat*> >const &PFV,  vector<CvMat*>  &KV
 
 
     }
-   if (method==TEST)
+    if (method==TEST)
     {
         printf("testing\n");
         DrawEnergyf(FV,  KV , width, height,confs);
