@@ -1218,3 +1218,604 @@ clc
 clear all
 clc
 [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY ] =     generateSelfPlot(4, 'b',20,0,0,1,30,0.3, 0 )
+
+%-- Unknown date --%
+5,10,0.7 )
+cls
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,10,1 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,10,0.98 )
+ks{1}
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,1,10 )
+clear all
+clc
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 )
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,7,0,0 )
+ks[1]
+ks{1}
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 )
+ks{1}
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 )
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 )
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+ks{1}
+clear all; clc;
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+%-- 16/09/10  3:17 PM --%
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+ks{1}
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,2,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,6,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,8,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,(randn()*10)+23,0,2,0,0 )
+[ F, ks ] = generateF( 400, 0, 1.0,0,0,2,0,0 )
+ks{1}
+clear all
+clc
+x=0:0.01:1
+y=(sin(((2*1)/2)*3.1415*.x)^2)
+y=(sin(((2*1)/2)*3.1415*x)^2)
+y=(sin(((2*1)/2)*3.1415*x).^2)
+plot(x,y)
+y=(sin(((2*-1)/2)*3.1415*x).^2)
+plot(x,y)
+y=(sin(((2*-10)/2)*3.1415*x).^2)
+plot(x,y)
+clear all
+clc
+syms n
+int('sin(((2*n)/2)*3.1415*x)^2)',0,1)
+int('(sin(((2*n)/2)*3.1415*x)^2)',0,1)
+clear all
+clc
+int('(sin(((2*n)/2)*3.1415*x)^2)',0,1)
+int('(sin(((2*n)/2)*3.1415*x)^2)',x)
+syms x
+int('(sin(((2*n)/2)*3.1415*x)^2)',x)
+int('(sin(((2*n)/2)*3.1415*x)^2)',x,0,1)
+n=1:1000;
+m=1:1000;
+y=0.5 - (0.079579818558013687728791978354289*sin(6.283*m))/m;
+size(y)
+y=0.5 - (0.079579818558013687728791978354289*sin(6.283*.m))/.m;
+for i=1:1001
+y=0.5 - (0.079579818558013687728791978354289*sin(6.283*m(i)))/m(i);
+end
+for i=1:1000
+y=0.5 - (0.079579818558013687728791978354289*sin(6.283*m(i)))/m(i);
+end
+plot(y,x)
+plot(y,m)
+plot(m,y)
+for i=1:1000
+y(i)=0.5 - (0.079579818558013687728791978354289*sin(6.283*m(i)))/m(i);
+end
+plot(m,y)
+m=1:10000;
+for i=1:10000
+y(i)=0.5 - (0.079579818558013687728791978354289*sin(6.283*m(i)))/m(i);
+end
+plot(m,y)
+y(1000)
+y(1001)
+plot(m,y)
+cd levmar
+cd bin
+cd levmar
+lmdemo.m
+pwd
+cd matlab\
+lmdemo.m
+mex -setup
+mex -DHAVE_LAPACK -I.. -O -L../ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+mex -DHAVE_LAPACK -I.. -O -L../ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+mex -setup
+mex -DHAVE_LAPACK -I.. -O -L../ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+mex -DHAVE_LAPACK -I.. -O -L../ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -llibF77
+pwd
+mex -DHAVE_LAPACK -I.. -O -L../ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+mex -DHAVE_LAPACK -I.. -O -L..\ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+mex -setup
+mex -DHAVE_LAPACK -I.. -O -L..\ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+owd
+pwd
+cd ..\..\..
+pwd
+cd \extern\examples\mex
+cd extern\examples\mex
+mex yprime.c
+cd C:\matlab\2009b\toolbox\levmar\matlab
+make
+cd C:\gnumex\
+gnumex
+lmdemo.m
+mex -DHAVE_LAPACK -I.. -O -L..\ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+cd C:\matlab\2009b\toolbox\levmar\matlab
+mex -DHAVE_LAPACK -I.. -O -L..\ -L'C:\Documents and Settings\hrast019\Desktop\locallibs\lib' -L'C:\MinGW\lib' levmar.c -llevmar -lclapack -lblas -lf2c
+lmdemo.m
+levmar
+open lmdemo.m
+help levmar
+FFormatted=cell(number,number)
+number=4
+FFormatted=cell(number,number)
+FFormatted(1,2)=rand(3)
+FFormatted{1,2}=rand(3)
+%-- 05/10/10  2:28 PM --%
+levmar
+ls levmar.m
+cd levmar
+levmar
+cd matlab\
+levmar
+cd ..
+%-- 05/10/10  2:32 PM --%
+levmar
+[ F, ks,ps , badpoints,corrs, FFormatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+cformatted(1,1)
+cformatted{1,1}
+size(cformatted{1,1})
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )\
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 )
+open lmdemo.m
+help levmar
+A=rand(3)
+delete A
+clear A
+[K] = S3nonlinsolvesamFramf(TF,corrs,w,h)
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(F,cformatted)
+ident(3)
+eye(3)
+[K] = S3nonlinsolvesamFramf(F,cformatted)
+K
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+K{1,1}
+K{2,1}
+K{3,1}
+K{4,1}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+help levmar
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+s
+s.funds
+s->funds
+help levmar
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clc
+clear all
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+data.h
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+data.width
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+data.pwidth
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+s
+s.pwidth
+size(s)
+s
+s.numFrams
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+f = @(x)tan(.3x)+2.15x
+f = @(x)tan(0.3x)+2.15x
+f = @(x)tan(0.3x)+2.15x;
+f = @(x)x.^3-2*x-5;
+f = @(x)tan(0.3x)+2.15x;
+f = @(x)tan(0.3*x)+(2.15*x);
+z = fzero(f)
+z = fzero(f,2)
+z = fzero(f,3)
+z = fzero(f,4)
+z = fzero(f,5)
+f = @(x)tan(0.3*x)+(2.15*x);
+z = fzero(f,2)
+z = fzero(f,[0 100])
+z = fzero(f,8)
+z = fzero(f,[0 100])
+z = fzero(f,[-100 100])
+z = fzero(f,[1 6])
+x=0:0.1:100;
+y=tan(0.3*x)+(2.15*x);
+plot(x,y)
+z = fzero(f,[-100 100])
+CLEAR ALL
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+data{4,1}{i,j}
+data{4,1}
+data{1,1}{i,j}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,2,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+K[1]
+K{1}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+open lmdemo.m
+help levmar
+clear all
+lc
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,2,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clc
+clear all
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clear all;clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,2,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted)
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,4,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clc
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clc
+clear all
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+ks{1}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,0,0,5,0,0 );
+ks{1}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+kk{i,1}
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all; clcl
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+clear all;clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+clear all;clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+ks{1}
+\
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+pp
+kk
+kk{1}
+kk{2}
+ks{3}
+kk{3}
+kk{4}
+kk{5}
+ks{1
+ks{1}
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+ks{4}
+ks{5}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+open levmar
+open levmar.m
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+ks{5}
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clc
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,ks);
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks);
+ks
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks');
+K1'
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+PeterSturmSelf(F{1,1},512,512)
+PeterSturmSelf(F{1,1},512,512)(1,1)
+A=eye(3)
+a(1,1)
+A(1,1)
+open PeterSturmSelfRobust
+[fcl, centerloc] = S2nonlinsolveEsstwofram(TF,w,h,corrs)
+[fcl, centerloc] = S2nonlinsolveEsstwofram(TF,512,512,corrs)
+[fcl, centerloc] = S2nonlinsolveEsstwofram(F,512,512,corrs)
+clear all;
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[fcl, centerloc] = S2nonlinsolveEsstwofram(F,512,512,corrs)
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+TF(i,:)
+help isempty
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+TF(1,1)
+ifempty(TF(1,1))
+isempty(TF(1,1))
+isempty(TF{1,1})
+isempty(TF{1,2})
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+open getEssentialMatrix.m
+open decomposeEmatrix.m
+open reconstructOxford.m
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+v=[1; 2; 3; 4; 5; 6; 7; 8]
+B = reshape(v,3,2)
+B = reshape(v,4,2)
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted);
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks);
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks');
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks);
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks');
+ps{1}
+ps{2}
+ps{3}
+ps{4}
+ps{5}
+ps{1}=ps{1}/ps{1}(3,4)
+ps{1}
+clear all; clc
+open generateF.m
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 )
+clear all;clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+ps{1}
+ps{2}
+ps{3}
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+d=Pij/norm(Pij)
+clear all
+clc
+open decomposeEmatrix.m
+open vgg_KR_from_P.m
+%-- 14/10/10  4:41 PM --%
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,5,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1})
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2})
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3})
+t12=tt1-tt2
+t12=t12/t12(3,1)
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+KOij, Rij, tij
+tij/tij(3,1)
+tij=tij/tij(3,1)
+clear all; clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1})
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2})
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3})
+t12=tt1-tt2
+t12=t12/t12(3,1)
+t13=tt1-tt3
+t13=t13/t13(3,1)
+t23=tt2-tt3
+t23=t23/t23(3,1)
+t13
+t23
+t13
+t13-t12-t23
+clc
+t13
+t23
+t12
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1})
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2})
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3})
+tt1=tt1/tt1(3,1)
+tt1
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1})
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2})
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3})
+clc
+tt1
+tt2
+tt3
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+tij
+tjk
+tik
+tt1
+tt2
+tt2/(25.8715171228578/1.24043624975074)
+sqrt(4)
+abs(4.67-5.32)
+R=[
+3.2471667291e-01 -1.0372666302e-01 -9.4010630341e-01
+2.7245486596e-01 9.6209316145e-01  -1.2045526681e-02
+9.0571928783e-01 -2.5222515354e-01 3.4066852448e-01
+]
+[q] = rotmat2quat(R)
+[R2] = quat2rotmat(q)
+open generateF.m
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted,EFormatted]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+EFormatted
+corrs
+cformatted
+ps{1}
+[P12] = getCameraMatrix(EFormatted{1,2});
+[P12c] = getCorrectCameraMatrix(P12, ks{1},ks{2}, reshape(cformatted{1,2}(:,1),3,2))
+ps{2}
+[KK3, RR3, tt3] = vgg_KR_from_P(P12c)
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{2})
+tt3=tt3/ ( 0.549768207303775/23.9079993984857 )
+tt3=tt3/ ( 23.9079993984857/0.549768207303775 )
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted,EFormatted]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[K] = S3nonlinsolvesamFramf(FFormatted,cformatted,512,512,ks')
+qij
+qjk
+qik
+qij*qjk
+dot(qij,qjk)
+help quatmultiply
+quatmultiply(qij,qjk)
+qik
+quatmultiply(qjk,qij)
+open quatmultiply.m
+quatmultiply(qjk,qij)
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted ]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1})
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2})
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3})
+[P12] = getCameraMatrix(EFormatted{1,2});
+[P12c] = getCorrectCameraMatrix(P12, ks{1},ks{2}, reshape(cformatted{1,2}(:,1),3,2));
+clear all
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted,EFormatted]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[P12] = getCameraMatrix(EFormatted{1,2});
+[P12c] = getCorrectCameraMatrix(P12, ks{1},ks{2}, reshape(cformatted{1,2}(:,1),3,2));
+[KK12, RR12, tt12] = vgg_KR_from_P(P12c);
+[P23] = getCameraMatrix(EFormatted{2,3});
+[P23c] = getCorrectCameraMatrix(P23, ks{2},ks{3}, reshape(cformatted{2,3}(:,1),3,2));
+[KK23, RR23, tt23] = vgg_KR_from_P(P23c);
+[P13] = getCameraMatrix(EFormatted{1,3});
+[P13c] = getCorrectCameraMatrix(P13, ks{1},ks{3}, reshape(cformatted{1,3}(:,1),3,2));
+[KK13, RR13, tt13] = vgg_KR_from_P(P13c);
+[q12] = rotmat2quat(R12);
+[q12] = rotmat2quat(RR12);
+[q23] = rotmat2quat(RR23);
+[q13] = rotmat2quat(RR13);
+q12
+q23
+q13
+quatmultiply(q12,q23)
+quatmultiply(q23,q12)
+clc
+tt12
+tt23
+tt13
+tt12+tt23
+clc
+testR1= [ 1 0 0 ; 0 cos(20) -sin(20) ; 0 sin(20) cos(20) ]
+testR1= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ]
+testR1= [ 1 0 0 ; 0 cos(20) -sin(20) ; 0 sin(20) cos(20) ];
+testRw= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ];
+testR3= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ];
+testR2= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ];
+testR1= [ 1 0 0 ; 0 cos(-60) -sin(-60) ; 0 sin(-60) cos(-60) ];
+testR1= [ 1 0 0 ; 0 cos(20) -sin(20) ; 0 sin(20) cos(20) ];
+testR2= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ];
+testR3= [ 1 0 0 ; 0 cos(-60) -sin(-60) ; 0 sin(-60) cos(-60) ];
+testR1*testR2*testR3
+[testq1] = rotmat2quat(testR1);
+[testq2] = rotmat2quat(testR2);
+[testq3] = rotmat2quat(testR3);
+quatmultiply(testq1,quatmultiply(testq2,testq3))
+quatmultiply(q12,quatmultiply(q23,q31))
+quatmultiply(q12,quatmultiply(q23,q13))
+quatmultiply(q12,quatconj(q12))
+quatmultiply(q12,quatmultiply(q23,quatconj(q13)))
+%-- 17/10/10  5:57 PM --%
+testR1= [ 1 0 0 ; 0 cos(20) -sin(20) ; 0 sin(20) cos(20) ];
+testR2= [ 1 0 0 ; 0 cos(40) -sin(40) ; 0 sin(40) cos(40) ];
+testR3= [ 1 0 0 ; 0 cos(-60) -sin(-60) ; 0 sin(-60) cos(-60) ];
+quatmultiply(testq1,quatmultiply(testq2,testq3))
+testR1*testR2*testR3
+quatmultiply(testR1,quatmultiply(testR2,testR3))
+[testq1] = rotmat2quat(testR1);
+[testq2] = rotmat2quat(testR2);
+[testq3] = rotmat2quat(testR3);
+quatmultiply(testq1,quatmultiply(testq2,testq3))
+quatmultiply(testq1,testq2)
+testq3
+clear all;
+clc
+clear all
+cl
+clc
+[ F, ks,ps , badpoints,corrs, FFormatted, cformatted,EFormatted]  = generateF( 400, 0, 1.0,(randn()*10)+23,0,3,0,0 );
+[KK1, RR1, tt1] = vgg_KR_from_P(ps{1});
+[KK2, RR2, tt2] = vgg_KR_from_P(ps{2});
+[KK3, RR3, tt3] = vgg_KR_from_P(ps{3});
+RR1
+RR2
+RR3
+T3=[RR3 tt3];
+T2=[RR2 tt2];
+T3p=T3*[inv(RR3) -inv(RR3)*tt3]
+T2=[RR2 tt2 ; 0 0 0 1];
+T3=[RR3 tt3; 0 0 0 1];
+T3p=T3*[inv(RR3) -inv(RR3)*tt3 ; 0 0 0 1]
+T2p=T2*[inv(RR3) -inv(RR3)*tt3 ; 0 0 0 1]
+RR4=[0.952620906875929        -0.258572728852609        -0.160167261563022
+0.286401195939038         0.939858885188812         0.186117250399671
+0.102409778573979        -0.223171279122919         0.969384762324573]
+clc
+[R1] = rotmat2quat(RR2);
+[R2] = rotmat2quat(RR3);
+[R3] = rotmat2quat(RR4);
+quatmultiply(R1,R2)
+R3
+quatmultiply(R2,R1)
+%-- 17/10/10  8:14 PM --%
