@@ -45,9 +45,11 @@ x;
 end
 function [x,q] = errorthreeFdist(Ki,Kj,Kk,Fij,Fjk,Fik,Xij,Xjk,Xik)
 
-Eij=(Kj')*Fij*Ki;
-Ejk=(Kk')*Fjk*Kj;
-Eik=(Kk')*Fik*Ki;
+Eij = getEssentialMatrix(Fij,Ki,Kj);
+Ejk = getEssentialMatrix(Fjk,Kj,Kk);
+Eik = getEssentialMatrix(Fik,Ki,Kk);
+
+
 
 [PijC] = getCameraMatrix(Eij);
 [PjkC] = getCameraMatrix(Ejk);

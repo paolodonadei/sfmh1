@@ -1,4 +1,4 @@
-function [corrs, IMS, P,K, F, E] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames)
+function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames)
 IMS={}
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
@@ -38,7 +38,9 @@ else
     display('something is wrong, incorrect arg number');
 end
 
-
+FFormatted=cell(m,m);
+EFormatted=cell(m,m);
+corrsFormatted=cell(m,m);
 
 
 count=0;
@@ -183,10 +185,21 @@ for i=1:numcolum
             
             [F{corcount}, e1, e2] = fundmatrix(x1, x2);
             
+            corrsFormatted{i,j}=[x1 ; x2]  ;
+            corrsFormatted{j,i}=[x2 ; x1]  ;
+            
+            
+            FFormatted{i,j}=fundmatrix(x1, x2);
+            FFormatted{j,i}=fundmatrix(x1, x2)';
             
             
             E{corcount}=(( K{1,j})')*F{corcount}*(( K{1,i}));
             E{corcount}=E{corcount}/E{corcount}(3,3);
+            
+            EFormatted{i,j}=(K{j}')*FFormatted{i,j}*(K{i});
+            EFormatted{j,i}=(K{i}')*FFormatted{j,i}*(K{j});
+            
+            
             fprintf(' right i=%d left j=%d and index=%d \n',i,j,corcount);
             %             E{corcount}
             corcount=corcount+1;

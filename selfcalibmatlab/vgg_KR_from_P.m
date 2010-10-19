@@ -36,4 +36,9 @@ if nargout > 2
   t = -P(:,1:N)\P(:,end);
 end
 
+ if(det(R)<0)
+        R=R*-1.0;
+ end
+
+
 return
