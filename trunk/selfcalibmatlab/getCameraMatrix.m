@@ -28,11 +28,22 @@ function [PXcam] = getCameraMatrix(E)
     W = [0,-1,0;1,0,0;0,0,1];
         
     % Compute 4 possible solutions (p259)
+    R1=U*W*V';
+    R2=U*W'*V';
+    
+    if(det(R1)<0)
+        R1=R1*-1.0;
+    end
+    
+    if(det(R2)<0)
+        R2=R2*-1.0;
+    end
+    
     PXcam = zeros(3,4,4);
-    PXcam(:,:,1) = [U*W*V',U(:,3)./max(abs(U(:,3)))];
-    PXcam(:,:,2) = [U*W*V',-U(:,3)./max(abs(U(:,3)))];
-    PXcam(:,:,3) = [U*W'*V',U(:,3)./max(abs(U(:,3)))];
-    PXcam(:,:,4) = [U*W'*V',-U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,1) = [R1,U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,2) = [R1,-U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,3) = [R2,U(:,3)./max(abs(U(:,3)))];
+    PXcam(:,:,4) = [R2,-U(:,3)./max(abs(U(:,3)))];
    
     
     

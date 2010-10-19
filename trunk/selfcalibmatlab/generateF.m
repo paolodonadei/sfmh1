@@ -1,4 +1,4 @@
-function [ F, ks,ps , badpoints,corrs, FFormatted, corrsFormatted,EFormatted ] = generateF( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs )
+function [ F, ks,ps , badpoints,corrs, FFormatted, corrsFormatted,EFormatted,spacePts ] = generateF( fdiff, skew, ar,centerdeviation,silent,number,noiselevel,numCorruptFs )
 
 writefiles=1;
 numCorrs=200;
@@ -177,7 +177,7 @@ end
 
 [stat, mess, id]=rmdir('currentProj','s');
 copyfile(dirname,'currentProj');
-
+spacePts=X;
 
 
 
