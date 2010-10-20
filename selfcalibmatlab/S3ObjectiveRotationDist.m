@@ -1,47 +1,50 @@
-function x = S3ObjectiveRotationDist(p, data)
+function [x] = S3ObjectiveRotationDist(p, data)
 
 nowKs = convertLinetoMats(p,data{2,1}, data{3,1},data{4,1},data{5,1},data{6,1});
 
 
 x=0;
-count=0;
+countsvd=0;
 
 for i=1:data{4,1}
     for j=1:i
         if(i~=j)
             
-            count=count+1;
-             ersvd(count)=0;
-            ersvd(count)=errorSingleF(nowKs{j},nowKs{i},data{1,1}{i,j});
-            x=x+ ersvd(count);
+            countsvd=countsvd+1;
+             ersvd(countsvd)=0;
+            ersvd(countsvd)=errorSingleF(nowKs{j},nowKs{i},data{1,1}{i,j});
+            x=x+ ersvd(countsvd);
         end
     end
 end
 
-count=0;
+countrot=0;
 y=0;
 for i=1:data{4,1}
     for j=1:data{4,1}
         for k=1:data{4,1}
             if(i~=j && j~=k && i~=k)
                 
-                count=count+1;
-                erdist(count)=0;
+                countrot=countrot+1;
+                erdist(countrot)=0;
 
-                [ erdist(count), errot(count)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
-                y=y+ erdist(count);
+                [ erdist(countrot), errot(countrot)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
+                y=y+  errot(countrot);
             end
         end
     end
 end
 
+A=0.1;
+B=1-A;
+finalError=((A*x)/countsvd)+((B*y)/countrot);
 
-
+finalError=0;
 
 [m,n]=size(p);
-x=(ones(m,n)*x*1000000.0)/count;
+z=(ones(m,n)*finalError*1000000.0);
 
-x;
+x=z;
 end
 function [x,q] = errorthreeFdist(Ki,Kj,Kk,Fij,Fjk,Fik,Xij,Xjk,Xik)
 
@@ -59,14 +62,20 @@ Eik = getEssentialMatrix(Fik,Ki,Kk);
 [Pjk] = getCorrectCameraMatrix(PjkC, Kj,Kk, Xjk);
 [Pik] = getCorrectCameraMatrix(PikC, Ki,Kk, Xik);
 
-[KOij, Rij, tij] = vgg_KR_from_P(Pij);
-[KOjk, Rjk, tjk] = vgg_KR_from_P(Pjk);
-[KOik, Rik, tik] = vgg_KR_from_P(Pik);
+
+% when decomposing the projection marix the signs get weird, and since i
+% did not multiply by K im just gonna copy the R part
+Rij = Pij(:,1:3);
+Rjk = Pjk(:,1:3);
+Rik = Pik(:,1:3);
 
 [qij] = rotmat2quat(Rij);
 [qjk] = rotmat2quat(Rjk);
 [qik] = rotmat2quat(Rik);
 
+QRes=  quatmultiply(quatconj(qik),quatmultiply(qjk,qij ) );
+
+q=abs(1.0-QRes(1,1));
 x=0;
 end
 function x = errorSingleF(K1,K2,F)
