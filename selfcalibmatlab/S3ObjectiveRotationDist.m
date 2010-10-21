@@ -74,6 +74,8 @@ Rik = Pik(:,1:3);
 [qik] = rotmat2quat(Rik);
 
 QRes=  quatmultiply(quatconj(qik),quatmultiply(qjk,qij ) );
+QRes2= slerp (quatconj(qik), quatmultiply(qjk,qij ), 1, 1);
+
 
 q=abs(1.0-QRes(1,1));
 x=0;
