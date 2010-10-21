@@ -1,4 +1,4 @@
-function [K] = S3nonlinsolvesamFramf(TF,corrs,w,h)
+function [K] = S3nonlinsolvesamFramf(TF,corrs,w,h,ks)
 %this shows random sampling consensus
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
@@ -42,8 +42,9 @@ lowK=cell(numFrames,1);
 
 
 for i=1:numFrames
-    x = PeterSturmSelfRobust( TF(i,:),w,h );
-    tempK=[ x(1,1) 0 w/2 ; 0 x(1,1) h/2 ; 0 0 1];
+  %  x = PeterSturmSelfRobust( TF(i,:),w,h );
+  x=700; 
+  tempK=[ x(1,1) 0 w/2 ; 0 x(1,1) h/2 ; 0 0 1];
     tempupK=[ maxf maxs (w/2)+(maxXdeviationpercentage*w) ; 0 maxf (h/2)+(maxYdeviationpercentage*h) ; 0 0 1];
     templowK=[ minf mins (w/2)-(maxXdeviationpercentage*w) ; 0 minf (h/2)-(maxYdeviationpercentage*h) ; 0 0 1];
     K{i,1}=tempK;
@@ -51,7 +52,8 @@ for i=1:numFrames
     lowK{i,1}=templowK;
 end
 
-[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+%[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
