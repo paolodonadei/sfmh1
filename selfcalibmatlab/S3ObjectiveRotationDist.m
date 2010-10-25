@@ -35,16 +35,17 @@ for i=1:data{4,1}
     end
 end
 
-A=0.1;
+A=1;
 B=1-A;
 finalError=((A*x)/countsvd)+((B*y)/countrot);
 
-finalError=0;
+%finalError=0;
 
 [m,n]=size(p);
-z=(ones(m,n)*finalError*1000000.0);
+z=(ones(m,n)*finalError*10000.0);
 
 x=z;
+x
 end
 function [x,q] = errorthreeFdist(Ki,Kj,Kk,Fij,Fjk,Fik,Xij,Xjk,Xik)
 
@@ -77,7 +78,8 @@ QRes=  quatmultiply(quatconj(qik),quatmultiply(qjk,qij ) );
 QRes2= slerp (quatconj(qik), quatmultiply(qjk,qij ), 1, 1);
 
 
-q=abs(1.0-QRes(1,1));
+
+q=abs(QRes(1,1))/mean([ abs(qij(1)) abs(qjk(1)) abs(qik(1))  ]);
 x=0;
 end
 function x = errorSingleF(K1,K2,F)

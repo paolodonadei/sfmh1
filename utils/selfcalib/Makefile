@@ -3,9 +3,9 @@ VPATH = .:../..
 CC=g++
 INC = -I../../ -I$(LOCALLIBS)/include
 
-CFLAGS=$(INC) -c -g -Wall   `gsl-config --cflags`
-LIBS=-lm  -L$(LOCALLIBS)/lib -lhrlib -lboost_filesystem `gsl-config --libs`
-LDFLAGS=-L../../
+CFLAGS=$(INC) -c -g -Wall
+LIBS=-lm  -L$(LOCALLIBS)/lib  -llevmar -lhrlib -lboost_filesystem  `pkg-config opencv --cflags --libs`  -llevmar
+LDFLAGS=-L../../ -L/usr/lib
 SOURCES=selfcalib.cpp focallength.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
