@@ -42,8 +42,8 @@ lowK=cell(numFrames,1);
 
 
 for i=1:numFrames
-  %  x = PeterSturmSelfRobust( TF(i,:),w,h );
-  x=700; 
+    x = PeterSturmSelfRobust( TF(i,:),w,h );
+ % x=700; 
   tempK=[ x(1,1) 0 w/2 ; 0 x(1,1) h/2 ; 0 0 1];
     tempupK=[ maxf maxs (w/2)+(maxXdeviationpercentage*w) ; 0 maxf (h/2)+(maxYdeviationpercentage*h) ; 0 0 1];
     templowK=[ minf mins (w/2)-(maxXdeviationpercentage*w) ; 0 minf (h/2)-(maxYdeviationpercentage*h) ; 0 0 1];
@@ -52,8 +52,8 @@ for i=1:numFrames
     lowK{i,1}=templowK;
 end
 
-%[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
-[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+%[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
