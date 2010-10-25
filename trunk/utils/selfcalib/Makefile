@@ -1,33 +1,24 @@
-LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs/
-VPATH = .:../..
+LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
 CC=g++
-INC = -I../../ -I$(LOCALLIBS)/include
-
+INC = -I../../ -I'$(LOCALLIBS)/include'
 CFLAGS=$(INC) -c -g -Wall
-LIBS=-lm  -L$(LOCALLIBS)/lib  -llevmar -lhrlib -lboost_filesystem  `pkg-config opencv --cflags --libs`  -llevmar
-LDFLAGS=-L../../ -L/usr/lib
-SOURCES=selfcalib.cpp focallength.cpp
+LIBS= -llevmar  -lhrlib  `pkg-config opencv --cflags --libs` -lboost_filesystem -lboost_system -llapack -lblas -lf2c
+LDFLAGS=-L../../ -L'$(LOCALLIBS)/lib'
+SOURCES=selfcalib.cpp focallength.cpp nonlinSClvm.cpp ../fundutils/funddrawutils.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=intrinsic
 
 
 all: $(EXECUTABLE)
 
+
+
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
 clean:
 	rm -f *.o core *.core $(EXECUTABLE) *~
 
-cleandirs: clean
-	$(MAKE) -C utils/fundutils -f Makefile clean
-	$(MAKE) -C utils/decompose -f Makefile clean
-	$(MAKE) -C utils/selfcalib -f Makefile clean
-
-
-builddirs: all
-	cd "utils/fundutils" && $(MAKE) -f Makefile
-	cd "utils/decompose" && $(MAKE) -f Makefile
-	cd "utils/selfcalib" && $(MAKE) -f Makefile
