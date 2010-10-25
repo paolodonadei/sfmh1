@@ -1,7 +1,7 @@
 CC=g++
 INC = -I../../ -I'$(MINGW)\include' -I'..\..\..\locallibs\include'
 CFLAGS=$(INC) -c -g -Wall
-LIBS= -llevmar  -lhrlib  -lcxcore -lhighgui -lcv -lboost_filesystem -lboost_system -llapack -lblas -lf2c  -lgsl
+LIBS= -llevmar  -lhrlib  -lcxcore -lhighgui -lcv -lboost_filesystem -lboost_system -llapack -lblas -lf2c
 LDFLAGS=-L../../ -L'$(MINGW)\lib' -L'..\..\..\locallibs\lib'
 SOURCES=selfcalib.cpp focallength.cpp nonlinSClvm.cpp ../fundutils/funddrawutils.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
