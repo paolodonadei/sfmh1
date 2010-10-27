@@ -2,7 +2,7 @@ function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted] = readCo
 IMS={}
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
-
+writefiles=1;
 [m,n]=size(dirnames);
 
 path='empty';
@@ -123,6 +123,17 @@ for j=1:numcolum
 end
 
 
+if(writefiles==1)
+    dirname=['projFolder' num2str(sum(round(100*clock)))];
+    mkdir(dirname);
+    for i=1:numcolum
+        Kb= K{1,i};
+        save([dirname '/K_' num2str(i) '.txt'], 'Kb','-ascii', '-double');
+    end
+    fid = fopen([dirname '/F_index.txt'], 'w');
+end
+
+
 corcount=1;
 for i=1:numcolum
     for j=1:i
@@ -202,11 +213,28 @@ for i=1:numcolum
             
             fprintf(' right i=%d left j=%d and index=%d \n',i,j,corcount);
             %             E{corcount}
-            corcount=corcount+1;
+          
             
+            if(writefiles==1)
+                GG=F{corcount};
+                fname=['F' num2str(i-1) '_' num2str(j-1) '.txt'];
+                save([dirname '/' fname], 'GG','-ascii', '-double');
+                fprintf(fid, ' %d\t%d\t%s\n' ,i-1,j-1,fname);
+            end
+              corcount=corcount+1;
         end
     end
 end
+
+
+if(writefiles==1)
+    fclose(fid);
+    [stat, mess, id]=rmdir('currentProj','s');
+    copyfile(dirname,'currentProj');
+  
+    
+end
+
 
 
 
