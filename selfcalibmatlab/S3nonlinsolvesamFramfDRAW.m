@@ -80,39 +80,70 @@ minf=0;
 minerr=100000000000;
 maxerr=-100000000000;
 
-for f2=1000:1:1200
-    for f1=1000:1:1200
-        
-        ks{1}(1,1)=f1;
-        ks{1}(2,2)=f1;
-        
-                ks{2}(1,1)=f2;
-        ks{2}(2,2)=f2;
-        
-        [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
-        [x] = S3ObjectiveRotationDist(pp,s);
-        Z(f1-999,f2-999)=x(1);
-        orm(counter)=x(1);
-        t(counter)=f1;
-        counter=counter+1;
-        
-        if(x(1)>maxerr)
-            maxf=[f1 f2];
-            maxerr=x(1);
-        end
-        
-        if(x(1)<minerr)
-            minf=[f1 f2];
-            minerr=x(1);
-        end
+% for f2=1000:1:1200
+%     f2
+%     for f1=1000:1:1200
+%
+%         ks{1}(1,1)=f1;
+%         ks{1}(2,2)=f1;
+%
+%                 ks{2}(1,1)=f2;
+%         ks{2}(2,2)=f2;
+%
+%         [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+%         [x] = S3ObjectiveRotationDist(pp,s);
+%         Z(f1-999,f2-999)=x(1);
+%         orm(counter)=x(1);
+%         t(counter)=f1;
+%         counter=counter+1;
+%
+%         if(x(1)>maxerr)
+%             maxf=[f1 f2];
+%             maxerr=x(1);
+%         end
+%
+%         if(x(1)<minerr)
+%             minf=[f1 f2];
+%             minerr=x(1);
+%         end
+%     end
+% end
+%
+% %plot(t,orm);
+% X=1000:1:1200;
+% Y=1000:1:1200;
+%
+% mesh(X,Y,Z);
+
+
+for f1=1000:1:1200
+    
+    ks{1}(1,1)=f1;
+    ks{1}(2,2)=f1;
+     ks{2}(1,1)=f1+20;
+    ks{2}(2,2)=f1+100;
+    
+    [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+    [x] = S3ObjectiveRotationDist(pp,s);
+    
+    orm(counter)=x(1);
+    t(counter)=f1;
+    counter=counter+1;
+    
+    if(x(1)>maxerr)
+        maxf=[f1 0];
+        maxerr=x(1);
+    end
+    
+    if(x(1)<minerr)
+        minf=[f1 0];
+        minerr=x(1);
     end
 end
 
-%plot(t,orm);
-X=1000:1:1200;
-Y=1000:1:1200;
 
-mesh(X,Y,Z);
+plot(t,orm);
+
 disp(['the min error focal length is ' num2str(minf(1)) ' , ' num2str(minf(2)) ' and the max focal length is ' num2str(maxf(1)) ' , ' num2str(maxf(2)) ]);
 end
 

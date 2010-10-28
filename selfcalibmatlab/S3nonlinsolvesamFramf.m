@@ -15,7 +15,7 @@ maxXdeviationpercentage=0.20;
 maxYdeviationpercentage=0.20;
 
 framesconstant=0;
-numparams=3;
+numparams=1;
 [s1,s2]=size(TF);
 
 numFrames=s1;
@@ -52,12 +52,12 @@ for i=1:numFrames
     lowK{i,1}=templowK;
 end
 
-[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
-%[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+%[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
-iterMax= 100;
+iterMax= 1000;
 x=zeros(m,1);
 
 options=[1E-03, 1E-18, 1E-28, 1E-28, 1E-06];
