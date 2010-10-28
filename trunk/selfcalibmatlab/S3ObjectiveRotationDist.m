@@ -20,19 +20,29 @@ end
 
 countrot=0;
 y=0;
-for i=1:data{4,1}
-    for j=1:data{4,1}
-        for k=1:data{4,1}
-            if(i~=j && j~=k && i~=k)
-                
-                countrot=countrot+1;
-                erdist(countrot)=0;
+% for i=1:data{4,1}
+%     for j=1:data{4,1}
+%         for k=1:data{4,1}
+%             if(i~=j && j~=k && i~=k)
+%                 
+%                 countrot=countrot+1;
+%                 erdist(countrot)=0;
+% 
+%                 [ erdist(countrot), errot(countrot)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
+%                 y=y+  errot(countrot);
+%             end
+%         end
+%     end
+% end
+i=1;j=2;k=3;
+[di, y]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
+y=di;
+if(countrot==0)
+    countrot=1;
+end
 
-                [ erdist(countrot), errot(countrot)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
-                y=y+  errot(countrot);
-            end
-        end
-    end
+if(countsvd==0)
+    countsvd=1;
 end
 
 A=0;
@@ -82,8 +92,17 @@ QRes=  quatmultiply(conjRik,interRot );
 
 
 
-q=abs(QRes(1,1));
-x=0;
+q=1-abs(QRes(1,1));
+%%%%%%%% now calculate the distance error
+
+dij = Pij(:,4);
+djk = Pjk(:,4);
+dik = Pik(:,4);
+% normalizing
+[x] = findError3angle(dij, djk, dik);
+
+x=abs(x);
+
 end
 function x = errorSingleF(K1,K2,F)
 
