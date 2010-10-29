@@ -98,6 +98,11 @@ q=1-abs(QRes(1,1));
 dij = Pij(:,4);
 djk = Pjk(:,4);
 dik = Pik(:,4);
+b=[dij djk dik];
+[ Ki(1,1) Kj(1,1) Kk(1,1)]
+
+
+b
 % normalizing
 [x] = findError3angle(dij, djk, dik);
 
