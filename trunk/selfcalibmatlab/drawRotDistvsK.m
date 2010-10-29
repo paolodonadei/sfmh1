@@ -7,7 +7,7 @@ Ke(2,3)=h/2;
 counter=1;
 
 for f1=200:1:2000
-    clear K1 K2 E Pq P R q
+    clear K1 K2 E Pq P R q dij  djk dik
     K1=Ke;
     K1(1,1)=f1;
     K1(2,2)=f1;
@@ -19,7 +19,7 @@ for f1=200:1:2000
     [P] = getCorrectCameraMatrix(Pq, K1,K2, X);
     R = P(:,1:3);
     [q] = rotmat2quat(R);
-  
+    
     rm(counter)=q(1);
     
     mag=sqrt( (q(2)*q(2))+(q(3)*q(3))+(q(4)*q(4)));
@@ -27,9 +27,19 @@ for f1=200:1:2000
     SX(1,counter)= q(2)/ mag ;
     SX(2,counter)= q(3)/mag  ;
     SX(3,counter)= q(4)/ mag ;
+    %%%%%%%%%%%%%%%%%% distance
+    
+    dij = P(:,4);
+    dij=dij/norm(dij);
+      dX(1,counter)= dij(1) ;
+    dX(2,counter)= dij(2) ;
+    dX(3,counter)= dij(3) ;
+    % normalizing
+  
+    
     
     t(counter)=f1;
-  counter=counter+1;
+    counter=counter+1;
 end
 
 
@@ -49,6 +59,8 @@ Z1 = [z1(:)];
 
 scatter3(X1(:),Y1(:),Z1(:));
 
+figure
+scatter3(dX(1,:),dX(2,:),dX(3,:));
 
 
 end

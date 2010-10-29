@@ -52,8 +52,8 @@ for i=1:numFrames
     lowK{i,1}=templowK;
 end
 
-%[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
-[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+%[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
@@ -62,6 +62,7 @@ x=zeros(m,1);
 
 options=[1E-03, 1E-18, 1E-28, 1E-28, 1E-06];
 
+%options=[1E-01, 1E-18, 1E-28, 1E-28, 1E-06];
 s=cell(8,1);
 s{1,1}= TF;
 s{2,1}= framesconstant;

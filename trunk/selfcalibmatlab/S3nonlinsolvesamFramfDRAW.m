@@ -120,13 +120,11 @@ for f1=1000:1:1200
     
     ks{1}(1,1)=f1;
     ks{1}(2,2)=f1;
-     ks{2}(1,1)=f1+20;
-    ks{2}(2,2)=f1+100;
     
     [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
     [x] = S3ObjectiveRotationDist(pp,s);
     
-    orm(counter)=x(1);
+    orm(counter)=x(1)*10000000;
     t(counter)=f1;
     counter=counter+1;
     
