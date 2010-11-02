@@ -5,7 +5,8 @@ Ke(1,3)=w/2;
 Ke(2,3)=h/2;
 
 counter=1;
-
+ fid = fopen([dirname 'intrinsicvsdistance.csv'], 'w');
+ 
 for f1=200:1:2000
     clear K1 K2 E Pq P R q dij  djk dik
     K1=Ke;
@@ -61,8 +62,9 @@ scatter3(X1(:),Y1(:),Z1(:));
 
 figure
 scatter3(dX(1,:),dX(2,:),dX(3,:));
-
-
+hold
+scatter3(X1(:),Y1(:),Z1(:));
+    fclose(fid);
 end
 function x = errorSingleF(K1,K2,F)
 

@@ -10,7 +10,7 @@ a_ji_jk=acos(dot(-ij,jk));
 a_ki_kj=acos(dot(-ik,-jk));
 
 total=(180-(((a_ij_ik+ a_ji_jk+ a_ki_kj)*180)/pi))/180;
-
+[a_ij_ik  a_ji_jk a_ki_kj]
 x=total;
 
 end
