@@ -20,26 +20,11 @@ end
 
 countrot=0;
 y=0;
-% for i=1:data{4,1}
-%     for j=1:data{4,1}
-%         for k=1:data{4,1}
-%             if(i~=j && j~=k && i~=k)
-%                 
-%                 countrot=countrot+1;
-%                 erdist(countrot)=0;
-% 
-%                 [ erdist(countrot), errot(countrot)]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
-%                 y=y+  errot(countrot);
-%             end
-%         end
-%     end
-% end
+
+
 i=1;j=2;k=3;
 [di, y]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
 y=di;
-if(countrot==0)
-    countrot=1;
-end
 
 if(countsvd==0)
     countsvd=1;
@@ -48,8 +33,8 @@ end
 A=0;
 B=1-A;
 
-finalError=(A*(x/countsvd))+(B*(y/countrot));
-disp(['svd error is ' num2str(x/countsvd) ' and rotation error is ' num2str(y/countrot) ' and final error is ' num2str(finalError*1000000.0) ]);
+finalError=(A*(x/countsvd))+(B*y);
+disp(['svd error is ' num2str(x/countsvd) ' and rotation error is ' num2str(y) ' and final error is ' num2str(finalError*1000000.0) ]);
 %finalError=0;
 
 [m,n]=size(p);
@@ -95,9 +80,9 @@ QRes=  quatmultiply(conjRik,interRot );
 q=1-abs(QRes(1,1));
 %%%%%%%% now calculate the distance error
 
-dij = Pij(:,4);
-djk = Pjk(:,4);
-dik = Pik(:,4);
+dij = -inv(Rij)*Pij(:,4);
+djk = -inv(Rjk)*Pjk(:,4);
+dik = -inv(Rik)*Pik(:,4);
 b=[dij djk dik];
 [ Ki(1,1) Kj(1,1) Kk(1,1)]
 
