@@ -30,7 +30,7 @@ if(countsvd==0)
     countsvd=1;
 end
 
-A=0;
+A=1;
 B=1-A;
 
 finalError=(A*(x/countsvd))+(B*y);
