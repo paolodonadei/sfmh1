@@ -14,14 +14,16 @@ f32=MYF(3,2);
 f33=MYF(3,3);
 
 fc=x(1,1);
-ux=x(2,1);
-vy=x(3,1);
+ux=x(1,2);
+vy=x(1,3);
+as=x(1,4);
+
 
 K_norm1=zeros(3,3);
 
 
 K_norm1(1,1)=  fc;
-K_norm1(2,2)=  fc;
+K_norm1(2,2)= as* fc;
 K_norm1(3,3)=  1;
 K_norm1(1,3)= ux;
 K_norm1(2,3)= vy;

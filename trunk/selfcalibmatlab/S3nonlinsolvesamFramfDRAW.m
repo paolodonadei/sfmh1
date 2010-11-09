@@ -1,4 +1,4 @@
-function [K] = S3nonlinsolvesamFramfDRAW(TF,corrs,w,h,ks)
+function [K,t] = S3nonlinsolvesamFramfDRAW(TF,corrs,w,h,ks)
 %this shows random sampling consensus
 %this function , given a camera center and a focal length and a fundamental
 %matrix computes the error with respect to a fundamental matrix
@@ -120,6 +120,9 @@ for f1=1000:1:1200
     
     ks{1}(1,1)=f1;
     ks{1}(2,2)=f1;
+    
+     ks{1}(1,3)=ks{1}(1,3)+10;
+    ks{1}(2,3)=ks{1}(2,3)+10;
     %   ks{3}(1,1)=f1;
     
     %  ks{3}(2,2)=f1;
