@@ -52,7 +52,7 @@ end
 
 xinit=w/2;
 yinit=h/2;
-numtries=150;
+numtries=8500;
 
 
 
@@ -87,14 +87,18 @@ for i=1:numtries
     
     x0=[ initbeginF  (randn()*xvari)+xinit  (randn()*yvari)+yinit ];
     
+    fbegnis(i,1)=x0(1);
+    xbegnis(i,1)=x0(2);
+    ybegnis(i,1)=x0(3);
     
     %[x,fval,exitflag,output]  = fsolve(f ,x0,optionsfsolve);
-    [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-(fvari/2) ((w/2)-60) ((h/2)-60) ],[finit+(fvari/2) ((w/2)+60) ((h/2)+60)],optionslsqnonlin);
-    ffinals(i,1)=x(1);
+  %  [x,resnorm,fval,exitflag] = lsqnonlin(f,x0,[finit-(fvari/2) ((w/2)-60) ((h/2)-60) ],[finit+(fvari/2) ((w/2)+60) ((h/2)+60)],optionslsqnonlin);
+  x=x0; 
+  ffinals(i,1)=x(1);
     xfinals(i,1)=x(2);
     yfinals(i,1)=x(3);
     
-    curscore=sum(abs(fval));
+%    curscore=sum(abs(fval));
     
     disp(['started from ' num2str(x0(1,1)) ' and got ' num2str(x(1,1))]);
     %[svScore, detScore, EssScore, EssScoreIA ]= EvalErrorParams1(TF{1},x(1),x(1),x(2),x(3),x(2),x(3) );
@@ -240,6 +244,13 @@ fcl=[ bestf bestf];
 xcen=bestx;
 ycen=besty;
 centerloc=[xcen ycen];
-
+figure
+scatter(xbegnis,ybegnis);
+figure
+scatter(xfinals,yfinals);
+figure
+hist(fbegnis,100);
+    
+    
 end
 
