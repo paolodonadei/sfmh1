@@ -115,21 +115,21 @@ maxerr=-100000000000;
 %
 % mesh(X,Y,Z);
 
-
-for f1=1000:1:1200
+range=300;
+for f1=(ks{1}(1,1)-range):1:(ks{1}(1,1)+range)
     
-    ks{1}(1,1)=f1;
-    ks{1}(2,2)=f1;
+   ks{1}(1,1)=f1;
+   ks{1}(2,2)=f1;
     
-     ks{1}(1,3)=ks{1}(1,3)+10;
-    ks{1}(2,3)=ks{1}(2,3)+10;
+ %   ks{1}(1,3)=ks{1}(1,3)+1;
+ %  ks{1}(2,3)=ks{1}(2,3)+1;
     %   ks{3}(1,1)=f1;
     
     %  ks{3}(2,2)=f1;
     [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
     [x] = S3ObjectiveRotationDist(pp,s);
     
-    orm(counter)=x(1)*10000000;
+    orm(counter)=x(1);
     t(counter)=f1;
     counter=counter+1;
     
