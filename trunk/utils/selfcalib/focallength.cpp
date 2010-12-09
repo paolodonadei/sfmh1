@@ -9,7 +9,7 @@
 #include <math.h>
 
 #include <cv.h>
-
+#include <cxcore.h>
 #include <vector>
 #include <iostream>
 
