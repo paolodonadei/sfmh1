@@ -1,4 +1,4 @@
-function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames)
+function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames,gaussianerrorstd)
 IMS={}
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
@@ -15,6 +15,9 @@ end
 if(strcmp(path,'empty')==1)
     disp('directory not found');
     return;
+end
+if(nargin<5)
+    gaussianerrorstd=0;
 end
 
 if(path(size(path,2))~='\' && path(size(path,2))~='/' )
@@ -70,11 +73,11 @@ end
 
 
 count=0;
-% for i=1:m
-%     count=count+1;
-%     IMS{1,count}=imread([path imdirs(i,1).name]);
-% end
-
+for i=1:m
+    count=count+1;
+    IMS{1,count}=imread([path imdirs(i,1).name]);
+end
+ [imheight,imwidth,imchannels]=IMS{1,1}; % get the size of the first image
 
 
 
@@ -146,6 +149,10 @@ for i=1:numcolum
                 if(nviewnums(k,i)~=-1 && nviewnums(k,j)~=-1)
                     count=count+1;
                     
+                    X1Gaussian= randn()*gaussianerrorstd ;
+                    Y1Gaussian=randn()*gaussianerrorstd  ;
+                    X2Gaussian= randn()*gaussianerrorstd ;
+                    Y2Gaussian= randn()*gaussianerrorstd ;
                     
                     x1(1,count)=corners{1,i}(nviewnums(k,i)+1,1);
                     x1(2,count)=corners{1,i}(nviewnums(k,i)+1,2);
@@ -155,18 +162,74 @@ for i=1:numcolum
                     x2(2,count)=corners{1,j}(nviewnums(k,j)+1,2);
                     x2(3,count)=1;
                     
-                    
+                    %adding gaussian noise
+                    x1(1,count)=  x1(1,count)+  X1Gaussian;
+                    x1(2,count)= x1(2,count)+  Y1Gaussian;
+                     x2(1,count)= x2(1,count)+  X2Gaussian;
+                     x1(2,count)= x1(2,count)+Y2Gaussian;
+                     
+                     % i did not check to see if the noisy coordinates dont
+                     % exceed the image boundaries, but this check might be
+                     % important zzz
                 end
             end
             
+            FFormattedGT{i,j}=fundmatrix(x1, x2);
+            FFormattedGT{j,i}=fundmatrix(x1, x2)';
             
+            %add gaussian noise
+            count=0;
+                      for k=1:numrows
+                if(nviewnums(k,i)~=-1 && nviewnums(k,j)~=-1)
+                    count=count+1;
+                    
+                    X1Gaussian= randn()*gaussianerrorstd ;
+                    Y1Gaussian=randn()*gaussianerrorstd  ;
+                    X2Gaussian= randn()*gaussianerrorstd ;
+                    Y2Gaussian= randn()*gaussianerrorstd ;
+                    
+                 
+                    
+                    %adding gaussian noise
+                    x1(1,count)=  x1(1,count)+  X1Gaussian;
+                    x1(2,count)= x1(2,count)+  Y1Gaussian;
+                     x2(1,count)= x2(1,count)+  X2Gaussian;
+                     x1(2,count)= x1(2,count)+Y2Gaussian;
+                     
+                     % i did not check to see if the noisy coordinates dont
+                     % exceed the image boundaries, but this check might be
+                     % important zzz
+                end
+                      end
+            
+                      
+                      
+                      
+                      
+                      
             
             if(corcount<=numbadf )
                 %  disp([' going to have ' num2str(count*noiselevel) ' outliers']);
-                for q=1:(count*noiselevel)
-                    
-                    noise1=(rand()*1024);
-                    noise2=(rand()*768);
+                numOutliers=int16(count*noiselevel);
+                clear statusOutliers;
+                statusOutliers=zeros(coun,1);
+                for mm=1: numOutliers
+                    indexOut=int16(rand()*count);
+                    while(statusOutliers(indexOut,1)~=0)
+                          indexOut=int16(rand()*count);
+                    end
+                    statusOutliers(indexOut,1)=0;
+                end
+                
+                if(sum( statusOutliers)~=numOutliers)
+                    display('the number of found outliers is not same as requested');
+                end
+                
+                for q=1:count
+           
+                    if(statusOutliers(q,1)~=0)
+                    noise1=(rand()*imwidth);
+                    noise2=(rand()*imheight);
                     
                     if(rand()<0.5)
                         x2(1,q)=noise1; % outlier generation, this is whack and important
@@ -177,7 +240,7 @@ for i=1:numcolum
                         x1(2,q)=noise2;
                     end
                     
-                    
+                    end
                 end
             end
             
@@ -240,4 +303,3 @@ end
 
 
 end
-
