@@ -48,7 +48,7 @@ if(type=='f')
       if(exist(seq_name,'dir')==0)
         display(['directory can not be found']);
       end
-    
+    left off here
       imdirs=dir([seq_name '*.jpg']);
  [ corrs, I1, I2 ] = SIFTmatchpair(fname1,fname2 );
  R1=eye(3);
