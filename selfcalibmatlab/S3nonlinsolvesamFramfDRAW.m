@@ -71,6 +71,7 @@ s{5,1}=w;
 s{6,1}=h;
 s{7,1}=Weights;
 s{8,1}=corrs;
+s{9,1}=[ 1 ; 0  ; 0]; % this is the weights for  svd error , distance error and rotation error,
 %[ret, popt, info, covar]=levmar('S3Objective', pp, x, iterMax, options,'bc', lb, ub, s);
 counter=1;
 
@@ -80,72 +81,71 @@ minf=0;
 minerr=100000000000;
 maxerr=-100000000000;
 
-% for f2=1000:1:1200
-%     f2
-%     for f1=1000:1:1200
-%
-%         ks{1}(1,1)=f1;
-%         ks{1}(2,2)=f1;
-%
-%                 ks{2}(1,1)=f2;
-%         ks{2}(2,2)=f2;
-%
-%         [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
-%         [x] = S3ObjectiveRotationDist(pp,s);
-%         Z(f1-999,f2-999)=x(1);
-%         orm(counter)=x(1);
-%         t(counter)=f1;
-%         counter=counter+1;
-%
-%         if(x(1)>maxerr)
-%             maxf=[f1 f2];
-%             maxerr=x(1);
-%         end
-%
-%         if(x(1)<minerr)
-%             minf=[f1 f2];
-%             minerr=x(1);
-%         end
-%     end
-% end
-%
-% %plot(t,orm);
-% X=1000:1:1200;
-% Y=1000:1:1200;
-%
-% mesh(X,Y,Z);
+for f2=1000:1:1200
+    f2
+    for f1=1000:1:1200
 
-range=300;
-for f1=(ks{1}(1,1)-range):1:(ks{1}(1,1)+range)
-    
-   ks{1}(1,1)=f1;
-   ks{1}(2,2)=f1;
-    
- %   ks{1}(1,3)=ks{1}(1,3)+1;
- %  ks{1}(2,3)=ks{1}(2,3)+1;
-    %   ks{3}(1,1)=f1;
-    
-    %  ks{3}(2,2)=f1;
-    [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
-    [x] = S3ObjectiveRotationDist(pp,s);
-    
-    orm(counter)=x(1);
-    t(counter)=f1;
-    counter=counter+1;
-    
-    if(x(1)>maxerr)
-        maxf=[f1 0];
-        maxerr=x(1);
-    end
-    
-    if(x(1)<minerr)
-        minf=[f1 0];
-        minerr=x(1);
+        ks{1}(1,1)=f1;
+        ks{1}(2,2)=f1;
+
+                ks{2}(1,1)=f2;
+        ks{2}(2,2)=f2;
+
+        [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+        [x] = S3ObjectiveRotationDist(pp,s);
+        Z(f1-999,f2-999)=x(1);
+        orm(counter)=x(1);
+        t(counter)=f1;
+        counter=counter+1;
+
+        if(x(1)>maxerr)
+            maxf=[f1 f2];
+            maxerr=x(1);
+        end
+
+        if(x(1)<minerr)
+            minf=[f1 f2];
+            minerr=x(1);
+        end
     end
 end
+minf
+%plot(t,orm);
+
+[X,Y]=meshgrid(1000:1:1200,1000:1:1200);
+mesh(X,Y,Z);
+
+range=300;
+% for f1=(ks{1}(1,1)-range):1:(ks{1}(1,1)+range)
+%     
+%    ks{1}(1,1)=f1;
+%    ks{1}(2,2)=f1;
+%     
+%  %   ks{1}(1,3)=ks{1}(1,3)+1;
+%  %  ks{1}(2,3)=ks{1}(2,3)+1;
+%     %   ks{3}(1,1)=f1;
+%     
+%     %  ks{3}(2,2)=f1;
+%     [pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+%     [x] = S3ObjectiveRotationDist(pp,s);
+%     
+%     orm(counter)=x(1);
+%     t(counter)=f1;
+%     counter=counter+1;
+%     
+%     if(x(1)>maxerr)
+%         maxf=[f1 0];
+%         maxerr=x(1);
+%     end
+%     
+%     if(x(1)<minerr)
+%         minf=[f1 0];
+%         minerr=x(1);
+%     end
+% end
 
 
-plot(t,orm);
+%plot(t,orm);
 
 disp(['the min error focal length is ' num2str(minf(1)) ' , ' num2str(minf(2)) ' and the max focal length is ' num2str(maxf(1)) ' , ' num2str(maxf(2)) ]);
 end
