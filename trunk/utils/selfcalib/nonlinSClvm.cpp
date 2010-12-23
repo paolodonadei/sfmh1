@@ -1105,6 +1105,15 @@ double HRSelfCalibtwoFrameNonlin(vector< vector<CvMat*> > const &FV,  vector<CvM
     HRSelfCalibtwoFrame(FV, KV ,width, height, confs,STRUM);
 
 
+/// zzzz remove this, this effectively starts all the focal lengths from pregiven value and bypasses
+//the kruppa equations
+    for (int i = 0; i < numFrames; ++i)
+    {
+        cvmSet(KV[i],0,0,1000);
+        cvmSet(KV[i],1,1,1000);
+    }
+
+
 
     vector< vector<double> > Weights;
 
@@ -1399,8 +1408,8 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
                 totEr=totEr+curError;
             }
 
-         //    printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
-          //    writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
+            //    printf("weight %f product %f given to matrix [%d][%d] with content:\n",(*myWeights)[i][j],curError,i,j);
+            //    writeCVMatrix(cout<<"Mat is "<<endl,(*FMat)[i][j]);
 
 
 
@@ -1420,9 +1429,9 @@ void errnonLinFunctionSelfCalibmestimator(double *p, double *hx, int m, int n, v
 
 // this scaling is important to make sure we dont stop because of a small dp
 //double mult=1;
-double mult=1000000.0;
+    double mult=1000000.0;
 //this is to sum all the errors
-totEr=totEr*mult;
+    totEr=totEr*mult;
     for (int i=0; i<n; i++)
     {
         hx[i]=(totEr);

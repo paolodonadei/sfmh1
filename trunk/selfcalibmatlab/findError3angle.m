@@ -9,11 +9,16 @@ a_jki=findError3anglemiddle(inv(Pjk),inv(Pik));
 a_kij=findError3anglemiddle(Pik,Pij );
 
 total=(180-(((a_ijk+ a_jki+ a_kij))))/180;
-[a_ijk  a_jki  a_kij]
-x=total;
+%[a_ijk  a_jki  a_kij]
+x=abs(total);
 
+if(x>1)
+    
+    display(['**what happened, the value of the distance error exceeded the range and was ' num2dtr(x)]);
+    x=1;
 end
 
+end
 % XYZ angle->find angle between vectors xy and yz where both originate from y. Y is
 % placed at origin and x is defined in the coordinate axis of y and z is
 % defined in the coordinate axis of Y 

@@ -1,46 +1,46 @@
 function [x] = S3ObjectiveRotationDist(p, data)
 
 nowKs = convertLinetoMats(p,data{2,1}, data{3,1},data{4,1},data{5,1},data{6,1});
-
+weights=data{9,1};
 %%%%%%%%%%%%%%%%%%% SVD ERROR %%%%%%%%%%%%%%
 x=0;
-countsvd=0;
+countsvd=1;
 
-for i=1:data{4,1}
-    for j=1:i
-        if(i~=j)
-            
-            countsvd=countsvd+1;
-             ersvd(countsvd)=0;
-            ersvd(countsvd)=errorSingleF(nowKs{j},nowKs{i},data{1,1}{i,j});
-            x=x+ ersvd(countsvd);
+if(weights(1)>0.0001)
+    countsvd=0;
+    for i=1:data{4,1}
+        for j=1:i
+            if(i~=j)
+                
+                countsvd=countsvd+1;
+                ersvd(countsvd)=0;
+                ersvd(countsvd)=errorSingleF(nowKs{j},nowKs{i},data{1,1}{i,j});
+                x=x+ ersvd(countsvd);
+            end
         end
     end
-end
-x=x/countsvd;
-if(countsvd==0)
-    display(['erorr , count svd is zero']);
+    x=x/countsvd;
+    if(countsvd==0)
+        display(['erorr , count svd is zero']);
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DIST AND ROT ERROR
+
 
 
 i=1;j=2;k=3;
 [distEr, rotEr]=errorthreeFdist(nowKs{i},nowKs{j},nowKs{k},data{1,1}{i,j},data{1,1}{j,k},data{1,1}{i,k},reshape(data{8,1}{i,j}(:,1),3,2),reshape(data{8,1}{j,k}(:,1),3,2),reshape(data{8,1}{i,k}(:,1),3,2));
 
 
-
-y=distEr;
-y=rotEr;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% END OF DIST AND ROT ERROR,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NOW MIX THE ERRORS
 
 
-A=0;
-B=1-A;
 
-finalError=(A*x)+(B*y);
-disp(['svd error is ' num2str(x/countsvd) ' and rotation error is ' num2str(y) ' and final error is ' num2str(finalError*1000000.0) ]);
+% how you mix the rotation and dist together is hard to figure out
+finalError=(weights(1)*abs(x) + weights(2)*abs(distEr)+ weights(3)*abs(rotEr))*1000 ;
+%disp(['svd error is ' num2str(x/countsvd) ' and rotation error is ' num2str(abs(rotEr)) ' and dist error is  ' num2str(abs(distEr))   '  and final error is ' num2str(finalError) ]);
 
 
 
@@ -85,7 +85,14 @@ QRes=  quatmultiply(conjRik,interRot );
 
 
 
-q=abs(QRes(1,1));
+q=abs(1-abs(QRes(1,1)));
+
+if(q>1)
+    
+    display(['**what happened, the value of the rotation error exceeded the range and was ' num2dtr(q)]);
+    q=1;
+end
+
 %%%%%%%% now calculate the distance error
 
 % dij = -inv(Rij)*Pij(:,4);

@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
         printf("##### FEATURE DETECTION\n");
         imSet.featureDetectSift();
-        //imSet.showOneByOneFeature();
+        imSet.showOneByOneFeature();
 
         printf("##### FEATURE MATCHING\n");
         imSet.exhaustiveSIFTMatching();
@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
         printf("##### multiple view geometry \n");
         imSet.multipleViewEstimate();
 
-       // printf("##### draw matches \n");
-      //  imSet.drawallMatches();
+        printf("##### draw matches \n");
+        imSet.drawallMatches();
 
         printf("##### create feature tracks \n");
         imSet.createFeatureTrackMatrix();
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
         printf("#####  write motion \n");
         imSet.writeMotions();
-        //    imSet.showOneByOneFeatureMotions();
+         imSet.showOneByOneFeatureMotions();
 
         HRStructure mystruct(&imSet,imSet.outdirStemName);
         printf("#####  run SFM\n");

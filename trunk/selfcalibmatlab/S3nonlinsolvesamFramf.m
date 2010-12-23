@@ -15,7 +15,7 @@ maxXdeviationpercentage=0.20;
 maxYdeviationpercentage=0.20;
 
 framesconstant=0;
-numparams=1;
+numparams=3;
 [s1,s2]=size(TF);
 
 numFrames=s1;
@@ -52,8 +52,8 @@ for i=1:numFrames
     lowK{i,1}=templowK;
 end
 
-%[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
-[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
+[pp] = convertMatstoLin(K,framesconstant, numparams,numFrames,w,h);
+%[pp] = convertMatstoLin(ks,framesconstant, numparams,numFrames,w,h);
 [ub] = convertMatstoLin(upK,framesconstant, numparams,numFrames,w,h);
 [lb] = convertMatstoLin(lowK,framesconstant, numparams,numFrames,w,h);
 
@@ -72,6 +72,7 @@ s{5,1}=w;
 s{6,1}=h;
 s{7,1}=Weights;
 s{8,1}=corrs;
+s{9,1}=[ 1 ; 1  ; 1]; % this is the weights for  svd error distance error and rotation error, 
 %[ret, popt, info, covar]=levmar('S3Objective', pp, x, iterMax, options,'bc', lb, ub, s);
 
 [ret, popt, info, covar]=levmar('S3ObjectiveRotationDist', pp, x, iterMax, options,'bc', lb, ub, s);

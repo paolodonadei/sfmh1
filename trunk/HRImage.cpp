@@ -1116,8 +1116,8 @@ int  HRImageSet::open(string directoryName, string TEMPdirectoryName)
 
                 if ( fs::is_regular( dir_itr->status() ) )
                 {
-                    if (fs::extension(dir_itr->path())==".pgm" || fs::extension(dir_itr->path())==".bpm" ||
-                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff"
+                    if (fs::extension(dir_itr->path())==".pgm" || fs::extension(dir_itr->path())==".bpm" ||  fs::extension(dir_itr->path())==".JPG" ||
+                            fs::extension(dir_itr->path())==".jpg" || fs::extension(dir_itr->path())==".tiff"  || fs::extension(dir_itr->path())==".tif" || fs::extension(dir_itr->path())==".TIF"
                             || fs::extension(dir_itr->path())==".ppm" || fs::extension(dir_itr->path())==".png")
                     {
                         ++file_count;
