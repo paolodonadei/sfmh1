@@ -1,4 +1,4 @@
-function [ corrs, I1, I2] = SIFTmatchpair(fname1,fname2 )
+function [ Fgt,corrs, I1, I2] = SIFTmatchpair(fname1,fname2 )
 
 I1 = imread(fname1) ;
 [m,n,p]=size(I1);
@@ -43,4 +43,4 @@ matches = siftmatch(descriptors1, descriptors2) ;
      
  end
 
-
+    Fgt=fundmatrix(corrs(1:2,:), corrs(3:4,:));
