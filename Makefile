@@ -1,4 +1,5 @@
-LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
+#LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
+LOCALLIBS=/home/houman/Desktop/code/locallibs
 VPATH = .:utils/selfcalib
 INC = -I. -I'$(LOCALLIBS)'/include -Iutils/selfcalib  -Iutils/sbainterface/ -Iutils/fundutils/
 CC=g++

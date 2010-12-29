@@ -1,4 +1,5 @@
-LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
+#LOCALLIBS=/home/houman/work/thesiscode/libraries/locallibs
+LOCALLIBS=/home/houman/Desktop/code/locallibs
 CC=g++
 INC = -I../../ -I'$(LOCALLIBS)/include'
 CFLAGS=$(INC) -c -g -Wall

@@ -1272,9 +1272,9 @@ void HRStructure::writeStructure(string fn)
 
 
 
-    string fname_outply=((fs::path( tempdir, fs::native )/fs::path( tempfilename, fs::native )).replace_extension("ply")).file_string();
+//    string fname_outply=((fs::path( tempdir, fs::native )/fs::path( tempfilename, fs::native )).replace_extension("ply")).file_string();
 
-    writePlyFile(structure,structureValid,fname_outply);
+   // writePlyFile(structure,structureValid,fname_outply);
 
 
 }
