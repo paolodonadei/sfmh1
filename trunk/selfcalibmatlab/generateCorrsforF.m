@@ -67,8 +67,8 @@ if(type=='s')
     %    I1=imread('correspondences_drprevimg.png');
     %    I2=imread('correspondences_drnextimg.png');
     %    I1motion=imread('correspondences_dr.png');
-    I1=zeros(512,512);
-    I2=zeros(512,512);
+    I1=uint8(zeros(512,512,3));
+    I2=uint8(zeros(512,512,3));
     
     
     
@@ -192,12 +192,7 @@ if(writefiles==1)
     axes('Position', [0 0 1 1]) ;
     imagesc(I) ; colormap gray ; hold on ; axis image ; axis off ;
     
-    K = size(matches, 2) ;
-    nans = NaN * ones(1,K) ;
-    
-    x = [ P1(1,matches(1,:)) ; P2(1,matches(2,:))+oj ; nans ] ;
-    y = [ P1(2,matches(1,:)) ; P2(2,matches(2,:))+oi ; nans ] ;
-    
+   
     
     for n = 1:size(corrs,2)
         if(inlierOutlier(n)==1)
@@ -207,7 +202,7 @@ if(writefiles==1)
         end
     end
     
-    set(h,'Marker','.','Color','b') ;
+%?????    set(gcf,'Marker','.','Color','b') ;
     
     saveas(gcf,[dirname 'matchesside'],'png');
     save2pdf([dirname 'matchesside.pdf']);
