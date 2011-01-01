@@ -5,21 +5,32 @@ function [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorr
 %the directory where the images reside
 writefiles=1;
 
+dirnames{1,1}='/home/houman/work/test_data/';
+dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
+dirnames{3,1}='E:\Documents and Settings\houman\Desktop\data\euclidean\';
+
+
+path='empty';
+
 if nargin < 5
-    if(type=='o')
+    if(type=='o' || type=='f')
         seqname='merton1';
-        
-    else
-        if(isunix()==0)
-            seqname='C:\Documents and Settings\hrast019\Desktop\data\euclidean\merton1';
-        else
-            seqname='/home/houman/Desktop/data';
-        end
-        
     end
-    
-    
 end
+
+if(type=='f')
+    for i=1:m
+        if(exist([dirnames{i,1} seqname],'dir')~=0)
+            path=[dirnames{i,1} seqname];
+            break;
+        end
+    end
+    if(strcmp(path,'empty')==1)
+        display('path not found in matlab');
+    end
+end
+
+
 
 dirindex=0;
 if(writefiles==1)
@@ -37,11 +48,22 @@ end
 if(type=='s')
     oldFolder = cd('../utils/CRC2D/');
     partonecom='./crc2Dto3D ';
+    
+    if(isunix~=0)
+        partonecom='./crc2Dto3D ';
+    else
+        partonecom='crc3D2D.exe ';
+    end
+    
     partTwo=[' -N ' num2str(numcorrs) ' -E ' num2str(outlierratio) ' -v ' num2str(stderror) ' -T 3 -q 1'];
     comma=[partonecom partTwo];
+    while(exist(['matches.csv'],'file')==0)        
     [status currdir] = system(comma );
+    end
+    
     M = dlmread('matches.csv',',',1);
     
+    delete('matches.csv');
     %    I1=imread('correspondences_drprevimg.png');
     %    I2=imread('correspondences_drnextimg.png');
     %    I1motion=imread('correspondences_dr.png');
@@ -70,20 +92,20 @@ if(type=='f')
     % so here we assume seqname is the directory name and we read the first
     % two images
     
-    if(exist(seq_name,'dir')==0)
+    if(exist(path,'dir')==0)
         display(['directory can not be found']);
     end
     
-    imdirs=dir([seq_name '*.jpg']);
+    imdirs=dir([path '*.jpg']);
     [m,n]=size(imdirs);
     if(m==0)
-        imdirs=dir([seq_name '*.pgm']);
+        imdirs=dir([path '*.pgm']);
         [m,n]=size(imdirs);
     elseif(m==0)
-        imdirs=dir([seq_name '*.png']);
+        imdirs=dir([path '*.png']);
         [m,n]=size(imdirs);
     elseif(m==0)
-        imdirs=dir([seq_name '*.tif']);
+        imdirs=dir([path '*.tif']);
         [m,n]=size(imdirs);
     elseif(m==0)
         display(['NO IMAGES WERE FOUND']);
@@ -123,14 +145,14 @@ end
 
 if(writefiles==1)
     % showing left and right features
-    show(I1), hold on, plot(corrs(1,:),corrs(2,:),'g+');
+    show(I1,1), hold on, plot(corrs(1,:),corrs(2,:),'g+');
     saveas(gcf,[dirname 'output1'],'png');
     save2pdf([dirname 'image1withfeat.pdf']);
-    figure
-    show(I2), hold on, plot(corrs(3,:),corrs(4,:),'g+');
+
+    show(I2,2), hold on, plot(corrs(3,:),corrs(4,:),'g+');
     saveas(gcf,[dirname 'output2'],'png');
     save2pdf([dirname 'image2withfeat.pdf']);
-    figure
+  
     %save left and write images
     imwrite(I1,[dirname 'image1.png']);
     imwrite(I2,[dirname 'image2.png']);
@@ -139,7 +161,7 @@ if(writefiles==1)
     %showing features matches
     % Display putative matches inb one image
     
-    show(im1), set('name','Putative matches'), hold on
+    show(I1,3), set(3,'name','Putative matches'), hold on
     for n = 1:size(corrs,2)
         if(inlierOutlier(n)==1)
             line([corrs(1,n) corrs(2,n)], [corrs(3,n) corrs(4,n)],'color',[0 0 1]);
