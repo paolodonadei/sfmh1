@@ -136,18 +136,20 @@ end
 
 %for oxford
 if(type=='o')
-    [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
-remove that last one from the correlations
-    corrs=corrsFormatted{1,2};
+    [cocorrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
+
+    corrs(1:2,:)=corrsFormatted{1,2}(1:2,:);
+    corrs(3:4,:)=corrsFormatted{1,2}(4:5,:);
     [k1, R1, t1] = vgg_KR_from_P(P{1});
     [k2, R2, t2] = vgg_KR_from_P(P{2});
     I1=double(double(IMS{1})/255);
     I2=double(double(IMS{2})/255);
     Fgt=FFormattedGT{1,2};
+    inlierOutlier=1-inlierOutlier;
 end
 
 %gui showing the F
-%fig=vgg_gui_F(I1, I2,Fgt);
+%fig=vgg_gui_F(I1, I2,Fgt');
 
 if(writefiles==1)
     % showing left and right features
@@ -231,3 +233,6 @@ end
 
 end
 
+%only thing i have not done here is make sure the number of corrrspondences
+%is the same as that requested for the cases of sift and oxford
+% next step is to write a function to calculate epipolar error
