@@ -1,7 +1,10 @@
 function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,statusOutliers] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames,gaussianerrorstd)
-IMS={}
+IMS={};
+
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
+dirnames{3,1}='E:\Documents and Settings\houman\Desktop\data\euclidean\';
+dirnames{4,1}='C:\mystf\data\euclidean\';
 writefiles=1;
 [m,n]=size(dirnames);
 
@@ -33,9 +36,9 @@ end
 % get the Ps
 psdir=dir([path '*.P']);
 
-if (nargin ==3)
+if (nargin<4)
     [m,n]=size(psdir);
-elseif (nargin ==4)
+elseif (nargin>3)
     m=numreadFrames;
 else
     display('something is wrong, incorrect arg number');
@@ -61,23 +64,12 @@ end
 imdirs=dir([path '*.jpg']);
 
 
-
-
-if (nargin ==3)
-    [m,n]=size(imdirs);
-elseif (nargin ==4)
-    m=numreadFrames;
-else
-    display('something is wrong, incorrect arg number');
-end
-
-
 count=0;
 for i=1:m
     count=count+1;
     IMS{1,count}=imread([path imdirs(i,1).name]);
 end
- [imheight,imwidth,imchannels]=IMS{1,1}; % get the size of the first image
+[imheight,imwidth,imchannels]=size(IMS{1,1}); % get the size of the first image
 
 
 
@@ -100,10 +92,9 @@ nviewfile = textscan(fid, textstr);
 fclose(fid);
 
 
-
-if (nargin ==3)
+if (nargin<4)
     [m,numcolum]=size(nviewfile);
-elseif (nargin ==4)
+elseif (nargin>3)
     numcolum=numreadFrames;
 else
     display('something is wrong, incorrect arg number');
@@ -149,7 +140,7 @@ for i=1:numcolum
                 if(nviewnums(k,i)~=-1 && nviewnums(k,j)~=-1)
                     count=count+1;
                     
-              
+                    
                     
                     x1(1,count)=corners{1,i}(nviewnums(k,i)+1,1);
                     x1(2,count)=corners{1,i}(nviewnums(k,i)+1,2);
@@ -159,11 +150,11 @@ for i=1:numcolum
                     x2(2,count)=corners{1,j}(nviewnums(k,j)+1,2);
                     x2(3,count)=1;
                     
-                   
-                     
-                     % i did not check to see if the noisy coordinates dont
-                     % exceed the image boundaries, but this check might be
-                     % important zzz
+                    
+                    
+                    % i did not check to see if the noisy coordinates dont
+                    % exceed the image boundaries, but this check might be
+                    % important zzz
                 end
             end
             
@@ -172,7 +163,7 @@ for i=1:numcolum
             
             %add gaussian noise
             count=0;
-                      for k=1:numrows
+            for k=1:numrows
                 if(nviewnums(k,i)~=-1 && nviewnums(k,j)~=-1)
                     count=count+1;
                     
@@ -181,35 +172,36 @@ for i=1:numcolum
                     X2Gaussian= randn()*gaussianerrorstd ;
                     Y2Gaussian= randn()*gaussianerrorstd ;
                     
-                 
+                    
                     
                     %adding gaussian noise
                     x1(1,count)=  x1(1,count)+  X1Gaussian;
                     x1(2,count)= x1(2,count)+  Y1Gaussian;
-                     x2(1,count)= x2(1,count)+  X2Gaussian;
-                     x1(2,count)= x1(2,count)+Y2Gaussian;
-                     
-                     % i did not check to see if the noisy coordinates dont
-                     % exceed the image boundaries, but this check might be
-                     % important zzz
+                    x2(1,count)= x2(1,count)+  X2Gaussian;
+                    x1(2,count)= x1(2,count)+Y2Gaussian;
+                    
+                    % i did not check to see if the noisy coordinates dont
+                    % exceed the image boundaries, but this check might be
+                    % important zzz
                 end
-                      end
+            end
             
-                      
-                      
-                      
-                      
-                      
+            
+            
+            
+            
+            
             
             if(corcount<=numbadf )
                 %  disp([' going to have ' num2str(count*noiselevel) ' outliers']);
                 numOutliers=int16(count*noiselevel);
                 clear statusOutliers;
-                statusOutliers=zeros(coun,1);
+                statusOutliers=zeros(count,1);
                 for mm=1: numOutliers
-                    indexOut=int16(rand()*count);
+                    indexOut=(int16(rand()*(count-1)))+1;
                     while(statusOutliers(indexOut,1)~=0)
-                          indexOut=int16(rand()*count);
+                        indexOut=(int16(rand()*(count-1)))+1;
+              
                     end
                     statusOutliers(indexOut,1)=0;
                 end
@@ -219,20 +211,20 @@ for i=1:numcolum
                 end
                 
                 for q=1:count
-           
+                    
                     if(statusOutliers(q,1)~=0)
-                    noise1=(rand()*imwidth);
-                    noise2=(rand()*imheight);
-                    
-                    if(rand()<0.5)
-                        x2(1,q)=noise1; % outlier generation, this is whack and important
-                        x2(2,q)=noise2;
+                        noise1=(rand()*imwidth);
+                        noise2=(rand()*imheight);
                         
-                    else
-                        x1(1,q)=noise1; % outlier generation, this is whack and important
-                        x1(2,q)=noise2;
-                    end
-                    
+                        if(rand()<0.5)
+                            x2(1,q)=noise1; % outlier generation, this is whack and important
+                            x2(2,q)=noise2;
+                            
+                        else
+                            x1(1,q)=noise1; % outlier generation, this is whack and important
+                            x1(2,q)=noise2;
+                        end
+                        
                     end
                 end
             end
@@ -269,7 +261,7 @@ for i=1:numcolum
             
             fprintf(' right i=%d left j=%d and index=%d \n',i,j,corcount);
             %             E{corcount}
-          
+            
             
             if(writefiles==1)
                 GG=F{corcount};
@@ -277,7 +269,7 @@ for i=1:numcolum
                 save([dirname '/' fname], 'GG','-ascii', '-double');
                 fprintf(fid, ' %d\t%d\t%s\n' ,i-1,j-1,fname);
             end
-              corcount=corcount+1;
+            corcount=corcount+1;
         end
     end
 end
@@ -287,7 +279,7 @@ if(writefiles==1)
     fclose(fid);
     [stat, mess, id]=rmdir('currentProj','s');
     copyfile(dirname,'currentProj');
-  
+    
     
 end
 
