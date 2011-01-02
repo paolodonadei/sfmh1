@@ -5,11 +5,13 @@ function [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorr
 %the directory where the images reside
 writefiles=1;
 
+
 dirnames{1,1}='/home/houman/work/test_data/';
 dirnames{2,1}='C:\Documents and Settings\hrast019\Desktop\data\euclidean\';
 dirnames{3,1}='E:\Documents and Settings\houman\Desktop\data\euclidean\';
+dirnames{4,1}='C:\mystf\data\euclidean\';
 
-
+[m,n]=size(dirnames);
 path='empty';
 
 if nargin < 5
@@ -21,7 +23,7 @@ end
 if(type=='f')
     for i=1:m
         if(exist([dirnames{i,1} seqname],'dir')~=0)
-            path=[dirnames{i,1} seqname];
+            path=[dirnames{i,1} seqname '/'];
             break;
         end
     end
@@ -57,8 +59,8 @@ if(type=='s')
     
     partTwo=[' -N ' num2str(numcorrs) ' -E ' num2str(outlierratio) ' -v ' num2str(stderror) ' -T 3 -q 1'];
     comma=[partonecom partTwo];
-    while(exist(['matches.csv'],'file')==0)        
-    [status currdir] = system(comma );
+    while(exist(['matches.csv'],'file')==0)
+        [status currdir] = system(comma );
     end
     
     M = dlmread('matches.csv',',',1);
@@ -82,6 +84,7 @@ if(type=='s')
     x1=M(:,2:3)';
     x2=M(:,4:5)';
     inlierOutlier=M(:,6)';
+      inlierOutlier=  1-inlierOutlier;
     corrs=[x1 ; x2];
     cd(oldFolder);
 end
@@ -119,9 +122,11 @@ if(type=='f')
     
     
     
-    [Fgt, corrs, I1, I2 ] = SIFTmatchpair(fname1,fname2 );
+    [Fgt, corrs, I1, I2 ] = SIFTmatchpair([path fname1],[path fname2] );
     R1=eye(3);
     R2=eye(3);
+     k1=eye(3);
+    k2=eye(3);
     t1=zeros(3,1);
     t2=zeros(3,1);
     
@@ -132,11 +137,12 @@ end
 %for oxford
 if(type=='o')
     [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
+remove that last one from the correlations
     corrs=corrsFormatted{1,2};
     [k1, R1, t1] = vgg_KR_from_P(P{1});
     [k2, R2, t2] = vgg_KR_from_P(P{2});
-    I1=IMS{1};
-    I2=IMS{2};
+    I1=double(double(IMS{1})/255);
+    I2=double(double(IMS{2})/255);
     Fgt=FFormattedGT{1,2};
 end
 
@@ -148,11 +154,11 @@ if(writefiles==1)
     show(I1,1), hold on, plot(corrs(1,:),corrs(2,:),'g+');
     saveas(gcf,[dirname 'output1'],'png');
     save2pdf([dirname 'image1withfeat.pdf']);
-
+    
     show(I2,2), hold on, plot(corrs(3,:),corrs(4,:),'g+');
     saveas(gcf,[dirname 'output2'],'png');
     save2pdf([dirname 'image2withfeat.pdf']);
-  
+    
     %save left and write images
     imwrite(I1,[dirname 'image1.png']);
     imwrite(I2,[dirname 'image2.png']);
@@ -164,9 +170,9 @@ if(writefiles==1)
     show(I1,3), set(3,'name','Putative matches'), hold on
     for n = 1:size(corrs,2)
         if(inlierOutlier(n)==1)
-            line([corrs(1,n) corrs(2,n)], [corrs(3,n) corrs(4,n)],'color',[0 0 1]);
+            line([corrs(1,n) corrs(3,n)], [corrs(2,n) corrs(4,n)],'color',[0 0 1]);
         else
-            line([corrs(1,n) corrs(2,n)], [corrs(3,n) corrs(4,n)],'color',[1 0 0]);
+            line([corrs(1,n) corrs(3,n)], [corrs(2,n) corrs(4,n)],'color',[1 0 0]);
         end
     end
     
@@ -192,17 +198,17 @@ if(writefiles==1)
     axes('Position', [0 0 1 1]) ;
     imagesc(I) ; colormap gray ; hold on ; axis image ; axis off ;
     
-   
+    
     
     for n = 1:size(corrs,2)
         if(inlierOutlier(n)==1)
-            line([corrs(1,n) corrs(2,n)], [corrs(3,n)+oj corrs(4,n)],'color',[0 0 1]);
+            line([corrs(1,n) corrs(3,n)+oj ], [corrs(2,n) corrs(4,n)],'color',[0 1 0]);
         else
-            line([corrs(1,n) corrs(2,n)], [corrs(3,n)+oj corrs(4,n)],'color',[1 0 0]);
+            line([corrs(1,n) corrs(3,n)+oj ], [corrs(2,n) corrs(4,n)],'color',[1 0 0]);
         end
     end
     
-%?????    set(gcf,'Marker','.','Color','b') ;
+    %?????    set(gcf,'Marker','.','Color','b') ;
     
     saveas(gcf,[dirname 'matchesside'],'png');
     save2pdf([dirname 'matchesside.pdf']);
