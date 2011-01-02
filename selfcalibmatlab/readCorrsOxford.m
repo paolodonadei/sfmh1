@@ -201,9 +201,9 @@ for i=1:numcolum
                     indexOut=(int16(rand()*(count-1)))+1;
                     while(statusOutliers(indexOut,1)~=0)
                         indexOut=(int16(rand()*(count-1)))+1;
-              
+                        
                     end
-                    statusOutliers(indexOut,1)=0;
+                    statusOutliers(indexOut,1)=1;
                 end
                 
                 if(sum( statusOutliers)~=numOutliers)
@@ -216,13 +216,28 @@ for i=1:numcolum
                         noise1=(rand()*imwidth);
                         noise2=(rand()*imheight);
                         
-                        if(rand()<0.5)
+                        randside=rand();
+                        if(randside<0.5)
                             x2(1,q)=noise1; % outlier generation, this is whack and important
                             x2(2,q)=noise2;
                             
                         else
                             x1(1,q)=noise1; % outlier generation, this is whack and important
                             x1(2,q)=noise2;
+                        end
+                        
+                        while(x2(1,q)<0 || x2(1,q)>imwidth || x1(1,q)<0 || x1(1,q)>imwidth || x2(2,q)<0 || x2(2,q)>imheight || x1(2,q)<0 || x1(2,q)>imheight)
+                            noise1=(rand()*imwidth);
+                            noise2=(rand()*imheight);
+                            
+                            if(randside<0.5)
+                                x2(1,q)=noise1; % outlier generation, this is whack and important
+                                x2(2,q)=noise2;
+                                
+                            else
+                                x1(1,q)=noise1; % outlier generation, this is whack and important
+                                x1(2,q)=noise2;
+                            end
                         end
                         
                     end
