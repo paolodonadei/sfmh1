@@ -1,4 +1,4 @@
-function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,statusOutliers] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames,gaussianerrorstd)
+function [corrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,statusOutliers,corrsFormattedclean] = readCorrsOxford(seq_name, noiselevel, numbadf,numreadFrames,gaussianerrorstd)
 IMS={};
 
 dirnames{1,1}='/home/houman/work/test_data/';
@@ -134,7 +134,7 @@ for i=1:numcolum
         if(i~=j)
             count=0;
             
-            clear x1 x2;
+            clear x1 x2 x1c x2c;
             
             for k=1:numrows
                 if(nviewnums(k,i)~=-1 && nviewnums(k,j)~=-1)
@@ -150,7 +150,8 @@ for i=1:numcolum
                     x2(2,count)=corners{1,j}(nviewnums(k,j)+1,2);
                     x2(3,count)=1;
                     
-                    
+                    x1c=x1;
+                    x2c=x2;
                     
                     % i did not check to see if the noisy coordinates dont
                     % exceed the image boundaries, but this check might be
@@ -262,7 +263,9 @@ for i=1:numcolum
             corrsFormatted{i,j}=[x1 ; x2]  ;
             corrsFormatted{j,i}=[x2 ; x1]  ;
             
-            
+            corrsFormattedclean{i,j}=[x1c ; x2c]  ;
+            corrsFormattedclean{j,i}=[x2c ; x1c]  ;
+             
             FFormatted{i,j}=fundmatrix(x1, x2);
             FFormatted{j,i}=fundmatrix(x1, x2)';
             

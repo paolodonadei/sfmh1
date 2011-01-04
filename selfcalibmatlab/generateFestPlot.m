@@ -3,7 +3,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 
 seqname='merton1';
 numN=200;
-t=1.96; %threshold for deciding outliers , not sure
+tt=1.96; %threshold for deciding outliers , not sure
 numPoints=20;
 
 
@@ -44,8 +44,8 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','RANSAC', 'MLESAC','NAPSAC'};
-AlgFuncs={ @fundmatrixunrobust ,@ransackovesi, @mlesactor ,  @napsactor};
+AlgNames={ 'Un-robust','RANSAC'};
+AlgFuncs={ @fundmatrixunrobust ,@ransackovesi};
 
 
 
@@ -115,6 +115,7 @@ for i=1:numPoints
         
         [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
         
+        [mm,nn]=size(corrs);
         % augmenting corrs with zeros for homo coordinates
         x1 = [ corrs(1:2,:); ones(1,nn)];    % Extract x1 and x2 from x
         x2 = [ corrs(3:4,:); ones(1,nn)];
@@ -129,7 +130,7 @@ for i=1:numPoints
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
             
-            [bestInliers, bestF, d, current_errors_samp_mean{i}(k,j),current_errors_samp_var{i}(k,j),current_errors_samp_median{i}(k,j),current_errors_inlier{i}(k,j)] = sampsonF(F, xcombined, t);
+            [bestInliers, bestF, d, current_errors_samp_mean{i}(k,j),current_errors_samp_var{i}(k,j),current_errors_samp_median{i}(k,j),current_errors_inlier{i}(k,j)] = sampsonF(F, xcombined, tt);
             
             fprintf(comletesolsf, [  num2str(current_errors_samp_mean{i}(k,j)) ' , ' num2str(current_errors_samp_var{i}(k,j)) ' , ' num2str(current_errors_samp_median{i}(k,j)) ' , '  num2str(current_errors_inlier{i}(k,j))  ' , ']);
             
@@ -178,28 +179,26 @@ data={current_errors_samp_mean, current_errors_samp_median,current_errors_samp_v
 dataNames={'means', 'variances', 'medians','inliers','iterations'};
 sizeDataCats=size(data,2);
 
-for i=1:sizeDataCats
-    % the mean stuff
-    for zz=1:3
-    figure;
-    hold;
-    for k=1:numalgs
-        
-        plot(t,data{i}(k,:),styles{k});
-    end
-    xlabel(['x (' label ')']);       %  add axis labels and plot title
-    ylabel('y (percentage error in focal length)');
-    title([dataNames{i} ' plot of ' label ' versus error in focal length estimation']);
-    legend(AlgNames);
+
+figure;
+hold;
+for k=1:numalgs
     
-    %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
-    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
-    saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
-    hold
-    end
-    
+    plot(t,means_mean(k,:),styles{k});
 end
+xlabel(['x noise ratio']);       %  add axis labels and plot title
+ylabel('y mean of mean errors');
+title([dataNames{i} ' plot of mean of mean errors versus error in focal length estimation']);
+legend(AlgNames);
+
+%  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
+saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
+saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
+saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
+hold
+
+
+
 
 
 
@@ -213,3 +212,10 @@ tElapsedprogram=toc(tStartprogram);
 disp([' program took ' num2str(tElapsedprogram) ' seconds']);
 copyfile('*.m',[curdirname '\matlabfiles']);
 end
+
+%make a generic plotting script that plots the variance and mean and median
+%of every measure
+
+% write a proper mapsac and ransac function that uses a function to
+% calculate the score and also doesnt normalize beforehand, also i should
+% probably write a mlesac fucntion

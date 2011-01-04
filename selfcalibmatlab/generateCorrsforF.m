@@ -1,4 +1,4 @@
-function [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numcorrs, outlierratio, stderror, type, seqname )
+function [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numcorrs, outlierratio, stderror, type, seqname )
 %this function generates a virtual or a real pair of images with the given
 %amount of outliers and inliers with the given amount of gaussian noise
 %added to everything and also the seqname is either the sequence name or
@@ -63,9 +63,10 @@ if(type=='s')
         [status currdir] = system(comma );
     end
     
-    M = dlmread('matches.csv',',',1);
-    
+    M = dlmread('matches.csv',',',1,0);
+    MCL = dlmread('matchesclean.csv',',',1,0);
     delete('matches.csv');
+    delete('matchesclean.csv');
     %    I1=imread('correspondences_drprevimg.png');
     %    I2=imread('correspondences_drnextimg.png');
     %    I1motion=imread('correspondences_dr.png');
@@ -83,9 +84,14 @@ if(type=='s')
     t2=load('trans_synth_data.txt');
     x1=M(:,2:3)';
     x2=M(:,4:5)';
+    
+      x1c=MCL(:,2:3)';
+    x2c=MCL(:,4:5)';
+    
     inlierOutlier=M(:,6)';
       inlierOutlier=  1-inlierOutlier;
     corrs=[x1 ; x2];
+     corrsclean=[x1c ; x2c];
     cd(oldFolder);
 end
 
@@ -129,14 +135,14 @@ if(type=='f')
     k2=eye(3);
     t1=zeros(3,1);
     t2=zeros(3,1);
-    
+    corrsclean=corrs;
     inlierOutlier=ones(size(corrs,2),1);
 end
 
 
 %for oxford
 if(type=='o')
-    [cocorrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
+    [cocorrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier,corrsFormattedclean] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
 
     corrs(1:2,:)=corrsFormatted{1,2}(1:2,:);
     corrs(3:4,:)=corrsFormatted{1,2}(4:5,:);
@@ -146,6 +152,8 @@ if(type=='o')
     I2=double(double(IMS{2})/255);
     Fgt=FFormattedGT{1,2};
     inlierOutlier=1-inlierOutlier;
+   corrsclean(1:2,:)=corrsFormattedclean{1,2}(1:2,:);
+     corrsclean(3:4,:)=corrsFormattedclean{1,2}(4:5,:);
 end
 
 %gui showing the F

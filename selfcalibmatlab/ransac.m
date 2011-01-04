@@ -110,7 +110,7 @@
 % December 2008 - Octave compatibility mods
 % June     2009 - Argument 'MaxTrials' corrected to 'maxTrials'!
 
-function [M, inliers] = ransac(x, fittingfn, distfn, degenfn, s, t, feedback, ...
+function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t, feedback, ...
                                maxDataTrials, maxTrials)
 
     Octave = exist('OCTAVE_VERSION') ~= 0;

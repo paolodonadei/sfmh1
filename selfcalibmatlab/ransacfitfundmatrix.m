@@ -40,8 +40,8 @@
 % February 2004  Original version
 % August   2005  Distance error function changed to match changes in RANSAC
 
-function [F, inliers] = ransacfitfundmatrix(x1, x2, t, feedback)
-
+function [F, inliers,trialcount] = ransacfitfundmatrix(x1, x2,  feedback)
+    t = .001;  % Distance threshold for deciding outliers
     if ~all(size(x1)==size(x2))
         error('Data sets x1 and x2 must have the same dimension');
     end
@@ -76,7 +76,7 @@ function [F, inliers] = ransacfitfundmatrix(x1, x2, t, feedback)
     distfn    = @funddist;
     degenfn   = @isdegenerate;
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [F, inliers] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
+    [F, inliers,trialcount] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
 
     % Now do a final least squares fit on the data points considered to
     % be inliers.
