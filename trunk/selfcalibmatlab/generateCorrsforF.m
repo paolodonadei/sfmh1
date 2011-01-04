@@ -3,7 +3,7 @@ function [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorr
 %amount of outliers and inliers with the given amount of gaussian noise
 %added to everything and also the seqname is either the sequence name or
 %the directory where the images reside
-writefiles=1;
+writefiles=0;
 
 
 dirnames{1,1}='/home/houman/work/test_data/';
@@ -233,6 +233,9 @@ end
 
 end
 
-%only thing i have not done here is make sure the number of corrrspondences
+%1) only thing i have not done here is make sure the number of corrrspondences
 %is the same as that requested for the cases of sift and oxford
 % next step is to write a function to calculate epipolar error
+
+%2)  other thing to do is to move this synthetic correlation creation to
+% matlab , its pretty time consuming now
