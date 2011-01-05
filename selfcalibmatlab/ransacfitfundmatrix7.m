@@ -44,7 +44,7 @@
 % August   2005  Distance error function changed to match changes in RANSAC
 % June     2009  Bug in the wrapper function fixed (thanks to Peter Corke)
 
-function [F, inliers] = ransacfitfundmatrix7(x1, x2, t, feedback)
+function [F, inliers,trialcount] = ransacfitfundmatrix7(x1, x2, t, feedback)
 
     if ~all(size(x1)==size(x2))
         error('Data sets x1 and x2 must have the same dimension');
@@ -79,7 +79,7 @@ function [F, inliers] = ransacfitfundmatrix7(x1, x2, t, feedback)
     distfn    = @funddist;
     degenfn   = @isdegenerate;
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [F, inliers] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
+    [F, inliers,trialcount] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
 
     % Now do a final least squares fit on the data points considered to
     % be inliers.

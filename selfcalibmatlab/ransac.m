@@ -118,7 +118,7 @@ function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t, f
     % Test number of parameters
     error ( nargchk ( 6, 9, nargin ) );
     
-    if nargin < 9; maxTrials = 1000;    end; 
+    if nargin < 9; maxTrials = 2000;    end; 
     if nargin < 8; maxDataTrials = 100; end; 
     if nargin < 7; feedback = 0;        end;
     
@@ -164,7 +164,9 @@ function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t, f
                 % reset degenerate to true.
                 if isempty(M)
                     degenerate = 1;
+              %      display('empty F');
                 end
+               
             end
             
             % Safeguard against being stuck in this loop forever
@@ -198,6 +200,7 @@ function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t, f
             pNoOutliers = max(eps, pNoOutliers);  % Avoid division by -Inf
             pNoOutliers = min(1-eps, pNoOutliers);% Avoid division by 0.
             N = log(1-p)/log(pNoOutliers);
+            display(['number of inliers is ' num2str(ninliers)]);
         end
         
         trialcount = trialcount+1;
