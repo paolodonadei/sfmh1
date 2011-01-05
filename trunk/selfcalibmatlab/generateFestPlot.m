@@ -188,13 +188,13 @@ for k=1:numalgs
 end
 xlabel(['x noise ratio']);       %  add axis labels and plot title
 ylabel('y mean of mean errors');
-title([dataNames{i} ' plot of mean of mean errors versus error in focal length estimation']);
+title([ ' plot of mean of mean errors versus error in focal length estimation']);
 legend(AlgNames);
 
 %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.jpg']);
-saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.fig']);
-saveas(gcf,[curdirname '/param_focal_' paramcheck '_' dataNames{i} nowtime '.eps'],'epsc');
+saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.jpg']);
+saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.fig']);
+saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.eps'],'epsc');
 hold
 
 
