@@ -23,26 +23,6 @@ end
 % Linear step
 A = vgg_vec_swap(x1,x2)';
 
-A2=[];
-for i=1:7
-    
-    xx0 = x1(1,i);
-    yy0 = x1(2,i);
-    xx1 = x2(1,i);
-    yy1 = x2(2,i);
-    
-    A2(i,1) = xx1*xx0;
-    A2(i,2) = xx1*yy0;
-    A2(i,3) = xx1;
-    A2(i,4) = yy1*xx0;
-    A2(i,5) = yy1*yy0;
-    A2(i,6) = yy1;
-    A2(i,7) = xx0;
-    A2(i,8) = yy0;
-    A2(i,9) = 1;
-end
-
-
 
 [u,s,v] = svd(A,0);
 FF{1} = reshape(v(:,end-1),[3 3]);
@@ -70,9 +50,12 @@ if(q>1)
     for k=1:q
         
         FB{k}=F(:,:,k);
+        FB{k}=FB{k}';
     end
     clear F
     F=FB;
+else
+    F=F';
 end
 
 
