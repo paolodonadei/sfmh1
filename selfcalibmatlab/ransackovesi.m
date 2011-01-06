@@ -16,8 +16,8 @@ if(m1==2)
     x1=[x1 ; ones(1,n1)];
       x2=[x2 ; ones(1,n1)];
 end
- [F, inliers, iters] = ransacfitfundmatrix7(x1, x2,  0.001);
- %[F, inliers, iters] =  ransacfitfundmatrix2(x1, x2,  0.001);
-% [F, inliers, iters] =  ransacfitfundmatrix(x1, x2,  0.001);
+ %[F, inliers, iters] = ransacfitfundmatrix7(x1, x2,  0.001);
+ [F, inliers, iters] =  ransacfitfundmatrix2(x1, x2,  0.001);
+ %[F, inliers, iters] =  ransacfitfundmatrix(x1, x2,  0.001);
 
 end
