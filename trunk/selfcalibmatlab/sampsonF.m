@@ -7,7 +7,7 @@
 % which we have to pick the best one. (A 7 point solution can return up to 3
 % solutions)
 
-function [bestInliers, bestF, d, meaner,varer,meder,numins] = sampsonF(F, x, t);
+function [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, x, t);
 [mm,nn]=size(x);
 
 if(mm==6)
@@ -43,9 +43,15 @@ if iscell(F)  % We have several solutions each of which must be tested
         inliers = find(abs(d) < t);     % Indices of inlying points
         
         if length(inliers) > ninliers   % Record best solution
+            clear residuals;
             ninliers = length(inliers);
             bestF = F{k};
             bestInliers = inliers;
+            numins=sum(bestInliers);
+            meaner=mean(d);
+            varer=var(d);
+            meder=median(d);
+            residuals=d;
         end
     end
     
@@ -68,4 +74,6 @@ else     % We just have one solution
     meaner=mean(d);
     varer=var(d);
     meder=median(d);
+    residuals=d;
+    
 end

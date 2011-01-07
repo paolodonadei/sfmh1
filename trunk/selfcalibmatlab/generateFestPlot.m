@@ -4,7 +4,7 @@ function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY
 seqname='merton1';
 numN=200;
 tt=1.96; %threshold for deciding outliers , not sure
-numPoints=20;
+numPoints=10;
 
 
 tStartprogram=tic;
@@ -44,8 +44,8 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','RANSAC'};
-AlgFuncs={ @fundmatrixunrobust ,@ransackovesi};
+AlgNames={ 'Un-robust','RANSAC','MSAC'};
+AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi};
 
 
 
@@ -113,15 +113,17 @@ for i=1:numPoints
         totalAgltime=0;
         
         
-        [ Fgt,k1,k2,corrs,inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
-        
+       [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
+         
         [mm,nn]=size(corrs);
         % augmenting corrs with zeros for homo coordinates
         x1 = [ corrs(1:2,:); ones(1,nn)];    % Extract x1 and x2 from x
         x2 = [ corrs(3:4,:); ones(1,nn)];
         xcombined = [x1 ; x2];
+        
+        
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ')'] );
-        fprintf(dispfid,['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ')']);
+        fprintf(dispfid,['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ') \n']);
         for k=1:numalgs
             
             tic;
@@ -130,9 +132,9 @@ for i=1:numPoints
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
             
-            [bestInliers, bestF, d, current_errors_samp_mean{i}(k,j),current_errors_samp_var{i}(k,j),current_errors_samp_median{i}(k,j),current_errors_inlier{i}(k,j)] = sampsonF(F, xcombined, tt);
+            [bestInliers, bestF, d, current_errors_samp_mean{i}(k,j),current_errors_samp_var{i}(k,j),current_errors_samp_median{i}(k,j),current_errors_inlier{i}(k,j)] = sampsonF(F, corrsclean, tt);
             
-            fprintf(comletesolsf, [  num2str(current_errors_samp_mean{i}(k,j)) ' , ' num2str(current_errors_samp_var{i}(k,j)) ' , ' num2str(current_errors_samp_median{i}(k,j)) ' , '  num2str(current_errors_inlier{i}(k,j))  ' , ']);
+            fprintf(comletesolsf, [  num2str(current_errors_samp_mean{i}(k,j)) ' , ' num2str(current_errors_samp_var{i}(k,j)) ' , ' num2str(current_errors_samp_median{i}(k,j)) ' , '  num2str(current_errors_inlier{i}(k,j))  ' , \n']);
             
             disp(['algorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j))  ' inliers: ' current_errors_inlier{i}(k,j) ' time: ' num2str(PtElapsed)]);
             fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j)) ' and error median: ' num2str(current_errors_samp_median{i}(k,j)) ' iterations: ' current_errors_iterations{i}(k,j) ' inliers: ' current_errors_inlier{i}(k,j) ' time: ' num2str(PtElapsed)]);
@@ -192,9 +194,9 @@ title([ ' plot of mean of mean errors versus error in focal length estimation'])
 legend(AlgNames);
 
 %  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.jpg']);
-saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.fig']);
-saveas(gcf,[curdirname '/param_focal_e_' dataNames{i} nowtime '.eps'],'epsc');
+saveas(gcf,[curdirname '/param_meanmean' nowtime '.jpg']);
+saveas(gcf,[curdirname '/param_meanmean' nowtime '.fig']);
+saveas(gcf,[curdirname '/param_meanmean' nowtime '.eps'],'epsc');
 hold
 
 
