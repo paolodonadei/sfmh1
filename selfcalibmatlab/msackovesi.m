@@ -1,4 +1,4 @@
-function [ F, iters ] = ransackovesi(x1,x2)
+function [ F, iters ] = msackovesi(x1,x2)
 
  if nargin == 1
 	corrs=x1;
@@ -17,7 +17,7 @@ if(m1==2)
       x2=[x2 ; ones(1,n1)];
 end
 
- [F, inliers, iters] =  ransacfitfundmatrix2(x1, x2);
+ [F, inliers, iters] =  msacfitfundmatrix(x1, x2);
 
 
 end
