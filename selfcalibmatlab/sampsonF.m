@@ -47,7 +47,7 @@ if iscell(F)  % We have several solutions each of which must be tested
             ninliers = length(inliers);
             bestF = F{k};
             bestInliers = inliers;
-            numins=sum(bestInliers);
+            numins=(length(inliers)/length(d))*100;
             meaner=mean(d);
             varer=var(d);
             meder=median(d);
@@ -70,7 +70,7 @@ else     % We just have one solution
     %d=sqrt(d);
     bestInliers = find(abs(d) < t);     % Indices of inlying points
     bestF = F;                          % Copy F directly to bestF
-    numins=sum(bestInliers);
+    numins=(length(bestInliers)/length(d))*100;
     meaner=mean(d);
     varer=var(d);
     meder=median(d);
