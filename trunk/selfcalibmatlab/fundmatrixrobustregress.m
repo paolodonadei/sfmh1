@@ -31,9 +31,17 @@ A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
 B=A(:,1:8); % it says forget that last column
 
 %b = robustfit(B,zeros(npts,1));
-b = regress(ones(npts,1),A);
+b = regress(ones(npts,1),B);
 
-F = reshape(b,3,3)';
+b(9,1)=1;
+
+F = reshape(b,3,3);
+
+  % Enforce constraint that fundamental matrix has rank 2 by performing
+    % a svd and then reconstructing with the two largest singular values.
+    [U,D,V] = svd(F,0);
+    F = U*diag([D(1,1) D(2,2) 0])*V';
+    
 % Denormalise
 % F = T2'*F*T1;
 % F=F/F(3,3);
