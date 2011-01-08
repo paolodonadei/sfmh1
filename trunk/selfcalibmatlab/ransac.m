@@ -110,19 +110,25 @@
 % December 2008 - Octave compatibility mods
 % June     2009 - Argument 'MaxTrials' corrected to 'maxTrials'!
 
-function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi)
+function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
 
 Octave = exist('OCTAVE_VERSION') ~= 0;
 
 % Test number of parameters
 error ( nargchk ( 6, 9, nargin ) );
 
-maxTrials = 2000;
+maxTrials = 4000;
 maxDataTrials = 100;
 feedback = 0;
 if nargin < 9
     initialPvi=ones(1,size(x,2));
 end
+
+pvis= initialPvi;
+
+
+ 
+
 [rows, npts] = size(x);
 
 p = 0.99;         % Desired probability of choosing at least one sample
@@ -145,7 +151,12 @@ while N > trialcount
         % (If you do not have the statistics toolbox, or are using Octave,
         % use the function RANDOMSAMPLE from my webpage)
         
-        ind = feval(randSampFunc,npts, s);
+        
+        if nargin < 8
+        ind =  randsample(npts, s);
+        else
+             ind = feval(randSampFunc,npts, s,pvi);
+        end
         
         
         % Test that these points are not a degenerate configuration.
@@ -190,6 +201,11 @@ while N > trialcount
     curerror=feval(errorFunc, size(x,2),inliers ,residuals,t);
     
     if curerror < besterror    % Largest set of inliers so far...
+         if nargin >9
+         pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
+         end
+        
+       
         besterror = curerror;  % Record data for this model
         bestinliers = inliers;
         bestM = M;

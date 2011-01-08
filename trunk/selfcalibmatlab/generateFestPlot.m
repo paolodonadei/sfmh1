@@ -1,21 +1,20 @@
-function [ t,means_F,medians_F,  variances_F ,means_XY,medians_XY,  variances_XY ] =     generateFestPlot(type, variance,repeat, startp, endp )
+function [ t,means_mean ] =     generateFestPlot(type, variance,repeat, startp, endp )
 
-
+tt=1.96*1.96;
 seqname='merton1';
 numN=200;
-tt=1.96; %threshold for deciding outliers , not sure
 numPoints=10;
 
 
 tStartprogram=tic;
 
-if (nargin == 9)
+if (nargin == 3)
     startp=0;
     endp=1;
 end
 
 
-savefoldername='datafilesdFest';
+savefoldername='festdatafiles';
 direxists=1;
 dircount=0;
 
@@ -40,8 +39,8 @@ t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
 %Algs
-fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
-fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
+fid = fopen([curdirname '/algresults.txt'], 'w');
+fidgraph = fopen([curdirname '/graphdata.csv'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
 AlgNames={ 'Un-robust','RANSAC','MSAC'};
@@ -52,13 +51,19 @@ AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi};
 numalgs=size(AlgFuncs,2);
 
 %outputs
-means_F=zeros(numalgs,numPoints);
-medians_F=zeros(numalgs,numPoints);
-variances_F=zeros(numalgs,numPoints);
 
-means_XY=zeros(numalgs,numPoints);
-medians_XY=zeros(numalgs,numPoints);
-variances_XY=zeros(numalgs,numPoints);
+
+means_mean=zeros(numalgs,numPoints);
+medians_mean=zeros(numalgs,numPoints);
+variances_mean=zeros(numalgs,numPoints);
+
+means_med=zeros(numalgs,numPoints);
+medians_med=zeros(numalgs,numPoints);
+variances_med=zeros(numalgs,numPoints);
+
+means_var=zeros(numalgs,numPoints);
+means_inliers=zeros(numalgs,numPoints);
+means_iterations=zeros(numalgs,numPoints);
 
 %arg paramters
 
@@ -69,7 +74,7 @@ step=(  endp-startp)/numPoints;
 n=startp:step:endp;
 
 t=n(1,1:numPoints);
-label='noise-level';
+
 
 
 
@@ -80,20 +85,25 @@ currIteration=0;
 %allSolutions=cell(numPoints,repeat,numalgs);
 
 
-fprintf(fidgraph, ' , ');
+fprintf(fidgraph, ' error Ratio , ');
 for k=1:numalgs
-    fprintf(fidgraph, [  AlgNames{1,k} '_meanE , ' AlgNames{1,k} '_medianE , '  AlgNames{1,k} '_variance , ']);
+    fprintf(fidgraph, [  AlgNames{1,k} '_meanOFmeanE , ' AlgNames{1,k} '_medianOFmeanE , '  AlgNames{1,k} '_varianceOFmean , '  AlgNames{1,k} '_meanOFmedianE , ' AlgNames{1,k} '_medianOFmedianE , '  AlgNames{1,k} '_varianceOFmedian , '   AlgNames{1,k} '_meanOFvariance , ' AlgNames{1,k} '_iterations , ' AlgNames{1,k} '_inliers , ']);
 end
 fprintf(fidgraph, '\n');
 
 
+current_errors_samp_mean=cell(numPoints);
+current_errors_samp_var=cell(numPoints);
+current_errors_samp_median=cell(numPoints);
+current_errors_inlier=cell(numPoints);
+current_errors_iterations=cell(numPoints);
 
 
 for i=1:numPoints
-    comletesolsf= fopen([curdirname '/sols' num2str(i) '_nowtime_.txt'], 'w');
-    fprintf(comletesolsf, ' , ');
+    comletesolsf= fopen([curdirname '/sols_t_' num2str(i) '_.txt'], 'w');
+    fprintf(comletesolsf, ' repeat , ');
     for k=1:numalgs
-        fprintf(comletesolsf, [  AlgNames{1,k} '_sampsonerrorMean , ' AlgNames{1,k} '_sampsonerrorVariance , '  AlgNames{1,k} '_sampsonerrormedian , ' AlgNames{1,k} '_nInliers , ' AlgNames{1,k} '_iterations , ' ]);
+        fprintf(comletesolsf, [  AlgNames{1,k} '_sampsonerrorMean , ' AlgNames{1,k} '_sampsonerrorVariance , '  AlgNames{1,k} '_sampsonerrormedian , '  AlgNames{1,k} '_iterations , ' ]);
     end
     
     
@@ -113,13 +123,13 @@ for i=1:numPoints
         totalAgltime=0;
         
         
-       [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
-         
+        [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
+        
         [mm,nn]=size(corrs);
         % augmenting corrs with zeros for homo coordinates
         x1 = [ corrs(1:2,:); ones(1,nn)];    % Extract x1 and x2 from x
         x2 = [ corrs(3:4,:); ones(1,nn)];
-        xcombined = [x1 ; x2];
+   
         
         
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ')'] );
@@ -128,16 +138,16 @@ for i=1:numPoints
             
             tic;
             clear F iterations
-            [F, current_errors_iterations{i}(k,j)]=AlgFuncs{k}(x1,x2); %assuming camera size is 512x512
+            [F, current_errors_iterations{i}(k,j)]=AlgFuncs{k}(x1,x2);
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
             
             [bestInliers, bestF, d, current_errors_samp_mean{i}(k,j),current_errors_samp_var{i}(k,j),current_errors_samp_median{i}(k,j),current_errors_inlier{i}(k,j)] = sampsonF(F, corrsclean, tt);
             
-            fprintf(comletesolsf, [  num2str(current_errors_samp_mean{i}(k,j)) ' , ' num2str(current_errors_samp_var{i}(k,j)) ' , ' num2str(current_errors_samp_median{i}(k,j)) ' , '  num2str(current_errors_inlier{i}(k,j))  ' , \n']);
+            fprintf(comletesolsf, [  num2str(current_errors_samp_mean{i}(k,j)) ' , ' num2str(current_errors_samp_var{i}(k,j)) ' , ' num2str(current_errors_samp_median{i}(k,j)) ' , '  num2str(current_errors_inlier{i}(k,j))  ' , ']);
             
-            disp(['algorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j))  ' inliers: ' current_errors_inlier{i}(k,j) ' time: ' num2str(PtElapsed)]);
-            fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j)) ' and error median: ' num2str(current_errors_samp_median{i}(k,j)) ' iterations: ' current_errors_iterations{i}(k,j) ' inliers: ' current_errors_inlier{i}(k,j) ' time: ' num2str(PtElapsed)]);
+            disp(['algorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j))  ' inliers: '  num2str(current_errors_inlier{i}(k,j)) ' time: ' num2str(PtElapsed)]);
+            fprintf(dispfid,['\nalgorithm: ' AlgNames{k} ' had mean error ' num2str(current_errors_samp_mean{i}(k,j)) ' and error variance: ' num2str(current_errors_samp_var{i}(k,j)) ' and error median: ' num2str(current_errors_samp_median{i}(k,j)) ' iterations: '  num2str(current_errors_iterations{i}(k,j)) ' inliers: '  num2str(current_errors_inlier{i}(k,j)) ' time: ' num2str(PtElapsed)]);
             
             
             
@@ -168,7 +178,7 @@ for i=1:numPoints
         means_inliers(k,i)=mean(current_errors_inlier{i}(k,:));
         means_iterations(k,i)=mean(current_errors_iterations{i}(k,:));
         
-        fprintf(fidgraph, ' %6.2f , %6.2f  , %6.2f ,  %6.2f , %6.2f  ,  %6.2f , %6.2f  ,  %6.2f , %6.2f ,' ,means_mean(k,i),medians_mean(k,i),  variances_mean(k,i),means_med(k,i),medians_med(k,i),variances_med(k,i), means_var(k,i),  means_inliers(k,i),means_iterations(k,i));
+        fprintf(fidgraph, ' %6.2f , %6.2f  , %6.2f ,  %6.2f , %6.2f  ,  %6.2f , %6.2f  ,  %6.2f  ,   %6.2f  ,' ,means_mean(k,i),medians_mean(k,i),  variances_mean(k,i),means_med(k,i),medians_med(k,i),variances_med(k,i), means_var(k,i),means_iterations(k,i),means_inliers(k,i));
     end
     
     fprintf(fidgraph, ' \n');
@@ -177,28 +187,30 @@ for i=1:numPoints
 end
 
 % for focal length
-data={current_errors_samp_mean, current_errors_samp_median,current_errors_samp_var,current_errors_inlier,current_errors_iterations};
-dataNames={'means', 'variances', 'medians','inliers','iterations'};
+data={means_mean,  medians_mean,variances_mean,means_inliers,means_iterations };
+dataNames={'means of errors', 'medians of errors', 'variance of errors','inliers','iterations'};
 sizeDataCats=size(data,2);
 
+for i=1:sizeDataCats
+    % the mean stuff
+    figure;
+    hold;
+    for k=1:numalgs
 
-figure;
-hold;
-for k=1:numalgs
-    
-    plot(t,means_mean(k,:),styles{k});
+        plot(t,data{i}(k,:),styles{k});
+    end
+    xlabel(['x outlier ratio']);       %  add axis labels and plot title
+    ylabel(['y ' dataNames{i}]);
+    title([ ' plot of ' dataNames{i} label ' versus error ratio']);
+    legend(AlgNames);
+    saveas(gcf,[curdirname '/param'   dataNames{i} nowtime '.fig']);
+    saveas(gcf,[curdirname '/param_center_'   dataNames{i} nowtime '.jpg']);
+    saveas(gcf,[curdirname '/param_center_' dataNames{i} nowtime '.eps'],'epsc');
+
+
+    hold
+
 end
-xlabel(['x noise ratio']);       %  add axis labels and plot title
-ylabel('y mean of mean errors');
-title([ ' plot of mean of mean errors versus error in focal length estimation']);
-legend(AlgNames);
-
-%  saveas(gcf,['param' paramcheck '_' dataNames{i} nowtime '.eps']);
-saveas(gcf,[curdirname '/param_meanmean' nowtime '.jpg']);
-saveas(gcf,[curdirname '/param_meanmean' nowtime '.fig']);
-saveas(gcf,[curdirname '/param_meanmean' nowtime '.eps'],'epsc');
-hold
-
 
 
 

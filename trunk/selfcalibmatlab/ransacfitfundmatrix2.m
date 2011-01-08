@@ -29,9 +29,9 @@ function [F, inliers,trialcount] = ransacfitfundmatrix2(x1, x2,  feedback)
     distfn    = @sampsonF;
     degenfn   = @isdegenerate;
     scorefunc = @ransacScore;
-    sampleFunc= @randsample;
+   
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [F, inliers,trialcount] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,sampleFunc);
+    [F, inliers,trialcount] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc);
 
     % Now do a final least squares fit on the data points considered to
     % be inliers.
