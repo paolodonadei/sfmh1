@@ -43,8 +43,8 @@ fid = fopen([curdirname '/algresults.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata.csv'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','RANSAC','MSAC'};
-AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi};
+AlgNames={ 'Un-robust','RANSAC','MSAC','Huber'};
+AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi,@fundmatrixrobustregress};
 
 
 

@@ -1,5 +1,5 @@
 
-function [F,iters] = fundmatrixrobustregress(x1, x2)
+function [F] = fundmatrixrobustrandleverage(x1, x2)
 
 
 if nargin == 1
@@ -28,18 +28,14 @@ A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
     x2(2,:)'.*x1(1,:)'   x2(2,:)'.*x1(2,:)'  x2(2,:)' ...
     x1(1,:)'             x1(2,:)'            ones(npts,1) ];
 
-B=A(:,1:7); % it says forget that last column
-y=-A(:,8);
-b = robustfit(B,y);
-%b = regress(-ones(npts,1),B);
+B=A(:,1:8); % it says forget that last column
 
-c=b(2:8,:);
-c(8,1)=1;
-c(9,1)=b(1,1);
+%b = robustfit(B,zeros(npts,1));
+b = regress(-ones(npts,1),B);
 
-c=c/c(9,1);
+b(9,1)=1;
 
-F = reshape(c,3,3);
+F = reshape(b,3,3);
 
 % Enforce constraint that fundamental matrix has rank 2 by performing
 % a svd and then reconstructing with the two largest singular values.
@@ -49,7 +45,7 @@ F=F';
 % Denormalise
 % F = T2'*F*T1;
 % F=F/F(3,3);
-iters=0;
+
 
 
 end
