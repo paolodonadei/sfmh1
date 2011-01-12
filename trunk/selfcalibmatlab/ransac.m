@@ -1,114 +1,3 @@
-% RANSAC - Robustly fits a model to data with the RANSAC algorithm
-%
-% Usage:
-%
-% [M, inliers] = ransac(x, fittingfn, distfn, degenfn s, t, feedback, ...
-%                       maxDataTrials, maxTrials)
-%
-% Arguments:
-%     x         - Data sets to which we are seeking to fit a model M
-%                 It is assumed that x is of size [d x Npts]
-%                 where d is the dimensionality of the data and Npts is
-%                 the number of data points.
-%
-%     fittingfn - Handle to a function that fits a model to s
-%                 data from x.  It is assumed that the function is of the
-%                 form:
-%                    M = fittingfn(x)
-%                 Note it is possible that the fitting function can return
-%                 multiple models (for example up to 3 fundamental matrices
-%                 can be fitted to 7 matched points).  In this case it is
-%                 assumed that the fitting function returns a cell array of
-%                 models.
-%                 If this function cannot fit a model it should return M as
-%                 an empty matrix.
-%
-%     distfn    - Handle to a function that evaluates the
-%                 distances from the model to data x.
-%                 It is assumed that the function is of the form:
-%                    [inliers, M] = distfn(M, x, t)
-%                 This function must evaluate the distances between points
-%                 and the model returning the indices of elements in x that
-%                 are inliers, that is, the points that are within distance
-%                 't' of the model.  Additionally, if M is a cell array of
-%                 possible models 'distfn' will return the model that has the
-%                 most inliers.  If there is only one model this function
-%                 must still copy the model to the output.  After this call M
-%                 will be a non-cell object representing only one model.
-%
-%     degenfn   - Handle to a function that determines whether a
-%                 set of datapoints will produce a degenerate model.
-%                 This is used to discard random samples that do not
-%                 result in useful models.
-%                 It is assumed that degenfn is a boolean function of
-%                 the form:
-%                    r = degenfn(x)
-%                 It may be that you cannot devise a test for degeneracy in
-%                 which case you should write a dummy function that always
-%                 returns a value of 1 (true) and rely on 'fittingfn' to return
-%                 an empty model should the data set be degenerate.
-%
-%     s         - The minimum number of samples from x required by
-%                 fittingfn to fit a model.
-%
-%     t         - The distance threshold between a data point and the model
-%                 used to decide whether the point is an inlier or not.
-%
-%     feedback  - An optional flag 0/1. If set to one the trial count and the
-%                 estimated total number of trials required is printed out at
-%                 each step.  Defaults to 0.
-%
-%     maxDataTrials - Maximum number of attempts to select a non-degenerate
-%                     data set. This parameter is optional and defaults to 100.
-%
-%     maxTrials - Maximum number of iterations. This parameter is optional and
-%                 defaults to 1000.
-%
-% Returns:
-%     M         - The model having the greatest number of inliers.
-%     inliers   - An array of indices of the elements of x that were
-%                 the inliers for the best model.
-%
-% For an example of the use of this function see RANSACFITHOMOGRAPHY or
-% RANSACFITPLANE
-
-% References:
-%    M.A. Fishler and  R.C. Boles. "Random sample concensus: A paradigm
-%    for model fitting with applications to image analysis and automated
-%    cartography". Comm. Assoc. Comp, Mach., Vol 24, No 6, pp 381-395, 1981
-%
-%    Richard Hartley and Andrew Zisserman. "Multiple View Geometry in
-%    Computer Vision". pp 101-113. Cambridge University Press, 2001
-
-% Copyright (c) 2003-2006 Peter Kovesi
-% School of Computer Science & Software Engineering
-% The University of Western Australia
-% pk at csse uwa edu au
-% http://www.csse.uwa.edu.au/~pk
-%
-% Permission is hereby granted, free of charge, to any person obtaining a copy
-% of this software and associated documentation files (the "Software"), to deal
-% in the Software without restriction, subject to the following conditions:
-%
-% The above copyright notice and this permission notice shall be included in
-% all copies or substantial portions of the Software.
-%
-% The Software is provided "as is", without warranty of any kind.
-%
-% May      2003 - Original version
-% February 2004 - Tidied up.
-% August   2005 - Specification of distfn changed to allow model fitter to
-%                 return multiple models from which the best must be selected
-% Sept     2006 - Random selection of data points changed to ensure duplicate
-%                 points are not selected.
-% February 2007 - Jordi Ferrer: Arranged warning printout.
-%                               Allow maximum trials as optional parameters.
-%                               Patch the problem when non-generated data
-%                               set is not given in the first iteration.
-% August   2008 - 'feedback' parameter restored to argument list and other
-%                 breaks in code introduced in last update fixed.
-% December 2008 - Octave compatibility mods
-% June     2009 - Argument 'MaxTrials' corrected to 'maxTrials'!
 
 function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
 
@@ -116,7 +5,23 @@ Octave = exist('OCTAVE_VERSION') ~= 0;
 debugf=1;
 
 if(debugf==1)
-    fid = fopen('ransacdebug.csv', 'w');
+    pviselected =[];
+    debugdirname='debugransac';
+    seedname='ransacdebug';
+    fexists=1;
+    counter=1;
+    dbgfname='';
+    if(exist(debugdirname,'dir')==0)
+        mkdir(debugdirname);
+    end
+    
+    while( fexists~=0)
+        counter= counter+1;
+        dbgfname=[debugdirname '/' seedname num2str(counter) '.csv'];
+        fexists=exist(dbgfname,'file');
+    end
+    fid = fopen(dbgfname, 'w');
+    fprintf( fid,[' trialcount, N, randSample , randSamplePvis , ninliers , curError,  bestSet ']);
 end
 
 % Test number of parameters
@@ -146,10 +51,9 @@ N = 1;            % Dummy initialisation for number of trials.
 
 while N > trialcount
     
-        if(debugf==1)
-           fprintf(fid,[ '\n' num2str(trialcount) ' , ']); left here zzz write teh debug for ransac then experiment with cook distance and some other crap 
-           and then see if you can accumulate anything during the runs
-        end
+    if(debugf==1)
+        fprintf(fid,[ '\n' num2str(trialcount) ' , ' num2str(N) ' , ']);
+    end
     % Select at random s datapoints to form a trial model, M.
     % In selecting these points we have to check that they are not in
     % a degenerate configuration.
@@ -167,11 +71,7 @@ while N > trialcount
             ind = feval(randSampFunc,npts, s,pvis);
         end
         
-        if(debugf==1)
-            for vv=1:s
-                fid = fopen('ransacdebug.csv', 'w');
-            end
-        end
+        
         
         % Test that these points are not a degenerate configuration.
         degenerate = feval(degenfn, x(:,ind));
@@ -188,10 +88,12 @@ while N > trialcount
             % reset degenerate to true.
             if isempty(M)
                 degenerate = 1;
-                %      display('empty F');
+                %     display('empty F');
             end
             
         end
+        
+        
         
         % Safeguard against being stuck in this loop forever
         count = count + 1;
@@ -201,6 +103,20 @@ while N > trialcount
         end
     end
     
+    if(debugf==1)
+        for vv=1:s
+            fprintf(fid,[ num2str(ind(vv)) ]);
+            if(vv~=s) fprintf(fid,[ ' - ']); end
+        end
+        fprintf(fid,[ ' , ']);
+        for vv=1:s
+            fprintf(fid,[ num2str(pvis(ind(vv))) ]);
+            if(vv~=s) fprintf(fid,[ ' - ']); end
+        end
+        fprintf(fid,[ ' , ']);
+        
+        pviselected =[pviselected  pvis(ind)'];
+    end
     % Once we are out here we should have some kind of model...
     % Evaluate distances between points and model returning the indices
     % of elements in x that are inliers.  Additionally, if M is a cell
@@ -214,11 +130,19 @@ while N > trialcount
     
     curerror=feval(errorFunc, size(x,2),inliers ,residuals,t);
     
+    if(debugf==1)
+        fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
+    end
+    
+    
     if curerror < besterror    % Largest set of inliers so far...
         if nargin >9
             pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
         end
         
+        if(debugf==1)
+            fprintf(fid,[ ' ,  * , ']);
+        end
         
         besterror = curerror;  % Record data for this model
         bestinliers = inliers;
@@ -232,6 +156,10 @@ while N > trialcount
         pNoOutliers = min(1-eps, pNoOutliers);% Avoid division by 0.
         N = log(1-p)/log(pNoOutliers);
         %    display(['number of inliers is ' num2str(ninliers)]);
+    else
+        if(debugf==1)
+            fprintf(fid,[ ' ,   , ']);
+        end
     end
     
     trialcount = trialcount+1;
@@ -256,4 +184,30 @@ else
     M = [];
     inliers = [];
     error('ransac was unable to find a useful solution');
+end
+
+if(debugf==1)
+    fprintf(fid,['\n\n\n mean of pvis was , ' num2str(mean(pvis))]);
+    fprintf(fid,['\n median of pvis was , ' num2str(median(pvis))]);
+    fprintf(fid,['\n mean of pvis selected was , ' num2str(mean( pviselected'))]);
+    fprintf(fid,['\n median of pvis selected  was , ' num2str(median( pviselected'))]);
+    fprintf(fid,['\n max of pvis selected was , ' num2str(max( pviselected'))]);
+    fprintf(fid,['\n min of pvis selected  was , ' num2str(min( pviselected'))]);
+    
+    fprintf(fid,['\n name of error function is , ' func2str(errorFunc)]);
+    if (nargin >7) fprintf(fid,['\n name of sampling function is , ' func2str(randSampFunc)]); end
+    if (nargin >9)   fprintf(fid,['\n name of update pvi function is , ' func2str(updatepviFunc)]); end
+    tm=clock;
+    fprintf(fid,['\n time is : , ' num2str(tm(1)) ' , ' num2str(tm(2)) ' , ' num2str(tm(3)) ' , ' num2str(tm(4)) ' , ' num2str(tm(5)) ' , ']);
+    fclose(fid);
+    
+    hist(pvis,100);
+    title([ ' histogram of pvis ']);
+    saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_all.png']);
+    figure
+    hist(pviselected',100);
+    title([ ' histogram of pvis selected ']);
+    saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_selected.png']);
+end
+
 end
