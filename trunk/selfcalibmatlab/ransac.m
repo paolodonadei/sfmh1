@@ -113,6 +113,11 @@
 function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
 
 Octave = exist('OCTAVE_VERSION') ~= 0;
+debugf=1;
+
+if(debugf==1)
+    fid = fopen('ransacdebug.csv', 'w');
+end
 
 % Test number of parameters
 error ( nargchk ( 6, 9, nargin ) );
@@ -127,7 +132,7 @@ end
 pvis= initialPvi;
 
 
- 
+
 
 [rows, npts] = size(x);
 
@@ -141,6 +146,10 @@ N = 1;            % Dummy initialisation for number of trials.
 
 while N > trialcount
     
+        if(debugf==1)
+           fprintf(fid,[ '\n' num2str(trialcount) ' , ']); left here zzz write teh debug for ransac then experiment with cook distance and some other crap 
+           and then see if you can accumulate anything during the runs
+        end
     % Select at random s datapoints to form a trial model, M.
     % In selecting these points we have to check that they are not in
     % a degenerate configuration.
@@ -153,11 +162,16 @@ while N > trialcount
         
         
         if nargin < 8
-        ind =  randsample(npts, s);
+            ind =  randsample(npts, s);
         else
-             ind = feval(randSampFunc,npts, s,pvi);
+            ind = feval(randSampFunc,npts, s,pvis);
         end
         
+        if(debugf==1)
+            for vv=1:s
+                fid = fopen('ransacdebug.csv', 'w');
+            end
+        end
         
         % Test that these points are not a degenerate configuration.
         degenerate = feval(degenfn, x(:,ind));
@@ -201,11 +215,11 @@ while N > trialcount
     curerror=feval(errorFunc, size(x,2),inliers ,residuals,t);
     
     if curerror < besterror    % Largest set of inliers so far...
-         if nargin >9
-         pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
-         end
+        if nargin >9
+            pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
+        end
         
-       
+        
         besterror = curerror;  % Record data for this model
         bestinliers = inliers;
         bestM = M;

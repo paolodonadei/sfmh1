@@ -42,9 +42,12 @@ nowtime=num2str(sum(round(100*clock)));
 fid = fopen([curdirname '/algresults.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata.csv'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
+% 
+% AlgNames={ 'Un-robust','RANSAC','MSAC','Leverage'};
+% AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi,@fundmatrixrobustrandleverage};
 
-AlgNames={ 'Un-robust','RANSAC','MSAC','Huber'};
-AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi,@fundmatrixrobustregress};
+AlgNames={ 'RANSAC','MSAC','Leverage'};
+AlgFuncs={ @ransackovesi,@msackovesi,@fundmatrixrobustrandleverage};
 
 
 

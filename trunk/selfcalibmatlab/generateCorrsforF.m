@@ -56,10 +56,12 @@ if(type=='s')
     else
         partonecom='crc3D2D.exe ';
     end
+    delete('matches.csv');
+    delete('matchesclean.csv');
     
     partTwo=[' -N ' num2str(numcorrs) ' -E ' num2str(outlierratio) ' -v ' num2str(stderror) ' -T 3 -q 1'];
     comma=[partonecom partTwo];
-    while(exist(['matches.csv'],'file')==0)
+    while(exist(['matches.csv'],'file')==0 || exist(['matchesclean.csv'],'file')==0)
         [status currdir] = system(comma );
     end
     
@@ -85,13 +87,13 @@ if(type=='s')
     x1=M(:,2:3)';
     x2=M(:,4:5)';
     
-      x1c=MCL(:,2:3)';
+    x1c=MCL(:,2:3)';
     x2c=MCL(:,4:5)';
     
     inlierOutlier=M(:,6)';
-      inlierOutlier=  1-inlierOutlier;
+    inlierOutlier=  1-inlierOutlier;
     corrs=[x1 ; x2];
-     corrsclean=[x1c ; x2c];
+    corrsclean=[x1c ; x2c];
     cd(oldFolder);
 end
 
@@ -131,7 +133,7 @@ if(type=='f')
     [Fgt, corrs, I1, I2 ] = SIFTmatchpair([path fname1],[path fname2] );
     R1=eye(3);
     R2=eye(3);
-     k1=eye(3);
+    k1=eye(3);
     k2=eye(3);
     t1=zeros(3,1);
     t2=zeros(3,1);
@@ -143,7 +145,7 @@ end
 %for oxford
 if(type=='o')
     [cocorrs, IMS, P,K, F, E, FFormatted, corrsFormatted,EFormatted,FFormattedGT,inlierOutlier,corrsFormattedclean] = readCorrsOxford(seqname, outlierratio, 1,2,stderror);
-
+    
     corrs(1:2,:)=corrsFormatted{1,2}(1:2,:);
     corrs(3:4,:)=corrsFormatted{1,2}(4:5,:);
     [k1, R1, t1] = vgg_KR_from_P(P{1});
@@ -152,8 +154,8 @@ if(type=='o')
     I2=double(double(IMS{2})/255);
     Fgt=FFormattedGT{1,2};
     inlierOutlier=1-inlierOutlier;
-   corrsclean(1:2,:)=corrsFormattedclean{1,2}(1:2,:);
-     corrsclean(3:4,:)=corrsFormattedclean{1,2}(4:5,:);
+    corrsclean(1:2,:)=corrsFormattedclean{1,2}(1:2,:);
+    corrsclean(3:4,:)=corrsFormattedclean{1,2}(4:5,:);
 end
 
 %gui showing the F
