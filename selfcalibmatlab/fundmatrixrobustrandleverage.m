@@ -1,5 +1,5 @@
 
-function [F] = fundmatrixrobustrandleverage(x1, x2)
+function [F, iters, pvi,h] = fundmatrixrobustrandleverage(x1, x2)
 
 
 if nargin == 1
@@ -7,6 +7,7 @@ if nargin == 1
     x1=corrs(1:2,:);
     x2=corrs(3:4,:);
 end
+
 [m1,n1]=size(x1);
 [m2,n2]=size(x1);
 
@@ -19,33 +20,47 @@ if(m1==2)
     x2=[x2 ; ones(1,n1)];
 end
 
-% [x1, T1] = normalise2dpts(x1);
-% [x2, T2] = normalise2dpts(x2);
+[x1n, T1] = normalise2dpts(x1);
+[x2n, T2] = normalise2dpts(x2);
 
 [m,npts]=size(x1);
 % Build the constraint matrix
-A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
-    x2(2,:)'.*x1(1,:)'   x2(2,:)'.*x1(2,:)'  x2(2,:)' ...
-    x1(1,:)'             x1(2,:)'            ones(npts,1) ];
+A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
+    x2n(2,:)'.*x1n(1,:)'   x2n(2,:)'.*x1n(2,:)'  x2n(2,:)' ...
+    x1n(1,:)'             x1n(2,:)'            ones(npts,1) ];
 
-B=A(:,1:8); % it says forget that last column
+h = leverage(A);
 
-%b = robustfit(B,zeros(npts,1));
-b = regress(-ones(npts,1),B);
+t = 1.96*1.96;  % Distance threshold for deciding outliers
+s = 7; 
 
-b(9,1)=1;
+fittingfn = @vgg_F_from_7pts_2img2;
+distfn    = @sampsonF;
+degenfn   = @isdegenerate;
+scorefunc = @msacScore;
+randSampFunc = @monteCarloSampling;
 
-F = reshape(b,3,3);
+minh=min(h);
+maxh=max(h);
+rangeh=maxh-minh;
+hn=(h-minh)*(1/rangeh);
 
-% Enforce constraint that fundamental matrix has rank 2 by performing
-% a svd and then reconstructing with the two largest singular values.
-[U,D,V] = svd(F,0);
-F = U*diag([D(1,1) D(2,2) 0])*V';
-F=F';
-% Denormalise
-% F = T2'*F*T1;
-% F=F/F(3,3);
+initPvi=exp(-(hn*5));
 
+
+% x1 and x2 are 'stacked' to create a 6xN array for ransac
+[F, inliers,iters] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,randSampFunc,initPvi);
+pvi=initPvi;
+% Now do a final least squares fit on the data points considered to
+% be inliers.
+F = fundmatrix(x1(:,inliers), x2(:,inliers));
+
+
+end
+
+
+function r = isdegenerate(x)
+r = 0;
 
 
 end

@@ -22,7 +22,7 @@ s = 7;
 fittingfn = @vgg_F_from_7pts_2img2;
 distfn    = @sampsonF;
 degenfn   = @isdegenerate;
-scorefunc = @ransacScore;
+scorefunc = @msacScore;
 
 % x1 and x2 are 'stacked' to create a 6xN array for ransac
 [F, inliers,iters] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc);

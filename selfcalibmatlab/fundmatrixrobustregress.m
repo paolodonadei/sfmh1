@@ -19,8 +19,8 @@ if(m1==2)
     x2=[x2 ; ones(1,n1)];
 end
 
-% [x1, T1] = normalise2dpts(x1);
-% [x2, T2] = normalise2dpts(x2);
+[x1, T1] = normalise2dpts(x1);
+[x2, T2] = normalise2dpts(x2);
 
 [m,npts]=size(x1);
 % Build the constraint matrix
@@ -46,9 +46,9 @@ F = reshape(c,3,3);
 [U,D,V] = svd(F,0);
 F = U*diag([D(1,1) D(2,2) 0])*V';
 F=F';
-% Denormalise
-% F = T2'*F*T1;
-% F=F/F(3,3);
+%Denormalise
+F = T2'*F*T1;
+F=F/F(3,3);
 iters=0;
 
 

@@ -1,12 +1,12 @@
 function y = monteCarloSampling(s, n, pvi)
 
-[m,msize]=size(pvi);
+[msize,m]=size(pvi);
 
-if(n~=msize)
+if(s~=msize)
     display('incompatible msizes');
 end
 
-if(msize<=s)
+if(msize<=n)
       display(' not enough correspondence pvis');
     return
 end
@@ -22,9 +22,9 @@ if(continumm(msize+1)<eps)
     return
 end
 collected=0;
-y=zeros(s,1);
+y=zeros(n,1);
 
-while collected<s
+while collected<n
     curRandval=rand*continumm(msize+1);
     
     curCandidate=0;
@@ -35,7 +35,7 @@ while collected<s
         end
     end
     
-    for i=1:s
+    for i=1:n
         if(y(i)==curCandidate)
             curCandidate=0;
             break;
