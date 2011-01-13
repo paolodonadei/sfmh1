@@ -187,7 +187,10 @@ else
 end
 
 if(debugf==1)
-    fprintf(fid,['\n\n\n mean of pvis was , ' num2str(mean(pvis))]);
+    [ST,I] = dbstack;
+   
+     fprintf(fid,['\n\n\n name of function is , '  ST(2).name]);
+    fprintf(fid,['\n mean of pvis was , ' num2str(mean(pvis))]);
     fprintf(fid,['\n median of pvis was , ' num2str(median(pvis))]);
     fprintf(fid,['\n mean of pvis selected was , ' num2str(mean( pviselected'))]);
     fprintf(fid,['\n median of pvis selected  was , ' num2str(median( pviselected'))]);
@@ -202,11 +205,11 @@ if(debugf==1)
     fclose(fid);
     
     hist(pvis,100);
-    title([ ' histogram of pvis ']);
+    title([ ' histogram of pvis for '  ST(2).name]);
     saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_all.png']);
     figure
     hist(pviselected',100);
-    title([ ' histogram of pvis selected ']);
+    title([ ' histogram of pvis selected for '  ST(2).name]);
     saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_selected.png']);
 end
 
