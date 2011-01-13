@@ -1,5 +1,5 @@
 
-function [F, iters, pvi,h] = fundmatrixrobustrandleverage(x1, x2)
+function [F, iters, initPvi,h] = fundmatrixrobustrandleverage(x1, x2)
 
 
 if nargin == 1
@@ -20,16 +20,6 @@ if(m1==2)
     x2=[x2 ; ones(1,n1)];
 end
 
-[x1n, T1] = normalise2dpts(x1);
-[x2n, T2] = normalise2dpts(x2);
-
-[m,npts]=size(x1);
-% Build the constraint matrix
-A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
-    x2n(2,:)'.*x1n(1,:)'   x2n(2,:)'.*x1n(2,:)'  x2n(2,:)' ...
-    x1n(1,:)'             x1n(2,:)'            ones(npts,1) ];
-
-h = leverage(A);
 
 t = 1.96*1.96;  % Distance threshold for deciding outliers
 s = 7; 
@@ -39,18 +29,13 @@ distfn    = @sampsonF;
 degenfn   = @isdegenerate;
 scorefunc = @msacScore;
 randSampFunc = @monteCarloSampling;
+initPvi = calc_initial_pvi_leverage(x1, x2);
 
-minh=min(h);
-maxh=max(h);
-rangeh=maxh-minh;
-hn=(h-minh)*(1/rangeh);
-
-initPvi=exp(-(hn*5));
 
 
 % x1 and x2 are 'stacked' to create a 6xN array for ransac
 [F, inliers,iters] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,randSampFunc,initPvi);
-pvi=initPvi;
+
 % Now do a final least squares fit on the data points considered to
 % be inliers.
 F = fundmatrix(x1(:,inliers), x2(:,inliers));
