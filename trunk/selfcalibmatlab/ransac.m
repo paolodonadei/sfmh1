@@ -125,6 +125,9 @@ while N > trialcount
     % representing only one model.
     [inliers, M, residuals, meaner,varer,meder,numins] = feval(distfn, M, x, t);
     
+  % [ xx, centerloc ] = PeterSturmSelf( M,512,512 );
+  %  display(['focal length was ' num2str(xx(1))]);
+    
     % Find the number of inliers to this model.
     ninliers = length(inliers);
     
@@ -136,6 +139,7 @@ while N > trialcount
     
     
     if curerror < besterror    % Largest set of inliers so far...
+     %   display(['best focal length was ' num2str(xx(1))]);
         if nargin >9
             pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
         end

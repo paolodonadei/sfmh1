@@ -1,4 +1,4 @@
-function [ x, centerloc ] = PeterSturmSelfRobust( F,w,h )
+function [ x, centerloc ] = PeterSturmSelf( F,w,h )
 
 xc=256;
 yc=256;
