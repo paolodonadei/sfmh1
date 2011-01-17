@@ -1,6 +1,6 @@
-function [pvi] = calc_initial_pvi_leverage(x1, x2)
+function [pvi] = calc_initial_pvi_cook(x1, x2)
 
-
+global inlierOutlier;
 
 if nargin == 1
     corrs=x1;
@@ -27,9 +27,20 @@ end
 % Build the constraint matrix
 A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
     x2n(2,:)'.*x1n(1,:)'   x2n(2,:)'.*x1n(2,:)'  x2n(2,:)' ...
-    x1n(1,:)'             x1n(2,:)'            ones(npts,1) ];
+    x1n(1,:)'             x1n(2,:)'            ];
 
-h = leverage(A);
+
+
+[b,bint,r] = regress(-ones(npts,1),A);
+L = leverage(A);
+
+h=zeros(npts,1);
+r=r.^2;
+for i=1:npts
+    h(i,1)=(r(i,1)*L(i,1))/((1-L(i,1))*(1-L(i,1)));
+end
+
+%     
 % 
 % 
 % hh=1-h;
@@ -38,7 +49,6 @@ h = leverage(A);
 % maxh=max(h);
 % rangeh=maxh-minh;
 % pvi=(h-minh)*(1/rangeh);
-
 pvi=h;
 
 end

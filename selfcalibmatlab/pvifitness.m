@@ -1,19 +1,7 @@
 function [errorin,errorout] = pvifitness(inliers,pvis)
 
 
-% here we scale pvis to lie in the [0-1] range
 
-
-minh=min(pvis);
-maxh=max(pvis);
-rangeh=maxh-minh;
-if(rangeh>eps)
-    pvisn=(pvis-minh)*(1/rangeh);
-else
-    pvisn=pvis;
-end
-
-pvis=pvisn;
 
 %  error of the pvis. ideally we would want the label of inliers to be 1 an
 % d that of outliers to be 0. So the way we find the error is to find the
