@@ -2,7 +2,7 @@
 function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
 
 Octave = exist('OCTAVE_VERSION') ~= 0;
-debugf=1;
+debugf=0;
 
 if(debugf==1)
     pviselected =[];
@@ -208,13 +208,13 @@ if(debugf==1)
     fprintf(fid,['\n time is : , ' num2str(tm(1)) ' , ' num2str(tm(2)) ' , ' num2str(tm(3)) ' , ' num2str(tm(4)) ' , ' num2str(tm(5)) ' , ']);
     fclose(fid);
     
-    hist(pvis,100);
-    title([ ' histogram of pvis for '  ST(2).name]);
-    saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_all.png']);
-    figure
-    hist(pviselected',100);
-    title([ ' histogram of pvis selected for '  ST(2).name]);
-    saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_selected.png']);
+%     hist(pvis,100);
+%     title([ ' histogram of pvis for '  ST(2).name]);
+%     saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_all.png']);
+%     figure
+%     hist(pviselected',100);
+%     title([ ' histogram of pvis selected for '  ST(2).name]);
+%     saveas(gcf,[debugdirname '/'   seedname num2str(counter) 'pvis_selected.png']);
 end
 
 end

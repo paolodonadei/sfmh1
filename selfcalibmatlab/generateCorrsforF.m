@@ -56,8 +56,14 @@ if(type=='s')
     else
         partonecom='crc3D2D.exe ';
     end
-    delete('matches.csv');
-    delete('matchesclean.csv');
+    
+    if(exist(['matches.csv'],'file')~=0)
+        delete('matches.csv');
+    end
+    
+    if(exist(['matchesclean.csv'],'file')~=0)
+        delete('matchesclean.csv');
+    end
     
     partTwo=[' -N ' num2str(numcorrs) ' -E ' num2str(outlierratio) ' -v ' num2str(stderror) ' -T 3 -q 1'];
     comma=[partonecom partTwo];
