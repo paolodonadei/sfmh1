@@ -43,12 +43,12 @@ end
 %     
 % 
 % 
-% hh=1-h;
-% h=hh;
-% minh=min(h);
-% maxh=max(h);
-% rangeh=maxh-minh;
-% pvi=(h-minh)*(1/rangeh);
-pvi=h;
+
+
+minh=min(h);
+maxh=max(h);
+rangeh=maxh-minh;
+hh=(h-minh)*(1/rangeh);
+pvi=1-hh;
 
 end

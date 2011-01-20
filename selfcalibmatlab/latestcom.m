@@ -1819,3 +1819,200 @@ quatmultiply(R1,R2)
 R3
 quatmultiply(R2,R1)
 %-- 17/10/10  8:14 PM --%
+[corrs, IMS, P,ks, F, E, FFormatted, corrsFormatted,EFormatted] = readCorrsOxford('merton1', 0,0);
+[K] = S3nonlinsolvesamFramfDRAW(FFormatted,corrsFormatted,1024,768,ks')
+clear all
+clc
+[corrs, IMS, P,ks, F, E, FFormatted, corrsFormatted,EFormatted] = readCorrsOxford('merton1', 0,0);
+[K] = S3nonlinsolvesamFramfDRAW(FFormatted,corrsFormatted,1024,768,ks')
+figure
+[K] = S3nonlinsolvesamFramfDRAW(FFormatted,corrsFormatted,1024,768,ks')
+%-- 15/12/10 11:38 AM --%
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+im1 = imread('im1.jpg');
+im2 = imread('im2.jpg');
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+show(im2,2), hold on, plot(c2,r2,'r+');
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+show(im2,2), hold on, plot(c2,r2,'r+');
+%-- 15/12/10 11:47 AM --%
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+show(im2,2), hold on, plot(c2,r2,'r+');
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+% Find Harris corners in image1 and image2
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+show(im2,2), hold on, plot(c2,r2,'r+');
+help conv2
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+show(im2,2), hold on, plot(c2,r2,'r+');
+close all
+clear all
+clcl
+clc
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+clear all; clc
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+show(im2,2), hold on, plot(c2,r2,'r+');
+thresh = 300;
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+c2
+clear all
+clc
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+[cim1, r1, c1] = harris(im1, 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+[cim2, r2, c2] = harris(im2, 1, thresh, 3);
+show(im2,2), hold on, plot(c2,r2,'r+');
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+open harris
+imshow(cim1)
+clear all
+clc
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+thresh = 500;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+show(im2,2), hold on, plot(c2,r2,'r+');
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 1);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, 5, 3);
+clear all
+clc
+thresh = 5;   % Harris corner threshold
+nonmaxrad = 3;  % Non-maximal suppression radius
+im1 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3995.jpg');
+im2 = imread('C:\Documents and Settings\hrast019\Desktop\data\skin_pablo\IMG_3996.jpg');
+[cim1, r1, c1] = harris(rgb2gray(im1), 1, thresh, 3);
+[cim2, r2, c2] = harris(rgb2gray(im2), 1, thresh, 3);
+show(im1,1), hold on, plot(c1,r1,'r+');
+show(im2,2), hold on, plot(c2,r2,'r+');
+w = 7;    % Window size for correlation matching
+[m1,m2] = matchbycorrelation(im1, [r1';c1'], im2, [r2';c2'], w);
+[m1,m2] = matchbycorrelation(rgb2gray(im1), [r1';c1'], rgb2gray(im2), [r2';c2'], w);
+% Display putative matches
+show(im1,3), set(3,'name','Putative matches'), hold on
+for n = 1:length(m1);
+line([m1(2,n) m2(2,n)], [m1(1,n) m2(1,n)])
+end
+length(m1)
+close all
+clear all
+clc
+clear all
+clc
+%-- 17/12/10 10:46 AM --%
+whereis sift
+help sift
+open sift_demo
+randn
+g=randn(1000,1);
+hist(g)
+b=imread('C:\Documents and Settings\hrast019\Desktop\pabloskin\doc\harrisleft.png');
+size(b)
+[imwidth,imheight,imchannels]=size(b)
+imshow(b)
+help rand
+help suim
+help sum
+t(1,1)=1;
+t(2,1)=1;
+t(3,1)=0;
+t(4,1)=10;
+sum(t)
+%-- 22/12/10  3:27 PM --%
+imdirs=dir([seq_name '*.jpg']);
+imdirs=dir(['*.jpg']);
+imdirs
+imdirs.name
+imdirs=dir(['*.jpg | *.m']);
+ISPC
+help ISPC
+q
+isunix
+isunix()
+%-- 22/12/10  4:13 PM --%
+%-- 23/12/10  4:23 PM --%
+%-- 18/01/11 11:06 AM --%
+[ t,means_mean ] =     generateFestPlot('s',1,5,0,0.7 )
+close all
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+[pvi] = calc_initial_pvi_leverage(corrs);
+[pvi] = calc_initial_pvi_cook(corrs);
+[pvicook] = calc_initial_pvi_cook(corrs);
+[pvilev] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvilev)
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvi] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+%-- 19/01/11 11:42 AM --%
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+[pvi] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+close all
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0,0, 's' );
+corrs(1,3)=500;
+corrs(2,3)=500;
+[pvicook] = calc_initial_pvi_cook(corrs);
+inlierOutlier(3)=0;
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvi] = calc_initial_pvi_leverage(corrs);
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,0, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+hist(h)
+hist(h,50)
+[pvicook] = calc_initial_pvi_cook(corrs);
+hist(hh)
+figure
+hist(pvi)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
