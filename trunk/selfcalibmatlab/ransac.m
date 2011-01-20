@@ -24,9 +24,6 @@ if(debugf==1)
     fprintf( fid,[' trialcount, N, randSample , randSamplePvis , ninliers , curError,  bestSet ']);
 end
 
-% Test number of parameters
-error ( nargchk ( 6, 9, nargin ) );
-
 maxTrials = 4000;
 maxDataTrials = 100;
 feedback = 0;

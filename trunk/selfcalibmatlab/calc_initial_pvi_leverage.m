@@ -27,18 +27,18 @@ end
 % Build the constraint matrix
 A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
     x2n(2,:)'.*x1n(1,:)'   x2n(2,:)'.*x1n(2,:)'  x2n(2,:)' ...
-    x1n(1,:)'             x1n(2,:)'            ones(npts,1) ];
+    x1n(1,:)'             x1n(2,:)'            ];
 
 h = leverage(A);
 % 
 % 
-% hh=1-h;
-% h=hh;
-% minh=min(h);
-% maxh=max(h);
-% rangeh=maxh-minh;
-% pvi=(h-minh)*(1/rangeh);
 
-pvi=h;
+minh=min(h);
+maxh=max(h);
+rangeh=maxh-minh;
+hh=(h-minh)*(1/rangeh);
+pvi=1-hh;
+
+
 
 end
