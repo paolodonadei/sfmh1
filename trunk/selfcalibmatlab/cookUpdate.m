@@ -8,8 +8,14 @@ L=initialPvi;
 pvis=zeros(npts,1);
 h=zeros(npts,1);
 r=residuals';
+rmean=mean(r);
+r=r./(9*rmean);
 for i=1:npts
-    h(i,1)=(r(i,1)*L(i,1))/((1-L(i,1))*(1-L(i,1)));
+    if(abs(L(i,1)-1)<eps)
+        h(i,1)=100; % i dont know what to do about this
+    else
+        h(i,1)=(r(i,1)*L(i,1))/((1-L(i,1))*(1-L(i,1)));
+    end
 end
 
 %
