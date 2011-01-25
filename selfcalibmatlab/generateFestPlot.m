@@ -46,8 +46,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'Un-robust','RANSAC','MSAC','Leverage'};
 % AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi,@fundmatrixrobustrandleverage};
 
-AlgNames={ 'RANSAC','MSAC','Leverage'};
-AlgFuncs={ @ransackovesi,@msackovesi,@fundmatrixrobustrandleverage};
+AlgNames={ 'RANSAC','MSAC','Leverage','cookUpdate','cook'};
+AlgFuncs={ @ransackovesi,@msackovesi,@fundmatrixrobustrandleverage,@fundmatrixrobustcookupdate,@fundmatrixrobustcook};
 
 
 
