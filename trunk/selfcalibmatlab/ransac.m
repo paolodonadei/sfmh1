@@ -24,7 +24,7 @@ if(debugf==1)
     fprintf( fid,[' trialcount, N, randSample , randSamplePvis , ninliers , curError,  bestSet ']);
 end
 
-maxTrials = 4000;
+maxTrials = 6000;
 maxDataTrials = 100;
 feedback = 0;
 if nargin < 9

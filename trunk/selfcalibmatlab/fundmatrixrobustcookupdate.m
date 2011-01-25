@@ -40,7 +40,7 @@ updatepviFunc = @cookUpdate;
 % be inliers.
 F = fundmatrix(x1(:,inliers), x2(:,inliers));
 
-
+h=initPvi;
 end
 
 

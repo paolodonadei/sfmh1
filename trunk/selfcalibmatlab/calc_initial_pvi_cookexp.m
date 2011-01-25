@@ -1,4 +1,4 @@
-function [pvis] = calc_initial_pvi_cook(x1, x2)
+function [pvis] = calc_initial_pvi_cookexp(x1, x2)
 
 global inlierOutlier;
 
@@ -42,12 +42,20 @@ r=r.^2;
 for i=1:npts
     h(i,1)=(r(i,1)*L(i,1))/((1-L(i,1))*(1-L(i,1)));
 end
+h=h.^2;
+h=h-min(h);
+%
+%
+%
+myrstd=mad(h,1);
+myvar=myrstd*myrstd;
+mdenom=1/(sqrt(2*pi*myvar));
+for i=1:npts
+    pvis(i,1)=(exp(-h(i,1)/(2*myvar)))*mdenom;
+end
 
-%
-%
-%
-pvis=normalizeData(h,1);
-pvis=1-pvis;
+
+
 
 end
 
