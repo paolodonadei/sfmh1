@@ -138,7 +138,7 @@ while N > trialcount
     if curerror < besterror    % Largest set of inliers so far...
      %   display(['best focal length was ' num2str(xx(1))]);
         if nargin >9
-            pvis = feval(updatepviFunc,initialPvi,pvis,residuals);
+            [pvis,initialPvi ] = feval(updatepviFunc,initialPvi,pvis,residuals,t,inliers,x);
         end
         
         if(debugf==1)

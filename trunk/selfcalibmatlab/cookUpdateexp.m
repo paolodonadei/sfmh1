@@ -1,4 +1,5 @@
-function   [pvis] = cookUpdate(initialPvi,pvis,residuals,t,inliers,x)
+function   [pvis] = cookUpdateexp(initialPvi,pvis,residuals,t,inliers,x)
+
 % global inlierOutlier;
 
 % here the initial pvis are the leverage
@@ -30,21 +31,15 @@ end
 % title('leverage');
 % figure
 
-minh=min(h);
-h=h-minh;
 
-rangeh=mad(h,1)*3;
-hh=(h/rangeh);
-pvis=1-hh;
-
+myrstd=mad(h,1); % calculatre teh median standard deviation before squaring
+h=h.^2;
+myvar=myrstd*myrstd;
+mdenom=1/(sqrt(2*pi*myvar));
 for i=1:npts
-    if(pvis(i,1)>1)
-        pvis(i,1)=1;
-    end
-    if(pvis(i,1)<0)
-        pvis(i,1)=0;
-    end
+    pvis(i,1)=(exp(-h(i,1)/(2*myvar)))*mdenom;
 end
+pvis = normalizeData(pvis,0);
 
 % [errorin,errorout] = pvifitness(inlierOutlier',pvis)
 % close all
