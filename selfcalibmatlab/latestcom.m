@@ -2016,3 +2016,424 @@ hist(pvi)
 [pvicook] = calc_initial_pvi_cook(corrs);
 [errorin,errorout] = pvifitness(inlierOutlier',pvicook)
 [F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+[imwidth,imheight,imchannels]=size(b)
+imshow(b)
+help rand
+help suim
+help sum
+t(1,1)=1;
+t(2,1)=1;
+t(3,1)=0;
+t(4,1)=10;
+sum(t)
+%-- 22/12/10  3:27 PM --%
+imdirs=dir([seq_name '*.jpg']);
+imdirs=dir(['*.jpg']);
+imdirs
+imdirs.name
+imdirs=dir(['*.jpg | *.m']);
+ISPC
+help ISPC
+q
+isunix
+isunix()
+%-- 22/12/10  4:13 PM --%
+%-- 23/12/10  4:23 PM --%
+%-- 18/01/11 11:06 AM --%
+[ t,means_mean ] =     generateFestPlot('s',1,5,0,0.7 )
+close all
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+[pvi] = calc_initial_pvi_leverage(corrs);
+[pvi] = calc_initial_pvi_cook(corrs);
+[pvicook] = calc_initial_pvi_cook(corrs);
+[pvilev] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvilev)
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvi] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+%-- 19/01/11 11:42 AM --%
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+[pvi] = calc_initial_pvi_leverage(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+close all
+[errorin,errorout] = pvifitness(inlierOutlier',pvi)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0,0, 's' );
+corrs(1,3)=500;
+corrs(2,3)=500;
+[pvicook] = calc_initial_pvi_cook(corrs);
+inlierOutlier(3)=0;
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvi] = calc_initial_pvi_leverage(corrs);
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,0, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+hist(h)
+hist(h,50)
+[pvicook] = calc_initial_pvi_cook(corrs);
+hist(hh)
+figure
+hist(pvi)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+%-- 20/01/11  4:33 PM --%
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,0, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+format long g
+r
+[r,t]=max(h)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+[r,t]=max(initPvi)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+log(11)
+log(10)
+log(1)
+log(0.30)
+clc
+syms x y z A B C
+solve('A*x +B*y=4','2*A*x+B*y=5')
+ans.x
+and.y
+ans.y
+ans.x
+ans
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+b=inlierOutlier';
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+%-- 23/01/11  2:57 PM --%
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,0, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+v=residuals';
+format long g
+v=inlierOutlier';
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(pvis)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+b=h;
+vb=var(b)
+b=sqrt(vb)
+b=b*3
+help std
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(pvis)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(pvi(
+hist(pvis)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(h)
+figure
+hist(hh)
+figure
+hist(pvis)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+mad(h,1)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(pvis)
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+hist(pvis)
+hist(pvis,50)
+figure
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean ,1.96*1.96);
+meaner
+[F, iters, initPvi,h] = ransackovesi(corrs);
+open ransackovesi.m
+[ F, iters ] = ransackovesi(corrs);
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean ,1.96*1.96);
+meaner
+iters
+[pvis] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvis)
+[pvis] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvis)
+[pvis] = calc_initial_pvi_cook(corrs);
+meax(L)
+max(L)
+min(L)
+[pvis] = calc_initial_pvi_cook(corrs);
+hist(pvis)
+hist(pvis,100)
+[errorin,errorout] = pvifitness(inlierOutlier',pvis)
+[pvis] = calc_initial_pvi_cook(corrs);
+hist
+hist(r,50)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+v=inlierOutlier';
+[pvis] = calc_initial_pvi_cook(corrs);
+hist(r,50); figure
+figure
+hist(r,50)
+[pvis] = calc_initial_pvi_cook(corrs);
+hist(r,50);
+figure
+hist(r,50);
+[pvis] = calc_initial_pvi_cook(corrs);
+y = prctile(r,[25 50 75])
+y = prctile(r,[25 50 75 95])
+[pvis] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvis)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.5,1, 's' );
+[Fr, itersr] = ransackovesi(corrs);
+itersr
+[Fc, itersc, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+itersc
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(Fr, corrsclean ,1.96*1.96);
+meaner
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(Fc, corrsclean ,1.96*1.96);
+meaner
+clear all
+clc
+[ t,means_mean ] =     generateFestPlot('s',1,10,0,0.7 );
+close all
+clear all
+clc
+[ t,means_mean ] =     generateFestPlot('s',1,50,0,0.9 );
+7635/(60)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.5,1, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+clc
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.7,2, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+clc
+clear all
+cl
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.7,0, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+clear all
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+clc
+clear all
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.4,1, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+clear all; clc; close all
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cook(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+close all
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+[errorin,errorout] = pvifitness(inlierOutlier',pvicook)
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+hist(h,50)
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+hist(h,50)
+min(h)
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+hist(L)
+v=inlierOutlier';
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.1,1, 's' );
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+v=inlierOutlier';
+[pvicook] = calc_initial_pvi_cookexp(corrs);
+bb=A*b+-ones(npts,1);
+bb=A*b;
+clear all
+clc
+global inlierOutlier
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+globals
+global
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clear all
+clc
+global inlierOutlier
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+clc
+close al
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+t=0:0.1:20;
+yt=(exp(-(t.^2)/(2*myvar)))*mdenom;
+plot(t,yt)
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clc
+clear all
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clear all
+clc
+global inlierOutlier
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+close all
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs)
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+close all
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+close all
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+iters
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean ,1.96*1.96);
+meaner
+ites
+iters
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+iters
+clear all; clc; close all
+global inlierOutlier
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+iters
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean ,1.96*1.96);
+meaner
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+iters
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+clear all
+clc
+close all
+global inlierOutlier]
+global inlierOutlier
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+close all
+clear all
+clc
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+clear all
+clc
+close all
+global inlierOutlier
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+Lnew = calc_leveragefromCorrs(x);
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdate(corrs);
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+iters
+[F, iters, initPvi,h] = ransackovesi(corrs);
+[F, iters] = ransackovesi(corrs);
+iters
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+close all
+clcl
+clc
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+close all
+close al
+close all
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+iters
+[F, iters] = ransackovesi(corrs);
+iters
+clc
+clear all
+[ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(200, 0.6,1, 's' );
+[F, iters] = ransackovesi(corrs);
+iters
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+iters
+[F, iters, initPvi,h] = fundmatrixrobustcookupdateuplev(corrs);
+initialPvi(bestInliers(1,i) ,1)
+Lnew(i,1)

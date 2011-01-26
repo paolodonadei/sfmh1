@@ -1,5 +1,5 @@
 
-function [F, iters, initPvi,h] = fundmatrixrobustcookupdate(x1, x2)
+function [F, iters, initPvi,h] = fundmatrixrobustcookupdateexp(x1, x2)
 
 
 if nargin == 1
@@ -30,7 +30,7 @@ degenfn   = @isdegenerate;
 scorefunc = @msacScore;
 randSampFunc = @monteCarloSampling;
 initPvi =calc_leveragefromCorrs(x1, x2);
-updatepviFunc = @cookUpdate;
+updatepviFunc = @cookUpdateexp;
 
 
 % x1 and x2 are 'stacked' to create a 6xN array for ransac
