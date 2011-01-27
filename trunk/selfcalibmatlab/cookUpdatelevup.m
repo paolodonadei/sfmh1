@@ -10,6 +10,8 @@ function   [pvis,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inlie
 % also the leverages are increasing when i update FK THIS
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
+Fnewz= fundmatrixnonlinrefine(x(:,inliers),Fnew,1);
+[bestInliersz, bestFz, residualsnewz, meanerz,varerz,mederz,numinsz] = sampsonF(Fnewz, x,1.96*1.96 );
 Lnew = calc_leveragefromCorrs(x(:,bestInliers));
 
 
