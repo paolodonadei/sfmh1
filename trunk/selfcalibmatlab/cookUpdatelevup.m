@@ -1,6 +1,6 @@
 function   [pvis,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x)
 % 
-% global inlierOutlier;
+ global inlierOutlier;
 
 % here the initial pvis are the leverage
 % display(['first leverage was ' num2str(mean(initialPvi))]);
@@ -11,11 +11,11 @@ function   [pvis,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inlie
 
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
-display([' old mean was ' num2str(mean(residuals)) ' and new is ' num2str(mean(residualsnew))]);
+%display([' old mean was ' num2str(mean(residuals)) ' and new is ' num2str(mean(residualsnew)) ' and used inliers '  num2str(sum(inlierOutlier(1,inliers))) ' and used outliers is '  num2str(length(inliers)-sum(inlierOutlier(1,inliers))) ' increase in inliers ' num2str(sum(inlierOutlier(1,bestInliers))-sum(inlierOutlier(1,inliers))) ' increase in percieved inliers is ' num2str(length(bestInliers)-length(inliers))]);
 
 Lnew = calc_leveragefromCorrs(x(:,bestInliers));
 
-
+display([' leverage changed from ' num2str(sum(initialPvi)) ' to ' num2str(sum(Lnew`))]);
 [m,nptsInlier]=size(bestInliers);
 
 
