@@ -1,7 +1,7 @@
 function   [pvis,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x)
 % 
  global inlierOutlier;
-
+ss={'outlier' , 'inlier'};
 % here the initial pvis are the leverage
 % display(['first leverage was ' num2str(mean(initialPvi))]);
 
@@ -13,19 +13,30 @@ Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 %display([' old mean was ' num2str(mean(residuals)) ' and new is ' num2str(mean(residualsnew)) ' and used inliers '  num2str(sum(inlierOutlier(1,inliers))) ' and used outliers is '  num2str(length(inliers)-sum(inlierOutlier(1,inliers))) ' increase in inliers ' num2str(sum(inlierOutlier(1,bestInliers))-sum(inlierOutlier(1,inliers))) ' increase in percieved inliers is ' num2str(length(bestInliers)-length(inliers))]);
 
+hist(residualsnew,50);
+figure
+hist(residualsnew(inlierOutlier==0),50);
+title('outlier residuals');
+figure
+hist(residualsnew(inlierOutlier==1),50);
+title('inlier residuals');
+
 Lnew = calc_leveragefromCorrs(x(:,bestInliers));
 
-display([' leverage changed from ' num2str(sum(initialPvi)) ' to ' num2str(sum(Lnew`))]);
 [m,nptsInlier]=size(bestInliers);
 
+beforel=mean(initialPvi);
 
 for i=1:nptsInlier
 
+    %display(['updated leverage from ' num2str(initialPvi(bestInliers(1,i) ,1)) ' to ' num2str(Lnew(i,1)) ' for ' ss{1+inlierOutlier(1,bestInliers(1,i))}]);
     initialPvi(bestInliers(1,i) ,1)=Lnew(i,1);
 end
 
+display([' difference in leverage mean is  ' num2str(beforel-mean(initialPvi))]);
 
-
+display(['------------------------------------------------------------------------------------------']);
+close all
 [npts,m]=size(initialPvi);
 pvis=zeros(npts,1);
 h=zeros(npts,1);
