@@ -20,6 +20,7 @@ using namespace std;
 
 
 
+
 HRCorrespond2N::HRCorrespond2N()
 {
     indexIm1=0;
