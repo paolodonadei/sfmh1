@@ -4,14 +4,16 @@ if(updatetype==1 || updatetype==2)
     outpvis=pvis;
     outinitpvi=initialPvi ;
 elseif(updatetype==3)
-    [outpvis] =  cookUpdatepureres(updatetype,initialPvi,pvis,residuals,t,inliers,x,currentIter,totalIter);
-       outinitpvi=initialPvi ;
+    [outpvis] =  cookUpdatepureres(initialPvi,pvis,residuals,t,inliers,x,currentIter,totalIter);
+    outinitpvi=initialPvi ;
 elseif(updatetype==4)
     [outpvis] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-      outinitpvi=initialPvi ;
+    outinitpvi=initialPvi ;
 elseif(updatetype==5)
-      [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-    
+    [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+elseif(updatetype==6)
+    [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+    outinitpvi=initialPvi ;
 end
 
 end
@@ -19,36 +21,38 @@ end
 function [cdi] = findCookDistance(Leverages, residuals)
 
 
-L=initialPvi;
-[npts,m]=size(initialPvi);
-pvis=zeros(npts,1);
-h=zeros(npts,1);
+L=Leverages;
+[npts,m]=size(Leverages);
+
+cdi=zeros(npts,1);
 r=residuals';
 rmean=mean(r);
 r=r./(9*rmean);
 for i=1:npts
-    if(abs(initialPvi(i,1)-1)<eps)
-        h(i,1)=eps; % i dont know what to do about this
+    if(abs(Leverages(i,1)-1)<eps)
+        cdi(i,1)=eps; % i dont know what to do about this
     else
-        h(i,1)=(r(i,1)*initialPvi(i,1))/((1-initialPvi(i,1))*(1-initialPvi(i,1)));
+        cdi(i,1)=(r(i,1)*Leverages(i,1))/((1-Leverages(i,1))*(1-Leverages(i,1)));
     end
 end
 end
 
-function [pi]=findProbabilitiesRobust(rawvals)
+function [pvi]=findProbabilitiesRobust(rawvals)
 
 % finding probabilities from these values by assuming a zero mean gaussian
 % as the distribution and then using the MADN as the STD and then finding
 % probabilities
-npts=size(rawvals,2);
+rawvals =  normalizeData(rawvals,0);
+npts=size(rawvals,1);
 myrstd=mad(rawvals,1); % calculatre teh median standard deviation before squaring
 rawvals=rawvals.^2;
 myvar=myrstd*myrstd;
 mdenom=1/(sqrt(2*pi*myvar));
+pvi=zeros(npts,1);
 for i=1:npts
-    pi(i,1)=(exp(-myvar(i,1)/(2*myvar)))*mdenom;
+    pvi(i,1)=(exp(-rawvals(i,1)/(2*myvar)))*mdenom;
 end
-pvis = normalizeData(pvis,0);
+pvis = normalizeData(pvi,0);
 
 end
 
@@ -130,5 +134,63 @@ Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 [pviso]=findProbabilitiesRobust(residualsnew);
+
+end
+
+function   [pviso] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+[npts,m]=size(initialPvi);
+if(currentIter< (0.1*totalIter))
+    pviso=pvis;
+    return
+end
+Fnew = fundmatrix(x(:,inliers));
+[bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
+
+resunsquared= sqrt(residualsnew);
+
+stdr= std(resunsquared);
+varr=var(resunsquared);
+Q=0:0.3:(100*0.3);
+n = histc(resunsquared,Q);
+n=n./npts;
+
+dpdfs=zeros(size(Q,2),1);
+
+prevpdf=0;
+
+gausDenmo=1/(sqrt(pi*2*stdr*stdr));
+for i=(size(Q,2)-1):-1:1
+    val=0;
+    
+    val=(Q(i)+Q(i+1))/2;
+    
+    
+    dpdfs(i,1)=prevpdf+((n(i)*gausDenmo*exp(-(val*val)/(2*stdr*stdr))));
+    prevpdf=dpdfs(i,1);
+end
+
+
+% normalizing
+for i=size(Q,2):-1:1
+    dpdfs(i,1)=dpdfs(i,1)/dpdfs(1,1);
+end
+
+
+pviso=zeros(npts,1);
+
+for i=1:npts
+    asign=0;
+    for j=2:size(Q,2)
+        if((resunsquared(1,i))> Q(j-1) && (resunsquared(1,i))<= Q(j))
+            pviso(i,1)=dpdfs(j,1);
+            asign=1;
+            break;
+        end
+    end
+    if(asign<eps)
+        pviso(i,1)=dpdfs(size(Q,2),1);
+    end
+end
 
 end

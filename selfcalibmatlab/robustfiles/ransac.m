@@ -1,7 +1,6 @@
 
 function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
 
-Octave = exist('OCTAVE_VERSION') ~= 0;
 debugf=0;
 
 if(debugf==1)
@@ -119,7 +118,7 @@ while N > trialcount
     % Find the number of inliers to this model.
     ninliers = length(inliers);
     
-    curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t);
+    curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis);
     
     if(debugf==1)
         fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
