@@ -73,8 +73,8 @@ r = 0;
 end
 
 
-
-debug the liang method make sure it works right, if the histpogram is collecting points for the wrong intervamls then the whole thing is wrong
-    also add in the pvi score calculation for everyone, and why didnt we use pvi calculation for everyone? in the old paper
-    collect results
-    
+%
+% debug the liang method make sure it works right, if the histpogram is collecting points for the wrong intervamls then the whole thing is wrong
+%     also add in the pvi score calculation for everyone, and why didnt we use pvi calculation for everyone? in the old paper
+%     collect results
+%

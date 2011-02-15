@@ -2,8 +2,10 @@ function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,
 
 if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==3 || typenum==4 || typenum==5 || typenum==6)
+elseif( typenum==3 || typenum==4 || typenum==5 )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
+    elseif( typenum==6 || typenum==7)
+    scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
 end
 
 
@@ -12,12 +14,27 @@ end
 end
 function [score] = likelihood(typenum, size,consideredInliers, residuals,t,pvis)
 score=0;
+stdr=1; %we assume deviation is one
+winddowsize=100; % we assume the search window is 100
+gaussDenom=1/(sqrt(2*pi*stdr*stdr));
+
+score = 0;
 
 for i=1:size
-   %implement this
-   % why did liang not use his own pvi? and use this stupid pvi?
+    pin=pvis(i);
+    po=1-pin;
+    if(pin>1 || pin<0)
+        display(['caught a bad pvi with value ' num2str(pin)]);
+    end
+    
+  pr=(pin*gaussDenom*exp(-(residuals(i)*residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
+  
+   if(pr>1 || pr<0)
+        display(['caught a bad pvi with value ' num2str(pr)]);
+   end
+    score=score+log(max(eps,pr));
 end
-
+score=-score;
 end
 
 
