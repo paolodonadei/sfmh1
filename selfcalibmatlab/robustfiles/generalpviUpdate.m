@@ -9,7 +9,7 @@ elseif(updatetype==3)
 elseif(updatetype==4)
     [outpvis] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
-elseif(updatetype==5)
+elseif(updatetype==5 || updatetype==7 )
     [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==6)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
@@ -30,21 +30,21 @@ rmean=mean(r);
 r=r./(9*rmean);
 for i=1:npts
     if(abs(Leverages(i,1)-1)<eps)
-        cdi(i,1)=eps; % i dont know what to do about this
+        cdi(i,1)=8; % i dont know what to do about this
     else
         cdi(i,1)=(r(i,1)*Leverages(i,1))/((1-Leverages(i,1))*(1-Leverages(i,1)));
     end
 end
 end
 
-function [pvi]=findProbabilitiesRobust(rawvals)
+function [pvis]=findProbabilitiesRobust(rawvals)
 
 % finding probabilities from these values by assuming a zero mean gaussian
 % as the distribution and then using the MADN as the STD and then finding
 % probabilities
-rawvals =  normalizeData(rawvals,0);
+%rawvals =  normalizeData(rawvals,0);
 npts=size(rawvals,1);
-myrstd=mad(rawvals,1); % calculatre teh median standard deviation before squaring
+myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
 rawvals=rawvals.^2;
 myvar=myrstd*myrstd;
 mdenom=1/(sqrt(2*pi*myvar));
@@ -52,7 +52,7 @@ pvi=zeros(npts,1);
 for i=1:npts
     pvi(i,1)=(exp(-rawvals(i,1)/(2*myvar)))*mdenom;
 end
-pvis = normalizeData(pvi,0);
+%pvis = normalizeData(pvi,0);
 
 end
 
@@ -151,7 +151,10 @@ resunsquared= sqrt(residualsnew);
 
 stdr= std(resunsquared);
 varr=var(resunsquared);
+
 Q=0:0.3:(100*0.3);
+Q(size(Q,2))=inf;
+
 n = histc(resunsquared,Q);
 n=n./npts;
 
@@ -161,36 +164,39 @@ prevpdf=0;
 
 gausDenmo=1/(sqrt(pi*2*stdr*stdr));
 for i=(size(Q,2)-1):-1:1
+    
     val=0;
+    if(i==(size(Q,2)-1))
+        val=(Q(i)+Q(i)+0.3)/2;
+    else
+        val=(Q(i)+Q(i+1))/2;
+    end 
+        
+        dpdfs(i,1)=prevpdf+((n(i)*gausDenmo*exp(-(val*val)/(2*stdr*stdr))));
+        prevpdf=dpdfs(i,1);
+    end
     
-    val=(Q(i)+Q(i+1))/2;
+    
+    % normalizing
+    for i=size(Q,2):-1:1
+        dpdfs(i,1)=dpdfs(i,1)/dpdfs(1,1);
+    end
     
     
-    dpdfs(i,1)=prevpdf+((n(i)*gausDenmo*exp(-(val*val)/(2*stdr*stdr))));
-    prevpdf=dpdfs(i,1);
-end
-
-
-% normalizing
-for i=size(Q,2):-1:1
-    dpdfs(i,1)=dpdfs(i,1)/dpdfs(1,1);
-end
-
-
-pviso=zeros(npts,1);
-
-for i=1:npts
-    asign=0;
-    for j=2:size(Q,2)
-        if((resunsquared(1,i))> Q(j-1) && (resunsquared(1,i))<= Q(j))
-            pviso(i,1)=dpdfs(j,1);
-            asign=1;
-            break;
+    pviso=zeros(npts,1);
+    
+    for i=1:npts
+        asign=0;
+        for j=2:size(Q,2)
+            if((resunsquared(1,i))> Q(j-1) && (resunsquared(1,i))<= Q(j))
+                pviso(i,1)=dpdfs(j,1);
+                asign=1;
+                break;
+            end
+        end
+        if(asign<eps)
+            pviso(i,1)=dpdfs(size(Q,2),1);
         end
     end
-    if(asign<eps)
-        pviso(i,1)=dpdfs(size(Q,2),1);
-    end
-end
-
+    
 end
