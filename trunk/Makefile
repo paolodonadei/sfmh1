@@ -2,8 +2,8 @@
 LOCALLIBS=/home/houman/Desktop/code/locallibs
 VPATH = .:utils/selfcalib
 INC = -I. -I'$(LOCALLIBS)'/include -Iutils/selfcalib  -Iutils/sbainterface/ -Iutils/fundutils/
-CC=g++
-CFLAGS=$(INC) -c -g -Wall
+CC=g++ 
+CFLAGS=$(INC)  -c -g -Wall
 LIBS= -lm  -llevmar  -lhighgui -lsba -lcxcore -lcv -lboost_filesystem -lboost_system    -llapack   -lcblas -lblas  -lf2c  `pkg-config opencv --cflags --libs` -lgfortran
 LDFLAGS= -L'$(LOCALLIBS)'/lib -L/usr/lib
 SOURCES=main.cpp argproc.cpp HRImage.cpp HRprimitives.cpp general.cpp pgmutils.cpp sift.cpp matching.cpp visiongen.cpp HRstructure.cpp robust_est.cpp  hrpmvshandler.cpp

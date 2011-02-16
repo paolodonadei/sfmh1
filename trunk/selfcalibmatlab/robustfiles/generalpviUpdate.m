@@ -37,14 +37,27 @@ for i=1:npts
 end
 end
 
-function [pvis]=findProbabilitiesRobust(rawvals)
+function [pvis]=findProbabilitiesRobust(rawvals,stdv,meanv)
+
+if(nargin  >1)
+     myrstd=stdv;
+else
+    myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
+end
+
+
+if(nargin  >2)
+    rawvals=rawvals-meanv;
+else
+    myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
+end
 
 % finding probabilities from these values by assuming a zero mean gaussian
 % as the distribution and then using the MADN as the STD and then finding
 % probabilities
 %rawvals =  normalizeData(rawvals,0);
 npts=size(rawvals,1);
-myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
+
 rawvals=rawvals.^2;
 myvar=myrstd*myrstd;
 mdenom=1/(sqrt(2*pi*myvar));
