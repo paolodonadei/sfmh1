@@ -34,7 +34,7 @@ while(direxists==1)
 end
 
 
-styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c'};
+styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c','g--'};
 t=zeros(1,numPoints);
 label='empty';
 nowtime=num2str(sum(round(100*clock)));
@@ -46,8 +46,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'Un-robust','RANSAC','MSAC','Leverage'};
 % AlgFuncs={ @fundmatrixunrobust ,@ransackovesi,@msackovesi,@fundmatrixrobustrandleverage};
 
-AlgNames={ 'RANSAC','MSAC','Leverage','cookUpdate','cook'};
-AlgFuncs={ @ransackovesi,@msackovesi,@fundmatrixrobustrandleverage,@fundmatrixrobustcookupdate,@fundmatrixrobustcook};
+AlgNames={ 'RANSAC','MSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
+AlgFuncs={1,2,3,4,5,6,7};
 
 
 
@@ -129,10 +129,7 @@ for i=1:numPoints
         [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
         
         [mm,nn]=size(corrs);
-        % augmenting corrs with zeros for homo coordinates
-        x1 = [ corrs(1:2,:); ones(1,nn)];    % Extract x1 and x2 from x
-        x2 = [ corrs(3:4,:); ones(1,nn)];
-   
+      
         
         
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ')'] );
@@ -141,7 +138,8 @@ for i=1:numPoints
             
             tic;
             clear F iterations
-            [F, current_errors_iterations{i}(k,j)]=AlgFuncs{k}(x1,x2);
+          
+            [F, current_errors_iterations{i}(k,j)]= fundmatrixrobustgeneral(corrs,AlgFuncs{k});
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
             

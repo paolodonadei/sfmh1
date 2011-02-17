@@ -30,7 +30,7 @@ rmean=mean(r);
 r=r./(9*rmean);
 for i=1:npts
     if(abs(Leverages(i,1)-1)<eps)
-        cdi(i,1)=8; % i dont know what to do about this
+        cdi(i,1)=0; % i dont know what to do about this
     else
         cdi(i,1)=(r(i,1)*Leverages(i,1))/((1-Leverages(i,1))*(1-Leverages(i,1)));
     end
@@ -49,8 +49,15 @@ end
 if(nargin  >2)
     rawvals=rawvals-meanv;
 else
-    myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
+  rawvals=rawvals;
 end
+
+%normalize distribution , now we have a normalized distribution
+% then made the variance 1/2 by multiplying the distribution by sqrt(1/2)
+rawvals=rawvals./myrstd;
+rawvals=rawvals.*sqrt(1/2);
+
+
 
 % finding probabilities from these values by assuming a zero mean gaussian
 % as the distribution and then using the MADN as the STD and then finding
@@ -58,14 +65,17 @@ end
 %rawvals =  normalizeData(rawvals,0);
 npts=size(rawvals,1);
 
-rawvals=rawvals.^2;
-myvar=myrstd*myrstd;
-mdenom=1/(sqrt(2*pi*myvar));
-pvi=zeros(npts,1);
+
+
+
+pvis=zeros(npts,1);
 for i=1:npts
-    pvi(i,1)=(exp(-rawvals(i,1)/(2*myvar)))*mdenom;
+    pvis(i,1)=erfc(rawvals(i,1));
+    if(pvis(i,1)>1 || pvis(i,1)<0)
+    display(['found a pvi with value ' num2str(pvis(i,1))]);
+    end
 end
-%pvis = normalizeData(pvi,0);
+
 
 end
 
@@ -105,6 +115,11 @@ end
 
 function   [pviso,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
+if(currentIter< (0.1*totalIter))
+    pviso=pvis;
+    return
+end
+%display(['started updating pvi from iteration ' num2str(currentIter)']);
 
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
@@ -122,22 +137,27 @@ end
 
 
 [cdi] = findCookDistance(initialPvi,  residualsnew);
-[pviso]=findProbabilitiesRobust(cdi);
-
+[pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
+% hist(cdi,100); title('histogram ofcook distance');
+% figure
+% hist(pviso,100); title('pvis hisrogram');
+% close all
 end
 
 function   [pviso] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-
+if(currentIter< (0.1*totalIter))
+    pviso=pvis;
+    return
+end
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 [cdi] = findCookDistance(initialPvi,  residualsnew);
-[pviso]=findProbabilitiesRobust(cdi);
+[pviso]=findProbabilitiesRobust(cdi,1/3);
 
 end
 
 function   [pviso] = cookUpdatepureres(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-
 
 if(currentIter< (0.1*totalIter))
     pviso=pvis;
@@ -146,7 +166,7 @@ end
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
-[pviso]=findProbabilitiesRobust(residualsnew);
+[pviso]=findProbabilitiesRobust(residualsnew');
 
 end
 
