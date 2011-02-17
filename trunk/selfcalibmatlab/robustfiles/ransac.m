@@ -29,7 +29,7 @@ feedback = 0;
 
 
 
-
+firstScoreFlag=0; % this is used to make sure the first score is set with calculated pvis not with fake uniform
 
 
 
@@ -130,6 +130,10 @@ while N > trialcount
         
     
          [pvis,initialPvi] = generalpviUpdate(updatepviFunc,initialPvi,pvis,residuals,t,inliers,x,trialcount , N);
+        if(firstScoreFlag<eps)% making sure pvis are used correctly 
+             curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis);
+            firstScoreFlag=1;
+        end
         
         if(debugf==1)
             fprintf(fid,[ ' ,  * , ']);

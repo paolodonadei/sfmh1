@@ -7,7 +7,7 @@
 % which we have to pick the best one. (A 7 point solution can return up to 3
 % solutions)
 
-function [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, x, t);
+function [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, x, t)
 
 if nargin < 3
    t=1.96*1.96;

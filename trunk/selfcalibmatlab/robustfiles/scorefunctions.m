@@ -4,7 +4,7 @@ if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
 elseif( typenum==3 || typenum==4 || typenum==5 )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
-    elseif( typenum==6 || typenum==7)
+elseif( typenum==6 || typenum==7)
     scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
 end
 
@@ -27,11 +27,11 @@ for i=1:size
         display(['caught a bad pvi with value ' num2str(pin)]);
     end
     
-  pr=(pin*gaussDenom*exp(-(residuals(i)*residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
-  
-   if(pr>1 || pr<0)
+    pr=(pin*gaussDenom*exp(-(residuals(i)*residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
+    
+    if(pr>1 || pr<0)
         display(['caught a bad pvi with value ' num2str(pr)]);
-   end
+    end
     score=score+log(max(eps,pr));
 end
 score=-score;
