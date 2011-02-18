@@ -151,6 +151,9 @@ end
 
 [cdi] = findCookDistance(initialPvi,  residualsnew);
 [pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
+
+
+
 % hist(cdi,100); title('histogram ofcook distance');
 % figure
 % hist(pviso,100); title('pvis hisrogram');

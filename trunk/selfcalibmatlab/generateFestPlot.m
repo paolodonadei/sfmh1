@@ -44,8 +44,8 @@ fidgraph = fopen([curdirname '/graphdata.csv'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
 
-AlgNames={ 'RANSAC','MSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
-AlgFuncs={1,2,3,4,5,6,7};
+AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
+AlgFuncs={1,3,4,5,6,7};
 
 
 
