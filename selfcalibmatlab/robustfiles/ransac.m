@@ -4,6 +4,7 @@ function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,er
 debugf=0;
 
 if(debugf==1)
+    global inlierOutlier;
     pviselected =[];
     debugdirname='debugransac';
     seedname='ransacdebug';
@@ -93,6 +94,9 @@ while N > trialcount
     if(debugf==1)
         for vv=1:s
             fprintf(fid,[ num2str(ind(vv)) ]);
+            if((exist('inlierOutlier'))==1 && size(inlierOutlier,2)>0 && inlierOutlier(1,ind(vv))==1)
+                  fprintf(fid,'* ');
+            end
             if(vv~=s) fprintf(fid,[ ' - ']); end
         end
         fprintf(fid,[ ' , ']);

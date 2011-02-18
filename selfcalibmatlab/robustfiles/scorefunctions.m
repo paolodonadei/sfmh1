@@ -6,16 +6,21 @@ elseif( typenum==3 || typenum==4 || typenum==5 )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
 elseif( typenum==6 || typenum==7)
     scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
+elseif(typenum==inf)
+     scores = likelihoodFixed(typenum, size,consideredInliers, residuals,t,pvis);
 end
 
 
 
 
 end
+
+
+
 function [score] = likelihood(typenum, size,consideredInliers, residuals,t,pvis)
 score=0;
 stdr=1; %we assume deviation is one
-winddowsize=100; % we assume the search window is 100
+winddowsize=400; % we assume the search window is 100
 gaussDenom=1/(sqrt(2*pi*stdr*stdr));
 
 score = 0;
