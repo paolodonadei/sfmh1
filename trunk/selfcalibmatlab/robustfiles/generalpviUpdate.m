@@ -15,26 +15,39 @@ elseif(updatetype==6)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
 end
-
+% 
+% global inlierOutlier;
+% [errorin,errorout] = pvifitness(inlierOutlier',outpvis);
+% close all
 end
 
 function [cdi] = findCookDistance(Leverages, residuals)
 
+p=8; % rank of matrix A
 
-L=Leverages;
 [npts,m]=size(Leverages);
 
 cdi=zeros(npts,1);
-r=residuals';
-rmean=mean(r);
-r=r./(9*rmean);
+ [r]=studentizeResiduals( residuals,Leverages);
 for i=1:npts
     if(abs(Leverages(i,1)-1)<eps)
-        cdi(i,1)=0; % i dont know what to do about this
+        cdi(i,1)=5; % i dont know what to do about this
     else
-        cdi(i,1)=(r(i,1)*Leverages(i,1))/((1-Leverages(i,1))*(1-Leverages(i,1)));
+        cdi(i,1)=(r(i,1)*r(i,1)*Leverages(i,1))/(p*(1-Leverages(i,1)));
+    end
+    if(cdi(i,1)>5) % i did this to see a proper histogram, this makes no diff because p(7) is zero anyays
+        cdi(i,1)=5;
     end
 end
+% hist(Leverages,100);
+% title('histogram of leverage');
+% figure
+% hist(r,100);
+% title('histogram of residuals');
+% figure
+% hist(cdi,100);
+% title('histogram of cook distance');
+% figure
 end
 
 function [pvis]=findProbabilitiesRobust(rawvals,stdv,meanv)
@@ -115,10 +128,10 @@ end
 
 function   [pviso,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
-if(currentIter< (0.1*totalIter))
-    pviso=pvis;
-    return
-end
+% if(currentIter< (0.1*totalIter))
+%     pviso=pvis;
+%     return
+% end
 %display(['started updating pvi from iteration ' num2str(currentIter)']);
 
 Fnew = fundmatrix(x(:,inliers));
@@ -145,10 +158,10 @@ end
 end
 
 function   [pviso] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-if(currentIter< (0.1*totalIter))
-    pviso=pvis;
-    return
-end
+% if(currentIter< (0.1*totalIter))
+%     pviso=pvis;
+%     return
+% end
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
@@ -169,7 +182,24 @@ Fnew = fundmatrix(x(:,inliers));
 [pviso]=findProbabilitiesRobust(residualsnew');
 
 end
+function [r]=studentizeResiduals(e,l)
+p=8;
+e=sqrt(e);
+n=size(e,2);
 
+MSRES=sum(e)/(n-p);
+
+r=zeros(n,1);
+for i=1:n
+    if(abs(l(i,1)-1)<eps)
+        r(i,1)=r(i,1); % cant divide by zero so just dont studentize
+    else
+   r(i,1)=e(1,i)/sqrt((MSRES*(1-l(i,1))));
+    end
+end
+
+
+end
 function   [pviso] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
 [npts,m]=size(initialPvi);
@@ -233,3 +263,4 @@ for i=(size(Q,2)-1):-1:1
     end
     
 end
+
