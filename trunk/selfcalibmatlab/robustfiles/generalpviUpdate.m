@@ -14,11 +14,13 @@ elseif(updatetype==5 || updatetype==7 )
 elseif(updatetype==6)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
+elseif(updatetype==8 )
+    [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 end
 % 
-% global inlierOutlier;
-% [errorin,errorout] = pvifitness(inlierOutlier',outpvis);
-% close all
+global inlierOutlier;
+[errorin,errorout] = pvifitness(inlierOutlier',outpvis);
+close all
 end
 
 function [cdi] = findCookDistance(Leverages, residuals)
@@ -123,8 +125,13 @@ else
 end
 
 end
+function   [pviso,initialPvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
+[pvison,initialPvin] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 
+pviso=(pvison+pvis)./2;
+initialPvin=(initialPvi+initialPvin)./2;
+end
 
 function   [pviso,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 

@@ -68,7 +68,16 @@ while N > trialcount
             % Fit model to this random selection of data points.
             % Note that M may represent a set of models that fit the data in
             % this case M will be a cell array of models
-            M = feval(fittingfn, x(:,ind));
+         
+            if(s==7)
+            M = vgg_F_from_7pts_2img2(x(:,ind));
+            elseif(s>7)
+               
+                 M =  fundmatrix(x(:,ind));
+            else
+               display('wrong S'); 
+               return;          
+            end
             
             % Depending on your problem it might be that the only way you
             % can determine whether a data set is degenerate or not is to
@@ -146,7 +155,7 @@ while N > trialcount
         besterror = curerror;  % Record data for this model
         bestinliers = inliers;
         bestM = M;
-        
+      
         % Update estimate of N, the number of trials to ensure we pick,
         % with probability p, a data set with no outliers.
         fracinliers =  ninliers/npts;

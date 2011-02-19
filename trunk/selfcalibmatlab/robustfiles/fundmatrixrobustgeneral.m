@@ -38,11 +38,10 @@ degenfn   = @isdegenerate;
 % 2- MSAC
 % 3- Residual based pvi
 % 4- cook distance without leverage update
-% 5- cook distance with update
+% 5- cook distance with update - this is best so far
 % 6- Liang's method, not imeplemented yet
-% 7- cook with update and cook based score , not imeplemented yet
+% 7- cook with update and cook based score using likelihoods
 % 8- cook wit update and cook based score and accumulation of pvis over
-% trials , not imeplemented yet
 
 scorefunc =  typenum;
 randSampFunc =  typenum;
