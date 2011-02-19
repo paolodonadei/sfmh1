@@ -2,7 +2,7 @@ function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,
 
 if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==3 || typenum==4 || typenum==5 )
+elseif( typenum==3 || typenum==4 || typenum==5 || typenum==8 )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
 elseif( typenum==6 || typenum==7)
     scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
