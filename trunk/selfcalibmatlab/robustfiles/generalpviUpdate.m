@@ -18,9 +18,12 @@ elseif(updatetype==8 )
     [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 end
 % 
-global inlierOutlier;
-[errorin,errorout] = pvifitness(inlierOutlier',outpvis);
-close all
+% changep=mean(abs(outpvis-pvis));
+% display(['-mean of pvi change was ' num2str(changep)]);
+% 
+% global inlierOutlier;
+% [errors] = pvifitness(inlierOutlier',outpvis);
+% close all
 end
 
 function [cdi] = findCookDistance(Leverages, residuals)
@@ -30,7 +33,7 @@ p=8; % rank of matrix A
 [npts,m]=size(Leverages);
 
 cdi=zeros(npts,1);
- [r]=studentizeResiduals( residuals,Leverages);
+[r]=studentizeResiduals( residuals,Leverages);
 for i=1:npts
     if(abs(Leverages(i,1)-1)<eps)
         cdi(i,1)=5; % i dont know what to do about this
@@ -55,7 +58,7 @@ end
 function [pvis]=findProbabilitiesRobust(rawvals,stdv,meanv)
 
 if(nargin  >1)
-     myrstd=stdv;
+    myrstd=stdv;
 else
     myrstd= 1.4826*mad(rawvals,1); % calculatre teh median standard deviation before squaring
 end
@@ -64,7 +67,7 @@ end
 if(nargin  >2)
     rawvals=rawvals-meanv;
 else
-  rawvals=rawvals;
+    rawvals=rawvals;
 end
 
 %normalize distribution , now we have a normalized distribution
@@ -87,7 +90,7 @@ pvis=zeros(npts,1);
 for i=1:npts
     pvis(i,1)=erfc(rawvals(i,1));
     if(pvis(i,1)>1 || pvis(i,1)<0)
-    display(['found a pvi with value ' num2str(pvis(i,1))]);
+        display(['found a pvi with value ' num2str(pvis(i,1))]);
     end
 end
 
@@ -135,12 +138,6 @@ end
 
 function   [pviso,initialPvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
-% if(currentIter< (0.1*totalIter))
-%     pviso=pvis;
-%     return
-% end
-%display(['started updating pvi from iteration ' num2str(currentIter)']);
-
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
@@ -159,6 +156,27 @@ end
 [cdi] = findCookDistance(initialPvi,  residualsnew);
 [pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
 
+
+
+changep=mean(abs(pviso-pvis));
+
+if(changep<0.09)
+    zmed=median(pviso);
+    bb=pviso;
+    pviso=(zmed/10)*ones(size(initialPvi,1),1);
+    for i=1:nptsInlier
+    pviso(bestInliers(1,i) ,1)= bb(bestInliers(1,i) ,1);
+    end
+
+end
+
+display(['-mean of pvi change was ' num2str(changep)]);
+
+global inlierOutlier;
+[errors] = pvifitness(inlierOutlier',pviso);
+display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
+currentIter
+close all
 
 
 % hist(cdi,100); title('histogram ofcook distance');
@@ -204,7 +222,7 @@ for i=1:n
     if(abs(l(i,1)-1)<eps)
         r(i,1)=r(i,1); % cant divide by zero so just dont studentize
     else
-   r(i,1)=e(1,i)/sqrt((MSRES*(1-l(i,1))));
+        r(i,1)=e(1,i)/sqrt((MSRES*(1-l(i,1))));
     end
 end
 
@@ -243,34 +261,34 @@ for i=(size(Q,2)-1):-1:1
         val=(Q(i)+Q(i)+0.3)/2;
     else
         val=(Q(i)+Q(i+1))/2;
-    end 
-        
-        dpdfs(i,1)=prevpdf+((n(i)*gausDenmo*exp(-(val*val)/(2*stdr*stdr))));
-        prevpdf=dpdfs(i,1);
     end
     
-    
-    % normalizing
-    for i=size(Q,2):-1:1
-        dpdfs(i,1)=dpdfs(i,1)/dpdfs(1,1);
-    end
-    
-    
-    pviso=zeros(npts,1);
-    
-    for i=1:npts
-        asign=0;
-        for j=2:size(Q,2)
-            if((resunsquared(1,i))> Q(j-1) && (resunsquared(1,i))<= Q(j))
-                pviso(i,1)=dpdfs(j,1);
-                asign=1;
-                break;
-            end
-        end
-        if(asign<eps)
-            pviso(i,1)=dpdfs(size(Q,2),1);
+    dpdfs(i,1)=prevpdf+((n(i)*gausDenmo*exp(-(val*val)/(2*stdr*stdr))));
+    prevpdf=dpdfs(i,1);
+end
+
+
+% normalizing
+for i=size(Q,2):-1:1
+    dpdfs(i,1)=dpdfs(i,1)/dpdfs(1,1);
+end
+
+
+pviso=zeros(npts,1);
+
+for i=1:npts
+    asign=0;
+    for j=2:size(Q,2)
+        if((resunsquared(1,i))> Q(j-1) && (resunsquared(1,i))<= Q(j))
+            pviso(i,1)=dpdfs(j,1);
+            asign=1;
+            break;
         end
     end
-    
+    if(asign<eps)
+        pviso(i,1)=dpdfs(size(Q,2),1);
+    end
+end
+
 end
 

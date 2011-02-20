@@ -1,7 +1,7 @@
 function [initpvis] = calcInitialPvis(typenum, x1, x2)
 npts=size(x1,2);
 if(typenum==0 || typenum==1 || typenum==2 || typenum==3 || typenum==6  )
-    initpvis=0.5*ones(npts,1);
+    initpvis=ones(npts,1);
 elseif(  typenum==4 || typenum==5 || typenum==7 || typenum==8)
     initpvis = initLeveragepvi( x1, x2);
     
