@@ -44,10 +44,11 @@ fidgraph = fopen([curdirname '/graphdata.csv'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
 
-AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
-AlgFuncs={1,3,4,5,6,7};
+% AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
+% AlgFuncs={1,3,4,5,6,7};
 
-
+AlgNames={ 'RANSAC','cookUpdate','Liang','cookAccumulate'};
+AlgFuncs={1,5,6,8};
 
 numalgs=size(AlgFuncs,2);
 

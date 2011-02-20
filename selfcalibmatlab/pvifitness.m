@@ -1,4 +1,4 @@
-function [errorin,errorout] = pvifitness(inliers,pvis)
+function [errors] = pvifitness(inliers,pvis)
 
 
 
@@ -24,7 +24,7 @@ errorout=sum(errors(find(inliers==0)))/(m-sum(inliers)+eps);
 
 display(['mean error of inliers is : ' num2str(errorin)]);
 display(['mean error of outliers is : ' num2str(errorout)]);
-display(['total error is : ' num2str((errorin+errorout)/2)]);
+display(['**total error is : ' num2str((errorin+errorout)/2)]);
 hist(pvis,100);
 title([ ' histogram of pvis']);
 

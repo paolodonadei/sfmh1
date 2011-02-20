@@ -35,7 +35,7 @@ firstScoreFlag=0; % this is used to make sure the first score is set with calcul
 
 
 [rows, npts] = size(x);
-pvis= 0.5*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
+pvis= 0.3*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
 p = 0.99;         % Desired probability of choosing at least one sample
 % free from outliers
 
@@ -59,7 +59,7 @@ while N > trialcount
         % (If you do not have the statistics toolbox, or are using Octave,
         % use the function RANDOMSAMPLE from my webpage)
         
-        ind =randsampleengine(npts, s,pvis,randSampFunc);;
+        ind =randsampleengine(npts, s,pvis,randSampFunc);
         
         % Test that these points are not a degenerate configuration.
         degenerate = feval(degenfn, x(:,ind));
@@ -163,6 +163,7 @@ while N > trialcount
         pNoOutliers = max(eps, pNoOutliers);  % Avoid division by -Inf
         pNoOutliers = min(1-eps, pNoOutliers);% Avoid division by 0.
         N = log(1-p)/log(pNoOutliers);
+    
         %    display(['number of inliers is ' num2str(ninliers)]);
     else
         if(debugf==1)
