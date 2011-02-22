@@ -225,7 +225,7 @@ save( [curdirname '/variables_GP' nowtime '.mat']);
 tElapsedprogram=toc(tStartprogram);
 disp([' program took ' num2str(tElapsedprogram) ' seconds']);
 copyfile('*.m',[curdirname '\matlabfiles']);
-copyfile(curdirname,['H:\matlabs\' curdirname ]);
+%copyfile(curdirname,['H:\matlabs\' curdirname ]);
 end
 
 %make a generic plotting script that plots the variance and mean and median
