@@ -1,5 +1,5 @@
 
-function [M, inliers,trialcount] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc)
+function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc)
 
 debugf=0;
 
@@ -35,7 +35,10 @@ firstScoreFlag=0; % this is used to make sure the first score is set with calcul
 
 
 [rows, npts] = size(x);
-pvis= 0.3*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
+pvis= 0.0027*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
+ newpvis= 0.0027*ones(npts,1);
+  
+  
 p = 0.99;         % Desired probability of choosing at least one sample
 % free from outliers
 
@@ -54,6 +57,7 @@ while N > trialcount
     % a degenerate configuration.
     degenerate = 1;
     count = 1;
+
     while degenerate
         % Generate s random indicies in the range 1..npts
         % (If you do not have the statistics toolbox, or are using Octave,
@@ -123,8 +127,14 @@ while N > trialcount
     % array of possible models 'distfn' will return the model that has
     % the most inliers.  After this call M will be a non-cell object
     % representing only one model.
-    [inliers, M, residuals, meaner,varer,meder,numins] = feval(distfn, M, x, t);
-    
+    [binliers, M, residuals, meaner,varer,meder,numins] = feval(distfn, M, x, t);
+           
+     [inliers] =findInliers(residuals, newpvis,t,0.0027,1);
+%     
+%     ginliers=find(znewpvis>0.0027);
+%     
+%     global inlierOutlier;
+
     % [ xx, centerloc ] = PeterSturmSelf( M,512,512 );
     %  display(['focal length was ' num2str(xx(1))]);
     
@@ -132,6 +142,8 @@ while N > trialcount
     ninliers = length(inliers);
     
     curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis);
+    
+
     
     if(debugf==1)
         fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
@@ -142,8 +154,12 @@ while N > trialcount
         %   display(['best focal length was ' num2str(xx(1))]);
         
     
-         [pvis,initialPvi] = generalpviUpdate(updatepviFunc,initialPvi,pvis,residuals,t,inliers,x,trialcount , N);
-        if(firstScoreFlag<eps)% making sure pvis are used correctly 
+         [newpvis,initialPvi] = generalpviUpdate(updatepviFunc,initialPvi,pvis,residuals,t,inliers,x,trialcount , N);
+     
+         pvidiff=pvis-newpvis;
+         
+         
+         if(firstScoreFlag<eps)% making sure pvis are used correctly 
              curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis);
             firstScoreFlag=1;
         end
@@ -158,11 +174,13 @@ while N > trialcount
       
         % Update estimate of N, the number of trials to ensure we pick,
         % with probability p, a data set with no outliers.
-        fracinliers =  ninliers/npts;
-        pNoOutliers = 1 -  fracinliers^s;
-        pNoOutliers = max(eps, pNoOutliers);  % Avoid division by -Inf
-        pNoOutliers = min(1-eps, pNoOutliers);% Avoid division by 0.
-        N = log(1-p)/log(pNoOutliers);
+        N=calcIterations(updateIterationFunc,ninliers,npts,trialcount,pvis,pvidiff,s,p);
+        
+        
+     %   if(N > trialcount)% update pvis if we need to further iterate, but if the best pvis were just found then forget it
+                pvis=newpvis; 
+      %  end
+       
     
         %    display(['number of inliers is ' num2str(ninliers)]);
     else

@@ -47,8 +47,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
 % AlgFuncs={1,3,4,5,6,7};
 
-AlgNames={ 'RANSAC','cookUpdate','Liang','cookAccumulate'};
-AlgFuncs={1,5,6,8};
+AlgNames={ 'RANSAC','cookUpdate','Liang'};
+AlgFuncs={1,5,6};
 
 numalgs=size(AlgFuncs,2);
 
@@ -225,6 +225,7 @@ save( [curdirname '/variables_GP' nowtime '.mat']);
 tElapsedprogram=toc(tStartprogram);
 disp([' program took ' num2str(tElapsedprogram) ' seconds']);
 copyfile('*.m',[curdirname '\matlabfiles']);
+copyfile(curdirname,['H:\matlabs\' curdirname ]);
 end
 
 %make a generic plotting script that plots the variance and mean and median

@@ -47,19 +47,39 @@ scorefunc =  typenum;
 randSampFunc =  typenum;
 updatepviFunc = typenum;
 initpvis = calcInitialPvis(typenum, x1, x2);
-
+updateIterationFunc=typenum;
+findInliersFunc=typenum;
 
 if(typenum~=0)
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [Fz, inliers,iters] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,randSampFunc,initpvis,updatepviFunc);
+    [Fz, inliers,iters,pvis] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,randSampFunc,initpvis,updatepviFunc,updateIterationFunc,findInliersFunc);
     
 else
     iters=0;
     inliers=1:1:npts;
 end
 
+global corrsclean;
 
-F = fundmatrix(x1(:,inliers), x2(:,inliers));
+
+
+
+
+if(typenum==5)
+
+F = fundmatrix(x1, x2,pvis.^2);
+else
+    F = fundmatrix(x1(:,inliers), x2(:,inliers));
+
+
+end
+% 
+% [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+% 
+% display([' after weighted least squares witgh everyone ' num2str(meaner)]);
+
+
+
 
 
 end
