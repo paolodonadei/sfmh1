@@ -21,21 +21,21 @@ display(['mean of pvis is: ' num2str(mean(pvis))]);
 errorin=sum(errors(find(inliers==1)))/(eps+sum(inliers));
 errorout=sum(errors(find(inliers==0)))/(m-sum(inliers)+eps);
 
-
+% 
 display(['mean error of inliers is : ' num2str(errorin)]);
 display(['mean error of outliers is : ' num2str(errorout)]);
 display(['**total error is : ' num2str((errorin+errorout)/2)]);
-hist(pvis,100);
-title([ ' histogram of pvis']);
-
-figure
-
-hist(pvis(find(inliers==1)),100);
-title([ ' histogram of inlier pvis']);
-figure
-
-hist(pvis(find(inliers==0)),100);
-title([ ' histogram of outlier pvis']);
+% hist(pvis,100);
+% title([ ' histogram of pvis']);
+% 
+% figure
+% 
+% hist(pvis(find(inliers==1)),100);
+% title([ ' histogram of inlier pvis']);
+% figure
+% 
+% hist(pvis(find(inliers==0)),100);
+% title([ ' histogram of outlier pvis']);
 
 
 end

@@ -2,12 +2,12 @@ function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,
 
 if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==3 || typenum==4 || typenum==5 || typenum==8 )
+elseif( typenum==3 || typenum==4 || typenum==8 || typenum==5  )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
 elseif( typenum==6 || typenum==7)
     scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
-elseif(typenum==inf)
-     scores = likelihoodFixed(typenum, size,consideredInliers, residuals,t,pvis);
+elseif(typenum==Inf )
+    scores = likelihoodfixed(typenum, size,consideredInliers, residuals,t,pvis);
 end
 
 
@@ -15,6 +15,16 @@ end
 
 end
 
+function [score] = likelihoodfixed(typenum, size,consideredInliers, residuals,t,pvis)
+score=0;
+for i=1:size
+    pr=pvis(i,1);
+    score=score+log(max(eps,pr));
+end
+
+
+
+end
 
 
 function [score] = likelihood(typenum, size,consideredInliers, residuals,t,pvis)

@@ -26,14 +26,14 @@ end
 % close all
 end
 
-function [cdi] = findCookDistance(Leverages, residuals)
+function [cdi] = findCookDistance(Leverages, residuals,p,nobs)
 
-p=8; % rank of matrix A
+
 
 [npts,m]=size(Leverages);
 
 cdi=zeros(npts,1);
-[r]=studentizeResiduals( residuals,Leverages);
+[r]=studentizeResiduals( residuals,Leverages,nobs);
 for i=1:npts
     if(abs(Leverages(i,1)-1)<eps)
         cdi(i,1)=5; % i dont know what to do about this
@@ -44,6 +44,15 @@ for i=1:npts
         cdi(i,1)=5;
     end
 end
+
+%%%%%%%%
+% %this is how matlab does it but its not workin for me really
+%  dfe = nobs-p;
+% sse = norm(sqrt(residuals'))^2;
+%   mse = sse./dfe;
+%   d = abs(sqrt(residuals')).^2 .* (Leverages./(1-Leverages).^2)./(p*mse);
+%   
+%   cdi=d;
 % hist(Leverages,100);
 % title('histogram of leverage');
 % figure
@@ -153,30 +162,20 @@ for i=1:nptsInlier
 end
 
 
-[cdi] = findCookDistance(initialPvi,  residualsnew);
-[pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
+[cdi] = findCookDistance(initialPvi,  residualsnew,9,size(initialPvi,1));
+[pviso]=findProbabilitiesRobust(cdi,1/15); % here we assume a std for cook's distance
 
 
 
-changep=mean(abs(pviso-pvis));
-
-if(changep<0.09)
-    zmed=median(pviso);
-    bb=pviso;
-    pviso=(zmed/10)*ones(size(initialPvi,1),1);
-    for i=1:nptsInlier
-    pviso(bestInliers(1,i) ,1)= bb(bestInliers(1,i) ,1);
-    end
-
-end
-
-display(['-mean of pvi change was ' num2str(changep)]);
-
-global inlierOutlier;
-[errors] = pvifitness(inlierOutlier',pviso);
-display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
-currentIter
-close all
+% changep=mean(abs(pviso-pvis));
+% 
+% display(['-mean of pvi change was ' num2str(changep)]);
+% 
+% global inlierOutlier;
+%  [errors] = pvifitness(inlierOutlier',pviso);
+% display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
+% currentIter
+% close all
 
 
 % hist(cdi,100); title('histogram ofcook distance');
@@ -210,15 +209,15 @@ Fnew = fundmatrix(x(:,inliers));
 [pviso]=findProbabilitiesRobust(residualsnew');
 
 end
-function [r]=studentizeResiduals(e,l)
-p=8;
+function [r]=studentizeResiduals(e,l,nobs)
+p=9;
 e=sqrt(e);
-n=size(e,2);
+n=nobs;
 
 MSRES=sum(e)/(n-p);
 
-r=zeros(n,1);
-for i=1:n
+r=zeros(size(e,2),1);
+for i=1:size(e,2)
     if(abs(l(i,1)-1)<eps)
         r(i,1)=r(i,1); % cant divide by zero so just dont studentize
     else
