@@ -59,7 +59,7 @@ else
     inliers=1:1:npts;
 end
 
-global corrsclean;
+
 
 
 
@@ -73,10 +73,11 @@ else
 
 
 end
-% 
-% [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
-% 
-% display([' after weighted least squares witgh everyone ' num2str(meaner)]);
+
+global corrsclean;
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+
+display([' after weighted least squares witgh everyone ' num2str(meaner)]);
 
 
 
