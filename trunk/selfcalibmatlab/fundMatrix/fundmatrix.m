@@ -42,7 +42,12 @@
 
 function [F,e1,e2] = fundmatrix(varargin)
 
-[x1, x2, npts,weights] = checkargs(varargin(:));
+[x1, x2, npts,weights,ended here add options for using nonline with this and try to see if its better with random sampling or with the final fit 
+    also weigh the residuals wirth the weights for nonlin in case you wanna use it in the end] = checkargs(varargin(:));
+
+origX1=x1;
+origX2=x2;
+
 Octave = exist('OCTAVE_VERSION') ~= 0;  % Are we running under Octave?
 
 % Normalise each set of points so that the origin
@@ -72,6 +77,42 @@ F = reshape(V(:,9),3,3)';
 [U,D,V] = svd(F,0);
 F = U*diag([D(1,1) D(2,2) 0])*V';
 
+
+
+
+
+
+
+global corrsclean;
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(T2'*F*T1, corrsclean );
+
+display([' before nonlin error was ' num2str(meaner)]);
+
+options = optimset('Display','off','Diagnostics','off','Algorithm','interior-point','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
+fo = fmincon('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',[],[],[],[],[],[],@torr_nonlcon_f2x2,options,[x1 ; x2],1.96*1.96);
+
+% options = optimset('Display','on','Diagnostics','on','Algorithm','levenberg-marquardt','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
+% fo = fminunc('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',options,[x1 ; x2],1.96*1.96)
+
+F(1,1)=fo(1,1);
+F(1,2)=fo(2,1);
+F(1,3)=fo(3,1);
+F(2,1)=fo(4,1);
+F(2,2)=fo(5,1);
+F(2,3)=fo(6,1);
+F(3,1)=fo(7,1);
+F(3,2)=fo(8,1);
+F(3,3)=fo(9,1);
+[U,D,V] = svd(F,0);
+F = U*diag([D(1,1) D(2,2) 0])*V';
+F=F/(F(3,3));
+
+
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(T2'*F*T1, corrsclean );
+
+
+display([' after nonlin error was ' num2str(meaner)]);
+
 % Denormalise
 F = T2'*F*T1;
 F=F/F(3,3);
@@ -81,6 +122,12 @@ if nargout == 3  	% Solve for epipoles
     e1 = hnormalise(V(:,3));
     e2 = hnormalise(U(:,3));
 end
+
+
+
+end
+
+
 
 %--------------------------------------------------------------------------
 % Function to check argument values and set defaults
@@ -129,4 +176,4 @@ npts = size(x1,2);
 if npts < 8
     error('At least 8 points are needed to compute the fundamental matrix');
 end
-
+end

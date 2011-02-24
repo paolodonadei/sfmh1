@@ -168,10 +168,11 @@ end
 
 
 changep=mean(abs(pviso-pvis));
-
+close all
 display(['-mean of pvi change was ' num2str(changep)]);
 
 global inlierOutlier;
+
 [errors] = pvifitness(inlierOutlier',pviso);
 display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
 currentIter
@@ -199,7 +200,7 @@ subplot(3,2,5)
 hist(cdi(find(inliers==1)),100); title('cook distance of inliers');
 subplot(3,2,6)
 hist(cdi(find(inliers==0)),100); title('cook distance of outliers');
-close all
+
 end
 
 function   [pviso] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
