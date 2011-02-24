@@ -12,7 +12,7 @@ if(updateIterationFunc==5)
         N = log(1-p)/log(pNoOutliers);
     else
         
-       N=0; 
+       N=0; % make sure this is N=0 zzz 
         
     end
     

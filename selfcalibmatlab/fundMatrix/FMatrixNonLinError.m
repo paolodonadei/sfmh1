@@ -9,7 +9,8 @@ F(3,1)=p0(7,1);
 F(3,2)=p0(8,1);
 F(3,3)=p0(9,1);
 
-% 
+
+
 % [U,D,V] = svd(F,0);
 % F = U*diag([D(1,1) D(2,2) 0])*V';
 % 
@@ -19,7 +20,6 @@ F(3,3)=p0(9,1);
 
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(F, x,t );
 
-r=mean(sqrt(residualsnew'));
-p0'
-r(1,1)
+r=mean((residualsnew'));
+
 end
