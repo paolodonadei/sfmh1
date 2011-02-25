@@ -2,14 +2,13 @@ function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,
 
 if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==3 || typenum==4 || typenum==8 || typenum==5  )
-    scores = msacScore(typenum, size,consideredInliers, residuals,t);
 elseif( typenum==6 || typenum==7)
     scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
 elseif(typenum==Inf )
     scores = likelihoodfixed(typenum, size,consideredInliers, residuals,t,pvis);
+else %( typenum==3 || typenum==4 || typenum==8 || typenum==5  )
+    scores = msacScore(typenum, size,consideredInliers, residuals,t);
 end
-
 
 
 

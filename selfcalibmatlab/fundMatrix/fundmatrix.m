@@ -42,8 +42,7 @@
 
 function [F,e1,e2] = fundmatrix(varargin)
 
-[x1, x2, npts,weights,ended here add options for using nonline with this and try to see if its better with random sampling or with the final fit 
-    also weigh the residuals wirth the weights for nonlin in case you wanna use it in the end] = checkargs(varargin(:));
+[x1, x2, npts,weights,nonlin] = checkargs(varargin(:));
 
 origX1=x1;
 origX2=x2;
@@ -62,7 +61,7 @@ A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
     x1(1,:)'             x1(2,:)'            ones(npts,1) ];
 
 for i=1:size(A,1)
-   A(i,:)= A(i,:)*weights(i,1);
+    A(i,:)= A(i,:)*weights(i,1);
 end
 
 [U,D,V] = svd(A,0); % Under MATLAB use the economy decomposition
@@ -74,46 +73,35 @@ F = reshape(V(:,9),3,3)';
 
 % Enforce constraint that fundamental matrix has rank 2 by performing
 % a svd and then reconstructing with the two largest singular values.
+
+
+
+
+
+if(nonlin==1)
+    options = optimset('Display','off','Diagnostics','off','Algorithm','interior-point','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
+    fo = fmincon('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',[],[],[],[],[],[],@torr_nonlcon_f2x2,options,[x1 ; x2],1.96*1.96,weights.^2);
+    
+    % options = optimset('Display','on','Diagnostics','on','Algorithm','levenberg-marquardt','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
+    % fo = fminunc('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',options,[x1 ; x2],1.96*1.96)
+    
+    F(1,1)=fo(1,1);
+    F(1,2)=fo(2,1);
+    F(1,3)=fo(3,1);
+    F(2,1)=fo(4,1);
+    F(2,2)=fo(5,1);
+    F(2,3)=fo(6,1);
+    F(3,1)=fo(7,1);
+    F(3,2)=fo(8,1);
+    F(3,3)=fo(9,1);
+    
+   
+    
+    % Denormalise
+    
+end
 [U,D,V] = svd(F,0);
 F = U*diag([D(1,1) D(2,2) 0])*V';
-
-
-
-
-
-
-
-global corrsclean;
-[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(T2'*F*T1, corrsclean );
-
-display([' before nonlin error was ' num2str(meaner)]);
-
-options = optimset('Display','off','Diagnostics','off','Algorithm','interior-point','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
-fo = fmincon('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',[],[],[],[],[],[],@torr_nonlcon_f2x2,options,[x1 ; x2],1.96*1.96);
-
-% options = optimset('Display','on','Diagnostics','on','Algorithm','levenberg-marquardt','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
-% fo = fminunc('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',options,[x1 ; x2],1.96*1.96)
-
-F(1,1)=fo(1,1);
-F(1,2)=fo(2,1);
-F(1,3)=fo(3,1);
-F(2,1)=fo(4,1);
-F(2,2)=fo(5,1);
-F(2,3)=fo(6,1);
-F(3,1)=fo(7,1);
-F(3,2)=fo(8,1);
-F(3,3)=fo(9,1);
-[U,D,V] = svd(F,0);
-F = U*diag([D(1,1) D(2,2) 0])*V';
-F=F/(F(3,3));
-
-
-[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(T2'*F*T1, corrsclean );
-
-
-display([' after nonlin error was ' num2str(meaner)]);
-
-% Denormalise
 F = T2'*F*T1;
 F=F/F(3,3);
 
@@ -132,12 +120,30 @@ end
 %--------------------------------------------------------------------------
 % Function to check argument values and set defaults
 
-function [x1, x2, npts,weights] = checkargs(arg);
+function [x1, x2, npts,weights,nonlin] = checkargs(arg);
 
-if length(arg) == 3
+
+
+if length(arg) == 4
     x1 = arg{1};
     x2 = arg{2};
     weights=arg{3};
+    nonlin=arg{4};
+    
+    if ~all(size(x1)==size(x2))
+        error('x1 and x2 must have the same size');
+    elseif size(x1,1) ~= 3
+        error('x1 and x2 must be 3xN');
+    end
+elseif length(arg) == 3
+    x1 = arg{1};
+    x2 = arg{2};
+    
+    if(size(arg{3},2)==size( x1,2))
+        weights=arg{3};
+    else
+        nonlin=arg{3};
+    end
     
     if ~all(size(x1)==size(x2))
         error('x1 and x2 must have the same size');
@@ -149,11 +155,19 @@ elseif length(arg) == 2
         x1 = arg{1};
         x2 = arg{2};
         npts = size(x1,2);
+        
+        nonlin=0;
         weights=ones(npts,1);
     elseif size(arg{1},1) == 6
         x1 = arg{1}(1:3,:);
         x2 = arg{1}(4:6,:);
-        weights=arg{2};
+        if(size(arg{2},2)==size( x1,2))
+            weights=arg{2};
+        else
+            nonlin=arg{2};
+        end
+        
+        
     else
         
         error('Single argument x must be 6xN');
@@ -165,8 +179,9 @@ elseif length(arg) == 1
     else
         x1 = arg{1}(1:3,:);
         x2 = arg{1}(4:6,:);
-       npts = size(x1,2);
+        npts = size(x1,2);
         weights=ones(npts,1);
+        nonlin=0;
     end
 else
     error('Wrong number of arguments supplied');

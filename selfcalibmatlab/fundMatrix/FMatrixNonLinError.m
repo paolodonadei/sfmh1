@@ -1,4 +1,4 @@
-function [r] = FMatrixNonLinError(p0, x,t)
+function [r] = FMatrixNonLinError(p0, x,t,WSQ)
 F(1,1)=p0(1,1);
 F(1,2)=p0(2,1);
 F(1,3)=p0(3,1);
@@ -20,6 +20,8 @@ F(3,3)=p0(9,1);
 
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(F, x,t );
 
-r=mean((residualsnew'));
+rv=(residualsnew').*(WSQ);
 
+r=mean((rv'));
+r
 end
