@@ -229,6 +229,7 @@ function   [pviso,initialPvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals
 Fnew = fundmatrix(x(:,inliers));
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
+
 badOutliers=find(residualsnew>1.96*1.96);
 Lout = calc_leveragefromCorrs(x(:,badOutliers));
 for i=1:size(badOutliers,2)

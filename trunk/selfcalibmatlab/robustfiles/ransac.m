@@ -1,7 +1,7 @@
 
 function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc)
 
-debugf=0;
+debugf=1;
 
 maxTrials = 6000;
 maxDataTrials = 100;
@@ -181,7 +181,9 @@ while N > trialcount
     if curerror < besterror    % Largest set of inliers so far...
         %   display(['best focal length was ' num2str(xx(1))]);
         
-        
+        if((exist('inlierOutlier'))==1 && debugf==1)
+            display([' the best set had ' num2str( ninliers) ' inliers of which ' num2str((sum(inlierOutlier(inliers))/ninliers)*100) ' % were real inliers']);
+        end
         [newpvis,initialPvi] = generalpviUpdate(updatepviFunc,initialPvi,pvis,residuals,t,inliers,x,trialcount , N);
         
         pvidiff=pvis-newpvis;
