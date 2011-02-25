@@ -1,7 +1,7 @@
 %	By Philip Torr 2002
 %	copyright Microsoft Corp.
 
-function [c,ceq] = torr_nonlcon_f2x2(f, x,t)
+function [c,ceq] = torr_nonlcon_f2x2(f, x,t,W)
 %c = ...     % Compute nonlinear inequalities at f.
 %ceq = ...   % Compute nonlinear equalities at f.
 

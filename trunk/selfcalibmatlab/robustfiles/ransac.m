@@ -1,7 +1,7 @@
 
 function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc)
 
-debugf=1;
+debugf=0;
 
 maxTrials = 6000;
 maxDataTrials = 100;
@@ -41,8 +41,8 @@ firstScoreFlag=0; % this is used to make sure the first score is set with calcul
 
 
 [rows, npts] = size(x);
-pvis= 0.0027*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
-newpvis= 0.0027*ones(npts,1);
+pvis= 1*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
+newpvis= 1*ones(npts,1);
 
 
 p = 0.99;         % Desired probability of choosing at least one sample
