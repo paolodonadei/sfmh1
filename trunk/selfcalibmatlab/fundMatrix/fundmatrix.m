@@ -39,8 +39,9 @@
 % Feb 2004  - Single argument allowed to enable use with RANSAC.
 % Mar 2005  - Epipole calculation added, 'economy' SVD used.
 % Aug 2005  - Octave compatibility
-
-function [F,e1,e2] = fundmatrix(varargin)
+% L for leverage
+% Re for algebraic residuals
+function [F,L,Re,e1,e2] = fundmatrix(varargin)
 
 [x1, x2, npts,weights,nonlin] = checkargs(varargin(:));
 
@@ -95,23 +96,35 @@ if(nonlin==1)
     F(3,2)=fo(8,1);
     F(3,3)=fo(9,1);
     
-   
+    
     
     % Denormalise
     
 end
+Funnormalized=F;
 [U,D,V] = svd(F,0);
 F = U*diag([D(1,1) D(2,2) 0])*V';
+
 F = T2'*F*T1;
 F=F/F(3,3);
 
-if nargout == 3  	% Solve for epipoles
+
+
+if nargout >2  	% Solve for epipoles
+    L = leverage(A); % im taking the leverage of the weighted data points with the pvi, is this correct?
+end
+
+if nargout >3  	% Solve for epipoles
+    FV=[Funnormalized(1,:) Funnormalized(2,:) Funnormalized(3,:)]';
+    Re=A*FV;
+end
+% stopped here, why is this residual not looking right?
+
+if nargout >4  	% Solve for epipoles
     [U,D,V] = svd(F,0);
     e1 = hnormalise(V(:,3));
     e2 = hnormalise(U(:,3));
 end
-
-
 
 end
 
@@ -174,14 +187,22 @@ elseif length(arg) == 2
     end
     
 elseif length(arg) == 1
-    if size(arg{1},1) ~= 6
-        error('Single argument x must be 6xN');
-    else
+    if size(arg{1},1) == 6
         x1 = arg{1}(1:3,:);
         x2 = arg{1}(4:6,:);
         npts = size(x1,2);
         weights=ones(npts,1);
         nonlin=0;
+    elseif size(arg{1},1) == 4
+        npts=size(arg{1},2);
+        x1 = [ arg{1}(1:2,:) ; ones(1,npts)];
+        x2 = [arg{1}(3:4,:) ; ones(1,npts)];
+        
+        weights=ones(npts,1);
+        nonlin=0;
+        
+    else
+        error('Single argument x must be 6xN');
     end
 else
     error('Wrong number of arguments supplied');
