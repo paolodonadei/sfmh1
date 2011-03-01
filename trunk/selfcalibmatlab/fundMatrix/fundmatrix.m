@@ -43,6 +43,7 @@
 % Re for algebraic residuals
 function [F,L,Re,e1,e2] = fundmatrix(varargin)
 
+normalize=1;
 [x1, x2, npts,weights,nonlin] = checkargs(varargin(:));
 
 origX1=x1;
@@ -53,9 +54,13 @@ Octave = exist('OCTAVE_VERSION') ~= 0;  % Are we running under Octave?
 % Normalise each set of points so that the origin
 % is at centroid and mean distance from origin is sqrt(2).
 % normalise2dpts also ensures the scale parameter is 1.
+if(normalize==1)
 [x1, T1] = normalise2dpts(x1);
 [x2, T2] = normalise2dpts(x2);
-
+else
+   T1=eye(3); 
+   T2=eye(3);
+end
 % Build the constraint matrix
 A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
     x2(2,:)'.*x1(1,:)'   x2(2,:)'.*x1(2,:)'  x2(2,:)' ...
@@ -71,6 +76,7 @@ end
 % Extract fundamental matrix from the column of V corresponding to
 % smallest singular value.
 F = reshape(V(:,9),3,3)';
+
 
 % Enforce constraint that fundamental matrix has rank 2 by performing
 % a svd and then reconstructing with the two largest singular values.
@@ -111,7 +117,7 @@ F=F/F(3,3);
 
 
 if nargout >2  	% Solve for epipoles
-    L = leverage(A); % im taking the leverage of the weighted data points with the pvi, is this correct?
+    L = leverage(A(:,1:8)); % im taking the leverage of the weighted data points with the pvi, is this correct?
 end
 
 if nargout >3  	% Solve for epipoles

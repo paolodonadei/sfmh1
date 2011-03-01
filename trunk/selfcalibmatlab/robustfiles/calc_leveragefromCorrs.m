@@ -1,4 +1,4 @@
-function [L] = calc_leveragefromCorrs(x1, x2)
+function [L,R] = calc_leveragefromCorrs(x1, x2,F)
 
 
 
@@ -26,8 +26,10 @@ if(m1==2)
     x2=[x2 ; ones(1,n1)];
 end
 
-[x1n, T1] = normalise2dpts(x1);
-[x2n, T2] = normalise2dpts(x2);
+% [x1n, T1] = normalise2dpts(x1);
+% [x2n, T2] = normalise2dpts(x2);
+x1n=x1;
+x2n=x2;
 
 [m,npts]=size(x1);
 % Build the constraint matrix
@@ -37,5 +39,7 @@ A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
 
 L = leverage(A);
 
+F=F/F(3,3);
+R=ones(npts,1)-A*[F(1,:) F(2,:) F(3,1:2)]';
 
 end
