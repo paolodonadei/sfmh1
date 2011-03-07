@@ -7,7 +7,7 @@ maxTrials = 6000;
 maxDataTrials = 100;
 feedback = 0;
 
-
+iterationLastUpdated=0;
 if(debugf==1)
     global inlierOutlier;
     global corrsclean;
@@ -115,7 +115,7 @@ while N > trialcount
     end
     
     if(debugf==1)
-       
+        
         numRealInliers=0;
         for vv=1:s
             fprintf(fid,[ num2str(ind(vv)) ]);
@@ -135,7 +135,7 @@ while N > trialcount
         if((exist('inlierOutlier'))==1)
             erpvis=mean(abs(pvis-(inlierOutlier')));
         end
-     
+        
         fprintf(fid,[ ' , ' num2str(erpvis)]);
         pvisAccuracy(trialcount+1,1)=erpvis;
         numRealInliers=numRealInliers/s;
@@ -179,12 +179,13 @@ while N > trialcount
     
     
     if(debugf==1)
-           PVIBOX=[PVIBOX pvis];
+        PVIBOX=[PVIBOX pvis];
         fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
     end
     
     
     if curerror < besterror    % Largest set of inliers so far...
+        iterationLastUpdated=0;
         %   display(['best focal length was ' num2str(xx(1))]);
         
         if((exist('inlierOutlier'))==1 && debugf==1)
@@ -223,8 +224,14 @@ while N > trialcount
         if(debugf==1)
             fprintf(fid,[ ' ,   , ']);
         end
+        if( updatepviFunc==9 && iterationLastUpdated>100)
+            newpvis= 0.5*ones(npts,1);   
+            pvis=newpvis;
+            iterationLastUpdated=0;
+        end
+           
     end
-    
+    iterationLastUpdated=iterationLastUpdated+1;
     trialcount = trialcount+1;
     if feedback
         fprintf('trial %d out of %d         \r',trialcount, ceil(N));
@@ -252,7 +259,7 @@ end
 if(debugf==1)
     [ST,I] = dbstack;
     csvwrite(dbgfnameBX,PVIBOX);
-      
+    
     fprintf(fid,['\n\n\n name of function is , '  ST(2).name]);
     fprintf(fid,['\n mean of pvis was , ' num2str(mean(pvis))]);
     fprintf(fid,['\n median of pvis was , ' num2str(median(pvis))]);
@@ -278,7 +285,7 @@ if(debugf==1)
     figure
     plot( inlierAccuracy(1:(trialcount),:));
     title('accuracy of random sampling versus iteration');
-   figure
+    figure
     plot( pvisAccuracy(1:(trialcount),:));
     title('error of Pvis versus iteration');
 end
