@@ -1,4 +1,4 @@
-function [L,R] = calc_leveragefromCorrs(x1, x2,F)
+function [L] = calc_leveragefromCorrs(x1, x2)
 
 
 
@@ -39,7 +39,5 @@ A = [x2n(1,:)'.*x1n(1,:)'   x2n(1,:)'.*x1n(2,:)'  x2n(1,:)' ...
 
 L = leverage(A);
 
-F=F/F(3,3);
-R=ones(npts,1)-A*[F(1,:) F(2,:) F(3,1:2)]';
 
 end
