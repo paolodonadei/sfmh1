@@ -1,6 +1,6 @@
 function [N]=calcIterations(updateIterationFunc,ninliers,npts,trialcount,pvis,pvidiff,s,p);
 
-threshold=0.07; % I dont know what else to use or how to detect convergence
+threshold=0.04; % I dont know what else to use or how to detect convergence
 if(updateIterationFunc==5 )
     v=mean(abs(pvidiff));
   
