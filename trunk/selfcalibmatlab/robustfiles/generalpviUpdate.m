@@ -164,61 +164,8 @@ end
 
 
 [cdi] = findCookDistance(initialPvi,  residualsnew,9,size(initialPvi,1));
-[pviso]=findProbabilitiesRobust(cdi,1/15); % here we assume a std for cook's distance
+[pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
 
-
-changep=mean(abs(pviso-pvis));
-close all
-display(['-mean of pvi change was ' num2str(changep)]);
-
-global inlierOutlier;
-
-[errors] = pvifitness(inlierOutlier',pviso);
-display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
-currentIter
-
-figure
-subplot(2,2,1)
-hist(residualsnew,100); title('residuals hisrogram');
-subplot(2,2,2)
-hist(initialPvi,100); title('leverage hisrogram');
-subplot(2,2,3)
-hist(cdi,100); title('histogram of cook distance');
-subplot(2,2,4)
-hist(pviso,100); title('pvis hisrogram');
-inliers=inlierOutlier';
-figure
-subplot(3,2,1)
-hist(initialPvi(find(inliers==1)),100); title('leverage of inliers');
-subplot(3,2,2)
-hist(initialPvi(find(inliers==0)),100); title('leverage of outliers');
-subplot(3,2,3)
-hist(residualsnew(find(inliers==1)),100); title('residual of inliers');
-subplot(3,2,4)
-hist(residualsnew(find(inliers==0)),100); title('residual of outliers');
-subplot(3,2,5)
-hist(cdi(find(inliers==1)),100); title('cook distance of inliers');
-subplot(3,2,6)
-hist(cdi(find(inliers==0)),100); title('cook distance of outliers');
-
-figure
-inlierOutRecent=(inlierOutlier(1,bestInliers))';
-initialPviRecent=initialPvi(bestInliers,1);
-residualsnewRecent=residualsnew(1,bestInliers);
-cdiRecent=cdi(bestInliers,1);
-
-subplot(3,2,1)
-hist(initialPviRecent(find(inlierOutRecent==1)),100); title('leverage of inliers RECENT');
-subplot(3,2,2)
-hist(initialPviRecent(find(inlierOutRecent==0)),100); title('leverage of outliers RECENT');
-subplot(3,2,3)
-hist(residualsnewRecent(find(inlierOutRecent==1)),100); title('residual of inliers RECENT');
-subplot(3,2,4)
-hist(residualsnewRecent(find(inlierOutRecent==0)),100); title('residual of outliers RECENT');
-subplot(3,2,5)
-hist(cdiRecent(find(inlierOutRecent==1)),100); title('cook distance of inliers RECENT');
-subplot(3,2,6)
-hist(cdiRecent(find(inlierOutRecent==0)),100); title('cook distance of outliers RECENT');
 
 end
 
@@ -247,62 +194,9 @@ end
 
 
 [cdi] = findCookDistance(initialPvi,  residualsnew,9,size(initialPvi,1));
-[pviso]=findProbabilitiesRobust(cdi,1/15); % here we assume a std for cook's distance
+[pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
 
 
-
-changep=mean(abs(pviso-pvis));
-close all
-display(['-mean of pvi change was ' num2str(changep)]);
-
-global inlierOutlier;
-
-[errors] = pvifitness(inlierOutlier',pviso);
-display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
-currentIter
-
-figure
-subplot(2,2,1)
-hist(residualsnew,100); title('residuals hisrogram');
-subplot(2,2,2)
-hist(initialPvi,100); title('leverage hisrogram');
-subplot(2,2,3)
-hist(cdi,100); title('histogram of cook distance');
-subplot(2,2,4)
-hist(pviso,100); title('pvis hisrogram');
-inliers=inlierOutlier';
-figure
-subplot(3,2,1)
-hist(initialPvi(find(inliers==1)),100); title('leverage of inliers');
-subplot(3,2,2)
-hist(initialPvi(find(inliers==0)),100); title('leverage of outliers');
-subplot(3,2,3)
-hist(residualsnew(find(inliers==1)),100); title('residual of inliers');
-subplot(3,2,4)
-hist(residualsnew(find(inliers==0)),100); title('residual of outliers');
-subplot(3,2,5)
-hist(cdi(find(inliers==1)),100); title('cook distance of inliers');
-subplot(3,2,6)
-hist(cdi(find(inliers==0)),100); title('cook distance of outliers');
-
-figure
-inlierOutRecent=(inlierOutlier(1,bestInliers))';
-initialPviRecent=initialPvi(bestInliers,1);
-residualsnewRecent=residualsnew(1,bestInliers);
-cdiRecent=cdi(bestInliers,1);
-
-subplot(3,2,1)
-hist(initialPviRecent(find(inlierOutRecent==1)),100); title('leverage of inliers RECENT');
-subplot(3,2,2)
-hist(initialPviRecent(find(inlierOutRecent==0)),100); title('leverage of outliers RECENT');
-subplot(3,2,3)
-hist(residualsnewRecent(find(inlierOutRecent==1)),100); title('residual of inliers RECENT');
-subplot(3,2,4)
-hist(residualsnewRecent(find(inlierOutRecent==0)),100); title('residual of outliers RECENT');
-subplot(3,2,5)
-hist(cdiRecent(find(inlierOutRecent==1)),100); title('cook distance of inliers RECENT');
-subplot(3,2,6)
-hist(cdiRecent(find(inlierOutRecent==0)),100); title('cook distance of outliers RECENT');
 
 
 

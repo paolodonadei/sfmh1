@@ -47,8 +47,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
 % AlgFuncs={1,3,4,5,6,7};
 
-AlgNames={ 'RANSAC','cookUpdate','Liang'};
-AlgFuncs={1,5,6};
+AlgNames={ 'MSAC','cookUpdate','compete'};
+AlgFuncs={2,5,9};
 
 numalgs=size(AlgFuncs,2);
 
