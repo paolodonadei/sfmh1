@@ -26,10 +26,14 @@ if(debugf==1)
     while( fexists~=0)
         counter= counter+1;
         dbgfname=[debugdirname '/' seedname num2str(counter) '.csv'];
+        dbgfnameBX=[debugdirname '/' seedname num2str(counter) 'BX.csv'];
         fexists=exist(dbgfname,'file');
     end
     fid = fopen(dbgfname, 'w');
     fprintf( fid,[' trialcount, N, randSample , randSamplePvis ,accuracy of pvis,   accuracy of random sampling, error, ninliers , curError,  bestSet ']);
+    
+    PVIBOX=[];
+    PVIBOX=[PVIBOX inlierOutlier'];
 end
 
 
@@ -41,8 +45,8 @@ firstScoreFlag=0; % this is used to make sure the first score is set with calcul
 
 
 [rows, npts] = size(x);
-pvis= 1*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
-newpvis= 1*ones(npts,1);
+pvis= 0.5*ones(npts,1); % the initial pvi is not really an initial pvi, but the pvi calculation function uses it to mix new pvis, so we cant use it as a pvi
+newpvis= 0.5*ones(npts,1);
 
 
 p = 0.99;         % Desired probability of choosing at least one sample
@@ -111,6 +115,7 @@ while N > trialcount
     end
     
     if(debugf==1)
+       
         numRealInliers=0;
         for vv=1:s
             fprintf(fid,[ num2str(ind(vv)) ]);
@@ -174,6 +179,7 @@ while N > trialcount
     
     
     if(debugf==1)
+           PVIBOX=[PVIBOX pvis];
         fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
     end
     
@@ -245,7 +251,8 @@ end
 
 if(debugf==1)
     [ST,I] = dbstack;
-    
+    csvwrite(dbgfnameBX,PVIBOX);
+      
     fprintf(fid,['\n\n\n name of function is , '  ST(2).name]);
     fprintf(fid,['\n mean of pvis was , ' num2str(mean(pvis))]);
     fprintf(fid,['\n median of pvis was , ' num2str(median(pvis))]);

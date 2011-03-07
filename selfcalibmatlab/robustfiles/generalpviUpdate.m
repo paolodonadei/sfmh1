@@ -167,7 +167,6 @@ end
 [pviso]=findProbabilitiesRobust(cdi,1/15); % here we assume a std for cook's distance
 
 
-
 changep=mean(abs(pviso-pvis));
 close all
 display(['-mean of pvi change was ' num2str(changep)]);
