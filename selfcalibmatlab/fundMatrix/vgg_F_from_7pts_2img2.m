@@ -12,9 +12,20 @@
 
 function F = vgg_F_from_7pts_2img2(corrs)
 
+if(size(corrs,1)==4)
+    x1 = corrs(1:2,:);
 
-x1 = corrs(1:3,:);
-x2 = corrs(4:6,:);
+    x2 = corrs(3:4,:);
+
+    x1=[x1 ; ones(1,7)];
+    x2=[x2 ; ones(1,7)];
+elseif (size(corrs,1)==6)
+    x1 = corrs(1:3,:);
+    x2 = corrs(4:6,:);
+else
+    display('wrong in 7 points');
+
+end
 
 if any(size(x1)~=[3 7]) | any(size(x2)~=[3 7])
     error('Wrong size of input points.');
@@ -48,7 +59,7 @@ end
 if(q>1)
     FB={};
     for k=1:q
-        
+
         FB{k}=F(:,:,k);
         FB{k}=FB{k}';
     end

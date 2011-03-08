@@ -86,7 +86,7 @@ F = reshape(V(:,9),3,3)';
 
 
 if(nonlin==1)
-    options = optimset('Display','off','Diagnostics','off','Algorithm','interior-point','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
+    options = optimset('Display','off','Diagnostics','off','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
     fo = fmincon('FMatrixNonLinError',[F(1,:) F(2,:) F(3,:)]',[],[],[],[],[],[],@torr_nonlcon_f2x2,options,[x1 ; x2],1.96*1.96,weights.^2);
     
     % options = optimset('Display','on','Diagnostics','on','Algorithm','levenberg-marquardt','TolFun',1.0e-76,'TolCon',1.0e-76,'TolX',1.0e-76);
@@ -116,11 +116,11 @@ F=F/F(3,3);
 
 
 
-if nargout >2  	% Solve for epipoles
+if nargout >1  	% Solve for epipoles
     L = leverage(A(:,1:8)); % im taking the leverage of the weighted data points with the pvi, is this correct?
 end
 
-if nargout >3  	% Solve for epipoles
+if nargout >2  	% Solve for epipoles
     FV=[Funnormalized(1,:) Funnormalized(2,:) Funnormalized(3,:)]';
     Re=A*FV;
 end
@@ -184,6 +184,7 @@ elseif length(arg) == 2
             weights=arg{2};
         else
             nonlin=arg{2};
+             weights=ones(size( x1,2),1);
         end
         
         

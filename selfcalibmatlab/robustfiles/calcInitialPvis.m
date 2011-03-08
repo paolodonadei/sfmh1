@@ -17,6 +17,7 @@ function [initpvis] = initLeveragepvi( x1, x2)
 
 L = calc_leveragefromCorrs(x1, x2);
 
+% should i be doing this? zzz 
 minh=min(L);
 maxh=max(L);
 rangeh=maxh-minh;

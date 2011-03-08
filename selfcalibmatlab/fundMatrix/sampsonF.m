@@ -62,8 +62,10 @@ if iscell(F)  % We have several solutions each of which must be tested
     
 else     % We just have one solution
     x2tFx1 = zeros(1,length(x1));
+
     for n = 1:length(x1)
         x2tFx1(n) = x2(:,n)'*F*x1(:,n);
+      
     end
     
     Fx1 = F*x1;
