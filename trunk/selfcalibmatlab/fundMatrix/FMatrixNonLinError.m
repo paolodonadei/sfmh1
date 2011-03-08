@@ -23,5 +23,5 @@ F(3,3)=p0(9,1);
 rv=(residualsnew').*(WSQ);
 
 r=mean((rv'));
-r
+
 end
