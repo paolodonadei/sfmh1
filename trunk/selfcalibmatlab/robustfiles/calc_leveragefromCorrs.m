@@ -26,10 +26,9 @@ if(m1==2)
     x2=[x2 ; ones(1,n1)];
 end
 
-% [x1n, T1] = normalise2dpts(x1);
-% [x2n, T2] = normalise2dpts(x2);
-x1n=x1;
-x2n=x2;
+[x1n, T1] = normalise2dpts(x1);
+[x2n, T2] = normalise2dpts(x2);
+
 
 [m,npts]=size(x1);
 % Build the constraint matrix

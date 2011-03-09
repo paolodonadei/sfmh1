@@ -160,77 +160,23 @@ while(size(inliers,2)<8)
 end
 
  initialPvio= initialPvi;
-Fnew = fundmatrix(x(:,inliers));
+[Fnew,Lnew] = fundmatrix(x(:,inliers));
+
+nptsInlier=size(inliers,2);
+
+for i=1:nptsInlier
+    initialPvio(inliers(1,i) ,1)=Lnew(i,1);
+end
+
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 
 
-Lnew = calc_leveragefromCorrs(x(:,bestInliers));
 
-[m,nptsInlier]=size(bestInliers);
-
-for i=1:nptsInlier
-    initialPvio(bestInliers(1,i) ,1)=Lnew(i,1);
-end
 
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-% 
-% changep=mean(abs(pviso-pvis));
-% close all
-% display(['-mean of pvi change was ' num2str(changep)]);
-% 
-% global inlierOutlier;
-% 
-% [errors] = pvifitness(inlierOutlier',pviso);
-% display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
-% currentIter
-% 
-% figure
-% subplot(2,2,1)
-% hist(residualsnew,100); title('residuals hisrogram');
-% subplot(2,2,2)
-% hist(initialPvi,100); title('leverage hisrogram');
-% subplot(2,2,3)
-% hist(cdi,100); title('histogram of cook distance');
-% subplot(2,2,4)
-% hist(pviso,100); title('pvis hisrogram');
-% inliers=inlierOutlier';
-% figure
-% subplot(3,2,1)
-% hist(initialPvi(find(inliers==1)),100); title('leverage of inliers');
-% subplot(3,2,2)
-% hist(initialPvi(find(inliers==0)),100); title('leverage of outliers');
-% subplot(3,2,3)
-% hist(residualsnew(find(inliers==1)),100); title('residual of inliers');
-% subplot(3,2,4)
-% hist(residualsnew(find(inliers==0)),100); title('residual of outliers');
-% subplot(3,2,5)
-% hist(cdi(find(inliers==1)),100); title('cook distance of inliers');
-% subplot(3,2,6)
-% hist(cdi(find(inliers==0)),100); title('cook distance of outliers');
-% 
-% figure
-% inlierOutRecent=(inlierOutlier(1,bestInliers))';
-% initialPviRecent=initialPvi(bestInliers,1);
-% residualsnewRecent=residualsnew(1,bestInliers);
-% cdiRecent=cdi(bestInliers,1);
-% 
-% subplot(3,2,1)
-% hist(initialPviRecent(find(inlierOutRecent==1)),100); title('leverage of inliers RECENT');
-% subplot(3,2,2)
-% hist(initialPviRecent(find(inlierOutRecent==0)),100); title('leverage of outliers RECENT');
-% subplot(3,2,3)
-% hist(residualsnewRecent(find(inlierOutRecent==1)),100); title('residual of inliers RECENT');
-% subplot(3,2,4)
-% hist(residualsnewRecent(find(inlierOutRecent==0)),100); title('residual of outliers RECENT');
-% subplot(3,2,5)
-% hist(cdiRecent(find(inlierOutRecent==1)),100); title('cook distance of inliers RECENT');
-% subplot(3,2,6)
-% hist(cdiRecent(find(inlierOutRecent==0)),100); title('cook distance of outliers RECENT');
-% 
 
 end
 
@@ -242,99 +188,36 @@ thresh=1.96*1.96;
 while(size(inliers,2)<8)
    inliers=find( residuals<thresh);
    thresh=thresh+0.1;
-    display('this shouldnt happen2');
+    display('this shouldnt happen1');
 end
 
-Fnew = fundmatrix(x(:,inliers));
+ initialPvio= initialPvi;
+[Fnew,Lnew] = fundmatrix(x(:,inliers));
+
+nptsInlier=size(inliers,2);
+
+for i=1:nptsInlier
+    initialPvio(inliers(1,i) ,1)=Lnew(i,1);
+end
+
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 
-initialPvio=initialPvi;
-Lnew = calc_leveragefromCorrs(x(:,bestInliers));
-
 worstInliers=find(residualsnew>(1.96*1.96));
-[m,nptsInlier]=size(bestInliers);
 
-for i=1:nptsInlier
-    initialPvio(bestInliers(1,i) ,1)=Lnew(i,1);
+
+Lbad = calc_leveragefromCorrs(x(:,worstInliers));
+
+[m,badnptsInlier]=size(worstInliers);
+
+
+for i=1:badnptsInlier
+    initialPvio(worstInliers(1,i) ,1)=Lbad(i,1);
 end
-
 
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-
-
-[Fcnew,L] = fundmatrix(x,pviso);
-
-[bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fcnew, x,1.96*1.96 );
-
-[cdi] = findCookDistance(L,  residualsnew,9,size(initialPvi,1));
-[pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-[m,nptsInlier]=size(worstInliers);
-
-for i=1:nptsInlier
-    initialPvio(worstInliers(1,i) ,1)=L(worstInliers(1,i),1);
-end
-
-
-% 
-% changep=mean(abs(pviso-pvis));
-% close all
-% display(['-mean of pvi change was ' num2str(changep)]);
-% 
-% global inlierOutlier;
-% 
-% [errors] = pvifitness(inlierOutlier',pviso);
-% display(['== mean of errors for recently updated: ' num2str(mean(errors(bestInliers,:))) ' mean of recently updated ' num2str(mean(pviso(bestInliers,:))) ' count: ' num2str(size(bestInliers,2))]);
-% currentIter
-% 
-% figure
-% subplot(2,2,1)
-% hist(residualsnew,100); title('residuals hisrogram');
-% subplot(2,2,2)
-% hist(initialPvi,100); title('leverage hisrogram');
-% subplot(2,2,3)
-% hist(cdi,100); title('histogram of cook distance');
-% subplot(2,2,4)
-% hist(pviso,100); title('pvis hisrogram');
-% inliers=inlierOutlier';
-% figure
-% subplot(3,2,1)
-% hist(initialPvi(find(inliers==1)),100); title('leverage of inliers');
-% subplot(3,2,2)
-% hist(initialPvi(find(inliers==0)),100); title('leverage of outliers');
-% subplot(3,2,3)
-% hist(residualsnew(find(inliers==1)),100); title('residual of inliers');
-% subplot(3,2,4)
-% hist(residualsnew(find(inliers==0)),100); title('residual of outliers');
-% subplot(3,2,5)
-% hist(cdi(find(inliers==1)),100); title('cook distance of inliers');
-% subplot(3,2,6)
-% hist(cdi(find(inliers==0)),100); title('cook distance of outliers');
-% 
-% figure
-% inlierOutRecent=(inlierOutlier(1,bestInliers))';
-% initialPviRecent=initialPvi(bestInliers,1);
-% residualsnewRecent=residualsnew(1,bestInliers);
-% cdiRecent=cdi(bestInliers,1);
-% 
-% subplot(3,2,1)
-% hist(initialPviRecent(find(inlierOutRecent==1)),100); title('leverage of inliers RECENT');
-% subplot(3,2,2)
-% hist(initialPviRecent(find(inlierOutRecent==0)),100); title('leverage of outliers RECENT');
-% subplot(3,2,3)
-% hist(residualsnewRecent(find(inlierOutRecent==1)),100); title('residual of inliers RECENT');
-% subplot(3,2,4)
-% hist(residualsnewRecent(find(inlierOutRecent==0)),100); title('residual of outliers RECENT');
-% subplot(3,2,5)
-% hist(cdiRecent(find(inlierOutRecent==1)),100); title('cook distance of inliers RECENT');
-% subplot(3,2,6)
-% hist(cdiRecent(find(inlierOutRecent==0)),100); title('cook distance of outliers RECENT');
-% 
-% 
 
 end
 
@@ -342,35 +225,40 @@ end
 
 function   [pviso,initialPvio] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
-
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
    inliers=find( residuals<thresh);
    thresh=thresh+0.1;
-    display('this shouldnt happen2');
+    display('this shouldnt happen1');
 end
 
-Fnew = fundmatrix(x(:,inliers));
+ initialPvio= initialPvi;
+[Fnew,Lnew] = fundmatrix(x(:,inliers));
+
+nptsInlier=size(inliers,2);
+
+for i=1:nptsInlier
+    initialPvio(inliers(1,i) ,1)=Lnew(i,1);
+end
+
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 
+worstInliers=find(residualsnew>(1.96*1.96));
 
 
+Lbad = calc_leveragefromCorrs(x(:,worstInliers));
+
+[m,badnptsInlier]=size(worstInliers);
 
 
-[cdi] = findCookDistance(initialPvi,  residualsnew,9,size(initialPvi,1));
+for i=1:badnptsInlier
+    initialPvio(worstInliers(1,i) ,1)=Lbad(i,1);
+end
+
+
+[cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-
-
-[Fcnew,L] = fundmatrix(x,pviso);
-
-[bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fcnew, x,1.96*1.96 );
-
-[cdi] = findCookDistance(L,  residualsnew,9,size(initialPvi,1));
-[pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-initialPvio=L;
 
 
 end
