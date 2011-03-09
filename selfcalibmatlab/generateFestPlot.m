@@ -47,8 +47,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
 % AlgFuncs={1,3,4,5,6,7};
 
-AlgNames={ 'MSAC','cookUpdate','compete'};
-AlgFuncs={2,5,10};
+AlgNames={ 'MSAC','cookUpdate','compete9','compete10'};
+AlgFuncs={2,5,9,10};
 
 numalgs=size(AlgFuncs,2);
 
@@ -225,6 +225,8 @@ save( [curdirname '/variables_GP' nowtime '.mat']);
 tElapsedprogram=toc(tStartprogram);
 disp([' program took ' num2str(tElapsedprogram) ' seconds']);
 copyfile('*.m',[curdirname '\matlabfiles']);
+copyfile('robustfiles',[curdirname '\matlabfiles\robustfiles']);
+copyfile('fundMatrix',[curdirname '\matlabfiles\fundMatrix']);
 %copyfile(curdirname,['H:\matlabs\' curdirname ]);
 end
 

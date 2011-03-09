@@ -9,6 +9,8 @@ feedback = 0;
 
 iterationLastUpdated=0;
 if(debugf==1)
+    
+    close all
     global inlierOutlier;
     global corrsclean;
     inlierAccuracy=zeros(maxTrials,1);
@@ -211,7 +213,7 @@ while N > trialcount
         
         % Update estimate of N, the number of trials to ensure we pick,
         % with probability p, a data set with no outliers.
-        N=calcIterations(updateIterationFunc,ninliers,npts,trialcount,pvis,pvidiff,s,p);
+        N=calcIterations(updateIterationFunc,ninliers,npts,trialcount,pvis,pvidiff,s,p,inliers);
         
         
         %   if(N > trialcount)% update pvis if we need to further iterate, but if the best pvis were just found then forget it
