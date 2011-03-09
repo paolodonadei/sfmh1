@@ -1,4 +1,4 @@
-function [errorin, errorout,errors] = pvifitness(inliers,pvis)
+function [errorin, errorout,errorstot] = pvifitness(inliers,pvis)
 
 
 
@@ -18,15 +18,15 @@ end
 
 errorin=sum(errors(find(inliers==1)))/(eps+sum(inliers));
 errorout=sum(errors(find(inliers==0)))/(m-sum(inliers)+eps);
-errors=((errorin*sum(inliers))+(errorout*(m-sum(inliers))))/m;
-
-display(['mean of inlier pvis is: ' num2str(errorin)]);
-display(['mean of outlier pvis is: ' num2str(errorout)]);
-display(['mean of pvis is: ' num2str(errors)]);
-% % 
-display(['mean error of inliers is : ' num2str(errorin)]);
-display(['mean error of outliers is : ' num2str(errorout)]);
-display(['**total error is : ' num2str((errorin+errorout)/2)]);
+errorstot=mean( errors);
+% 
+% display(['mean of inlier pvis is: ' num2str(errorin)]);
+% display(['mean of outlier pvis is: ' num2str(errorout)]);
+% display(['mean of pvis is: ' num2str(errors)]);
+% % % 
+% display(['mean error of inliers is : ' num2str(errorin)]);
+% display(['mean error of outliers is : ' num2str(errorout)]);
+% display(['**total error is : ' num2str((errorin+errorout)/2)]);
 
 % subplot(2,2,1)
 % hist(pvis,100);

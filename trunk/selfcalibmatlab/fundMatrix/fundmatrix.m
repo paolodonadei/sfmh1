@@ -55,11 +55,11 @@ Octave = exist('OCTAVE_VERSION') ~= 0;  % Are we running under Octave?
 % is at centroid and mean distance from origin is sqrt(2).
 % normalise2dpts also ensures the scale parameter is 1.
 if(normalize==1)
-[x1, T1] = normalise2dpts(x1);
-[x2, T2] = normalise2dpts(x2);
+    [x1, T1] = normalise2dpts(x1);
+    [x2, T2] = normalise2dpts(x2);
 else
-   T1=eye(3); 
-   T2=eye(3);
+    T1=eye(3);
+    T2=eye(3);
 end
 % Build the constraint matrix
 A = [x2(1,:)'.*x1(1,:)'   x2(1,:)'.*x1(2,:)'  x2(1,:)' ...
@@ -170,7 +170,7 @@ elseif length(arg) == 3
         error('x1 and x2 must be 3xN');
     end
 elseif length(arg) == 2
-    if size(arg{1},1) ~= 6
+    if (size(arg{1},1) ~= 6 && size(arg{1},1) ~= 4)
         x1 = arg{1};
         x2 = arg{2};
         npts = size(x1,2);
@@ -184,9 +184,21 @@ elseif length(arg) == 2
             weights=arg{2};
         else
             nonlin=arg{2};
-             weights=ones(size( x1,2),1);
+            weights=ones(size( x1,2),1);
         end
-        
+    elseif size(arg{1},1) == 4
+        x1 = arg{1}(1:2,:);
+        x2 = arg{1}(3:4,:);
+        npts=size(arg{1},2);
+        x1 = [x1 ; ones(1,npts)];
+        x2 = [x2 ; ones(1,npts)];
+        if(size(arg{2},2)==size( x1,2))
+            weights=arg{2};
+            nonlin=0;
+        else
+            nonlin=arg{2};
+            weights=ones(size( x1,2),1);
+        end
         
     else
         
@@ -217,6 +229,7 @@ end
 
 npts = size(x1,2);
 if npts < 8
+    dbstack
     error('At least 8 points are needed to compute the fundamental matrix');
 end
 end

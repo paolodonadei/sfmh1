@@ -162,7 +162,7 @@ while N > trialcount
     
     
     
-    [inliers] =findInliers(residuals, newpvis,t,0.0027,1);
+    inliers=find(residuals<t);
     %
     %     ginliers=find(znewpvis>0.0027);
     %
@@ -224,11 +224,7 @@ while N > trialcount
         if(debugf==1)
             fprintf(fid,[ ' ,   , ']);
         end
-        if( updatepviFunc==9 && iterationLastUpdated>100)
-            newpvis= 0.5*ones(npts,1);   
-            pvis=newpvis;
-            iterationLastUpdated=0;
-        end
+       
            
     end
     iterationLastUpdated=iterationLastUpdated+1;

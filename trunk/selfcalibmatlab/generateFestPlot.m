@@ -3,7 +3,7 @@ function [ t,means_mean ] =     generateFestPlot(type, variance,repeat, startp, 
 tt=1.96*1.96;
 seqname='merton1';
 numN=200;
-numPoints=10;
+numPoints=6;
 
 
 tStartprogram=tic;
