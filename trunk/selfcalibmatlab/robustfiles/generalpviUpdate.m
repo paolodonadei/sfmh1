@@ -224,7 +224,6 @@ end
 
 
 function   [pviso,initialPvio] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
    inliers=find( residuals<thresh);
@@ -244,22 +243,13 @@ end
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 
-worstInliers=find(residualsnew>(1.96*1.96));
 
 
-Lbad = calc_leveragefromCorrs(x(:,worstInliers));
-
-[m,badnptsInlier]=size(worstInliers);
-
-
-for i=1:badnptsInlier
-    initialPvio(worstInliers(1,i) ,1)=Lbad(i,1);
-end
 
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
+ initialPvio= initialPvi;
 
 end
 

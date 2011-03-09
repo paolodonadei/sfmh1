@@ -181,7 +181,7 @@ while N > trialcount
     
     
     if(debugf==1)
-        PVIBOX=[PVIBOX pvis];
+        
         fprintf(fid,[  num2str(ninliers)  ' , ' num2str(curerror)]);
     end
     
@@ -219,15 +219,16 @@ while N > trialcount
         %   if(N > trialcount)% update pvis if we need to further iterate, but if the best pvis were just found then forget it
         pvis=newpvis;
         %  end
-        
-        
+        if(debugf==1)
+            PVIBOX=[PVIBOX pvis];
+        end
         %    display(['number of inliers is ' num2str(ninliers)]);
     else
         if(debugf==1)
             fprintf(fid,[ ' ,   , ']);
         end
-       
-           
+        
+        
     end
     iterationLastUpdated=iterationLastUpdated+1;
     trialcount = trialcount+1;
