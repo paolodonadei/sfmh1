@@ -203,21 +203,18 @@ end
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 
-worstInliers=find(residualsnew>(1.96*1.96));
 
 
-Lbad = calc_leveragefromCorrs(x(:,worstInliers));
-
-[m,badnptsInlier]=size(worstInliers);
-
-
-for i=1:badnptsInlier
-    initialPvio(worstInliers(1,i) ,1)=Lbad(i,1);
-end
 
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
+
+for i=1:size(pviso,1)
+   if(pviso(i,1)<0.7)
+   pviso(i,1)=0;    
+   end
+end
 
 end
 
@@ -249,7 +246,12 @@ end
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
- initialPvio= initialPvi;
+
+for i=1:size(pviso,1)
+   if(pviso(i,1)<0.6)
+   pviso(i,1)=0;    
+   end
+end
 
 end
 

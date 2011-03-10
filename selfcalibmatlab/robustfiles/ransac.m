@@ -287,6 +287,20 @@ if(debugf==1)
     figure
     plot( pvisAccuracy(1:(trialcount),:));
     title('error of Pvis versus iteration');
+    
+    stringv={'outlier','inlier'};
+    if(1==2)
+              
+       for k=1:size(PVIBOX,1)
+     figure
+           hist(PVIBOX(k,:),20);
+     title([' point number ' num2str(k) ' ' stringv{1+inlierOutlier(1,k)}]);
+           figure
+           plot(PVIBOX(k,:));
+           close all
+       end
+        
+    end
 end
 
 end
