@@ -1,4 +1,4 @@
-function [F, iters] = fundmatrixrobustgeneral(corrs,typenum)
+function [F, iters,pvisot] = fundmatrixrobustgeneral(corrs,typenum)
 
 if(nargin ~= 2)
     display('wrong number of arguments');
@@ -81,7 +81,7 @@ end
 % display([' linear ' num2str(meaner)]);
 
 % 
-
+pvisot=pvis;
 end
 
 
