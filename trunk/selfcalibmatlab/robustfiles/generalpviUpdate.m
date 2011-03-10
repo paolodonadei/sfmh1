@@ -172,7 +172,19 @@ end
 
 
 
+global inlierOutlier;
+me_ou=mean(pvis((find(inlierOutlier==0))',1));
+md_ou=mean(pvis((find(inlierOutlier==0))',1));
 
+
+me_in=mean(pvis((find(inlierOutlier==1))',1));
+md_in=mean(pvis((find(inlierOutlier==1))',1));
+
+display(['mean of outliers is ' num2str(me_ou)]);
+display(['median of outliers is ' num2str(md_ou)]);
+
+display(['mean of inliers is ' num2str(me_in)]);
+display(['median of inliers is ' num2str(md_in)]);
 
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
@@ -211,7 +223,7 @@ end
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
 for i=1:size(pviso,1)
-   if(pviso(i,1)<0.7)
+   if(pviso(i,1)<0.5)
    pviso(i,1)=0;    
    end
 end
