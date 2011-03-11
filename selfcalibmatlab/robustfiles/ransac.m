@@ -1,7 +1,7 @@
 
 function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc)
 
-debugf=0;
+debugf=1;
 
 maxTrials = 6000;
 maxDataTrials = 100;
