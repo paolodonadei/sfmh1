@@ -1,7 +1,7 @@
 
 function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc)
 
-debugf=1;
+debugf=0;
 
 maxTrials = 6000;
 maxDataTrials = 100;
@@ -165,6 +165,7 @@ while N > trialcount
     
     
     inliers=find(residuals<t);
+   
     %
     %     ginliers=find(znewpvis>0.0027);
     %
@@ -187,6 +188,18 @@ while N > trialcount
     
     
     if curerror < besterror    % Largest set of inliers so far...
+        
+             global inlierOutlier;
+    [Fnew,Lnew] = fundmatrix(x(:,inliers));
+        display(['mean leverage of percieved inliers is ' num2str(mean(Lnew))]);
+
+display(['AFTERWARDS: out of ' num2str(size(inliers,2)) ' percieved inliers ' num2str(sum(inlierOutlier(1,inliers))) ' were actual inliers from a total of ' num2str(sum(inlierOutlier))]);
+
+
+
+
+    
+    
         iterationLastUpdated=0;
         %   display(['best focal length was ' num2str(xx(1))]);
         

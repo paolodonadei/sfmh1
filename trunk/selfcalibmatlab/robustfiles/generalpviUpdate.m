@@ -173,6 +173,7 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
+close all
 global inlierOutlier;
 
 badpts=find(residualsnew>(1.96*1.96));
@@ -234,11 +235,7 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
-for i=1:size(pviso,1)
-   if(pviso(i,1)<0.5)
-   pviso(i,1)=0;    
-   end
-end
+
 
 end
 
