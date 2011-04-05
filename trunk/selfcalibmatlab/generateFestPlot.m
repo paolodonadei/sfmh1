@@ -76,7 +76,7 @@ step=(  endp-startp)/numPoints;
 n=startp:step:endp;
 
 t=n(1,1:numPoints);
-t=[0.3 0.5 0.6];% zzzz remove this 
+
 
 
 

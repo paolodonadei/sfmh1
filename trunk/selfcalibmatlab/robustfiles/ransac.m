@@ -188,16 +188,6 @@ while N > trialcount
     
     
     if curerror < besterror    % Largest set of inliers so far...
-        
-             global inlierOutlier;
-    [Fnew,Lnew] = fundmatrix(x(:,inliers));
-        display(['mean leverage of percieved inliers is ' num2str(mean(Lnew))]);
-
-display(['AFTERWARDS: out of ' num2str(size(inliers,2)) ' percieved inliers ' num2str(sum(inlierOutlier(1,inliers))) ' were actual inliers from a total of ' num2str(sum(inlierOutlier))]);
-
-
-
-
     
     
         iterationLastUpdated=0;

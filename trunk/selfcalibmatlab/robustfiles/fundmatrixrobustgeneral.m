@@ -69,18 +69,29 @@ end
 if(typenum==5 || typenum>=9)
 
 F = fundmatrix(x1, x2,pvis,0);
+elseif(typenum==10)
+    
+    
+    for k=1:npts
+    if(pvis(k,1)<0.5)
+        pvis(k,1)=0;
+    end
+    
+    F = fundmatrix(x1, x2,pvis,0);
+    end
 else
+    
     F = fundmatrix(x1(:,inliers), x2(:,inliers));
 
 
 end
 
-global corrsclean;
-[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+% global corrsclean;
+% [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+% 
+% display([' linear ' num2str(meaner)]);
 
-display([' linear ' num2str(meaner)]);
-
-
+ 
 % 
 pvisot=pvis;
 end
