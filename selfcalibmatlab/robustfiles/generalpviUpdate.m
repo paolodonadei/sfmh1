@@ -173,42 +173,15 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
-close all
-global inlierOutlier;
-
-badpts=find(residualsnew>(1.96*1.96));
-goodpts=find(residualsnew<=(1.96*1.96));
-
-me_ou=mean(pvis((find(inlierOutlier==0))',1));
-md_ou=mean(pvis((find(inlierOutlier==0))',1));
-me_in=mean(pvis((find(inlierOutlier==1))',1));
-md_in=mean(pvis((find(inlierOutlier==1))',1));
-
-me_oup=mean(pvis(badpts',1));
-md_oup=mean(pvis(badpts',1));
-me_inp=mean(pvis(goodpts',1));
-md_inp=mean(pvis(goodpts',1));
-[errorin, errorout, errorstot, errors] = pvifitness(inlierOutlier',pviso);
-
-display(['________________________________________________']);
-display([' iteration ' num2str(currentIter)]);
-display(['mean of actual outliers is ' num2str(me_ou) ' median of outliers is ' num2str(md_ou) ]);
-display(['mean of actual inliers is ' num2str(me_in) ' median of inliers is ' num2str(md_in) ]);
-display(['mean of percieved outliers is ' num2str(me_oup) ' median of outliers is ' num2str(md_oup) ]);
-display(['mean of percieved inliers is ' num2str(me_inp) ' median of inliers is ' num2str(md_inp) ]);
-
-display(['mean leverage of percieved inliers is ' num2str(mean(Lnew))]);
-display(['mean of inliers is ' num2str(errorin) ' mean of outliers is ' num2str(errorout) ' total mean is ' num2str( errorstot)]);
-display([' out of ' num2str(size(inliers,2)) ' percieved inliers ' num2str(sum(inlierOutlier(1,inliers))) ' were actual inliers from a total of ' num2str(sum(inlierOutlier))]);
-display(['AFTERWARDS: out of ' num2str(size(bestInliers,2)) ' percieved inliers ' num2str(sum(inlierOutlier(1,bestInliers))) ' were actual inliers from a total of ' num2str(sum(inlierOutlier))]);
-
-
 end
 
 
 
 function   [pviso,initialPvio] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
+
+
+
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
    inliers=find( residuals<thresh);
@@ -227,21 +200,15 @@ end
 
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
-
-
-
-
-
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
-
-
 end
-
 
 
 function   [pviso,initialPvio] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
    inliers=find( residuals<thresh);
@@ -260,19 +227,8 @@ end
 
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
-
-
-
-
-
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
-
-for i=1:size(pviso,1)
-   if(pviso(i,1)<0.6)
-   pviso(i,1)=0;    
-   end
-end
 
 end
 
