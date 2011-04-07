@@ -136,9 +136,9 @@ for i=1:numPoints
         for k=1:numalgs
             
             tic;
-            clear F iterations
+            clear F iterations pvizout
           
-            [F, current_errors_iterations{i}(k,j)]= fundmatrixrobustgeneral(corrs,AlgFuncs{k});
+            [F, current_errors_iterations{i}(k,j),pvizout]= fundmatrixrobustgeneral(corrs,AlgFuncs{k});
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
             

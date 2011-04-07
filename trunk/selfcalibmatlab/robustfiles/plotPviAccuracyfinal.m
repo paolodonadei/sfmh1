@@ -3,13 +3,13 @@ function []= plotPviAccuracyfinal(beginp, endp,  repeatRatio)
 
 t=beginp:((endp-beginp)/10):endp;
 npts=200;
-AlgNames={ 'cookUpdate','compete9','compete10'};
-AlgFuncs={5,9,10};
+AlgNames={'MSAC', 'cookUpdate','compete9'};
+AlgFuncs={2,5,9,10};
 
 s=7;
 
 for z=1:size(AlgFuncs,2)
-    data{z}=zeros(4, size(t,2));
+    data{z}=zeros(6, size(t,2));
 end
 
 
@@ -29,7 +29,8 @@ for i=1:size(t,2)
             data{z}(2,i)=data{z}(2,i)+errorin;
             data{z}(3,i)=data{z}(3,i)+errorout;
             data{z}(4,i)=data{z}(4,i)+meaner;
-
+            data{z}(5,i)=data{z}(5,i)+mean(pvisot);
+            data{z}(6,i)=data{z}(6,i)+median(pvisot);
 
         end
     end
@@ -44,7 +45,7 @@ end
 
 
 styles={'-.or' ,'-.xg', '-.+b', '-.*y', '-.vr' ,'-..c','g--'};
-categories={'iterations ','error inliers','error outliers', ' mean error'};
+categories={'iterations ','error inliers','error outliers', ' mean error','mean pvi','median pvi'};
 
 for i=1:size(categories,2)
     figure;

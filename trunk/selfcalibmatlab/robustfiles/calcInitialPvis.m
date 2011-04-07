@@ -1,11 +1,11 @@
 function [initpvis] = calcInitialPvis(typenum, x1, x2)
 npts=size(x1,2);
-if(typenum==0 || typenum==1 || typenum==2 || typenum==3 || typenum==6 || typenum==9 )
-    initpvis=ones(npts,1)*0.05;
+if(typenum==0 || typenum==1 || typenum==2 || typenum==3 || typenum==6 )
+    initpvis=ones(npts,1);
 elseif(typenum==9 )
     initpvis=ones(npts,1)*0.05;
-elseif(typenum==10)
-    initpvis=ones(npts,1)*0.1;
+ elseif(typenum==10)
+     initpvis=ones(npts,1)*0.05;
 else
     initpvis = initLeveragepvi( x1, x2);
     
