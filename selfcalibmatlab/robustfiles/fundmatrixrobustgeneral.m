@@ -86,10 +86,10 @@ else
 
 end
 
-% global corrsclean;
-% [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
-% 
-% display([' linear ' num2str(meaner)]);
+global corrsclean;
+[bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+
+display([' linear ' num2str(meaner)]);
 
  
 % 
