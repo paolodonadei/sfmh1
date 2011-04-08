@@ -10,9 +10,28 @@ feedback = 0;
 iterationLastUpdated=0;
 if(debugf==1)
     
+    
     close all
     global inlierOutlier;
     global corrsclean;
+    
+    imageA=ones(2000,1 ,3);
+    imagesteps=2000/size(x,2);
+    imagethickness=40;
+    
+    tempim=zeros(2000,imagethickness ,3);
+    for kk=1:size(x,2)
+        
+        if(inlierOutlier(1,kk)==1)
+            tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)=tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)+1;
+        else
+            tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,1)=tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,1)+1;
+        end
+        tempim(((kk)*(imagesteps)),:,3)=   tempim(((kk)*(imagesteps)),:,3)+1;
+    end
+    
+    imageA=[imageA tempim zeros(2000,20 ,3)];
+    
     inlierAccuracy=zeros(maxTrials,1);
     pvisAccuracy=zeros(maxTrials,1);
     pviselected =[];
@@ -165,7 +184,7 @@ while N > trialcount
     
     
     inliers=find(residuals<t);
-   
+    
     %
     %     ginliers=find(znewpvis>0.0027);
     %
@@ -188,8 +207,11 @@ while N > trialcount
     
     
     if curerror < besterror    % Largest set of inliers so far...
-    
-    
+        
+        besterror = curerror;  % Record data for this model
+        bestinliers = inliers;
+        bestM = M;
+        
         iterationLastUpdated=0;
         %   display(['best focal length was ' num2str(xx(1))]);
         
@@ -208,11 +230,28 @@ while N > trialcount
         
         if(debugf==1)
             fprintf(fid,[ ' ,  * , ']);
+            
+            tempim=zeros(2000,imagethickness ,3);
+            tempim(:,:,1)=tempim(:,:,1)+1;
+            
+            
+            for vv=1:size(bestinliers,2)
+                kk=bestinliers(1,vv);
+                tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)=tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)+1;
+            end
+            
+            
+            for kk=1:size(x,2)
+                tempim(((kk)*(imagesteps)),:,3)=   tempim(((kk)*(imagesteps)),:,3)+1;
+            end
+            
+            
+            
+            imageA=[imageA tempim zeros(2000,5,3)];
+            
         end
         
-        besterror = curerror;  % Record data for this model
-        bestinliers = inliers;
-        bestM = M;
+        
         
         % Update estimate of N, the number of trials to ensure we pick,
         % with probability p, a data set with no outliers.
@@ -293,17 +332,53 @@ if(debugf==1)
     
     stringv={'outlier','inlier'};
     if(1==2)
-              
-       for k=1:size(PVIBOX,1)
-     figure
-           hist(PVIBOX(k,:),20);
-     title([' point number ' num2str(k) ' ' stringv{1+inlierOutlier(1,k)}]);
-           figure
-           plot(PVIBOX(k,:));
-           close all
-       end
+        
+        for k=1:size(PVIBOX,1)
+            figure
+            hist(PVIBOX(k,:),20);
+            title([' point number ' num2str(k) ' ' stringv{1+inlierOutlier(1,k)}]);
+            figure
+            plot(PVIBOX(k,:));
+            close all
+        end
         
     end
+    
+    tempim=ones(2000,imagethickness ,3);
+    
+    proposedinliers=zeros(size(x,2),1);
+    
+    for vv=1:size(bestinliers,2)
+        proposedinliers(bestinliers(1,vv),1)=1;
+    end
+    
+    proposedinliers=(proposedinliers-inlierOutlier') ;
+    for kk=1:size(x,2)
+        if(proposedinliers(kk,1)>0)
+            tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,:)=  0;
+        elseif (proposedinliers(kk,1)<0)
+            tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)=  0;
+            tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,3)=  0;
+        end
+        
+    end
+
+    imageA=[imageA zeros(2000,15,3) tempim ];
+    
+    % writing probabilities
+    tempim=zeros(2000,imagethickness ,3);
+    
+    for kk=1:size(x,2)
+        tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)=  tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)+(1*pvis(kk,1));
+        
+    end
+
+    imageA=[imageA zeros(2000,20,3) tempim ];
+
+    imshow( imageA);
+    imwrite(imageA,[debugdirname '/matches.png']);
+    title({'the first column shows the ground truth, red is outlier, green is inlier';'the second last shows the errors, red is points that were taken as outliers but were inliers in reality, opposite with the blacks';' last column shows the pvis, intensity shows the value of the probability'});
+        
 end
 
 end

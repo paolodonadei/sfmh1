@@ -227,8 +227,6 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
-
-
 end
 
 
