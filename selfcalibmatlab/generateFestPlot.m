@@ -52,6 +52,13 @@ AlgFuncs={2,5,9,10};
 
 numalgs=size(AlgFuncs,2);
 
+if(size(AlgFuncs,2)~=size(AlgFuncs,2))
+    
+display('you for got to add correct params, exit now');
+return;
+end
+
+
 %outputs
 
 
@@ -212,7 +219,14 @@ for i=1:sizeDataCats
 
 end
 
-
+cvsMatrix=[];
+for k=1:numalgs
+    for i=1:numPoints
+           for j=1:repeat
+               cvsMatrix(j+1,1+((k-1)*(numPoints))+i)=
+           end
+    end
+end
 
 
 
