@@ -3,7 +3,7 @@ function [ t,means_mean ] =     generateFestPlot(type, variance,repeat, startp, 
 tt=1.96*1.96;
 seqname='merton1';
 numN=200;
-numPoints=6;
+numPoints=10;
 
 
 tStartprogram=tic;
@@ -54,8 +54,8 @@ numalgs=size(AlgFuncs,2);
 
 if(size(AlgFuncs,2)~=size(AlgFuncs,2))
     
-display('you for got to add correct params, exit now');
-return;
+    display('you for got to add correct params, exit now');
+    return;
 end
 
 
@@ -135,7 +135,7 @@ for i=1:numPoints
         [ Fgt,k1,k2,corrs,corrsclean, inlierOutlier, I1, I2,  R1, t1,R2,t2 ] = generateCorrsforF(numN, n(1,i), variance, type, seqname );
         
         [mm,nn]=size(corrs);
-      
+        
         
         
         disp(['****iteration ' num2str(currIteration) ' out of ' num2str(numTotalIterations) '   AND calling generateCorrsforF( ' num2str((numN)) ' , ' num2str( n(1,i)) ' , '  num2str( variance) ' , '  seqname ')'] );
@@ -144,7 +144,7 @@ for i=1:numPoints
             
             tic;
             clear F iterations pvizout
-          
+            
             [F, current_errors_iterations{i}(k,j),pvizout]= fundmatrixrobustgeneral(corrs,AlgFuncs{k});
             PtElapsed=toc;
             totalAgltime=totalAgltime+PtElapsed;
@@ -203,7 +203,7 @@ for i=1:sizeDataCats
     figure;
     hold;
     for k=1:numalgs
-
+        
         plot(t,data{i}(k,:),styles{k});
     end
     xlabel(['x outlier ratio']);       %  add axis labels and plot title
@@ -213,21 +213,28 @@ for i=1:sizeDataCats
     saveas(gcf,[curdirname '/param'   dataNames{i} nowtime '.fig']);
     saveas(gcf,[curdirname '/param_center_'   dataNames{i} nowtime '.jpg']);
     saveas(gcf,[curdirname '/param_center_' dataNames{i} nowtime '.eps'],'epsc');
-
-
+    
+    
     hold
-
+    
 end
 
-cvsMatrix=[];
+
+
+
 for k=1:numalgs
-    for i=1:numPoints
-           for j=1:repeat
-               cvsMatrix(j+1,1+((k-1)*(numPoints))+i)=
-           end
+   clear   cvsMatrix
+    for j=1:repeat
+        
+        for i=1:numPoints
+            cvsMatrix(j+1,i+1)=current_errors_samp_mean{i}(k,j);
+            cvsMatrix(1,i+1)=n(1,i);
+              cvsMatrix(j+1,1)=j;
+        end
     end
+    dlmwrite([curdirname '/datasamplers_'  AlgNames{1,k}  '.csv'], cvsMatrix);
+    
 end
-
 
 
 
