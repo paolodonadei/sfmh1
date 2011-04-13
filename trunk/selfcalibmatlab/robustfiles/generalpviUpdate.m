@@ -9,17 +9,19 @@ elseif(updatetype==3)
 elseif(updatetype==4)
     [outpvis] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
-elseif(updatetype==5 || updatetype==7 || updatetype==9 || updatetype==10 || updatetype==11)
+elseif(updatetype==5 || updatetype==7 )
     [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==6)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
 elseif(updatetype==8 )
     [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-% elseif(updatetype==9 )
-%     [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+elseif(updatetype==9 )
+    [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 % elseif(updatetype==10 )
 %     [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+    elseif(updatetype==11 || updatetype==10  )
+    [outpvis, outinitpvi] = cookUpdatelevupCompete3(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 end
 %
 % changep=mean(abs(outpvis-pvis));
@@ -199,13 +201,48 @@ end
 [bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
-[pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
+[pviso]=findProbabilitiesRobust(cdi,1/3); % here we assume a std for cook's distance
 
 
 end
 
 
+function   [pviso,initialPvio] = MLESAC(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+
+
+% we assume residuals are squared errors
+score=0;
+stdr=stdest; 
+winddowsize=windowsize; 
+gaussDenom=1/((2*pi*stdr*stdr));
+
+score = 0;
+
+for i=1:size
+pin=mixparam;
+po=1-pin;
+
+    
+    pr=(pin*gaussDenom*exp(-(residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
+    
+    if(pr>1 || pr<0)
+        display(['caught a bad pvi with value ' num2str(pr)]);
+    end
+    score=score+log(max(eps,pr));
+end
+score=-score;
+
+
+end
+
+
+
+
+
+
 function   [pviso,initialPvio] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
     inliers=find( residuals<thresh);
@@ -227,9 +264,39 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
+pviso=(pviso + pvis)/2;
 end
 
 
+
+function   [pviso,initialPvio] = cookUpdatelevupCompete3(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+thresh=1.96*1.96;
+while(size(inliers,2)<8)
+    inliers=find( residuals<thresh);
+    thresh=thresh+0.1;
+    display('this shouldnt happen1');
+end
+
+initialPvio= initialPvi;
+[Fnew,Lnew] = fundmatrix(x(:,inliers));
+
+nptsInlier=size(inliers,2);
+
+
+newLevs=zeros(size(initialPvi,1),1);
+for i=1:nptsInlier
+    newLevs(inliers(1,i) ,1)=Lnew(i,1);
+end
+initialPvio=(newLevs+initialPvi);
+
+[bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
+
+[cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
+[pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
+
+
+end
 function   [pviso] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 % if(currentIter< (0.1*totalIter))
 %     pviso=pvis;

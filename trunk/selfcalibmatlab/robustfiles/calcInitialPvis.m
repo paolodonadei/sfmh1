@@ -2,14 +2,10 @@ function [initpvis] = calcInitialPvis(typenum, x1, x2)
 npts=size(x1,2);
 if(typenum==0 || typenum==1 || typenum==2 || typenum==3 || typenum==6 )
     initpvis=ones(npts,1);
-elseif(typenum==5 )
+elseif(typenum==5 || typenum==9 || typenum==10  )
     initpvis=ones(npts,1)*0.05;
-elseif(typenum==9 )
-    initpvis= initLeveragepviGroup( x1, x2);
-elseif(typenum==10 )
-    [Fnew,initpvis] = fundmatrix(x1, x2);
 elseif(typenum==11 )
-    initpvis=initLeveragepvi( x1, x2);
+     [Fnew,initpvis] = fundmatrix(x1, x2);
 else
     initpvis = initLeveragepvi( x1, x2);
     
