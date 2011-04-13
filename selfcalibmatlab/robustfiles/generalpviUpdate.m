@@ -9,17 +9,17 @@ elseif(updatetype==3)
 elseif(updatetype==4)
     [outpvis] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
-elseif(updatetype==5 || updatetype==7 )
+elseif(updatetype==5 || updatetype==7 || updatetype==9 || updatetype==10 || updatetype==11)
     [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==6)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
 elseif(updatetype==8 )
     [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-elseif(updatetype==9 )
-    [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-elseif(updatetype==10 )
-    [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+% elseif(updatetype==9 )
+%     [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+% elseif(updatetype==10 )
+%     [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 end
 %
 % changep=mean(abs(outpvis-pvis));
