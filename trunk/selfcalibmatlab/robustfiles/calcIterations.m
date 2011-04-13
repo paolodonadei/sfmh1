@@ -1,7 +1,7 @@
 function [N]=calcIterations(updateIterationFunc,ninliers,npts,trialcount,pvis,pvidiff,s,p,inliers)
 
 threshold=0.06; % I dont know what else to use or how to detect convergence
-if(updateIterationFunc==5 || updateIterationFunc==9 || updateIterationFunc==10)
+if(updateIterationFunc==5 || updateIterationFunc==9 || updateIterationFunc==10 || updateIterationFunc==11)
     v=mean(abs(pvidiff));
   
       fracinliers =  ninliers/npts;
