@@ -7,7 +7,7 @@ elseif(typenum==5 )
 elseif(typenum==9 )
     initpvis= initLeveragepviGroup( x1, x2);
 elseif(typenum==10 )
-    initpvis=calc_leveragefromCorrs( x1, x2);
+    [Fnew,initpvis] = fundmatrix(x1, x2);
 elseif(typenum==11 )
     initpvis=initLeveragepvi( x1, x2);
 else
