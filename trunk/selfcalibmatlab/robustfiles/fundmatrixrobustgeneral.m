@@ -1,5 +1,7 @@
 function [F, iters,pvisot] = fundmatrixrobustgeneral(corrs,typenum,winsize)
 
+debugf=1;
+
 if(nargin <2)
     display('wrong number of arguments');
     return
@@ -36,7 +38,12 @@ distfn    = @sampsonF;
 degenfn   = @isdegenerate;
 
 
-
+samplingHash=struct('UNIFORMSAMPLING',1,'MONTECARLO',2);
+updateHash=struct('NOCHANGE',1,'COOKUPDATE',2,'LIANG',3,'ACCUMULATION',4,'EXPERIMENTAL1',5,'EXPERIMENTAL2',6);
+scoreHash=struct('RANSACSCORE',1,'MSACSCORE',2,'MLESAC',3,'MLESACMIUFROMPVI',4);
+initialPVIHash=struct('ONES',1,'POINTZEROFIVE',2,'FROMLEVERAGE',3,'INITIALIZELEVERAGE',4);
+iterationsHash=struct('NORMAL',1,'PVICONVERGE',2,'INLIERPVICONVERGE',3);
+finalFitHash=struct('NORMAL',1,'WEIGHTED',2,'WEIGHTEDTRIMMED',3);
 % 1- RANSACV
 % 2- MSAC
 % 3- Residual based pvi
@@ -46,12 +53,14 @@ degenfn   = @isdegenerate;
 % 7- cook with update and cook based score using likelihoods
 % 8- cook wit update and cook based score and accumulation of pvis over
 
+algorithms(1)= struct('f1', 1, 'f2', 3)
 scorefunc =  typenum;
 randSampFunc =  typenum;
 updatepviFunc = typenum;
 initpvis = calcInitialPvis(typenum, x1, x2);
 updateIterationFunc=typenum;
 findInliersFunc=typenum;
+finalfitOption=typenum;
 stdest=1;
 
 pvis=initpvis;
@@ -70,20 +79,33 @@ end
 
 % pay attention to these guys
 
-if(typenum==5  || typenum==10 || typenum==11 || typenum==12 )
+if(finalfitOption==1 )
     
     F = fundmatrix(x1, x2,pvis,0);
-else
+elseif(finalfitOption==2 )
     F = fundmatrix(x1(:,inliers), x2(:,inliers));
+elseif(finalfitOption==3 )
+    
+    for i=1:npts
+        if(pvis(i,1)<0.5)
+            pvis(i,1)=0;
+        end
+    end
+      F = fundmatrix(x1, x2,pvis,0);
+else
+    display(' this is wrong');
 end
 
-% global corrsclean;
-% [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
-% 
-% display([' linear ' num2str(meaner)]);
+
+if(debugf==1)
+    global corrsclean;
+    [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
+    
+    display([' linear ' num2str(meaner)]);
+    
+end
 
 
-%
 pvisot=pvis;
 end
 

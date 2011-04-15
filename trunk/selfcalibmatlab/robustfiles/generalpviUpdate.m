@@ -1,27 +1,21 @@
 function   [outpvis, outinitpvi] = generalpviUpdate(updatetype,initialPvi,pvis,residuals,t,inliers,x,currentIter,totalIter)
 
-if(updatetype==1 || updatetype==2 || updatetype==15)
+if(updatetype==1 )
     outpvis=pvis;
     outinitpvi=initialPvi ;
-elseif(updatetype==3)
-    [outpvis] =  cookUpdatepureres(initialPvi,pvis,residuals,t,inliers,x,currentIter,totalIter);
-    outinitpvi=initialPvi ;
-elseif(updatetype==4)
-    [outpvis] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-    outinitpvi=initialPvi ;
-elseif(updatetype==5 || updatetype==7 )
+elseif(updatetype==2)
     [outpvis, outinitpvi] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-elseif(updatetype==6)
+elseif(updatetype==3)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
-elseif(updatetype==8 )
+elseif(updatetype==4 )
     [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-elseif(updatetype==9 )
+elseif(updatetype==5)
     [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-    % elseif(updatetype==10 )
-    %     [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-elseif(updatetype==11 || updatetype==10  )
-    [outpvis, outinitpvi] = cookUpdatelevupCompete3(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+elseif(updatetype==6 )
+    [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+else
+    display('wrooong');
 end
 %
 % changep=mean(abs(outpvis-pvis));
@@ -264,18 +258,7 @@ initialPvio=(newLevs+initialPvi);
 
 
 end
-function   [pviso] = cookUpdatefixed(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-% if(currentIter< (0.1*totalIter))
-%     pviso=pvis;
-%     return
-% end
-Fnew = fundmatrix(x(:,inliers));
-[bestInliers, bestF, residualsnew, meaner,varer,meder,numins] = sampsonF(Fnew, x,1.96*1.96 );
 
-[cdi] = findCookDistance(initialPvi,  residualsnew);
-[pviso]=findProbabilitiesRobust(cdi,1/3);
-
-end
 
 function   [pviso] = cookUpdatepureres(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
