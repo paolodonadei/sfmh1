@@ -18,9 +18,9 @@ elseif(updatetype==8 )
     [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==9 )
     [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-% elseif(updatetype==10 )
-%     [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
-    elseif(updatetype==11 || updatetype==10  )
+    % elseif(updatetype==10 )
+    %     [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+elseif(updatetype==11 || updatetype==10  )
     [outpvis, outinitpvi] = cookUpdatelevupCompete3(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 end
 %
@@ -205,39 +205,6 @@ end
 
 
 end
-
-
-function   [pviso,initialPvio] = MLESAC(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
-
-
-
-% we assume residuals are squared errors
-score=0;
-stdr=stdest; 
-winddowsize=windowsize; 
-gaussDenom=1/((2*pi*stdr*stdr));
-
-score = 0;
-
-for i=1:size
-pin=mixparam;
-po=1-pin;
-
-    
-    pr=(pin*gaussDenom*exp(-(residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
-    
-    if(pr>1 || pr<0)
-        display(['caught a bad pvi with value ' num2str(pr)]);
-    end
-    score=score+log(max(eps,pr));
-end
-score=-score;
-
-
-end
-
-
-
 
 
 

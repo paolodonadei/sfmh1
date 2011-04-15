@@ -223,17 +223,22 @@ end
 
 
 for k=1:numalgs
-   clear   cvsMatrix
+    clear   cvsMatrix
+    clear iterMatrix
     for j=1:repeat
         
         for i=1:numPoints
             cvsMatrix(j+1,i+1)=current_errors_samp_mean{i}(k,j);
             cvsMatrix(1,i+1)=n(1,i);
-              cvsMatrix(j+1,1)=j;
+            cvsMatrix(j+1,1)=j;
+            
+            iterMatrix(j+1,i+1)=current_errors_iterations{i}(k,j);
+            iterMatrix(1,i+1)=n(1,i);
+            iterMatrix(j+1,1)=j;
         end
     end
     dlmwrite([curdirname '/datasamplers_'  AlgNames{1,k}  '.csv'], cvsMatrix);
-    
+    dlmwrite([curdirname '/datasamplers_iters_'  AlgNames{1,k}  '.csv'],iterMatrix);
 end
 
 
