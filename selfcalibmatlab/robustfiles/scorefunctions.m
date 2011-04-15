@@ -1,17 +1,13 @@
 function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,pvis,stdest,winsize)
 
-if(typenum==1 || typenum==2 )
+if(typenum==1 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==6 || typenum==7)
-    scores = likelihood(typenum, size,consideredInliers, residuals,t,pvis);
-elseif(typenum==Inf )
-    scores = likelihoodfixed(typenum, size,consideredInliers, residuals,t,pvis);
-elseif( typenum==3 || typenum==4 || typenum==8 || typenum==5 || typenum==9 || typenum==10 || typenum==11 || typenum==12  )
+elseif( typenum==2  )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
-elseif( typenum==15 ||  typenum==10 )
+elseif( typenum==3 )
     miu = mixingparameterMLESAC(residuals',winsize,stdest);
     scores =  MLESACscore(residuals, miu,stdest,winsize);
-elseif( typenum==11 )
+elseif( typenum==4 )
     miu = mean(pvis);
     scores =  MLESACscore(residuals, miu,stdest,winsize);
 else

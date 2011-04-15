@@ -184,7 +184,7 @@ while N > trialcount
     
     
     inliers=find(residuals<t);
-
+    
     %
     %     ginliers=find(znewpvis>0.0027);
     %
@@ -362,7 +362,7 @@ if(debugf==1)
         end
         
     end
-
+    
     imageA=[imageA zeros(2000,15,3) tempim ];
     
     % writing probabilities
@@ -372,13 +372,13 @@ if(debugf==1)
         tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)=  tempim((1+(kk-1)*(imagesteps)):((kk)*(imagesteps)),:,2)+(1*pvis(kk,1));
         
     end
-
+    
     imageA=[imageA zeros(2000,20,3) tempim ];
-
+    
     imshow( imageA);
     imwrite(imageA,[debugdirname '/matches.png']);
     title({'the first column shows the ground truth, red is outlier, green is inlier';'the second last shows the errors, red is points that were taken as outliers but were inliers in reality, opposite with the blacks';' last column shows the pvis, intensity shows the value of the probability'});
-        
+    
 end
 
 end

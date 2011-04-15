@@ -1,14 +1,15 @@
 function [initpvis] = calcInitialPvis(typenum, x1, x2)
 npts=size(x1,2);
-if(typenum==0 || typenum==1 || typenum==2 || typenum==3 || typenum==6 || typenum==15 )
+if(typenum==1 )
     initpvis=ones(npts,1);
-elseif(typenum==5 || typenum==9 || typenum==10  || typenum==11)
+elseif(typenum==2)
     initpvis=ones(npts,1)*0.05;
-elseif(typenum==Inf )
+elseif(typenum==3 )
      [Fnew,initpvis] = fundmatrix(x1, x2);
-else
+elseif(typenum==4 )
     initpvis = initLeveragepvi( x1, x2);
-    
+else
+    display(' bad option');
 end
 
 

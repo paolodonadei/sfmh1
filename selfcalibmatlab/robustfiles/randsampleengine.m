@@ -1,17 +1,10 @@
 function z=randsampleengine(s, n, pvi,typenum)
-if(typenum==1 || typenum==2 || typenum==15)
+if(typenum==1)
     z= randsample(s, n);
-% elseif(typenum==5)
-%     med=median(pvi);
-%     for i=1:s
-%         if(pvi(i,1)<med) 
-%             pvi(i,1)=0;
-%         end
-%     end
-%     
-%      z = monteCarloSampling(s, n, pvi);
-else
+elseif(typenum==2)
     z = monteCarloSampling(s, n, pvi);
+else
+    display('wrong item');
 
 end
 end
