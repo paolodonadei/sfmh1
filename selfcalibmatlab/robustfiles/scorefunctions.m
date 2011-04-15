@@ -1,4 +1,4 @@
-function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,pvis)
+function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,pvis,stdest,winsize)
 
 if(typenum==1 || typenum==2 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
@@ -8,6 +8,12 @@ elseif(typenum==Inf )
     scores = likelihoodfixed(typenum, size,consideredInliers, residuals,t,pvis);
 elseif( typenum==3 || typenum==4 || typenum==8 || typenum==5 || typenum==9 || typenum==10 || typenum==11 || typenum==12  )
     scores = msacScore(typenum, size,consideredInliers, residuals,t);
+elseif( typenum==15 ||  typenum==10 )
+    miu = mixingparameterMLESAC(residuals',winsize,stdest);
+    scores =  MLESACscore(residuals, miu,stdest,winsize);
+elseif( typenum==11 )
+    miu = mean(pvis);
+    scores =  MLESACscore(residuals, miu,stdest,winsize);
 else
     display('whaaaaaaaaaaaaaaaaat');
 end
@@ -18,24 +24,25 @@ end
 
 
 
-function   [pviso,initialPvio] = MLESACscore(residuals,mixparam,stdest,windowsize)
+function   [score] = MLESACscore(residuals,mixparam,stdest,windowsize)
 
 
-
+sized=size(residuals,2);
 % we assume residuals are squared errors
 score=0;
-stdr=stdest;
-winddowsize=windowsize;
-gaussDenom=1/((2*pi*stdr*stdr));
+
+pin=mixparam;
+po=1-pin;
 
 score = 0;
 
-for i=1:size
-    pin=mixparam;
-    po=1-pin;
+oOutlier=findPOMLESAC(windowsize);
+
+for i=1:sized
     
     
-    pr=(pin*gaussDenom*exp(-(residuals(i))/(2*stdr*stdr)))+(po*(1/winddowsize));
+    
+    pr=(pin*findPiMLESAC(residuals(1,i),stdest))+(po*oOutlier);
     
     if(pr>1 || pr<0)
         display(['caught a bad pvi with value ' num2str(pr)]);
@@ -46,7 +53,7 @@ score=-score;
 
 
 end
-function   [miu] = mixingparameterMLESAC(residuals,winsize)
+function   [miu] = mixingparameterMLESAC(residuals,winsize,stdest)
 
 npts=size(residuals,1);
 z=zeros(npts,1);
@@ -54,7 +61,7 @@ po=findPOMLESAC(winsize);
 miu=0.5;
 counter=0;
 oldmiu=10;
-while(counter<7 && (abs(oldmiu-miu)<0.02))
+while(counter<7 && (abs(oldmiu-miu)>0.02))
     curPo=(1-miu)*po;
     oldmiu=miu;
     for j=1:npts
@@ -64,9 +71,10 @@ while(counter<7 && (abs(oldmiu-miu)<0.02))
     end
     miu=mean( z);
     counter=counter+1;
-    display(['new miu is ' num2str(miu)]);
+  %  display(['new miu is ' num2str(miu)]);
+    
 end
-
+%display(['___________________']);
 
 end
 function [pin]= findPiMLESAC(e,stdest)
