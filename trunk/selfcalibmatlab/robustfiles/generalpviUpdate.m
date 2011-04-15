@@ -1,6 +1,6 @@
 function   [outpvis, outinitpvi] = generalpviUpdate(updatetype,initialPvi,pvis,residuals,t,inliers,x,currentIter,totalIter)
 
-if(updatetype==1 || updatetype==2)
+if(updatetype==1 || updatetype==2 || updatetype==15)
     outpvis=pvis;
     outinitpvi=initialPvi ;
 elseif(updatetype==3)

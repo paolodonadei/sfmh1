@@ -1,5 +1,5 @@
 function z=randsampleengine(s, n, pvi,typenum)
-if(typenum==1 || typenum==2)
+if(typenum==1 || typenum==2 || typenum==15)
     z= randsample(s, n);
 % elseif(typenum==5)
 %     med=median(pvi);
