@@ -1,5 +1,5 @@
 
-function [M, inliers,trialcount,pvis] = ransac(x, fittingfn, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,findInliersFunc,stdest,winsize)
+function [M, inliers,trialcount,pvis] = ransac(x, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,stdest,winsize)
 
 debugf=0;
 
@@ -196,7 +196,7 @@ while N > trialcount
     % Find the number of inliers to this model.
     ninliers = length(inliers);
     
-    curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis,stdest,winsize);
+    curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis,stdest,winsize,x);
     
     
     
@@ -224,7 +224,7 @@ while N > trialcount
         
         
         if(firstScoreFlag<eps)% making sure pvis are used correctly
-            curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis,stdest,winsize);
+            curerror=scorefunctions(errorFunc, size(x,2),inliers ,residuals,t,pvis,stdest,winsize,x);
             firstScoreFlag=1;
         end
         
