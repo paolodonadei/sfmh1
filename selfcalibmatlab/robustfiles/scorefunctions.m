@@ -1,4 +1,4 @@
-function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,pvis,stdest,winsize)
+function [scores] = scorefunctions(typenum, size,consideredInliers, residuals,t,pvis,stdest,winsize,x)
 
 if(typenum==1 )
     scores = ransacScore(typenum, size,consideredInliers, residuals,t);
@@ -10,6 +10,9 @@ elseif( typenum==3 )
 elseif( typenum==4 )
     miu = mean(pvis);
     scores =  MLESACscore(residuals, miu,stdest,winsize);
+elseif( typenum==5 )
+
+    scores =   LEVERAGEscore(consideredInliers,x);
 else
     display('whaaaaaaaaaaaaaaaaat');
 end
@@ -17,7 +20,12 @@ end
 
 
 end
+function   [score] = LEVERAGEscore(consideredInliers,x)
 
+[L] = calc_leveragefromCorrs(x(:,consideredInliers));
+score=mean(L);
+
+end
 
 
 function   [score] = MLESACscore(residuals,mixparam,stdest,windowsize)

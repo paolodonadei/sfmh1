@@ -1,6 +1,6 @@
 function [F, iters,pvisot] = fundmatrixrobustgeneral(corrs,typenum,winsize)
 
-debugf=1;
+debugf=0;
 
 if(nargin <2)
     display('wrong number of arguments');
@@ -37,13 +37,13 @@ fittingfn = @vgg_F_from_7pts_2img2;
 distfn    = @sampsonF;
 degenfn   = @isdegenerate;
 
-
+algNameHash=struct('RANSAC',1,'MSAC',2,'MLESAC',3,'LIANG',4,'COOKUPDATE1',5,'COOKUPDATE2',6,'COOKUPDATE3',7,'COOKUPDATE4',8,'COOKUPDATE5',9);
 samplingHash=struct('UNIFORMSAMPLING',1,'MONTECARLO',2);
 updateHash=struct('NOCHANGE',1,'COOKUPDATE',2,'LIANG',3,'ACCUMULATION',4,'EXPERIMENTAL1',5,'EXPERIMENTAL2',6);
-scoreHash=struct('RANSACSCORE',1,'MSACSCORE',2,'MLESAC',3,'MLESACMIUFROMPVI',4);
+scoreHash=struct('RANSACSCORE',1,'MSACSCORE',2,'MLESAC',3,'MLESACMIUFROMPVI',4,'LEVERAGESCORE',5);
 initialPVIHash=struct('ONES',1,'POINTZEROFIVE',2,'FROMLEVERAGE',3,'INITIALIZELEVERAGE',4);
-iterationsHash=struct('NORMAL',1,'PVICONVERGE',2,'INLIERPVICONVERGE',3);
-finalFitHash=struct('NORMAL',1,'WEIGHTED',2,'WEIGHTEDTRIMMED',3);
+iterationsHash=struct('NORMAL',2,'PVICONVERGE',1,'MEDIANCONVERG',3,'INLIERPVICONVERGE',4);
+finalFitHash=struct('NORMAL',2,'WEIGHTED',1,'WEIGHTEDTRIMMED',3);
 % 1- RANSACV
 % 2- MSAC
 % 3- Residual based pvi
@@ -53,20 +53,62 @@ finalFitHash=struct('NORMAL',1,'WEIGHTED',2,'WEIGHTEDTRIMMED',3);
 % 7- cook with update and cook based score using likelihoods
 % 8- cook wit update and cook based score and accumulation of pvis over
 
-algorithms(1)= struct('f1', 1, 'f2', 3)
-scorefunc =  typenum;
-randSampFunc =  typenum;
-updatepviFunc = typenum;
-initpvis = calcInitialPvis(typenum, x1, x2);
-updateIterationFunc=typenum;
-findInliersFunc=typenum;
-finalfitOption=typenum;
+
+% RANSAC
+algorithms(1).SAMPLINGMETHOD= samplingHash.UNIFORMSAMPLING;
+algorithms(1).UPDATEPVIMETHOD= updateHash.NOCHANGE;
+algorithms(1).SCOREMETHOD=scoreHash.RANSACSCORE;
+algorithms(1).INITIALPVIMETHOD=initialPVIHash.ONES;
+algorithms(1).ITERATIONNUMBERMETHOD=iterationsHash.NORMAL;
+algorithms(1).FINALFITTINGMETHOD=finalFitHash.NORMAL ;
+
+
+% MSAC
+algorithms(2)=algorithms(1);
+algorithms(2).SCOREMETHOD=scoreHash.MSACSCORE;
+
+
+%MLESAC
+algorithms(3)=algorithms(1);
+algorithms(3).SCOREMETHOD=scoreHash.MLESAC;
+
+% cookupdate
+
+algorithms(5).SAMPLINGMETHOD= samplingHash.MONTECARLO;
+algorithms(5).UPDATEPVIMETHOD= updateHash.COOKUPDATE;
+algorithms(5).SCOREMETHOD=scoreHash.MSACSCORE;
+algorithms(5).INITIALPVIMETHOD=initialPVIHash.POINTZEROFIVE;
+algorithms(5).ITERATIONNUMBERMETHOD=iterationsHash.PVICONVERGE;
+algorithms(5).FINALFITTINGMETHOD=finalFitHash.WEIGHTED;
+
+
+% cookupate 2 score variation
+algorithms(6)=algorithms(5);
+algorithms(6).SCOREMETHOD=scoreHash.MLESAC;
+
+
+% cookupate 3 score variation
+algorithms(7)=algorithms(5);
+algorithms(7).SCOREMETHOD=scoreHash.MLESACMIUFROMPVI;
+
+% cookupate 4 score variation
+algorithms(8)=algorithms(5);
+algorithms(8).SCOREMETHOD=scoreHash.RANSACSCORE;
+
+% cookupate 5 score variation
+algorithms(9)=algorithms(5);
+algorithms(9).SCOREMETHOD=scoreHash.LEVERAGESCORE;
+
+initpvis = calcInitialPvis(algorithms(typenum).INITIALPVIMETHOD, x1, x2);
+
 stdest=1;
+
+pvis=initpvis;
 
 pvis=initpvis;
 if(typenum~=0)
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [Fz, inliers,iters,pvis] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t,scorefunc,randSampFunc,initpvis,updatepviFunc,updateIterationFunc,findInliersFunc,stdest,winsize);
+    [Fz, inliers,iters,pvis] = ransac([x1; x2], distfn, degenfn, s, t,algorithms(typenum).SCOREMETHOD,algorithms(typenum).SAMPLINGMETHOD,initpvis,algorithms(typenum).UPDATEPVIMETHOD,algorithms(typenum).ITERATIONNUMBERMETHOD,stdest,winsize);
     
 else
     iters=0;
@@ -79,12 +121,12 @@ end
 
 % pay attention to these guys
 
-if(finalfitOption==1 )
+if(algorithms(typenum).FINALFITTINGMETHOD==1 )
     
     F = fundmatrix(x1, x2,pvis,0);
-elseif(finalfitOption==2 )
+elseif(algorithms(typenum).FINALFITTINGMETHOD==2 )
     F = fundmatrix(x1(:,inliers), x2(:,inliers));
-elseif(finalfitOption==3 )
+elseif(algorithms(typenum).FINALFITTINGMETHOD==3 )
     
     for i=1:npts
         if(pvis(i,1)<0.5)
@@ -101,8 +143,8 @@ if(debugf==1)
     global corrsclean;
     [bestInliers, bestF, residuals, meaner,varer,meder,numins] = sampsonF(F, corrsclean );
     
-    display([' linear ' num2str(meaner)]);
-    
+    display([' final error : ' num2str(meaner)]);
+    display([' iterations :  ' num2str(iters)]);
 end
 
 

@@ -5,7 +5,7 @@ if(typenum==1 )
 elseif(typenum==2)
     initpvis=ones(npts,1)*0.05;
 elseif(typenum==3 )
-     [Fnew,initpvis] = fundmatrix(x1, x2);
+    initpvis = calc_leveragefromCorrs(x1, x2);
 elseif(typenum==4 )
     initpvis = initLeveragepvi( x1, x2);
 else
