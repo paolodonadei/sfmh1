@@ -3,7 +3,7 @@ function [M, inliers,trialcount,pvis] = ransac(x, distfn, degenfn, s, t,errorFun
 
 debugf=0;
 
-maxTrials = 6000;
+maxTrials = 8000;
 maxDataTrials = 100;
 feedback = 0;
 

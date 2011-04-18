@@ -9,11 +9,11 @@ elseif(updatetype==3)
     [outpvis] = cookUpdatepureresLIANG(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
     outinitpvi=initialPvi ;
 elseif(updatetype==4 )
-    [outpvis, outinitpvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+   [outpvis, outinitpvi] = cookUpdatelevupPVILEVaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==5)
-    [outpvis, outinitpvi] = cookUpdatelevupCompete(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+    [outpvis, outinitpvi] =cookUpdatelevupPVI(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 elseif(updatetype==6 )
-    [outpvis, outinitpvi] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+    [outpvis, outinitpvi] = cookUpdatelevupLEV(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 else
     display('wrooong');
 end
@@ -137,12 +137,25 @@ else
 end
 
 end
-function   [pviso,initialPvi] = cookUpdatelevupaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+function   [pviso,initialPvi] = cookUpdatelevupPVILEVaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
 [pvison,initialPvin] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
 
-pviso=(pvison+pvis)./2;
-initialPvin=(initialPvi+initialPvin)./2;
+pviso=((pvison)+pvis)./2;
+initialPvi=(initialPvi+(2*initialPvin))./3;
+end
+function   [pviso,initialPvi] = cookUpdatelevupPVI(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+[pvison,initialPvin] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+
+pviso=((pvison)+pvis)./2;
+initialPvi=initialPvin;
+end
+function   [pviso,initialPvi] = cookUpdatelevupLEV(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+
+[pvison,initialPvin] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter);
+pviso=pvison;
+initialPvi=(initialPvi+(2*initialPvin))./3;
 end
 
 function   [pviso,initialPvio] = cookUpdatelevup(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
@@ -202,7 +215,7 @@ end
 
 
 
-function   [pviso,initialPvio] = cookUpdatelevupCompete2(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+function   [pviso,initialPvio] = cookUpdatelevupPVIaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
 thresh=1.96*1.96;
 while(size(inliers,2)<8)
@@ -225,12 +238,12 @@ end
 [cdi] = findCookDistance(initialPvio,  residualsnew,9,size(initialPvio,1));
 [pviso]=findProbabilitiesRobust(cdi,1/10); % here we assume a std for cook's distance
 
-pviso=(pviso + pvis)/2;
+pviso=((pviso) + pvis)/2;
 end
 
 
 
-function   [pviso,initialPvio] = cookUpdatelevupCompete3(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
+function   [pviso,initialPvio] = cookUpdatelevupLEVERAGEaccumulate(initialPvi,pvis,residuals,t,inliers,x, currentIter,totalIter)
 
 thresh=1.96*1.96;
 while(size(inliers,2)<8)

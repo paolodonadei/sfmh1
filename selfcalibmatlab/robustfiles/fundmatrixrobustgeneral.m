@@ -39,7 +39,7 @@ degenfn   = @isdegenerate;
 
 algNameHash=struct('RANSAC',1,'MSAC',2,'MLESAC',3,'LIANG',4,'COOKUPDATE1',5,'COOKUPDATE2',6,'COOKUPDATE3',7,'COOKUPDATE4',8,'COOKUPDATE5',9);
 samplingHash=struct('UNIFORMSAMPLING',1,'MONTECARLO',2);
-updateHash=struct('NOCHANGE',1,'COOKUPDATE',2,'LIANG',3,'ACCUMULATION',4,'EXPERIMENTAL1',5,'EXPERIMENTAL2',6);
+updateHash=struct('NOCHANGE',1,'COOKUPDATE',2,'LIANG',3,'ACCUMULATIONLEVANDPVI',4,'ACCUMULATEPVI',5,'ACCUMULATELEVERAGE',6);
 scoreHash=struct('RANSACSCORE',1,'MSACSCORE',2,'MLESAC',3,'MLESACMIUFROMPVI',4,'LEVERAGESCORE',5);
 initialPVIHash=struct('ONES',1,'POINTZEROFIVE',2,'FROMLEVERAGE',3,'INITIALIZELEVERAGE',4);
 iterationsHash=struct('NORMAL',2,'PVICONVERGE',1,'MEDIANCONVERG',3,'INLIERPVICONVERGE',4);
@@ -73,7 +73,9 @@ algorithms(3)=algorithms(1);
 algorithms(3).SCOREMETHOD=scoreHash.MLESAC;
 
 % cookupdate
-
+%1)  score was decided to be msac
+%2) point zero starting pvi
+% 3) iteration method of the regular method also proved to be the best
 algorithms(5).SAMPLINGMETHOD= samplingHash.MONTECARLO;
 algorithms(5).UPDATEPVIMETHOD= updateHash.COOKUPDATE;
 algorithms(5).SCOREMETHOD=scoreHash.MSACSCORE;
@@ -84,20 +86,20 @@ algorithms(5).FINALFITTINGMETHOD=finalFitHash.WEIGHTED;
 
 % cookupate 2 score variation
 algorithms(6)=algorithms(5);
-algorithms(6).SCOREMETHOD=scoreHash.MLESAC;
+algorithms(6).UPDATEPVIMETHOD= updateHash.ACCUMULATIONLEVANDPVI;
 
 
 % cookupate 3 score variation
 algorithms(7)=algorithms(5);
-algorithms(7).SCOREMETHOD=scoreHash.MLESACMIUFROMPVI;
+algorithms(7).UPDATEPVIMETHOD= updateHash.ACCUMULATEPVI;
 
 % cookupate 4 score variation
 algorithms(8)=algorithms(5);
-algorithms(8).SCOREMETHOD=scoreHash.RANSACSCORE;
+algorithms(8).UPDATEPVIMETHOD= updateHash.ACCUMULATELEVERAGE;
 
 % cookupate 5 score variation
 algorithms(9)=algorithms(5);
-algorithms(9).SCOREMETHOD=scoreHash.LEVERAGESCORE;
+algorithms(9).ITERATIONNUMBERMETHOD=iterationsHash.PVICONVERGE;
 
 initpvis = calcInitialPvis(algorithms(typenum).INITIALPVIMETHOD, x1, x2);
 

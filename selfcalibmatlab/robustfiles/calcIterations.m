@@ -27,7 +27,7 @@ elseif(updateIterationFunc==2)
     pNoOutliers = min(1-eps, pNoOutliers);% Avoid division by 0.
     N = log(1-p)/log(pNoOutliers);
 elseif(updateIterationFunc==3)
-    threshold=0.04; % I dont know what else to use or how to detect convergence
+    threshold=0.06; % I dont know what else to use or how to detect convergence
     v=median(abs(pvidiff));
     
     fracinliers =  ninliers/npts;
@@ -45,7 +45,7 @@ elseif(updateIterationFunc==3)
         
     end
 elseif(updateIterationFunc==4)
-    threshold=0.04; % I dont know what else to use or how to detect convergence
+    threshold=0.05; % I dont know what else to use or how to detect convergence
     v=mean(abs(pvidiff(inliers',:)));
     
     fracinliers =  ninliers/npts;
