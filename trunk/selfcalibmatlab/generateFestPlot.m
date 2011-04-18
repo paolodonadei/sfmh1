@@ -3,7 +3,7 @@ function [ t,means_mean ] =     generateFestPlot(type, variance,repeat, startp, 
 tt=1.96*1.96;
 seqname='merton1';
 numN=200;
-numPoints=6;
+numPoints=10;
 
 
 tStartprogram=tic;
@@ -47,8 +47,8 @@ dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 % AlgNames={ 'RANSAC','Residuals','cookFixed','cookUpdate','Liang','CookUpdateLikelihood'};
 % AlgFuncs={1,3,4,5,6,7};
 
-AlgNames={'cookUpdate','compete6','compete7','compete8','compete9'};
-AlgFuncs={5,6,7,8,9};
+AlgNames={'RANSAC','MSAC','MLESAC','cookUpdate','compete8'};
+AlgFuncs={1,2,3,5,8};
 
 numalgs=size(AlgFuncs,2);
 
