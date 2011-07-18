@@ -44,6 +44,7 @@ scoreHash=struct('RANSACSCORE',1,'MSACSCORE',2,'MLESAC',3,'MLESACMIUFROMPVI',4,'
 initialPVIHash=struct('ONES',1,'POINTZEROFIVE',2,'FROMLEVERAGE',3,'INITIALIZELEVERAGE',4);
 iterationsHash=struct('NORMAL',2,'PVICONVERGE',1,'MEDIANCONVERG',3,'INLIERPVICONVERGE',4);
 finalFitHash=struct('NORMAL',2,'WEIGHTED',1,'WEIGHTEDTRIMMED',3);
+preVerification=struct('NORMAL',1,'TDD',2,'SPRT',3);
 % 1- RANSACV
 % 2- MSAC
 % 3- Residual based pvi
@@ -61,11 +62,17 @@ algorithms(1).SCOREMETHOD=scoreHash.RANSACSCORE;
 algorithms(1).INITIALPVIMETHOD=initialPVIHash.ONES;
 algorithms(1).ITERATIONNUMBERMETHOD=iterationsHash.NORMAL;
 algorithms(1).FINALFITTINGMETHOD=finalFitHash.NORMAL ;
-
+algorithms(1).PREVERIFIC=preVerification.NORMAL ;
 
 % MSAC
 algorithms(2)=algorithms(1);
 algorithms(2).SCOREMETHOD=scoreHash.MSACSCORE;
+
+
+
+% MSAC TDD
+algorithms(12)=algorithms(1);
+algorithms(12).PREVERIFIC=preVerification.TDD ;
 
 
 %MLESAC
@@ -109,9 +116,11 @@ pvis=initpvis;
 
 pvis=initpvis;
 if(typenum~=0)
+     tStart = tic; 
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [Fz, inliers,iters,pvis] = ransac([x1; x2], distfn, degenfn, s, t,algorithms(typenum).SCOREMETHOD,algorithms(typenum).SAMPLINGMETHOD,initpvis,algorithms(typenum).UPDATEPVIMETHOD,algorithms(typenum).ITERATIONNUMBERMETHOD,stdest,winsize);
-    
+    [Fz, inliers,iters,pvis] = ransac([x1; x2], distfn, degenfn, s, t,algorithms(typenum).SCOREMETHOD,algorithms(typenum).SAMPLINGMETHOD,initpvis,algorithms(typenum).UPDATEPVIMETHOD,algorithms(typenum).ITERATIONNUMBERMETHOD,stdest,winsize,algorithms(typenum).PREVERIFIC);
+     tElapsed = toc(tStart);
+     
 else
     iters=0;
     inliers=1:1:npts;
@@ -147,6 +156,8 @@ if(debugf==1)
     
     display([' final error : ' num2str(meaner)]);
     display([' iterations :  ' num2str(iters)]);
+    display(['time elapsed is ' num2str(tElapsed)]);
+    display(['time per iteration is ' num2str((tElapsed/iters)*1000)]);
 end
 
 

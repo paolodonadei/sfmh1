@@ -1,7 +1,11 @@
 
-function [M, inliers,trialcount,pvis] = ransac(x, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,stdest,winsize)
+function [M, inliers,trialcount,pvis] = ransac(x, distfn, degenfn, s, t,errorFunc,randSampFunc ,initialPvi,updatepviFunc,updateIterationFunc,stdest,winsize,prever)
 
 debugf=0;
+numTest=0;
+
+
+
 
 maxTrials = 8000;
 maxDataTrials = 100;
@@ -77,6 +81,11 @@ bestM = NaN;      % Sentinel value allowing detection of solution failure.
 trialcount = 0;
 besterror =  100000000000;
 N = 1;            % Dummy initialisation for number of trials.
+if(prever==2)
+    s=8;
+    numTest=1;
+    N=10000;
+end
 
 while N > trialcount
     
@@ -172,10 +181,23 @@ while N > trialcount
     % array of possible models 'distfn' will return the model that has
     % the most inliers.  After this call M will be a non-cell object
     % representing only one model.
-    [binliers, M, residuals, meaner,varer,meder,numins] = feval(distfn, M, x, t);
+    
+    
+    if(prever==2 )
+        [vbinliers, vM, vresiduals, vmeaner,vvarer,vmeder,vnumins] = feval(distfn, M, x, t,numTest,ind);
+        if(vmeaner>5)
+       %     display(['skippped ' num2str(vmeaner)]);
+            trialcount = trialcount+1;
+            
+            continue;
+        end
+     %   display(['NOT skippped' num2str(vmeaner)]);
+    end
+    
+    [binliers, M, residuals, meaner,varer,meder,numins] = feval(distfn, M, x, t,0);
     
     if(debugf==1 && exist('corrsclean'))
-        [dbinliers, dM, dresiduals, dmeaner,dvarer,dmeder,dnumins] = feval(distfn, M, corrsclean, t);
+        [dbinliers, dM, dresiduals, dmeaner,dvarer,dmeder,dnumins] = feval(distfn, M, corrsclean, t,numTest);
         fprintf(fid,[ ' e= ' num2str(dmeaner) ' , ' ]);
     elseif (debugf==1 && ~exist('corrsclean'))
         fprintf(fid,[ ' e= NA , ' ]);
