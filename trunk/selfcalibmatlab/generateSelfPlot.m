@@ -72,8 +72,8 @@ fid = fopen([curdirname '/exp' nowtime '.txt'], 'w');
 fidgraph = fopen([curdirname '/graphdata' nowtime '.txt'], 'w');
 dispfid = fopen([curdirname '/dispcommands' nowtime '.txt'], 'w');
 
-AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','Weighted'};
-AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEssNframGeometric};
+AlgNames={ 'Un-robust','Case Deletion', 'M-estimator', 'RANSAC','Weighted','Hough'};
+AlgFuncs={ @S2nonlinsolveEssNfram ,@S2nonlinsolveEssNframdiagnostics, @S2nonlinsolveEssNframestimator ,  @S2nonlinsolveEssRansac,@S2nonlinsolveEssNframGeometric,@S2nonlinsolveEsstwofram};
 
 
 
