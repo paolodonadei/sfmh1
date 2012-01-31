@@ -120,7 +120,7 @@ for i=1:numFs
     solvector(curcounter,1)=x(1,1);
     curcounter=curcounter+1;
 end
-
+%solvector
 sln=mean(solvector);
 
 bestf=sln;

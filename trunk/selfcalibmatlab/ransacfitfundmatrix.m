@@ -76,7 +76,7 @@ function [F, inliers,trialcount] = ransacfitfundmatrix(x1, x2,  feedback)
     distfn    = @funddist;
     degenfn   = @isdegenerate;
     % x1 and x2 are 'stacked' to create a 6xN array for ransac
-    [F, inliers,trialcount] = ransac([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
+    [F, inliers] = ransactraditional([x1; x2], fittingfn, distfn, degenfn, s, t, feedback);
 
     % Now do a final least squares fit on the data points considered to
     % be inliers.

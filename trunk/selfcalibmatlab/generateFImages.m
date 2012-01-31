@@ -42,7 +42,7 @@ for i=1:numimages
     
 end
 
-[height,width]=size(IMS{1,1});
+[height,width,ch]=size(IMS{1,1});
 
 [m,numIs]=size(IMS);
 
